@@ -1,0 +1,43 @@
+{
+  "stage": 3,
+  "status": "LOCKED",
+  "design_version": "stage3-v1",
+  "population": "DEFINE AT STAGE 3",
+  "grain": "one row per request",
+  "request_id": "SR_NUMBER",
+  "decision_window": {
+    "start": "LOCK AT STAGE 3",
+    "end": "LOCK AT STAGE 3",
+    "boundary_semantics": "LOCK AT STAGE 3"
+  },
+  "open_definition": "LOCK AT STAGE 3",
+  "urgency_definition": "LOCK AT STAGE 3",
+  "decision_rules": {
+    "ESCALATE": "LOCK AT STAGE 3",
+    "INCONCLUSIVE": "LOCK AT STAGE 3",
+    "STANDARD": "LOCK AT STAGE 3"
+  },
+  "selected_definition": "LOCK AT STAGE 3",
+  "locked_knob": {
+    "name": "LOCK EXACTLY ONE OWNER-TUNABLE KNOB",
+    "value": "LOCK AT STAGE 3"
+  },
+  "reconciliation_critical_fields": [
+    "SR_NUMBER",
+    "is_in_window",
+    "is_open",
+    "is_eligible",
+    "action",
+    "selected"
+  ],
+  "source_delivery_contract": "LOCK REQUIRED SOURCE FIELDS, MECHANICAL TRANSFORMATIONS, AND EXTRACTION ENVELOPE",
+  "fixture_version": "fixtures-v1",
+  "required_outputs": [
+    "R-A judged output",
+    "R-B judged output",
+    "fixture results for both paths",
+    "exact reconciliation table",
+    "structural cross-review",
+    "validated action list"
+  ]
+}
