@@ -14,13 +14,21 @@ This project must demonstrate the same five-stage method on a materially differe
 4. **Execution, Independent Validation, and optional deeper analysis**
 5. **Interpretation and Recommendation**
 
-Do not merely tell three AIs to analyze Chicago 311 data. At every stage, open the controlling GitHub framework, follow its roles and procedures, preserve its records and independence requirements, produce its required artifacts, and pass its gate before continuing.
+The five-stage method now includes a separate **deterministic R workflow-enforcement layer**. The AIs still reason, design, build, critique, and interpret. The R workflow gate does not replace them. Its job is to verify that the prescribed procedure was actually followed before Stage 5 is allowed to begin.
+
+The governing pattern is:
+
+> **AI proposes and reviews → locked artifacts are preserved → Stage 4 validates the analysis → R verifies procedural compliance → PASS permits Stage 5 / FAIL returns the work for repair.**
+
+Do not merely tell three AIs to analyze Chicago 311 data. At every stage, open the controlling framework, follow its roles and independence requirements, preserve required records, produce required artifacts, and pass the proper gate before continuing.
+
+A verbal statement by Grok Bot or another AI that a stage was followed is not sufficient evidence that it was followed.
 
 ---
 
-## 1. Controlling GitHub files
+## 1. Controlling files
 
-Use the current version of each controlling file.
+Use the current version of each controlling framework.
 
 ### Stages 1–2 — Start and Framing
 
@@ -34,21 +42,29 @@ https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/three
 
 https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/three-ai-validation-and-analysis-framework.md
 
-For this project, Stage 4 follows the current canonical architecture in that framework:
+For Chicago 311, Stage 4 follows this canonical architecture:
 
-> **controlled SQL source delivery → SQL Source Gate → independent R-A and R-B judged implementations → exact reconciliation → structural cross-review → validated-data freeze**
+> **controlled SQL source delivery → SQL Source Gate → independent R-A and R-B judged implementations → fixture gate → exact reconciliation → structural cross-review → validated-data freeze**
 
 ### Optional Stage 4 R Workflow Engine
 
-Use only if a modular R report, Excel output, or other post-gate R workflow is genuinely needed:
+Use only if a modular post-gate R report, Excel output, or other secondary R workflow is genuinely needed:
 
 https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/ENGINE.md
 
-Do not invoke ENGINE.md merely because R appears somewhere in the project.
+Do not generate both independent Stage 4 judged builders from one common ENGINE implementation, shared judged-code template, or shared judged helper library.
 
-Do **not** generate both independent Stage 4 validation builders from one common ENGINE.md implementation, shared judged-code template, or shared function library. That would weaken meaningful independence.
+### Cross-stage deterministic workflow gate
 
-ENGINE.md is primarily an optional post-validation implementation aid after the appropriate gate.
+Project-local enforcement code:
+
+`validation/workflow-gate/workflow_gate.R`
+
+Project-local gate documentation:
+
+`validation/workflow-gate/README.md`
+
+This R gate is a **procedural referee**. It does not redo Stage 4 reconciliation and does not decide whether the Stage 3 measurement design is philosophically or methodologically correct.
 
 ### Stage 5 — Interpretation and Recommendation
 
@@ -56,21 +72,17 @@ https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/three
 
 ### Dataset 1 process precedent
 
-The FulfillIQ 2.0 repository may be consulted only as a precedent for orchestration structure, artifact organization, independence, gates, and reproducibility:
+The FulfillIQ 2.0 repository may be consulted only as precedent for orchestration structure, artifact organization, independence, gates, and reproducibility:
 
 https://github.com/markjamesc/fulfilliq-2.0
 
 FulfillIQ 2.0 is not analytical evidence for this project.
 
-Do not copy its business decision, stakeholder brief, question, measurement rules, SQL logic, seller thresholds, action rules, or recommendation.
-
-Its old `SQL A / SQL B / R(B)` implementation is historical precedent, not the Stage 4 architecture for Chicago 311.
-
 If conversational memory conflicts with the current controlling GitHub files, the GitHub files control.
 
 ---
 
-## 2. Project identity
+## 2. Project identity and locked decision
 
 Project:
 
@@ -82,28 +94,7 @@ Repository:
 
 This is **Dataset 2 of 3** in the methodology evaluation.
 
-The purpose is to test whether the same five-stage method that worked on a relational e-commerce seller-enrollment problem can control a different class of problem:
-
-- one large operational source;
-- request-level grain;
-- open-work triage;
-- time-window logic;
-- ambiguous operational warrant;
-- and a three-way action decision.
-
-This is not a Kaggle competition.
-
-This is not a dashboard project.
-
-This is not an exercise in maximizing a prediction score.
-
-This is not a live City of Chicago deployment.
-
----
-
-## 3. Locked decision
-
-The human owner has already locked the decision class.
+This is not a Kaggle competition, dashboard exercise, prediction leaderboard, or live City of Chicago deployment.
 
 The only decision is:
 
@@ -117,31 +108,15 @@ Allowed final actions are exactly:
 - `INCONCLUSIVE`
 - `STANDARD`
 
-Do not add additional decision classes unless the human owner explicitly changes the lock.
+The action list is a **portfolio simulation**. Never describe an `ESCALATE` result as an actual city dispatch order or imply City endorsement.
 
-The action list is a **portfolio simulation**.
-
-A successful analytical gate does not mean the City of Chicago should adopt or execute the result.
-
-Never describe an `ESCALATE` result as an actual city dispatch order.
-
-Do not expand the project into:
-
-- service-performance reporting;
-- neighborhood ranking;
-- employee performance;
-- resource allocation across departments;
-- causal evaluation of city operations;
-- forecasting total 311 volume;
-- a dashboard;
-- a machine-learning leaderboard;
-- or a second decision.
+Do not expand the project into service-performance reporting, neighborhood ranking, employee performance, department-wide resource allocation, causal evaluation, forecasting total 311 volume, a dashboard, or a second decision.
 
 One dataset = one decision.
 
 ---
 
-## 4. Data authority
+## 3. Data authority
 
 Primary source:
 
@@ -151,34 +126,11 @@ Official portal:
 
 https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy
 
-Dataset ID:
+Dataset ID: `v6vf-nfxy`
 
-`v6vf-nfxy`
+Use the owner's frozen official CSV snapshot rather than stale mirrors or derivative Kaggle datasets.
 
-The owner downloaded one complete official CSV snapshot from the City of Chicago portal.
-
-Prefer this frozen official snapshot over stale Kaggle mirrors.
-
-Do not substitute the abandoned-vehicles Kaggle split or another derivative dataset.
-
-The raw source must remain unchanged.
-
-Do not clean, filter, recode, deduplicate, or otherwise alter the authoritative raw file before Stage 3 defines the treatment.
-
-The raw file itself should not be committed to GitHub because of its size.
-
-Maintain a source manifest recording, when available:
-
-- source URL;
-- dataset ID;
-- download date/time;
-- raw filename;
-- byte size;
-- checksum if produced;
-- row count after verified import;
-- column count;
-- MySQL location;
-- and any import warnings or anomalies.
+The raw source must remain unchanged. Do not clean, filter, recode, deduplicate, or otherwise alter the authoritative raw file before Stage 3 defines treatment.
 
 Known database target:
 
@@ -189,104 +141,69 @@ table:  raw_311_requests
 
 The raw table has 39 source columns.
 
-The MySQL import must be independently verified before Stage 4 execution relies on it.
+Maintain `docs/source-manifest.md` with source URL, dataset ID, download details, raw filename, size, checksum if available, verified row/column counts, database location, and import anomalies.
 
-Do not claim the import succeeded merely because a command ran.
-
-Preserve evidence of:
-
-- final imported row count;
-- schema/column count;
-- duplicate-ID checks;
-- date coverage;
-- status values;
-- parse anomalies;
-- and any import warnings.
-
-Raw-import verification and the Stage 4 SQL Source Gate are related but distinct:
+Raw-import verification and the Stage 4 SQL Source Gate are distinct:
 
 - **raw-import verification** establishes that the official CSV was faithfully loaded into `raw_311_requests`;
-- **SQL Source Gate** establishes that the controlled source package delivered to R-A and R-B faithfully represents the authorized raw source contract.
+- **SQL Source Gate** establishes that the controlled source package supplied to R-A and R-B faithfully represents the authorized source contract.
 
-Neither one substitutes for the other.
+Neither substitutes for the other.
 
 ---
 
-## 5. Core methodological locks
+## 4. Core methodological locks
 
-The following project rules are mandatory.
+Before Stage 4 judged builders run, Stage 3 must freeze at least:
 
-### 5.1 Freeze before builders
-
-The following must be frozen before Stage 4 judged builders receive their packets:
-
-- decision window;
+- decision window and boundary semantics;
 - known-case fixtures;
 - eligible-universe definition;
+- one-row-per-request grain and request identifier;
 - open definition;
-- late/SLA or equivalent urgency definition;
-- action rule;
-- treatment of missing or contradictory evidence;
-- selected flag definition;
 - duplicate / identity treatment;
+- late/SLA/urgency or equivalent decision evidence;
+- ESCALATE / INCONCLUSIVE / STANDARD rules;
+- missing and contradictory evidence treatment;
+- selected flag definition;
 - reconciliation-critical fields;
 - source-delivery contract;
-- attestation rule;
-- and the one permitted locked decision knob.
+- lineage and attestation requirements;
+- Stage 4 output contract;
+- and exactly one permitted owner-tunable decision knob.
 
-Do not rewrite fixtures after a builder fails them.
+Do not rewrite fixtures after a builder fails them. Fix the implementation, not the fixture. An owner-authorized fixture correction creates a new frozen fixture version and requires affected work to be rerun.
 
-A failed fixture is evidence against an implementation, not permission to alter the fixture.
+### Warrant versus translation versus procedure
 
-### 5.2 One locked knob
+Keep three questions separate:
 
-Stage 3 may define exactly one owner-tunable decision knob.
+**Translation:** Did R-A and R-B independently translate the locked Stage 3 contract into the same judged result?
 
-Do not create a hidden collection of adjustable thresholds that can be tuned after seeing the selected request IDs.
+**Warrant:** Does the locked contract provide a defensible reason for assigning ESCALATE, INCONCLUSIVE, or STANDARD?
 
-All other cutoffs or categorical rules must be:
+**Procedure:** Were the prescribed stages, locks, fixtures, independent builds, validations, evidence files, and versions actually completed as required?
 
-- externally documented;
-- logically required by a definition;
-- fixed by the stakeholder requirement;
-- or explicitly disclosed as methodological judgments.
+Stage 4 exact reconciliation addresses translation consistency.
 
-### 5.3 Warrant versus translation
+The Warrant Ledger and methodological review address warrant.
 
-Keep two different questions separate:
+The deterministic R workflow gate addresses procedural compliance.
 
-**Translation question:** Did R-A and R-B independently translate the locked Stage 3 specification into the same judged result?
+None of these three proves the other two.
 
-**Warrant question:** Does the locked specification provide a defensible reason for classifying a request as ESCALATE, INCONCLUSIVE, or STANDARD?
-
-Exact R-A / R-B agreement can establish translation consistency.
-
-It cannot by itself establish that the escalation rule is substantively warranted.
-
-The SQL Source Gate answers a different question again:
-
-**Source-delivery question:** Did both R builders receive a faithful, authorized, nonjudgmental source package?
-
-Maintain a Warrant Ledger for every material cutoff or action criterion and classify its basis as one of:
+Maintain `docs/warrant-ledger.md` for material cutoffs and action criteria, classifying each basis as:
 
 - source-backed;
 - stakeholder-locked portfolio requirement;
 - methodological judgment;
 - unresolved/open.
 
-Residual project uncertainty is expected to concern warrant more than code translation.
-
-Do not hide that distinction.
-
 ---
 
-## 6. Repository and provenance
+## 5. Repository, provenance, and machine-readable receipts
 
-Use the repository:
-
-`chicago-311-dispatch-priority`
-
-Use a structure similar to:
+Use this structure as the controlling organization:
 
 ```text
 chicago-311-dispatch-priority/
@@ -300,176 +217,126 @@ chicago-311-dispatch-priority/
 │   │   ├── controlling-framework-manifest.md
 │   │   └── grokbot-conversation-transcript.md
 │   ├── stage-01-02-start-framing/
+│   │   ├── stage1_decision.json
+│   │   └── stage2_framing.json
 │   ├── stage-03-measurement-design/
+│   │   ├── stage3_locked_design.json
 │   │   └── fixtures/
 │   ├── stage-04-execution-validation/
+│   │   └── stage4_validation_status.json
 │   └── stage-05-interpretation/
-├── sql/
-│   └── source-delivery/
-├── R/
-│   ├── r-a/
-│   └── r-b/
-├── validation/
-│   ├── source-gate/
-│   ├── fixtures/
-│   ├── reconciliation/
-│   └── cross-review/
+├── sql/source-delivery/
+├── R/r-a/
+├── R/r-b/
+├── validation/source-gate/
+├── validation/fixtures/
+├── validation/reconciliation/
+├── validation/cross-review/
+├── validation/workflow-gate/
+│   ├── workflow_gate.R
+│   ├── workflow_gate_status.json
+│   └── README.md
 ├── outputs/
 └── data-documentation/
 ```
 
-Do not commit:
+The `.example.json` files in the stage folders are templates only. During the run, create the actual receipt without `.example` only after the corresponding gate truthfully passes.
 
-- the 5+ GB raw CSV;
-- passwords;
-- credentials;
-- private machine configuration;
-- unnecessary local filesystem paths;
-- or fabricated execution evidence.
+Required receipts:
 
-Preserve the exact final master prompt as:
+1. `docs/stage-01-02-start-framing/stage1_decision.json`
+2. `docs/stage-01-02-start-framing/stage2_framing.json`
+3. `docs/stage-03-measurement-design/stage3_locked_design.json`
+4. `docs/stage-04-execution-validation/stage4_validation_status.json`
+
+The R gate creates:
+
+5. `validation/workflow-gate/workflow_gate_status.json`
+
+Do not create a `PASS` receipt merely because the AIs agree that a step probably occurred. A receipt is a machine-readable statement backed by preserved project evidence.
+
+Do not commit the 5+ GB raw CSV, passwords, credentials, private machine configuration, or fabricated execution evidence.
+
+Preserve the exact final master prompt at:
 
 `docs/orchestration/master-orchestration-prompt.md`
 
-Do not silently rewrite it after the run begins.
+If the prompt materially changes after formal run start, preserve the previous version, record why it changed, identify affected stages, and determine whether a previously passed gate must reopen.
 
-If the prompt must materially change later:
-
-- preserve the previous version;
-- record the change;
-- record why it changed;
-- identify which stages are affected;
-- determine whether any previously passed gate must be reopened.
-
-Create or maintain:
-
-`docs/orchestration/controlling-framework-manifest.md`
-
-Record:
-
-- every controlling framework;
-- its URL;
-- its repository path;
-- commit/blob/retrieval version when available;
-- purpose;
-- and any access failure or substitution.
-
-Preserve the project-relevant Grok Bot conversation as:
-
-`docs/orchestration/grokbot-conversation-transcript.md`
-
-The transcript is process provenance, not analytical evidence.
-
-A conversation statement cannot prove that SQL executed, an R result existed, a Source Gate passed, reconciliation passed, or a validation gate passed.
-
-Those claims require preserved execution evidence.
+The Grok Bot conversation transcript is process provenance, not analytical evidence. Conversation text cannot prove that SQL executed, an R script ran, reconciliation passed, or a gate passed.
 
 ---
 
-## 7. Grok Bot's two separate functions
+## 6. Grok Bot roles
 
-Grok Bot performs two distinct functions:
+Grok Bot has two separate functions:
 
-- Framework Coordinator
-- Dana Brooks Simulator
+- **Framework Coordinator**
+- **Dana Brooks Simulator**
 
 Never blur them.
 
----
+### Framework Coordinator
 
-## 8. Framework Coordinator mode
+Grok Bot must:
 
-In Framework Coordinator mode, Grok Bot:
+- retrieve the controlling framework for the current stage;
+- assign required independent AI roles;
+- control information packets and preserve information barriers;
+- preserve first-pass independence;
+- record outputs, disagreements, failures, and revisions;
+- maintain open-item and warrant ledgers;
+- apply the framework's human/AI gates;
+- create the machine-readable stage receipt only after a gate truthfully passes;
+- run the deterministic R workflow gate at the required checkpoint;
+- route a failed R check back to the stage or implementation that owns it;
+- write approved handoffs;
+- determine when human-owner judgment is required;
+- and prevent premature movement into later stages.
 
-- retrieves the controlling framework for the current stage;
-- assigns the required independent AI roles;
-- controls information packets;
-- prevents unauthorized information leakage between AIs;
-- preserves required first-pass independence;
-- records outputs and disagreements;
-- maintains open-item and warrant ledgers;
-- applies gates;
-- writes approved handoffs;
-- determines when the human owner must decide;
-- and prevents premature movement into later stages.
+Coordinator statements are not stakeholder statements and do not substitute for owner approval.
 
-Coordinator statements are not stakeholder statements.
+### Dana Brooks Simulator
 
-Coordinator judgments are not substitutes for owner approval where owner approval is required.
+Dana Brooks is a fictional 311 Operations Duty Manager created solely for this portfolio exercise. She is not a real City of Chicago employee.
 
----
+Dana participates primarily in Stages 1–2. She provides a plausible operational stakeholder conversation without inventing actual Chicago policy.
 
-## 9. Dana Brooks mode
+When speaking as Dana:
 
-Dana Brooks is a fictional 311 Operations Duty Manager created solely for this portfolio exercise.
-
-She is not a real City of Chicago employee.
-
-Do not imply that her statements describe actual Chicago policy unless separately verified from an authoritative source.
-
-Dana participates primarily in Stages 1–2.
-
-She is the simulated practical decision owner through whom the Start and Framing process discovers and clarifies the already locked decision class.
-
-When Grok Bot switches into Dana mode:
-
-- respond only as Dana;
+- answer only as Dana;
 - remain consistent across dialogue turns;
 - speak as an operational stakeholder rather than an analyst;
-- begin with a plausible but incomplete request;
 - reveal business context gradually;
 - answer one analyst question at a time;
-- correct misunderstandings;
-- confirm, revise, or reject proposed decision statements;
-- confirm, revise, or reject the candidate analytical question;
-- distinguish business needs from technical implementation;
-- do not write SQL;
-- do not design R;
-- do not invent a real Chicago SLA;
-- do not fabricate municipal policy;
+- confirm, revise, or reject proposed decision statements and framing questions;
+- distinguish fictional portfolio requirements from real municipal policy;
+- do not write SQL or R;
+- do not invent a real City SLA;
 - do not invent analytical results;
 - and do not perform independent AI review while speaking as Dana.
-
-Dana may establish fictional portfolio business requirements, but they must be clearly distinguishable from factual claims about the City of Chicago.
-
-If a material policy fact is necessary and is not documented, mark it unresolved rather than allowing Dana to invent it as a real-world fact.
-
-The Coordinator may hold Dana's complete fictional brief.
-
-The Dialogue Lead and independent reviewers receive only what Dana has revealed through the recorded dialogue plus any explicitly authorized owner locks.
-
-Do not ask the human owner to role-play Dana.
-
-Grok Bot generates Dana's routine stakeholder responses.
 
 Human-owner approval remains distinct from fictional Dana approval.
 
 ---
 
-## 10. Three-AI rule
+## 7. Three-AI independence rule
 
 Use the roles defined by the controlling framework at every stage.
 
-Grok Bot must call genuinely separate AI instances when the framework requires independent work.
+Grok Bot must call genuinely separate AI instances when independent work is required. Do not simulate three independent first passes inside one response.
 
-Do not simulate three independent first passes inside one response.
-
-When Stage 4 independence is required:
+For Stage 4:
 
 - AI 1 builds **R-A** in a separate context;
 - AI 2 builds and audits the **controlled SQL source delivery**;
 - AI 3 builds **R-B** in a separate context;
-- R-A and R-B receive the same locked Stage 3 contract and the same verified source package;
-- R-A and R-B do not see one another's code before first-pass freeze;
-- R-A and R-B do not see one another's judged results before first-pass freeze;
-- no common judged request-ID list is supplied;
-- no common action function or judged helper function is supplied to both builders;
-- no builder is told what IDs the other builder selected;
-- and cross-review occurs only after the required independent outputs exist.
+- R-A and R-B receive the same locked Stage 3 contract, verified source package, frozen fixtures, and required output contract;
+- R-A and R-B do not see one another's code or judged output before first-pass freeze;
+- no common judged request-ID list, action list, selected set, or judged helper function is supplied;
+- and cross-review begins only after the required independent outputs exist.
 
-Both R builders may use tidyverse and owner-familiar R idioms.
-
-Different languages are not required for independence.
+Both R builders may use tidyverse and owner-familiar R idioms. Different programming languages are not required for independence.
 
 The AIs do not decide by majority vote.
 
@@ -482,78 +349,77 @@ Resolve disagreements using, in order:
 - preserved execution evidence;
 - human-owner decisions.
 
-If the evidence cannot resolve the dispute, classify it explicitly as:
-
-- Open;
-- Disputed;
-- Working assumption;
-- or Blocked.
+If unresolved, classify the issue as Open, Disputed, Working assumption, or Blocked.
 
 ---
 
-## 11. Stages 1–2 — Start and Framing
+## 8. Stages 1–2 — Start and Framing
 
 Open and follow the current Start and Framing framework.
 
-The owner has locked the destination decision class, but the analyst dialogue must still demonstrate the method.
+The owner has locked the destination decision class, but the dialogue must still demonstrate the method rather than simply handing the final analytical question to the Dialogue Lead.
 
-Do not simply hand the Dialogue Lead the final analytical question.
+Dana begins with a plausible incomplete operational request. The process must include:
 
-The simulated dialogue should show whether the Start process can discover the practical decision from a plausible incomplete stakeholder request.
+- Dana's initial request;
+- AI 1 Dialogue Lead drafting one concise stakeholder-facing question;
+- Dana responding one question at a time;
+- complete verbatim turn preservation;
+- AI 2 independent decision reconstruction at the required checkpoints;
+- AI 3 independent ambiguity / premature-framing attack;
+- reconciliation through the framework;
+- Start Gate;
+- candidate analytical question;
+- Framing review;
+- Dana confirmation/correction;
+- human-owner approval where required;
+- complete Stage 3 handoff.
 
-Dana should begin with an operational request such as needing to know which unresolved requests deserve attention this window, without giving the analyst the complete final measurement specification.
-
-The process must include:
-
-- Dana's initial request.
-- AI 1 Dialogue Lead drafts one concise stakeholder-facing question.
-- Grok Bot switches into Dana mode and answers.
-- Preserve the complete turn verbatim.
-- AI 2 independently reconstructs the decision at required checkpoints.
-- AI 3 independently attacks ambiguity and premature framing.
-- Their findings return to the Dialogue Lead.
-- The Dialogue Lead asks the next highest-value question.
-- Continue until the Start Gate passes or the work is blocked.
-- Draft one candidate analytical question.
-- Review it under the Framing framework.
-- Present it to Dana for confirmation or correction.
-- Obtain human-owner approval wherever required.
-- Produce the complete Stage 3 handoff.
-
-Ask only one stakeholder-facing question per dialogue turn.
-
-Do not define during Stages 1–2:
-
-- final SLA formulas;
-- final age cutoffs;
-- final escalation threshold;
-- SQL;
-- R;
-- implementation grain beyond what is needed to understand the decision;
-- statistical methods;
-- model architecture;
-- or final code rules.
-
-Stages 1–2 must converge on the locked decision rather than silently change it into a different problem.
+Do not lock final SLA formulas, age cutoffs, escalation thresholds, SQL, R, statistical methods, or final implementation rules during Stages 1–2.
 
 The final framing must preserve:
 
 - open requests;
-- a frozen decision window;
+- frozen decision window;
 - request-level action;
-- and the ESCALATE / INCONCLUSIVE / STANDARD decision.
+- ESCALATE / INCONCLUSIVE / STANDARD.
 
-Do not begin Stage 3 until both Start and Framing gates pass.
+### Required Stage 1 receipt
+
+After the Start Gate truthfully passes, create:
+
+`docs/stage-01-02-start-framing/stage1_decision.json`
+
+It must include at least:
+
+- `stage`
+- `status = LOCKED`
+- `decision_statement`
+- `decision_owner`
+
+Do not create the locked receipt while a blocking Start issue remains.
+
+### Required Stage 2 receipt
+
+After the Framing Gate truthfully passes, create:
+
+`docs/stage-01-02-start-framing/stage2_framing.json`
+
+It must include at least:
+
+- `stage`
+- `status = LOCKED`
+- `analytical_question`
+
+Do not begin Stage 3 until both framework gates have passed and both receipts exist.
 
 ---
 
-## 12. Stage 3 — Measurement Design
+## 9. Stage 3 — Measurement Design
 
 Open and follow the current Measurement Design framework.
 
-Stage 3 converts the approved decision and analytical question into a complete measurement contract before production SQL or R is written.
-
-Provide the three AIs only the authorized package, including:
+Provide the three AIs only the authorized package:
 
 - approved Stages 1–2 handoff;
 - source manifest;
@@ -563,460 +429,305 @@ Provide the three AIs only the authorized package, including:
 
 Stage 3 must explicitly lock:
 
-- decision window;
-- snapshot/cutoff semantics;
+- decision window and snapshot/cutoff semantics;
 - eligible universe;
-- one-row-per-request analytical grain;
+- one-row-per-request grain;
 - request identifier;
 - open definition;
-- treatment of closed or reopened records if relevant;
-- duplicate and legacy-record handling;
-- late/SLA/urgency definition;
-- evidence required for action assignment;
-- ESCALATE rule;
-- INCONCLUSIVE rule;
-- STANDARD rule;
+- duplicate / legacy handling;
+- urgency/lateness evidence;
+- exact action rules;
 - selected flag;
-- missing-data treatment;
-- contradiction treatment;
-- supporting measures;
-- segments if analytically necessary;
+- missing and contradictory evidence treatment;
+- supporting measures and necessary segments;
 - confounders and alternative explanations;
 - sensitivity checks;
-- exactly one locked knob;
-- validation fields;
-- audit fields;
-- reconciliation-critical fields;
+- exactly one locked owner-tunable knob;
+- audit and reconciliation-critical fields;
 - source-delivery contract;
-- permitted SQL mechanical transformations;
-- any permitted broad extraction envelope;
-- source-lineage requirements;
+- permitted mechanical SQL transformations and any extraction envelope;
+- source lineage;
 - attestation;
-- and Stage 4 output contract.
+- Stage 4 output contract;
+- and frozen fixture version.
 
-The source-delivery contract must specify which source fields R-A and R-B require and which transformations are mechanical rather than judged.
+Do not call a portfolio-defined threshold a City SLA unless an authoritative City source establishes that it is one.
 
-Stage 3 must keep the analytical judgments in the R paths wherever practical.
+### Frozen fixtures
 
-Do not assume that a field called `STATUS = Open` automatically answers every historical or operational question.
+Create and freeze known cases before either judged R builder begins. Include material boundaries such as eligible/open, ineligible/closed, decision-window boundary, action-threshold boundary, missing evidence, contradictory evidence, duplicate/legacy relationship if relevant, and the exact one-knob boundary.
 
-Define precisely what "open" means for this frozen evaluation.
+A failed fixture is evidence against an implementation. Do not rewrite the fixture to make the code pass.
 
-Do not call a threshold a City SLA unless an authoritative source establishes that it is one.
+### Required Stage 3 machine-readable contract
 
-A portfolio-defined lateness or urgency cutoff must be labeled accordingly.
+After the Measurement Design Gate passes, create:
 
-### Known-case fixtures
+`docs/stage-03-measurement-design/stage3_locked_design.json`
 
-Before any Stage 4 judged builder runs, create and lock known-case fixtures.
+Use the repository's `.example.json` as the shape. At minimum the actual contract must contain:
 
-Fixtures should test material boundaries such as:
+- `stage`
+- `status = LOCKED`
+- `design_version`
+- `population`
+- `grain`
+- `request_id`
+- `decision_window`
+- `open_definition`
+- `urgency_definition`
+- `decision_rules`
+- `selected_definition`
+- `locked_knob`
+- `reconciliation_critical_fields`
+- `source_delivery_contract`
+- `fixture_version`
+- `required_outputs`
 
-- clearly eligible/open;
-- clearly ineligible/closed;
-- date-window boundary;
-- action-threshold boundary;
-- missing critical evidence;
-- contradictory evidence;
-- duplicate/legacy relationship where relevant;
-- and the exact one-knob boundary.
+This file is the machine-readable Stage 3 authority for the workflow gate. The full Markdown Stage 3 design remains the human-readable controlling contract.
 
-Fixtures may be synthetic if necessary.
-
-They must be frozen before R-A or R-B begins implementation or execution.
-
-After a failed fixture:
-
-**fix the implementation, not the fixture.**
-
-An owner-authorized fixture correction creates a new frozen version and requires fresh validation. It cannot retroactively convert a failed old fixture pack into a pass.
-
-Do not begin Stage 4 source delivery or judged construction until the Stage 3 Measurement Design Gate passes.
+Do not begin Stage 4 source delivery or judged construction until the Stage 3 gate passes, the fixture pack is frozen, and the actual Stage 3 JSON contract exists.
 
 ---
 
-## 13. Stage 4 — Execution and Independent Validation
+## 10. Stage 4 — Execution and Independent Validation
 
 Open and follow the current Independent Validation and Analysis framework.
 
-For Chicago 311, the Stage 4 architecture is locked as:
+The Stage 4 architecture is:
 
-```mermaid
-flowchart TD
-    D["Locked Stage 3 measurement design"] --> S["AI 2: Controlled SQL source<br/>Thin, faithful, nonjudgmental"]
-    S --> SG{"SQL Source Gate"}
-
-    SG -->|Fail| SF["Repair source delivery<br/>Rerun Source Gate"]
-    SF --> SG
-
-    SG -->|Pass| A["AI 1: R-A<br/>Independent judged implementation"]
-    SG -->|Pass| B["AI 3: R-B<br/>Independent judged implementation"]
-
-    A --> R["Exact reconciliation"]
-    B --> R
-
-    R -->|Fail| F["Diagnose mismatch<br/>Correct and rerun"]
-    F --> R
-
-    R -->|Pass| X["Structural cross-review"]
-    X --> G{"Validation gate"}
-
-    G -->|Issues remain| C["Resolve and rerun<br/>affected validation"]
-    C --> X
-
-    G -->|Clear| V["Freeze validated action table"]
-    V --> S5["Stage 5"]
+```text
+LOCKED STAGE 3
+      |
+      v
+CONTROLLED SQL SOURCE
+      |
+      v
+SQL SOURCE GATE
+      |
+   -----------
+   |         |
+   v         v
+  R-A       R-B
+independent judged paths
+   |         |
+   +----+----+
+        |
+        v
+FIXTURE PASS BOTH PATHS
+        |
+        v
+EXACT RECONCILIATION
+        |
+        v
+STRUCTURAL CROSS-REVIEW
+        |
+        v
+VALIDATED DATA FREEZE
 ```
-
-The core validation requirement is **two genuinely independent judged R implementations operating on one verified common source package**.
 
 The SQL layer is not a third judged path.
 
-### 13.1 AI 2 — Controlled SQL source delivery
+### 10.1 Controlled SQL source delivery
 
-AI 2 independently constructs the controlled SQL source package from `chicago311.raw_311_requests` according to the Stage 3 source-delivery contract.
+AI 2 independently constructs the controlled source package from `chicago311.raw_311_requests` according to the Stage 3 source-delivery contract.
 
-Because the authoritative Chicago 311 source is already request-level, do not manufacture relational complexity merely to imitate FulfillIQ.
+Because the source is already request-level, do not manufacture relational complexity merely to imitate FulfillIQ.
 
-The SQL source should be as close to the stored source values as practical.
+SQL should deliver source evidence, not decide the answer. Do not precompute judged equivalents of `is_in_window`, `is_open`, `is_eligible`, final urgency, final action, final selected, or priority rank unless Stage 3 explicitly classified a transformation as mechanical source plumbing.
 
-Its job is to deliver source evidence, not to decide the final answer.
+If data volume requires it, Stage 3 may authorize a broad mechanical extraction envelope. The envelope must be wider or more primitive than the final judged universe, and the Source Gate must prove completeness against the authorized raw condition.
 
-Where practical, preserve raw or raw-ish values for fields such as:
+### 10.2 SQL Source Gate
 
-- `SR_NUMBER`
-- `SR_TYPE`
-- `STATUS`
-- `CREATED_DATE`
-- `LAST_MODIFIED_DATE`
-- `CLOSED_DATE`
-- `DUPLICATE`
-- `LEGACY_RECORD`
-- `LEGACY_SR_NUMBER`
-- `PARENT_SR_NUMBER`
-- and other Stage 3-authorized source fields.
+Before final validation can be claimed, preserve evidence for source/extract row counts, identifier coverage, repeated-ID characterization, critical-field equality, null/blank profiles, important source domains, date/time range and parseability, row loss from source plumbing, extraction-envelope completeness, and exact source lineage.
 
-Do not precompute judged fields equivalent to:
-
-- `is_in_window`
-- `is_open`
-- `is_eligible`
-- `is_late`
-- final urgency classification
-- membership qualification
-- final `action`
-- final `selected`
-- priority rank
-
-unless Stage 3 explicitly classifies a particular transformation as mechanical source plumbing rather than judged logic.
-
-If SQL starts deciding what R-A and R-B are supposed to validate independently, stop and redesign the source extract.
-
-### 13.2 Mechanical extraction envelope
-
-The full source is very large.
-
-If downstream R cannot reasonably consume the complete table, SQL may use a **broad mechanical extraction envelope** authorized by Stage 3.
-
-That envelope must be mechanically defined and must not simply encode the final analytical universe.
-
-For example, a broad source date range may be used for data-volume control while R-A and R-B independently apply the actual locked decision window.
-
-The Source Gate must prove that no raw rows satisfying the authorized mechanical envelope were omitted.
-
-### 13.3 SQL Source Gate
-
-Before either judged R path may claim validation, the controlled source package must pass a formal SQL Source Gate against the authoritative raw source.
-
-At minimum, preserve evidence for:
-
-1. raw/envelope row count versus extract row count;
-2. identifier coverage;
-3. repeated/duplicate `SR_NUMBER` characterization;
-4. critical-field value preservation;
-5. null/blank profiles for Stage 3-critical source fields;
-6. status and other important source domains;
-7. date/time range and parseability checks;
-8. any row loss introduced by source plumbing;
-9. mechanical-envelope completeness when an envelope is used;
-10. exact source lineage / snapshot identity.
-
-The Source Gate must test faithful **delivery**, not Stage 3 judgment.
-
-### 13.4 Repeated-ID safeguard
-
-Do not assume `SR_NUMBER` is a unique physical-row key until verified.
-
-If `SR_NUMBER` repeats, do not validate source equality by joining raw and extract on `SR_NUMBER` alone. A many-to-many join could multiply rows and create misleading evidence.
-
-Use one of the following:
-
-- a stable raw-row identifier, if available;
-- a reproducible full-row or critical-field fingerprint plus occurrence counts;
-- or another explicitly justified physical-row identity method.
-
-The Source Gate must compare both **field values** and **multiplicity**.
-
-If the same authorized source row occurs three times in raw, the source package must preserve three occurrences unless Stage 3 explicitly authorizes otherwise.
-
-### 13.5 Source Gate pass/fail
-
-A Source Gate report should mechanically show PASS/FAIL for checks such as:
-
-| Check | Expected | Actual | Result |
-|---|---:|---:|---|
-| Missing delivered rows | 0 | value | PASS/FAIL |
-| Extra delivered rows | 0 | value | PASS/FAIL |
-| Critical-field mismatches | 0 | value | PASS/FAIL |
-| Multiplicity mismatches | 0 | value | PASS/FAIL |
-| Mechanical-envelope omissions | 0 | value | PASS/FAIL |
-| Lineage mismatch | 0 | value | PASS/FAIL |
+Do not assume `SR_NUMBER` is a physical-row key until verified. If a business ID repeats, use a stable raw-row identifier, multiset/fingerprint method, or another justified identity mechanism.
 
 "Close" is not a Source Gate pass.
 
-If the Source Gate fails:
+If the source package changes, invalidate downstream R outputs, rerun Source Gate, and rebuild both R paths from the newly frozen source package.
 
-- repair the source-delivery SQL or the gate itself;
-- regenerate the source package;
-- rerun the complete Source Gate;
-- preserve the failed report;
-- and invalidate downstream R outputs if their source package changed.
+### 10.3 R-A and R-B
 
-Only after Source Gate Pass may the verified source package be frozen for the judged R builders.
+AI 1 constructs R-A independently. AI 3 constructs R-B independently.
 
-### 13.6 AI 1 — R-A
+Both receive only the locked Stage 3 specification, the same verified frozen source package, source/data dictionary, frozen fixture pack, and required output contract.
 
-AI 1 receives only:
+Both must independently implement every judged operation required by Stage 3, including as applicable date parsing, decision-window logic, open-state logic, eligibility, identity/duplicate handling, urgency classification, thresholds, action assignment, selected flag, and reconciliation-critical audit fields.
 
-- locked Stage 3 specification;
-- verified frozen source package;
-- source/data dictionary;
-- frozen known-case fixtures;
-- required judged output contract;
-- and its own implementation packet.
+Do not share judged helper functions or first-pass outputs.
 
-AI 1 independently constructs R-A in owner-familiar tidyverse style.
+### 10.4 Fixture Gate
 
-R-A independently performs every locked judged operation, including as applicable:
+Run the same frozen Stage 3 fixture pack against both R-A and R-B.
 
-- date parsing;
-- decision-window logic;
-- open-state logic;
-- eligibility;
-- duplicate/identity treatment;
-- lateness/urgency classification;
-- threshold/floor logic;
-- ESCALATE / INCONCLUSIVE / STANDARD assignment;
-- selected flag;
-- and all reconciliation-critical audit fields.
+Both must pass. If either fails, repair the implementation toward the locked design, preserve the failed run, and rerun the same frozen fixture version.
 
-R-A must not see R-B code or judged output before first-pass freeze.
+Fixture pass does not substitute for production-data reconciliation.
 
-### 13.7 AI 3 — R-B
+### 10.5 Exact reconciliation
 
-AI 3 receives the same authorized Stage 3 contract, the same verified frozen source package, the same frozen fixtures, and the same required judged output contract.
+Validation requires exact R-A/R-B agreement on every reconciliation-critical field designated by Stage 3, including at minimum the final universe, request IDs, open/eligibility status, action, selected flag, and any locked decision components.
 
-AI 3 independently constructs R-B in tidyverse style.
+Produce a machine-readable reconciliation table that distinguishes match, missing in either path, duplicate-key failure, value mismatch, eligibility mismatch, action mismatch, selected mismatch, and other structural failure.
 
-R-B must implement the complete judged logic independently.
-
-It may use a different internal construction strategy, but different syntax is not the goal. Independent reasoning and construction are the goal.
-
-R-B must not see R-A code or judged output before first-pass freeze.
-
-R-A and R-B must not share:
-
-- a judged request-ID list;
-- a final action list;
-- selected IDs;
-- copied decision functions;
-- copied judged helper functions;
-- or one another's first-pass reconciliation results.
-
-### 13.8 Fixture Gate
-
-Run the frozen Stage 3 fixtures against both R-A and R-B before reconciliation may claim Pass.
-
-Both judged paths must pass the same frozen fixture pack.
-
-If either path fails a fixture:
-
-- repair that implementation toward the locked Stage 3 design;
-- rerun the frozen fixtures;
-- preserve the failed result;
-- do not rewrite the fixture to match the code.
-
-Fixture Gate Pass does not substitute for production-data reconciliation.
-
----
-
-## 14. Exact reconciliation and structural validation gate
-
-Validation requires exact agreement between **R-A and R-B**.
-
-"Close" is failure.
-
-At minimum reconcile exactly on:
-
-- total frozen analytical universe n;
-- request IDs;
-- universe membership;
-- decision-window classification when included in the contract;
-- open flag;
-- eligibility;
-- exclusion reason when locked;
-- action;
-- selected;
-- any locked numerator / denominator or urgency components;
-- and every Stage 3 field designated as reconciliation-critical.
-
-Produce a machine-readable reconciliation table.
-
-The reconciliation must distinguish:
-
-- match;
-- missing in R-A;
-- missing in R-B;
-- duplicate-key failure;
-- value mismatch;
-- eligibility mismatch;
-- action mismatch;
-- selected mismatch;
-- and other structural failure.
-
-Any nonauthorized mismatch means:
+Any unauthorized mismatch means:
 
 **FAIL / INVESTIGATE / CORRECT / RERUN**
 
-Do not average the answers.
+Do not average results, waive close counts, manually force agreement, or copy judged IDs from one path into the other.
 
-Do not manually force agreement.
+If a true Stage 3 design defect is discovered, formally reopen Stage 3 under owner control, create a new design version, invalidate affected downstream work, and rerun.
 
-Do not waive a mismatch because the counts are similar.
+### 10.6 Structural cross-review
 
-Do not copy one path's judged IDs into the other.
+After exact reconciliation passes, remove the information barriers and perform structural cross-review.
 
-Do not rewrite Stage 3 merely because a builder disagrees with it.
+Review for shared weaknesses such as wrong date semantics, status/open misinterpretation, accidental exclusion, duplicate/legacy handling, parse errors, null handling, boundary errors, judged logic leaking into SQL, extraction envelope encoding the final universe, source-field misunderstanding, post-hoc ID manipulation, or shared judged helper logic.
 
-If a genuine Stage 3 design defect is discovered, explicitly reopen the design gate, document why, revise the design under owner control, invalidate affected downstream outputs, and rerun.
-
-### 14.1 Mismatch investigation
-
-A mismatch does not establish that R-A is right or that R-B is right.
-
-Investigate independently:
-
-- R-A against locked Stage 3;
-- R-B against locked Stage 3;
-- reconciliation code;
-- and, where relevant, the common SQL source delivery / Source Gate.
-
-Use:
-
-- row-level source evidence;
-- frozen fixtures;
-- intermediate counts;
-- Stage 3 rules;
-- Source Gate evidence;
-- and reproducible calculations.
-
-After any judged-code change, rerun fixtures and complete reconciliation.
-
-After any source-package change, rerun the SQL Source Gate and rebuild **both** R paths from the newly frozen source package.
-
-Preserve failed reports.
-
-### 14.2 Structural cross-review
-
-After exact reconciliation passes, remove the information barriers and perform the framework-required structural cross-review.
-
-Use these Stage 4 review assignments:
-
-| Reviewer | Primary artifacts reviewed |
-|---|---|
-| AI 1 | R-B + SQL Source Gate / source-delivery assumptions |
-| AI 2 | R-A + R-B, especially judged-logic leakage from the common source |
-| AI 3 | R-A + SQL Source Gate / source-delivery assumptions |
-
-Cross-review must inspect for shared weaknesses including:
-
-- wrong date interpretation;
-- status/open misinterpretation;
-- accidental exclusion;
-- duplicate or legacy handling;
-- string/date parsing;
-- null/`NA` handling;
-- boundary errors;
-- action-rule leakage into SQL;
-- an extraction envelope that accidentally encodes the final population;
-- source-field misunderstanding;
-- post-hoc ID manipulation;
-- shared helper logic that undermines independence;
-- and inadequate Source Gate protection against a shared-input defect.
-
-Only after all of the following pass may the validated action table be frozen:
+Only after all of these pass may the validated action table be frozen:
 
 1. SQL Source Gate
-2. Fixture Gate
-3. Exact R-A / R-B reconciliation
-4. Structural cross-review gate
-5. Required lineage / attestation checks
+2. R-A fixture gate
+3. R-B fixture gate
+4. Exact R-A/R-B reconciliation
+5. Structural cross-review
+6. Lineage / attestation checks
+7. Stage 4 validation gate
+
+### Required Stage 4 machine-readable receipt
+
+After the full Stage 4 chain truthfully passes, create:
+
+`docs/stage-04-execution-validation/stage4_validation_status.json`
+
+Use the repository's `.example.json` as the shape. It must include at least:
+
+- `stage`
+- `status = PASS`
+- `design_version_used`
+- `fixture_version_used`
+- `sql_source_gate = PASS`
+- `r_a_fixtures = PASS`
+- `r_b_fixtures = PASS`
+- `r_a_status = PASS`
+- `r_b_status = PASS`
+- `reconciliation = PASS`
+- `structural_cross_review = PASS`
+- `lineage_attestation = PASS`
+- `validation_gate = PASS`
+- `unresolved_issues = 0`
+- `artifact_paths`
+
+`artifact_paths` must list the actual preserved evidence files supporting the PASS claim. Do not list files that do not exist.
+
+If any required field is not truly PASS or unresolved issues remain, do not create a false clean Stage 4 receipt. Record the failure and repair the proper layer.
 
 ---
 
-## 15. Optional deeper R analysis
+## 11. Deterministic R workflow gate — mandatory before Stage 5
+
+This is the new enforcement layer.
+
+It is separate from R-A, R-B, and their Stage 4 reconciliation.
+
+After Stage 4 has produced its validation receipt, Grok Bot must run the local project gate from the repository root:
+
+```bash
+Rscript validation/workflow-gate/workflow_gate.R .
+```
+
+If `jsonlite` is unavailable, install it once before running the gate.
+
+The workflow gate checks that:
+
+- Stage 1 locked decision receipt exists and parses;
+- Stage 2 locked framing receipt exists and parses;
+- Stage 3 machine-readable contract exists, parses, and is LOCKED;
+- Stage 4 validation receipt exists and parses;
+- Stage 4 used the exact locked Stage 3 design version;
+- Stage 4 used the exact frozen fixture version;
+- SQL Source Gate passed;
+- both R paths passed fixtures;
+- R-A and R-B statuses passed;
+- exact reconciliation passed;
+- structural cross-review passed;
+- lineage/attestation passed;
+- Stage 4 validation gate passed;
+- unresolved issues equal zero;
+- Stage 4 overall status is PASS;
+- and every evidence file declared in `artifact_paths` actually exists.
+
+The gate writes:
+
+`validation/workflow-gate/workflow_gate_status.json`
+
+A successful report must contain:
+
+```json
+{
+  "result": "PASS",
+  "stage5_allowed": true
+}
+```
+
+### Hard rule
+
+**Stage 5 may not begin merely because Grok Bot or the three AIs believe the workflow was followed. Stage 5 may begin only after the R workflow gate itself returns PASS.**
+
+If the R command exits nonzero or the report says FAIL:
+
+1. do not start Stage 5;
+2. preserve the failed `workflow_gate_status.json`;
+3. read the exact failed checks;
+4. route each failure to the stage or implementation that owns it;
+5. correct the problem without weakening the locked rules merely to obtain PASS;
+6. rerun any analytically affected validations;
+7. regenerate the appropriate receipt if its evidence changed;
+8. rerun the R workflow gate.
+
+Do not manually edit the workflow-gate result from FAIL to PASS.
+
+The workflow gate verifies **procedure**. It does not prove that the Stage 3 design is substantively correct, that the decision warrant is strong, or that a real City deployment is appropriate. Those remain human and multi-AI judgment questions.
+
+---
+
+## 12. Optional deeper R analysis
 
 Do not automatically perform a large secondary analysis.
 
-This project's primary deliverable is the request action decision.
+The project's primary deliverable is the request-level action decision.
 
-If deeper descriptive analysis materially helps interpret the validated action list, it may begin only after the Stage 4 validation gate passes.
+Deeper descriptive analysis may begin only after Stage 4 analytical validation passes. If that analysis is needed before the Stage 5 memo, preserve it as a validated Stage 4 artifact and include it in the evidence package as appropriate.
 
-If a modular R report is needed, use:
-
-https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/ENGINE.md
-
-ENGINE.md may control post-gate R coding style and modular report structure.
-
-Do not use one ENGINE-generated judged implementation as the common template for both R-A and R-B.
-
-ENGINE.md does not override:
-
-- Stage 3 measurement design;
-- SQL Source Gate;
-- R-A / R-B independence;
-- fixture discipline;
-- reconciliation;
-- validation gates;
-- or decision scope.
+Use ENGINE.md only if it materially helps implementation or reporting. It does not override Stage 3, the Source Gate, dual R independence, fixture discipline, reconciliation, the workflow gate, or decision scope.
 
 Do not create a dashboard merely because the Engine can publish one.
 
-No analysis may introduce a second decision.
-
 ---
 
-## 16. Stage 5 — Interpretation and Recommendation
+## 13. Stage 5 — Interpretation and Recommendation
 
-Open and follow the current Interpretation and Recommendation framework.
+Before opening the Stage 5 framework, verify that:
 
-Use only evidence that passed Stage 4.
+`validation/workflow-gate/workflow_gate_status.json`
 
-The three independent AI roles must distinguish:
+contains `result = PASS` and `stage5_allowed = true`.
 
-- validated facts;
-- interpretation;
-- decision warrant;
-- uncertainty;
-- limitations;
-- unsupported claims;
-- and proportionate action.
+If not, STOP.
+
+Then open and follow the current Interpretation and Recommendation framework.
+
+Use only validated evidence that survived Stage 4 and the workflow-gate handoff.
+
+The three independent AI roles must distinguish validated facts, interpretation, decision warrant, uncertainty, limitations, unsupported claims, and proportionate action.
 
 Stage 5 must produce:
 
-**A. Action list**
+### A. Action list
 
-One row per request in the eligible frozen universe with the locked final action:
+One row per request in the eligible frozen universe with exactly one action:
 
 - `ESCALATE`
 - `INCONCLUSIVE`
@@ -1024,150 +735,104 @@ One row per request in the eligible frozen universe with the locked final action
 
 Include the audit fields required by Stage 3.
 
-**B. Short decision memo**
+### B. Short decision memo
 
-The memo must answer:
+The memo must explain:
 
 - what the validated action list shows;
 - how many requests fall into each action class;
 - why ESCALATE requests meet the locked rule;
 - why INCONCLUSIVE requests cannot be resolved confidently;
-- why STANDARD requests remain standard under the rule;
-- what evidence does not establish;
+- why STANDARD requests remain standard;
+- what the evidence does not establish;
 - which warrant assumptions remain;
-- and what would be required before any real operational use.
+- and what would be required before real operational use.
 
-Do not imply causal effects.
-
-Do not claim escalation will improve service outcomes unless separately established.
-
-Do not claim requests are citizen-safety emergencies unless the evidence and locked definitions support that language.
-
-Do not claim City endorsement.
-
-Do not describe the output as a live dispatch queue.
-
-The final recommendation must remain explicitly a portfolio simulation / analytical handoff.
+Do not imply causal effects, City endorsement, guaranteed service improvement, or a live dispatch queue.
 
 The human owner retains final authority over the Stage 5 recommendation.
 
 ---
 
-## 17. Required project outputs
+## 14. Required final project outputs
 
-The completed project must preserve, at minimum:
+Preserve at minimum:
 
 - source manifest;
 - controlling-framework manifest;
 - master orchestration prompt;
 - Grok Bot process transcript;
 - Stages 1–2 stakeholder dialogue;
-- Start Gate decision;
-- locked analytical question;
-- Stage 3 measurement contract;
-- locked known-case fixtures;
+- Stage 1 locked decision receipt;
+- Stage 2 locked framing receipt;
+- Stage 3 human-readable measurement contract;
+- Stage 3 machine-readable locked-design receipt;
+- locked known-case fixtures and fixture version;
 - Warrant Ledger;
 - controlled SQL source-delivery script;
-- frozen SQL source package or reproducible reference to it;
+- frozen source package or reproducible reference;
 - SQL Source Gate report;
-- source-delivery manifest / lineage evidence;
+- source-delivery lineage evidence;
 - R-A script and judged output;
 - R-B script and judged output;
 - fixture results for both R paths;
-- exact R-A / R-B reconciliation table;
+- exact reconciliation table;
 - mismatch investigations if any;
 - structural cross-review;
+- Stage 4 validation receipt;
 - frozen validated action list;
 - validated-data manifest;
-- short Stage 5 memo;
-- gate decisions;
+- workflow-gate PASS/FAIL report;
+- Stage 5 decision memo;
+- gate decisions and failed-run history;
 - execution evidence;
 - limitations;
-- and reproduction instructions.
+- reproduction instructions.
 
-The README must make clear:
-
-- this is Dataset 2 of the three-dataset evaluation;
-- Dataset 1 was FulfillIQ 2.0 / Olist;
-- this dataset uses official Chicago 311 data;
-- the analytical decision is request-level dispatch priority;
-- the result is simulated, not live;
-- Stage 4 uses controlled SQL source delivery plus dual independent R judged builders;
-- which components were actually executed;
-- which gates passed;
-- what remains uncertain;
-- and how the analysis can be reproduced.
+The README must state what was actually executed, which gates passed, what remains uncertain, and that the result is a simulation.
 
 ---
 
-## 18. Attestation
+## 15. Attestation
 
-Stage 3 must define an attestation, and Stage 4 must preserve evidence for it.
+The final project must be able to attest that:
 
-At minimum the final project must be able to attest that:
-
-- the date window was frozen before judged builders ran;
-- fixtures were frozen before R-A or R-B began implementation or execution;
-- the SQL source package passed its Source Gate before final validation was claimed;
-- the SQL source package did not contain prohibited final judged action logic;
+- the decision window was frozen before judged builders ran;
+- fixtures were frozen before R-A/R-B implementation or execution;
+- the SQL source package passed its Source Gate;
+- SQL did not contain prohibited final judged action logic;
 - R-A and R-B received the same verified frozen source package;
-- R-A and R-B were constructed independently;
-- R-A and R-B did not share a judged ID list, action list, selected set, or judged helper function;
-- neither R builder saw the other's first-pass judged output before freeze;
+- R-A and R-B were independently constructed;
+- they did not share judged ID lists, action lists, selected sets, or judged helper functions;
+- neither saw the other's first-pass judged output before freeze;
 - no request IDs were manually added or removed to force agreement;
 - the action rule was not tuned after seeing selected IDs;
-- all reconciliation-critical fields matched exactly before validation passed;
+- all reconciliation-critical fields matched exactly;
 - structural cross-review passed with no unresolved blocking/material defect;
+- Stage 4 used the exact locked Stage 3 design and fixture versions;
+- the Stage 4 receipt identifies real preserved evidence artifacts;
+- the deterministic R workflow gate returned PASS before Stage 5 began;
 - and the final action list came from the validated locked specification.
 
 If any required statement is false, do not issue a clean validation pass.
 
 ---
 
-## 19. Questions for the human owner
+## 16. Questions for the human owner
 
-Ask me a question only when my answer is genuinely necessary to prevent a material error or unlock a required gate.
+Ask me only when my answer is genuinely necessary to prevent a material error or unlock a required gate.
 
-Ask when:
+Ask when a controlling source cannot be accessed, a material business choice has two reasonable alternatives, a real-world policy claim cannot be verified, the one locked knob requires owner judgment, an unresolved design choice would materially change the action list, a contradiction cannot be resolved, explicit owner approval is required, or a locked artifact genuinely needs reopening.
 
-- a controlling source cannot be accessed;
-- a material business choice has two reasonable alternatives;
-- a real-world policy claim cannot be verified;
-- the one locked knob requires owner judgment;
-- an unresolved design choice would materially change the action list;
-- a contradiction cannot be resolved;
-- the framework requires explicit owner approval;
-- or a previously locked artifact genuinely needs to be reopened.
+Do not ask me routine questions that the source schema, controlling framework, Dana simulation, or ordinary technical judgment can answer.
 
-Do not ask me:
+Do not repeatedly ask permission to continue after successful mechanical steps.
 
-- routine questions Dana should answer;
-- questions already answered in locked artifacts;
-- which join key to use when the source schema answers it;
-- whether to use the existing raw table;
-- routine date parsing questions;
-- internal object names;
-- ordinary R package choices;
-- routine SQL syntax questions;
-- routine charts;
-- whether to continue after every successful step;
-- or to repeat a decision already locked.
-
-Do not interview me about:
-
-- file layout;
-- join strategy;
-- groups;
-- publish mix;
-- or other routine pipeline mechanics unless a material ambiguity actually exists.
-
-Resolve nonmaterial technical choices from the controlling frameworks and source schema.
-
-Record assumptions transparently.
+Record nonmaterial technical choices and assumptions transparently.
 
 ---
 
-## 20. Gate discipline
+## 17. Gate discipline
 
 Never claim a gate passed because:
 
@@ -1175,27 +840,42 @@ Never claim a gate passed because:
 - SQL executed without proving source fidelity;
 - an R script ran;
 - code looked plausible;
-- counts were similar;
-- R-A and R-B rounded to the same displayed value while underlying components differed;
-- a screenshot existed without preserved result evidence;
-- or one implementation matched its own expected answer.
+- counts were close;
+- displayed rounded values matched while underlying fields differed;
+- a screenshot existed without preserved evidence;
+- one implementation matched its own expected answer;
+- or Grok Bot stated that the procedure had been followed.
 
-A gate passes only when the controlling framework's evidence requirements are met.
-
-For Stage 4, a clean validation pass requires the complete chain:
+For this project, the complete pre-Stage-5 chain is:
 
 ```text
-Stage 3 locked
+Start Gate PASS
+    ↓
+Stage 1 receipt LOCKED
+    ↓
+Framing Gate PASS
+    ↓
+Stage 2 receipt LOCKED
+    ↓
+Stage 3 Design Gate PASS
+    ↓
+Stage 3 JSON contract LOCKED + fixtures frozen
     ↓
 SQL Source Gate PASS
     ↓
-R-A fixture PASS + R-B fixture PASS
+R-A fixtures PASS + R-B fixtures PASS
     ↓
 Exact R-A ↔ R-B reconciliation PASS
     ↓
 Structural cross-review PASS
     ↓
-Validated-data freeze
+Lineage / attestation PASS
+    ↓
+Stage 4 validation receipt PASS
+    ↓
+R WORKFLOW GATE PASS
+    ↓
+STAGE 5 ALLOWED
 ```
 
 If a gate fails:
@@ -1204,36 +884,35 @@ If a gate fails:
 - identify the failed requirement;
 - correct the appropriate upstream or implementation layer;
 - invalidate affected downstream artifacts;
-- rerun the required checks;
-- preserve the failure and correction record.
+- rerun required checks;
+- preserve failed and corrected reports.
 
 Do not erase failed runs from project history.
 
 ---
 
-## 21. Begin
+## 18. Begin
 
 Begin by:
 
-- confirming access to all controlling GitHub framework files;
-- confirming the Chicago 311 project repository and provenance files;
-- recording the official City of Chicago source and the frozen raw-snapshot status;
+- confirming access to the controlling GitHub framework files;
+- confirming the Chicago 311 repository and provenance files;
+- confirming that `validation/workflow-gate/workflow_gate.R` and its receipt templates exist;
+- recording the official City source and frozen raw-snapshot status;
 - verifying, but not cleaning, the MySQL raw source when available;
 - initializing the Warrant Ledger;
 - creating Dana Brooks's stable fictional stakeholder brief consistent with the locked decision;
 - starting Stages 1–2 only.
 
-Dana's initial request must be plausible and incomplete.
+Dana's initial request must be plausible and incomplete. Do not expose her complete brief to the Dialogue Lead.
 
-Do not expose her complete brief to the Dialogue Lead.
+Do not begin Stage 3 until Start and Framing gates pass and their machine-readable receipts exist.
 
-Do not begin Stage 3 until the Start and Framing gates pass.
+Do not begin Stage 4 source delivery until Stage 3, its machine-readable contract, and fixtures are locked.
 
-Do not begin Stage 4 source delivery until Stage 3 and fixtures are locked.
+Do not begin judged R validation until SQL Source Gate has passed and the verified source package is frozen.
 
-Do not begin judged R validation until the SQL Source Gate has passed and the verified source package is frozen.
-
-Do not begin Stage 5 until Fixture Gate, exact R-A / R-B reconciliation, structural cross-review, lineage, and attestation requirements all pass.
+Do not begin Stage 5 until the deterministic R workflow gate itself has returned PASS.
 
 Do not redo Olist.
 

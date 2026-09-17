@@ -1,0 +1,6 @@
+{
+  "stage": 1,
+  "status": "LOCKED",
+  "decision_statement": "Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority.",
+  "decision_owner": "Dana Brooks simulation / human owner approval"
+}
