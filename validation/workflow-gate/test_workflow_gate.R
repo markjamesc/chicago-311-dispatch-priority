@@ -2,10 +2,6 @@
 
 suppressPackageStartupMessages(library(jsonlite))
 
-repo_root <- normalizePath(file.path(dirname(commandArgs(trailingOnly = FALSE)[grep("--file=", commandArgs(trailingOnly = FALSE))]), "..", ".."), mustWork = FALSE)
-repo_root <- sub("^--file=", "", repo_root)
-
-# More reliable script path resolution for Rscript.
 full_args <- commandArgs(trailingOnly = FALSE)
 file_arg <- full_args[grepl("^--file=", full_args)]
 script_path <- normalizePath(sub("^--file=", "", file_arg[[1]]), mustWork = TRUE)
@@ -80,11 +76,6 @@ write_receipts <- function(root, reconciliation = "PASS") {
     unresolved_issues = if (reconciliation == "PASS") 0 else 1,
     artifact_paths = artifacts
   ), file.path(root, "docs", "stage-04-execution-validation", "stage4_validation_status.json"), auto_unbox = TRUE, pretty = TRUE)
-}
-
-run_gate <- function(root) {
-  system2("Rscript", c(shQuote(gate_script), shQuote(root)), stdout = TRUE, stderr = TRUE)
-  attr(system2("Rscript", c(shQuote(gate_script), shQuote(root)), stdout = FALSE, stderr = FALSE), "status")
 }
 
 # PASS case.
