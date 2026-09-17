@@ -1,0 +1,26 @@
+# Raw data and local extracts
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.rds
+*.RData
+*.Rhistory
+
+# Local outputs that may contain large or machine-specific artifacts
+*.xlsx
+*.html
+*.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.Rproj.user/
+.vscode/
+.idea/
+
+# Credentials and environment files
+.env
+*.env
+*.pem
+*.key
