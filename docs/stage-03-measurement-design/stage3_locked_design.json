@@ -1,79 +1,237 @@
 {
   "stage": 3,
   "status": "LOCKED",
-  "design_version": "stage3-v0.1-PENDING",
-  "fixture_version": "fixtures-v0.1-PENDING",
-  "generated_at": "2026-09-19T04:35:00-05:00",
+  "design_version": "stage3-v1-tcd-ig",
+  "fixture_version": "fixtures-v1-tcd-ig",
+  "locked_at": "2026-09-19T05:23:53-05:00",
+  "locked_at_display_ct": "2026-09-19 05:23:53 CDT",
+  "construct": "TCD-IG B-leaning hybrid",
+  "construct_full_name": "Type-Conditional Dormancy with Integrity Gate (TCD-IG) + Design A documentation/diagnostics",
+  "owner_approval_quote": "Approve Design Gate: B-leaning hybrid with κ; accept checklist items 1–15; accept Grok Auto for this pass",
+  "owner_approval_date_ct": "2026-09-19",
   "authority": {
     "stage1": "docs/stage-01-02-start-framing/stage1_decision.json LOCKED",
     "stage2": "docs/stage-01-02-start-framing/stage2_framing.json CQ-F02 LOCKED",
-    "measurement_design_md": "docs/stage-03-measurement-design/MEASUREMENT_DESIGN.md"
+    "measurement_design_md": "docs/stage-03-measurement-design/MEASUREMENT_DESIGN_LOCKED.md",
+    "prior_measurement_design_md": "docs/stage-03-measurement-design/MEASUREMENT_DESIGN.md SUPERSEDED scratch"
   },
-  "working_assumptions_require_owner_confirm": [
-    "WA-W1 T_freeze=2026-09-12 23:59:59 America/Chicago",
-    "WA-O1 STATUS==Open",
-    "WA-E1 eligibility + info-only + legacy exclude",
-    "WA-K1 open_age_days_threshold=14 portfolio NOT City SLA",
-    "WA-I1 INCONCLUSIVE rules",
-    "WA-S1 STANDARD residual",
-    "WA-C1 capacity/ranking deferred to Stage 5 note"
-  ],
-  "population": "Open eligible requests in frozen snapshot under WA-W1/WA-O1/WA-E1",
+  "population": "Open eligible 311 requests in the frozen snapshot decision set at as-of T (one row per SR_NUMBER)",
   "grain": "one row per SR_NUMBER",
   "request_id": "SR_NUMBER",
   "decision_window": {
-    "start": "WORKING_ASSUMPTION",
-    "end": "WORKING_ASSUMPTION T_freeze 2026-09-12T23:59:59-05:00",
-    "boundary_semantics": "Open rows in frozen snapshot; calendar freeze pending owner confirm",
-    "snapshot_max_CREATED_DATE": "2026-09-12 15:39:45"
+    "first_pass_window": "snapshot as-of T",
+    "T_freeze_working": "2026-09-12T23:59:59-05:00",
+    "T_freeze_timezone": "America/Chicago",
+    "snapshot_max_CREATED_DATE": "2026-09-12 15:39:45",
+    "boundary_semantics": "First-pass bounded feasibility: T aligns with frozen snapshot; historical as-of open without status history out of scope. Locked per checklist item 4.",
+    "checklist_item": 4,
+    "status": "LOCKED"
   },
-  "open_definition": "STATUS == 'Open' (exact string)",
-  "urgency_definition": "open_age_days = floor((T_freeze - CREATED_DATE)/86400); portfolio attention proxy; NOT City SLA",
+  "open_definition": {
+    "rule": "STATUS parses to Open (case/whitespace-normalized) per locked Open-token list",
+    "default_open_tokens": [
+      "Open"
+    ],
+    "out_of_decision_set": [
+      "Completed",
+      "Canceled",
+      "Closed"
+    ],
+    "status": "LOCKED"
+  },
+  "eligible_skeleton": {
+    "include_if_all": [
+      "Open per open_definition",
+      "DUPLICATE not true-like (true/Y/1/yes) — default exclude",
+      "LEGACY_RECORD not true-like — default exclude",
+      "CREATED_DATE parses and created_ts <= T",
+      "type_key = coalesce(trim(SR_SHORT_CODE), trim(SR_TYPE)) non-blank"
+    ],
+    "non_exclusions": "Do not exclude solely by request type, geography, age, or workload difficulty",
+    "status": "LOCKED"
+  },
+  "urgency_definition": {
+    "primary_statistic": "dormant_h = T - mod_ts (hours); require mod_ts >= created_ts",
+    "compare_to": "kappa * peer_p75_h",
+    "peer_p75_h": "75th percentile of (closed - created) hours on Completed non-dup non-legacy historical peers same type_key with created in lookback W ending at T",
+    "open_age_h": "diagnostic only — T - created_ts; NOT a decision/escalate trigger",
+    "peer_p75_label": "empirical Completed-peer statistic — never labeled or used as City SLA",
+    "status": "LOCKED"
+  },
+  "evidence": {
+    "created_ts": "Parsed CREATED_DATE",
+    "mod_ts": "Parsed LAST_MODIFIED_DATE; missing/unparseable → integrity fail",
+    "closed_ts": "Parsed CLOSED_DATE; used for integrity on open rows",
+    "type_key": "coalesce(trim(SR_SHORT_CODE), trim(SR_TYPE))",
+    "peer_n": "Count of Completed non-dup non-legacy peers in lookback W",
+    "thin_type": "peer_n < n_min",
+    "integrity_fail": "See decision_rules.INCONCLUSIVE"
+  },
   "decision_rules": {
-    "INCONCLUSIVE": "missing/unparseable critical evidence OR contradictory duplicate/parent OR CREATED_DATE > T_freeze",
-    "ESCALATE": "eligible open AND open_age_days >= open_age_days_threshold",
-    "STANDARD": "eligible open AND not INCONCLUSIVE AND not ESCALATE"
+    "order": [
+      "Not in decision set → emit no label",
+      "INCONCLUSIVE if integrity_fail",
+      "ESCALATE if not integrity_fail and dormant_h >= kappa * peer_p75_h",
+      "STANDARD otherwise"
+    ],
+    "INCONCLUSIVE": "integrity gate: Open-like with parseable closed_ts; created_ts or mod_ts unparseable or mod_ts < created_ts; created_ts > T; blank type_key; thin_type (peer_n < n_min); DUPLICATE unparseable if retained; PARENT_SR_NUMBER orphan; Open-like STATUS not in locked Open-token list",
+    "ESCALATE": "not integrity_fail AND dormant_h >= kappa * peer_p75_h",
+    "STANDARD": "open, eligible, coherent, not dormant-relative-to-type at current kappa"
   },
-  "selected_definition": "selected := (action == 'ESCALATE'); no capacity cap",
+  "selected_definition": "selected := (action == 'ESCALATE'); unordered partition; no capacity rank / shortlist",
   "locked_knob": {
-    "name": "open_age_days_threshold",
-    "value": 14,
-    "unit": "days",
-    "warrant": "portfolio working assumption \u2014 NOT City SLA",
-    "status": "PROPOSED"
+    "name": "kappa",
+    "symbol": "κ",
+    "value": 2.0,
+    "grid": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "unit": "multiplier on type peer_p75_h",
+    "warrant": "how many type-cycles of silence count as warranting elevation; portfolio simulation — NOT City SLA",
+    "status": "LOCKED"
+  },
+  "method_constants": {
+    "W_days": 365,
+    "n_min": 50,
+    "note": "Not owner-tunable knobs; changing them is a design change"
   },
   "reconciliation_critical_fields": [
     "SR_NUMBER",
+    "type_key",
+    "is_in_decision_set",
     "is_open",
     "is_eligible",
+    "integrity_fail",
+    "integrity_clause",
+    "dormant_h",
+    "peer_n",
+    "peer_p75_h",
+    "kappa",
+    "open_age_h",
     "action",
-    "selected"
+    "selected",
+    "rule_version",
+    "design_version"
   ],
-  "source_delivery_contract": "docs/stage-03-measurement-design/SOURCE_DELIVERY_CONTRACT.md",
-  "spec_to_builder_packet": "docs/stage-03-measurement-design/SPEC_TO_BUILDER_PACKET.md",
+  "source_delivery_contract": {
+    "summary": "Method B: SQL nonjudgmental extract + peer aggregates; R judges labels. SQL must not assign ESCALATE/INCONCLUSIVE/STANDARD or apply kappa. Mechanical envelope targets open-scale candidates (~245k), not full 14.6M rows to R.",
+    "method": "B",
+    "path": "docs/stage-03-measurement-design/SOURCE_DELIVERY_CONTRACT.md"
+  },
+  "capacity": {
+    "flag": "RANKING_NOT_IN_SCOPE",
+    "rule": "If ESCALATE volume exceeds attention, return to Framing with new candidate question (hard cap + ranking). Do not add secondary sort here. Lowering kappa is not a capacity tool."
+  },
+  "owner_approvals": {
+    "1": {
+      "item": "Lock candidate = B-leaning hybrid (TCD-IG); not Design A confidence-age as primary",
+      "decision": "APPROVED"
+    },
+    "2": {
+      "item": "Single knob = κ; default 2.0; grid {1.0, 1.5, 2.0, 3.0}",
+      "decision": "APPROVED"
+    },
+    "3": {
+      "item": "Method constants W=365d, n_min=50 (not knobs)",
+      "decision": "APPROVED"
+    },
+    "4": {
+      "item": "First-pass window = snapshot as-of T",
+      "decision": "APPROVED"
+    },
+    "5": {
+      "item": "Open = locked Open-token list (default Open); other statuses out of decision set",
+      "decision": "APPROVED"
+    },
+    "6": {
+      "item": "Open + parseable CLOSED_DATE → INCONCLUSIVE",
+      "decision": "APPROVED"
+    },
+    "7": {
+      "item": "Default exclude DUPLICATE true-like and LEGACY_RECORD true-like; require type_key; CREATED_DATE ≤ T",
+      "decision": "APPROVED"
+    },
+    "8": {
+      "item": "Unresolved PARENT_SR_NUMBER → INCONCLUSIVE; no cluster collapse",
+      "decision": "APPROVED"
+    },
+    "9": {
+      "item": "Lock date-parse + timezone rule (date-level OK; hour-level deferred until tz locked)",
+      "decision": "APPROVED"
+    },
+    "10": {
+      "item": "open_age_h diagnostic only — not escalate trigger",
+      "decision": "APPROVED"
+    },
+    "11": {
+      "item": "Peer P75 labeled empirical, not City SLA on all outputs",
+      "decision": "APPROVED"
+    },
+    "12": {
+      "item": "Fixture outline F01–F14 (esp. F03) as construct sign-off",
+      "decision": "APPROVED"
+    },
+    "13": {
+      "item": "Capacity/ranking out of Stage 3; excess ESCALATE → return to Framing",
+      "decision": "APPROVED"
+    },
+    "14": {
+      "item": "SQL may emit peer aggregates; SQL must not emit labels",
+      "decision": "APPROVED"
+    },
+    "15": {
+      "item": "Prior coordinator MEASUREMENT_DESIGN = superseded scratch",
+      "decision": "APPROVED"
+    },
+    "16": {
+      "item": "Accept AI2 produced under Grok Auto (not Comprehensive) for this pass",
+      "decision": "APPROVED — accept Grok Auto"
+    }
+  },
+  "ai_reviews": {
+    "AI1": {
+      "role": "Design A",
+      "model": "ChatGPT",
+      "mode": "Chat highest reasoning",
+      "blind": true
+    },
+    "AI2": {
+      "role": "Design B",
+      "model": "Grok",
+      "mode": "Auto",
+      "note": "Comprehensive unavailable this run; owner accepted Grok Auto for this pass",
+      "blind": true
+    },
+    "AI3": {
+      "role": "Data Risk Dossier",
+      "model": "DeepSeek",
+      "mode": "DeepThink",
+      "verdict": "Supportable-with-bounds",
+      "blind": true
+    }
+  },
+  "superseded": {
+    "prior_design_version": "stage3-v0.1-PENDING / stage3-v0.1 age-threshold scratch",
+    "prior_files": [
+      "docs/stage-03-measurement-design/MEASUREMENT_DESIGN.md",
+      "docs/stage-03-measurement-design/stage3_locked_design.json (prior open_age_days_threshold design)"
+    ],
+    "prior_knob": "open_age_days_threshold=14",
+    "note": "Prior MEASUREMENT_DESIGN / stage3-v0.1 age-threshold scratch superseded by stage3-v1-tcd-ig B-leaning hybrid"
+  },
   "required_outputs": [
     "R-A judged output",
     "R-B judged output",
     "fixture results for both paths",
     "exact reconciliation table",
     "structural cross-review",
-    "validated action list"
+    "validated action list (unordered ESCALATE set)"
   ],
   "stage4_started": false,
-  "three_ai_reviews": "PACKETS_READY_NOT_EXECUTED_NO_COMPUTERUSE",
-  "locked_at": "2026-09-19T04:33:00-05:00",
-  "owner_approval": "Approve Stage 3 Design Gate with WA working assumptions as locked",
-  "working_assumptions_locked": [
-    "WA-W1: Open set STATUS=Open at T_freeze 2026-09-12 23:59:59 America/Chicago",
-    "WA-O1: Open = STATUS Open",
-    "WA-E1: Eligible = open + nonblank id/type + parseable CREATED_DATE <= freeze; exclude 311 INFORMATION ONLY CALL; duplicate/legacy rules per design",
-    "WA-K1: one knob open_age_days_threshold = 14 (portfolio, not City SLA)",
-    "WA-I1/WA-S1: INCONCLUSIVE missing/contradictory; else STANDARD if not ESCALATE",
-    "WA-C1: capacity/ranking Stage 5 note only",
-    "SQL: raw-ish nonjudgmental delivery only"
-  ],
-  "stage4_authorized": false,
-  "three_ai_reviews_at_lock": "packets ready; execution may still be in progress \u2014 owner locked on design substance",
-  "fixture_pack_sha256": "c79484d64365c6896ff859a621bb58c4580ef5086aca1a5447b112e5e9e91de4",
-  "fixture_pack_path": "docs/stage-03-measurement-design/fixtures/KNOWN_CASE_FIXTURE_PACK.md"
+  "stage4_authorized": true,
+  "design_gate": "PASS",
+  "promoted_from": "stage-03/stage3_reconciled_design_DRAFT.md"
 }
