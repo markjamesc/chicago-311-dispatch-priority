@@ -19,3 +19,20 @@ Those claims require preserved execution artifacts in the appropriate repository
 ## Transcript status
 
 **Not started.**
+
+---
+
+## Process note — 2026-09-18 ~20:22 CT (Grok Bot executor)
+
+Stages 1–2 non-browser setup continued while browser/computerUse paused for owner three-AI access verification (ChatGPT / Grok / DeepSeek).
+
+Completed locally and mirrored under `docs/stage-01-02-start-framing/`:
+- Verbatim Start dialogue T000–T010 (Dana synthetic stakeholder; analyst turns coordinator-drafted pending real AI 1)
+- Decision / ambiguity / revision ledgers
+- Start Gate package marked READY_FOR_OWNER + PENDING independent AI reviews
+- `stage1_decision.PENDING.md` (not LOCKED JSON)
+- STATUS.md
+
+**Not done:** real AI 2/AI 3 Start reviews (not invented); Framing Gate lock; Stage 3; publish of Dana coordinator-only secret brief (kept off public GitHub).
+
+**Next human steps:** finish three-AI access check → run independent Start reviews → owner Start Gate approval.
