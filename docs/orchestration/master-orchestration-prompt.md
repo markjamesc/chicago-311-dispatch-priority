@@ -326,7 +326,16 @@ Use the roles defined by the controlling framework at every stage.
 
 Grok Bot must call genuinely separate AI instances when independent work is required. Do not simulate three independent first passes inside one response.
 
+For Stage 3:
+
+- AI 1 produces complete **Design A** from the shared input packet only;
+- AI 2 produces complete **Design B** without seeing Design A;
+- AI 3 produces the independent **Data and Risk Dossier** without seeing Design A or Design B;
+- no coordinator MEASUREMENT_DESIGN / draft design is supplied on the first pass;
+- and cross-review begins only after Design A, Design B, and the Data/Risk dossier exist as separate artifacts.
+
 For Stage 4:
+
 
 - AI 1 builds **R-A** in a separate context;
 - AI 2 builds and audits the **controlled SQL source delivery**;
@@ -417,7 +426,19 @@ Do not begin Stage 3 until both framework gates have passed and both receipts ex
 
 ## 9. Stage 3 — Measurement Design
 
-Open and follow the current Measurement Design framework.
+Open and follow the current Measurement Design framework
+(`ai-augmented-analyst-workflow` → `docs/three-ai-measurement-design-framework.md`).
+
+### Stage 3 independence locks (mandatory)
+
+These four locks are hard rules. A prior “quick” or coordinator MEASUREMENT_DESIGN draft is discardable scratch only. It is **not** an authorized input to AI 1, AI 2, or AI 3 on the first pass.
+
+1. **Shared packet only before first passes.** Provide each AI only: locked Stages 1–2 handoff, source manifest, raw schema/profile facts, Method B constraints, and (where relevant) verified City source documentation. Do **not** include a coordinator MEASUREMENT_DESIGN, judged ID list, Design A, Design B, or the Data/Risk dossier.
+2. **Fixed blindness order.** AI 1 produces complete **Design A**. AI 2 produces complete **Design B** without seeing Design A. AI 3 produces the independent **Data and Risk Dossier** without seeing Design A or Design B. Cross-review starts only after all three first-pass artifacts exist as separate files.
+3. **Design Gate only after cross-review.** Owner lock uses Design Gate Gates 1–11 after controlled cross-review resolves or discloses findings. Do not treat “review my draft” or majority vote as the Design Gate.
+4. **Restart on blindness break.** If any AI is shown another’s first-pass output too early, or the ask is framed as reviewing a coordinator draft, stop that pass and restart from the shared packet.
+
+Do not simulate three independent Stage 3 first passes inside one response. Call genuinely separate AI instances.
 
 Provide the three AIs only the authorized package:
 
@@ -428,6 +449,7 @@ Provide the three AIs only the authorized package:
 - and no judged ID list.
 
 Stage 3 must explicitly lock:
+
 
 - decision window and snapshot/cutoff semantics;
 - eligible universe;
