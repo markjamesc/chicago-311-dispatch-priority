@@ -1,0 +1,21 @@
+{
+  "stage": 2,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T22:17:00-05:00",
+  "candidate_id": "CQ-F02",
+  "analytical_question": "Among open eligible 311 requests in the frozen decision window, which requests should Dana Brooks assign ESCALATE, which INCONCLUSIVE, and which STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)? Exact window dates, open/eligible formulas, urgency and evidence rules, and any capacity ranking if ESCALATE volume exceeds attention remain measurement-design open items and are not part of this question.",
+  "decision_linkage": "Assigns each open eligible request in the frozen window to exactly one of ESCALATE / INCONCLUSIVE / STANDARD under the locked Start.",
+  "owner_approval": "Approve Framing Gate with CQ-F02 tightened wording",
+  "reviews": {
+    "ai1": "ChatGPT Chat High \u2014 Keep CQ-F01",
+    "ai2": "Grok Comprehensive \u2014 Tighten to CQ-F02",
+    "ai3": "DeepSeek DeepThink \u2014 Pass with required revision"
+  },
+  "deferred_to_stage3": [
+    "exact window dates / snapshot cutoff",
+    "open/eligible formulas",
+    "urgency and evidence rules",
+    "capacity ranking if ESCALATE exceeds attention"
+  ],
+  "stage3_started": false
+}
