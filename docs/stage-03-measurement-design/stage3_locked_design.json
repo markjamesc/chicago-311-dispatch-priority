@@ -1,0 +1,79 @@
+{
+  "stage": 3,
+  "status": "LOCKED",
+  "design_version": "stage3-v0.1-PENDING",
+  "fixture_version": "fixtures-v0.1-PENDING",
+  "generated_at": "2026-09-19T04:35:00-05:00",
+  "authority": {
+    "stage1": "docs/stage-01-02-start-framing/stage1_decision.json LOCKED",
+    "stage2": "docs/stage-01-02-start-framing/stage2_framing.json CQ-F02 LOCKED",
+    "measurement_design_md": "docs/stage-03-measurement-design/MEASUREMENT_DESIGN.md"
+  },
+  "working_assumptions_require_owner_confirm": [
+    "WA-W1 T_freeze=2026-09-12 23:59:59 America/Chicago",
+    "WA-O1 STATUS==Open",
+    "WA-E1 eligibility + info-only + legacy exclude",
+    "WA-K1 open_age_days_threshold=14 portfolio NOT City SLA",
+    "WA-I1 INCONCLUSIVE rules",
+    "WA-S1 STANDARD residual",
+    "WA-C1 capacity/ranking deferred to Stage 5 note"
+  ],
+  "population": "Open eligible requests in frozen snapshot under WA-W1/WA-O1/WA-E1",
+  "grain": "one row per SR_NUMBER",
+  "request_id": "SR_NUMBER",
+  "decision_window": {
+    "start": "WORKING_ASSUMPTION",
+    "end": "WORKING_ASSUMPTION T_freeze 2026-09-12T23:59:59-05:00",
+    "boundary_semantics": "Open rows in frozen snapshot; calendar freeze pending owner confirm",
+    "snapshot_max_CREATED_DATE": "2026-09-12 15:39:45"
+  },
+  "open_definition": "STATUS == 'Open' (exact string)",
+  "urgency_definition": "open_age_days = floor((T_freeze - CREATED_DATE)/86400); portfolio attention proxy; NOT City SLA",
+  "decision_rules": {
+    "INCONCLUSIVE": "missing/unparseable critical evidence OR contradictory duplicate/parent OR CREATED_DATE > T_freeze",
+    "ESCALATE": "eligible open AND open_age_days >= open_age_days_threshold",
+    "STANDARD": "eligible open AND not INCONCLUSIVE AND not ESCALATE"
+  },
+  "selected_definition": "selected := (action == 'ESCALATE'); no capacity cap",
+  "locked_knob": {
+    "name": "open_age_days_threshold",
+    "value": 14,
+    "unit": "days",
+    "warrant": "portfolio working assumption \u2014 NOT City SLA",
+    "status": "PROPOSED"
+  },
+  "reconciliation_critical_fields": [
+    "SR_NUMBER",
+    "is_open",
+    "is_eligible",
+    "action",
+    "selected"
+  ],
+  "source_delivery_contract": "docs/stage-03-measurement-design/SOURCE_DELIVERY_CONTRACT.md",
+  "spec_to_builder_packet": "docs/stage-03-measurement-design/SPEC_TO_BUILDER_PACKET.md",
+  "required_outputs": [
+    "R-A judged output",
+    "R-B judged output",
+    "fixture results for both paths",
+    "exact reconciliation table",
+    "structural cross-review",
+    "validated action list"
+  ],
+  "stage4_started": false,
+  "three_ai_reviews": "PACKETS_READY_NOT_EXECUTED_NO_COMPUTERUSE",
+  "locked_at": "2026-09-19T04:33:00-05:00",
+  "owner_approval": "Approve Stage 3 Design Gate with WA working assumptions as locked",
+  "working_assumptions_locked": [
+    "WA-W1: Open set STATUS=Open at T_freeze 2026-09-12 23:59:59 America/Chicago",
+    "WA-O1: Open = STATUS Open",
+    "WA-E1: Eligible = open + nonblank id/type + parseable CREATED_DATE <= freeze; exclude 311 INFORMATION ONLY CALL; duplicate/legacy rules per design",
+    "WA-K1: one knob open_age_days_threshold = 14 (portfolio, not City SLA)",
+    "WA-I1/WA-S1: INCONCLUSIVE missing/contradictory; else STANDARD if not ESCALATE",
+    "WA-C1: capacity/ranking Stage 5 note only",
+    "SQL: raw-ish nonjudgmental delivery only"
+  ],
+  "stage4_authorized": false,
+  "three_ai_reviews_at_lock": "packets ready; execution may still be in progress \u2014 owner locked on design substance",
+  "fixture_pack_sha256": "c79484d64365c6896ff859a621bb58c4580ef5086aca1a5447b112e5e9e91de4",
+  "fixture_pack_path": "docs/stage-03-measurement-design/fixtures/KNOWN_CASE_FIXTURE_PACK.md"
+}
