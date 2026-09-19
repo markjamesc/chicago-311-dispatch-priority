@@ -1,0 +1,19 @@
+A04 Builder execution log
+Timestamp: 2026-09-19 16:32 UTC-5 (task timestamp)
+Application: ChatGPT at https://chatgpt.com/
+Chat: A04 Source Gate Ablation Analysis
+Role: Builder (ChatGPT); Validator: DeepSeek; Adjudicator: Grok
+Reasoning setting: High (highest visibly available setting in the Plus chat UI)
+Input packet: /workspace/chicago-311-run/ablations/A04/packets/A04_BUILDER_PASTE.txt
+Input packet size: 9,645 bytes; 268 lines
+Submission: completed in a new chat; full packet entered into the editor and sent.
+
+Observed Builder output highlights:
+- Source Gate: PASS (15 PASS, 0 FAIL, 2 INFO).
+- Source Gate counts: extract Open 245,193; raw Open 245,193; distinct SR_NUMBER 245,193.
+- Recon: n_ra 222,002; n_rb 222,002; n_inner 222,002; only-ra 0; only-rb 0; agree 222,002; disagree 0.
+- P1: process-step reduction is supported, but equal detection coverage is not established.
+- Key distinction: R reconciliation detects divergence between implementations; Source Gate validates the shared input contract.
+- Builder maintained the role boundary and issued no terminal KEEP/REVERT/HALT decision.
+
+Execution status: SUCCESS — Builder response received and report written.

@@ -1,0 +1,51 @@
+{
+  "stage": 5,
+  "status": "PASS",
+  "finish_gate": "PASS",
+  "design_version_used": "stage3-v1-tcd-ig",
+  "fixture_version_used": "fixtures-v1-tcd-ig",
+  "approved_at_ct": "2026-09-19 14:41 CT",
+  "owner_approval_quote": "Approve Finish Gate: accept frozen TCD-IG labels as Stage 5 methodology assignment; Framing return on capacity for any operational focus list; no live dispatch; proceed to evidence pack upload / ablations when ready",
+  "stance": {
+    "accept_frozen_labels": true,
+    "framing_return_on_capacity": true,
+    "live_dispatch": false,
+    "type_aggregate_monitor_optional": true
+  },
+  "portfolio": {
+    "n_decision": 222002,
+    "n_ESCALATE": 131968,
+    "n_INCONCLUSIVE": 6377,
+    "n_STANDARD": 83657,
+    "kappa": 2.0
+  },
+  "ai_reviews": {
+    "AI1": {
+      "role": "Interpretation builder",
+      "model": "ChatGPT High"
+    },
+    "AI2": {
+      "role": "Decision/method critic",
+      "model": "Grok Expert",
+      "note": "Comprehensive unavailable"
+    },
+    "AI3": {
+      "role": "Claim/evidence auditor",
+      "model": "DeepSeek DeepThink",
+      "verdict": "PASS-WITH-LIMITATIONS"
+    }
+  },
+  "artifact_paths": [
+    "docs/stage-05-interpretation/FINISH_GATE_RECEIPT.md",
+    "docs/stage-05-interpretation/FINISH_GATE_PACKAGE.md",
+    "docs/stage-05-interpretation/reviews/AI1_INTERPRETATION_BUILDER.md",
+    "docs/stage-05-interpretation/reviews/AI2_DECISION_METHOD_CRITIC.md",
+    "docs/stage-05-interpretation/reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md",
+    "docs/stage-05-interpretation/reviews/CROSS_REVIEW.md",
+    "docs/stage-05-interpretation/reviews/INTERPRETATION_RECONCILIATION.md",
+    "docs/stage-04-execution-validation/stage4_validation_status.json",
+    "docs/stage-04-execution-validation/WORKFLOW_GATE_RECEIPT.md",
+    "validation/workflow-gate/workflow_gate_status.json",
+    "outputs/validated_action_list.csv"
+  ]
+}

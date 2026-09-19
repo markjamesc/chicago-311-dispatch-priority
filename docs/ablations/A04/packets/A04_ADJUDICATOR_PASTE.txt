@@ -1,0 +1,449 @@
+# A04 Adjudicator — Grok (TERMINAL DECISION)
+
+Adjudicator only. Prefer Comprehensive else Expert. Exactly one of KEEP | REVERT | HALT.
+
+KEEP = optional/remove Source Gate becomes canonical.
+REVERT = keep mandatory Source Gate.
+HALT only for hard conflict / role breach / missing RAW MANIFEST (present below). If P1 fails → REVERT.
+
+---
+# SPEC
+# A04 — Ablation specification (FROZEN)
+
+**Ablation ID:** A04  
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok  
+**Target:** Stage 4 SQL Source Gate  
+**Constitution:** 1.0  
+
+## Exact change being tested
+
+**Proposed change:** Remove or make optional the SQL Source Gate vs raw (trust the extract; skip formal Source Gate PASS before R builders).
+
+## Benefit predicate P1
+
+Skipping Source Gate reduces steps while Chicago’s dual R recon + fixtures would still have caught extract/delivery defects with equal coverage.
+
+P1 **fails** if Source Gate was necessary to prove nonjudgmental delivery / completeness vs raw, or if skipping it would leave silent extract bugs undetectable by recon alone.
+
+## Raw evidence
+
+`_raw_evidence` MANIFEST including SOURCE_GATE_REPORT, recon, fixtures, stage4 JSON.
+
+## Adjudicator note
+
+If packs agree and RAW MANIFEST present → do not HALT for missing historical mysql stdout; REVERT when P1 fails.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# FREEZE
+{
+  "ablation_id": "A04",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A04/A04-builder/builder_report.md",
+      "bytes": 3501,
+      "sha256": "e5d4e85d03a43771b13c0897e48240b8c61733a1236c1e4d0e42f59c4650c167"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A04/A04-builder/execution_stdout.txt",
+      "bytes": 1180,
+      "sha256": "372270f60119dcd69d1c28e64624d3243e54a6afe9d6859a4fe5d5b82152861e"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A04/A04-validator/validator_report.md",
+      "bytes": 10959,
+      "sha256": "ca43b7226292794aca193dc0e1e49fc1b1eabf8df781549152be0e80d7ceb149"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A04/A04-validator/execution_stdout.txt",
+      "bytes": 29,
+      "sha256": "be74872b4bc86c85bf4c921090cbcb2ab14f74e2ad2fd8a6bf911d173477b005"
+    }
+  ],
+  "raw_manifest": {
+    "path": "/workspace/chicago-311-run/ablations/_raw_evidence/MANIFEST.sha256",
+    "bytes": 1472,
+    "sha256": "0c412aaaa7524c1e6466d364ffde1cc393f7b6a3301db194df245b18aff84926"
+  }
+}
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+---
+# SOURCE_GATE_REPORT excerpt
+# SOURCE_GATE_REPORT — Chicago 311 Stage 4 Method B
+**Overall:** **PASS**
+**When (CT):** 2026-09-19 ~07:30 CT (extract started ~05:34 CT; ~1h56m)
+**Authority:** Design Gate PASS; Fixture Gate PASS (`fixtures-v1-tcd-ig`, F01–F14, F03→STANDARD at κ=2)
+**R-A/R-B:** UNBLOCKED — may start independent judged builds
+
+## Counts (live)
+| Metric | Value |
+|---|---|
+| extract Open n | 245,193 |
+| raw Open n | 245,193 |
+| distinct SR_NUMBER | 245,193 |
+| peer type_key n | 104 |
+| peer row sum | 1,881,338 |
+| Source Gate overall | **PASS** (15 PASS, 0 FAIL, 2 INFO) |
+
+## Check results
+| Check | Result |
+|---|---|
+| A_open_count_match | PASS |
+| B_distinct_sr_equals_rows | PASS |
+| C_id_extra / C_id_missing | PASS |
+| D_field_mismatch_critical | PASS |
+| E_status_domain_open_only | PASS |
+| F_created_date_range | PASS |
+| G_null_profile_created_status | PASS |
+| G_null_closed_date_info | INFO (expected ~all Open blank CLOSED_DATE) |
+| H_sr_checksum_match | PASS |
+| I_peer_stats_present / p75 / type_key | PASS |
+| J_no_judged_columns | PASS |
+| K_lineage_open_matches_raw / t_freeze | PASS |
+| L_raw_status_dist_info | INFO |
+
+## Deliverables
+- MySQL `chicago311.src_open_candidates`
+- MySQL `chicago311.src_peer_stats`
+- MySQL `chicago311.src_extract_lineage`
+- Scripts: `sql/01_source_extract.sql`, `sql/02_source_gate_checks.sql`
+
+## Note
+Shell wrapper exit_code 1 was only from a post-gate `SELECT` against non-table `src_gate_overall`; gate script itself exited 0 with `SOURCE_GATE_PASS`.
+
+---
+# BUILDER
+# A04 Builder Report — ChatGPT Independent First Pass
+
+## Role attestation
+
+A04 was submitted to a new ChatGPT chat as the Builder. The Builder was instructed to use the highest available reasoning setting, remain blind to Validator output, and avoid issuing a terminal KEEP/REVERT/HALT decision. The response followed that boundary and explicitly ended with: “No terminal KEEP / REVERT / HALT determination is issued in Builder role.”
+
+## Scope and proposed change
+
+The tested change is removal or optionalization of the Stage 4 SQL Source Gate, trusting the raw extract and proceeding directly to independent R-A/R-B reconstruction, reconciliation, and fixtures. The operational benefit predicate (P1) requires both fewer process steps and equal defect-detection coverage for extract and delivery defects.
+
+## Evidence facts considered
+
+The supplied Source Gate report is marked PASS, with 15 PASS, 0 FAIL, and 2 INFO checks. It reports extract Open n = 245,193, raw Open n = 245,193, distinct SR_NUMBER = 245,193, 104 peer type keys, and peer row sum = 1,881,338. The reconciliation summary reports n_ra = 222,002, n_rb = 222,002, n_inner = 222,002, n_only_ra = 0, n_only_rb = 0, n_agree = 222,002, and n_disagree = 0. The supplied Source Gate checks cover count equality, identifier integrity, critical-field mismatches, status domain, date range, null profiles, SR checksum, peer statistics, absence of judged columns, and raw-to-lineage agreement.
+
+## Builder assessment of P1
+
+The evidence supports the narrow claim that removing Source Gate would eliminate an explicit workflow stage. It does not establish the required equal-coverage claim. R-A/R-B reconciliation demonstrates agreement between two analytical implementations on the tested population; it does not independently prove that their shared upstream input is complete, non-duplicated, non-contaminated, and faithful to the allowed raw scope. A shared extraction defect can be consumed identically by both R implementations and therefore produce perfect agreement while remaining undetected.
+
+The Builder specifically distinguishes two failure surfaces: Source Gate validates the analytical input contract, whereas R reconciliation validates implementation agreement after input delivery. Source Gate checks such as raw/extract completeness, distinct-ID equality, no judged columns, and lineage attestation are not shown to be reproduced by downstream recon alone. The supplied fixture and reconciliation evidence therefore cannot prove that skipping the gate preserves detection coverage for shared upstream defects.
+
+## Risks identified
+
+1. Shared-input blind spot: both R pipelines may inherit the same incomplete or corrupted extract.
+2. Semantic contamination: without an explicit no-judged-columns control, a precomputed judgment field could influence analysis without causing R disagreement.
+3. Loss of an auditable raw-to-source contract: the evidence chain would become raw to an unknown intermediate to analysis.
+4. False confidence from agreement: 222,002/222,002 agreement is strong implementation evidence, not proof of source correctness.
+
+## Builder conclusion
+
+The change is mechanically plausible as a step reduction, but the predeclared P1 benefit is not proven by the frozen evidence. The evidence indicates that Source Gate and R reconciliation protect different failure classes. This is an independent Builder assessment only; it does not adjudicate the ablation and does not issue KEEP, REVERT, or HALT.
+
+---
+# VALIDATOR
+# A04 Validator — DeepSeek DeepThink (Independent First Pass)
+
+## 1. Role attestation
+
+I am acting only as Validator for ablation A04. I am blind to the Builder's first-pass output. I will not issue a KEEP / REVERT / HALT decision. I assess evidence, state hard facts, identify blocking objections, and note evidence that is not independently visible. DeepThink is ON.
+
+The frozen inputs named in the SPEC and Constitution are controlling. The RAW MANIFEST is treated as present; the files listed there are therefore not missing merely because their contents are not reproduced in the prompt. Where I assess a file's content, I rely only on the frozen pack text provided.
+
+## 2. Test plan
+
+The ablation tests whether removing or making optional the SQL Source Gate versus raw extraction preserves the Source Gate's protective function:
+
+- nonjudgmental delivery and completeness versus raw;
+- detection of extract and delivery defects;
+- equal coverage from Chicago's dual R reconciliation plus fixtures alone.
+
+P1 requires that skipping Source Gate reduces steps while dual R reconciliation plus fixtures would still catch extract/delivery defects with equal coverage. P1 fails if Source Gate was necessary to prove nonjudgmental delivery/completeness versus raw, or if skipping it leaves silent extract bugs undetectable by reconciliation alone.
+
+The Validator checks whether Source Gate checks are mechanically evidenced; whether dual R reconciliation and fixture results cover the same defect classes; whether any silent extract bug class remains undetectable by reconciliation alone; whether hard mechanical facts are agreed and frozen; and whether RAW MANIFEST artifacts are sufficient for the claim.
+
+## 3. Hard facts
+
+### 3.1 RAW MANIFEST
+
+The RAW MANIFEST contains SHA-256 hashes for BASELINE_FRAMEWORK.sha256, EXACT_RECON_REPORT.md, LINEAGE_ATTESTATION.md, MANIFEST.sha256, RA_portfolio_counts.csv, RB_portfolio_counts.csv, RECON_DISAGREE_IDS.csv, RECON_SUMMARY.csv, SOURCE_GATE_REPORT.md, r_a_fixture_results.csv, r_b_fixture_results.csv, stage4_validation_status.json, structural_cross_review.md, three-ai-measurement-design-framework.md, three-ai-validation-and-analysis-framework.md, and workflow_gate_status.json.
+
+The adjudicator note says that when packs agree and the RAW MANIFEST is present, missing historical MySQL stdout is not by itself a HALT condition, and that P1 failure is handled under the frozen adjudication rule.
+
+### 3.2 SOURCE_GATE_REPORT
+
+The provided report states:
+
+- Overall: PASS.
+- Authority: Design Gate PASS and Fixture Gate PASS (`fixtures-v1-tcd-ig`, F01–F14, F03→STANDARD at kappa=2).
+- R-A/R-B: UNBLOCKED.
+- Extract Open n = 245,193; raw Open n = 245,193.
+- Distinct SR_NUMBER = 245,193; peer type_key n = 104; peer row sum = 1,881,338.
+- Source Gate overall: 15 PASS, 0 FAIL, 2 INFO.
+
+The checks reported PASS are A_open_count_match, B_distinct_sr_equals_rows, C_id_extra/C_id_missing, D_field_mismatch_critical, E_status_domain_open_only, F_created_date_range, G_null_profile_created_status, H_sr_checksum_match, I_peer_stats_present/p75/type_key, J_no_judged_columns, and K_lineage_open_matches_raw/t_freeze. G_null_closed_date_info and L_raw_status_dist are INFO. Deliverables include `chicago311.src_open_candidates`, `chicago311.src_peer_stats`, `chicago311.src_extract_lineage`, `sql/01_source_extract.sql`, and `sql/02_source_gate_checks.sql`.
+
+The report notes that wrapper exit_code 1 came only from a post-gate SELECT against non-table `src_gate_overall`; the gate script itself exited 0 with `SOURCE_GATE_PASS`.
+
+### 3.3 RECON_SUMMARY.csv
+
+The provided summary states: n_ra = 222,002; n_rb = 222,002; n_inner = 222,002; n_only_ra = 0; n_only_rb = 0; n_agree = 222,002; n_disagree = 0.
+
+### 3.4 Other manifest artifacts
+
+The artifacts are present by hash in the RAW MANIFEST, but their contents are not reproduced in the provided pack. Thus they are not treated as missing for the adjudicator's manifest rule, although their contents cannot be independently inspected from this prompt.
+
+## 4. Source Gate notes
+
+The Source Gate is the exact change target. The proposal is to trust the extract and skip formal Source Gate PASS before the R builders. The report shows a formal PASS with 15 PASS, 0 FAIL, and 2 INFO; the INFO items are described as expected or informational.
+
+Several checks directly compare extract versus raw: A_open_count_match, B_distinct_sr_equals_rows, C_id_extra/C_id_missing, D_field_mismatch_critical, E_status_domain_open_only, F_created_date_range, G_null_profile_created_status, H_sr_checksum_match, and K_lineage_open_matches_raw/t_freeze. These are the checks that establish nonjudgmental delivery/completeness versus raw and can catch extract or delivery defects.
+
+The dual R summary is strong evidence of R-A/R-B agreement on the reconciled field set, but it does not show whether the field set covers all critical extract fields, whether both builders could agree on a missing raw row, whether a systematic extract bug affects both identically, whether a raw-to-extract count mismatch is detected, or whether a stale/different extract was consumed. The Source Gate's A, B, C, D, H, and K checks compare against raw; the recon summary does not visibly reproduce those comparisons.
+
+Fixture evidence is present by hash and the fixture gate is asserted PASS, but the fixture result contents are not reproduced. The Validator therefore cannot independently confirm from the provided text that fixture coverage includes the extract/delivery defect classes covered by the Source Gate. `stage4_validation_status.json` and `workflow_gate_status.json` are likewise present by hash but not reproduced.
+
+## 5. P1 assessment
+
+### 5.1 Equal coverage
+
+The provided evidence does not establish equal coverage. The Source Gate report lists explicit extract-versus-raw checks for counts, IDs, critical fields, checksums, and lineage. The recon summary shows only that R-A and R-B agree on 222,002 rows with zero disagreements. It does not show that either builder was compared against raw on the same critical fields. If both builders consume the same extract, an extract defect can propagate identically and still produce recon agreement. The fixture PASS assertion is not enough to demonstrate equivalent coverage because the fixture contents are not reproduced.
+
+Therefore the evidence does not establish that dual R reconciliation plus fixtures would have caught extract/delivery defects with equal coverage. The first P1 failure condition is supported: the Source Gate was necessary to prove nonjudgmental delivery/completeness versus raw, while the recon summary alone does not prove that.
+
+### 5.2 Silent extract bugs undetectable by recon alone
+
+The following classes can remain silent when both R builders consume the same extract:
+
+- missing extract rows that are absent from both R outputs;
+- critical fields corrupted consistently in the extract;
+- extra or missing extract IDs versus raw;
+- checksum mismatch versus raw;
+- lineage or freeze mismatch versus raw.
+
+The Source Gate checks A/B, D, C, H, and K directly address these classes. The recon summary does not visibly do so. The second P1 failure condition is therefore supported: skipping Source Gate can leave silent extract bugs undetectable by reconciliation alone.
+
+### 5.3 P1 conclusion
+
+From the provided frozen evidence, P1 is not established. The evidence shows R-A/R-B agreement, but not equal coverage against raw. The Source Gate report documents extract-versus-raw checks that the recon summary does not replicate, and fixture coverage of those defect classes cannot be independently confirmed from the provided text. This is a P1 assessment only; the Validator does not issue KEEP / REVERT / HALT.
+
+## 6. Blocking objections
+
+**BO-1 — Recon summary does not prove nonjudgmental delivery/completeness versus raw.** The summary shows R-A/R-B agreement on 222,002 rows and zero disagreements, but not extract-versus-raw count match, ID extra/missing, critical-field mismatch, checksum match, or lineage/freeze match. The Source Gate report shows those checks PASS. This directly bears on P1 failure condition 1.
+
+**BO-2 — Silent extract bug classes remain undetectable by recon alone.** A defect identical in R-A and R-B can yield recon agreement because both consume the same extract. Source Gate checks A, B, C, D, H, and K are designed to detect those defects against raw. This directly bears on P1 failure condition 2.
+
+**BO-3 — Fixture coverage is not independently verifiable from the provided text.** Fixture gate PASS is asserted, but the result files are only present by hash. Equal coverage with Source Gate checks A–L cannot be confirmed.
+
+**BO-4 — Hard mechanical facts are not fully visible for Validator agreement.** Visible facts include Source Gate counts and statuses, RECON_SUMMARY counts, and RAW MANIFEST hashes. The contents of EXACT_RECON_REPORT.md, both fixture result CSVs, stage4_validation_status.json, workflow_gate_status.json, RECON_DISAGREE_IDS.csv, and both portfolio count files are not visible. The manifest rule means they are not missing, but it does not give the Validator enough content to independently confirm every hard fact.
+
+**BO-5 — Wrapper exit code 1 needs careful reading.** The report attributes it to a post-gate SELECT against a non-table and states the gate script exited 0 with `SOURCE_GATE_PASS`. This does not by itself invalidate the gate, but it should be reconciled against any Builder hard-mechanical exit-code claim.
+
+## 7. Missing evidence
+
+Per the adjudicator note, the RAW MANIFEST is present, so the listed files are not missing for HALT purposes. For independent Validator assessment, their contents are not reproduced. The Validator cannot confirm exact fixture actuals and expecteds, exact fixture IDs executed, fixture coverage of extract-versus-raw defect classes, baseline/candidate version hashes beyond the manifest listing, the declared changed-file set, the exact recon critical-field list, consistency of PASS/FAIL states in the two status JSON files, or whether RECON_DISAGREE_IDS.csv is empty and consistent with n_disagree = 0. These are not missing in the adjudicator-note sense; they are not independently visible in the provided text.
+
+## 8. Summary
+
+The frozen evidence shows a present RAW MANIFEST, a Source Gate PASS with 15 PASS/0 FAIL/2 INFO, direct extract-versus-raw checks A–L, and R-A/R-B agreement of 222,002 rows with zero disagreements. Fixture gate PASS is asserted but its result contents are not reproduced. The recon summary alone does not prove nonjudgmental delivery/completeness versus raw and would not detect extract defects identical in both builders. P1 is not established from the provided evidence. Blocking objections BO-1 through BO-5 are supported, especially BO-1 and BO-2. No KEEP / REVERT / HALT decision is issued by the Validator; the Validator's role is to assess and report.
+

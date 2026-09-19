@@ -1,20 +1,25 @@
-# SQL Source Delivery
+# SQL Source Delivery (Stage 4 Method B)
 
-Stage 4 SQL belongs here.
+**Status:** Scripts authored; PC execution required for Source Gate PASS.
 
-SQL must remain a **controlled, faithful, nonjudgmental source-delivery layer**. It may perform authorized mechanical extraction and joins, but it should not silently decide analytical concepts such as:
+## Mechanical envelope
+`STATUS = 'Open'` only — nonjudgmental volume bound (~245,193 rows per source-manifest). **No age filter. No judged columns.**
 
-- `is_in_window`
-- `is_open`
-- `is_eligible`
-- analytical duplicate treatment
-- urgency / lateness
-- `action`
-- `selected`
-- final request membership
+## Files
+| File | Role |
+|---|---|
+| `01_source_extract_open_envelope.sql` | SELECT all 39 raw columns for Open rows |
+| `run_source_delivery.ps1` | PC export → `data/source_open_envelope.tsv` + lineage JSON |
+| `../validation/source-gate/` | Source Gate SQL + report |
 
-unless Stage 3 explicitly authorizes the step as mechanical.
+## Forbidden in SQL outputs
+`is_open`, `is_eligible`, `open_age_days`, `action`, `selected`, urgency, ranking.
 
-The delivery query and its lineage must be auditable against `chicago311.raw_311_requests`.
-
-Status: **No production SQL yet.**
+## PC run
+```powershell
+cd "C:\Users\Mark\Documents\R Working Directory\chicago311"
+# sync this folder from repo, then:
+powershell -File .\sql\source-delivery\run_source_delivery.ps1
+# then Source Gate:
+# mysql --login-path=chicago311 < validation\source-gate\source_gate_checks.sql
+```

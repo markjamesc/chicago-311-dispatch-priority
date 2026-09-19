@@ -1,0 +1,33 @@
+{
+  "ablation_id": "A02",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "DeepSeek",
+    "Validator": "Grok",
+    "Adjudicator": "ChatGPT"
+  },
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-builder/builder_report.md",
+      "bytes": 5475,
+      "sha256": "af566a4ea43ddc294dc5afca3d316570d569dabd81018c6d19e39f153101be48"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-builder/execution_stdout.txt",
+      "bytes": 34,
+      "sha256": "0f84678d8c9f55fae4d2311ffad4158ce058e64fdec3599f49454e683ebf9bc9"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-validator/validator_report.md",
+      "bytes": 26192,
+      "sha256": "8f180e8d1e46404c56310ebe7ae4a5ff56b970dd1402a5cdf10bfda9881edf42"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-validator/execution_stdout.txt",
+      "bytes": 37,
+      "sha256": "054472ee096a044720e5f140f9445b6edb67ba7499470ff8692c695afaae0be7"
+    }
+  ]
+}

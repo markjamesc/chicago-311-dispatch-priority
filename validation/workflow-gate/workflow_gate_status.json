@@ -1,0 +1,159 @@
+{
+  "gate": "chicago_311_five_stage_workflow_gate",
+  "result": "PASS",
+  "stage5_allowed": true,
+  "checked_at_utc": "2026-09-19 19:07:52 UTC",
+  "project_root": "/workspace/chicago-311-dispatch-priority",
+  "checks": [
+    {
+      "check": "Stage 1 receipt exists",
+      "result": "PASS",
+      "detail": "/workspace/chicago-311-dispatch-priority/docs/stage-01-02-start-framing/stage1_decision.json"
+    },
+    {
+      "check": "Stage 1 receipt parses",
+      "result": "PASS",
+      "detail": "Valid JSON"
+    },
+    {
+      "check": "Stage 2 receipt exists",
+      "result": "PASS",
+      "detail": "/workspace/chicago-311-dispatch-priority/docs/stage-01-02-start-framing/stage2_framing.json"
+    },
+    {
+      "check": "Stage 2 receipt parses",
+      "result": "PASS",
+      "detail": "Valid JSON"
+    },
+    {
+      "check": "Stage 3 receipt exists",
+      "result": "PASS",
+      "detail": "/workspace/chicago-311-dispatch-priority/docs/stage-03-measurement-design/stage3_locked_design.json"
+    },
+    {
+      "check": "Stage 3 receipt parses",
+      "result": "PASS",
+      "detail": "Valid JSON"
+    },
+    {
+      "check": "Stage 4 receipt exists",
+      "result": "PASS",
+      "detail": "/workspace/chicago-311-dispatch-priority/docs/stage-04-execution-validation/stage4_validation_status.json"
+    },
+    {
+      "check": "Stage 4 receipt parses",
+      "result": "PASS",
+      "detail": "Valid JSON"
+    },
+    {
+      "check": "Stage 1 required fields",
+      "result": "PASS",
+      "detail": "Required: stage, status, decision_statement, decision_owner"
+    },
+    {
+      "check": "Stage 1 locked",
+      "result": "PASS",
+      "detail": "status must equal LOCKED"
+    },
+    {
+      "check": "Stage 2 required fields",
+      "result": "PASS",
+      "detail": "Required: stage, status, analytical_question"
+    },
+    {
+      "check": "Stage 2 locked",
+      "result": "PASS",
+      "detail": "status must equal LOCKED"
+    },
+    {
+      "check": "Stage 3 required fields",
+      "result": "PASS",
+      "detail": "Required: stage, status, design_version, population, grain, request_id, decision_window, open_definition, urgency_definition, decision_rules, selected_definition, locked_knob, reconciliation_critical_fields, source_delivery_contract, fixture_version, required_outputs"
+    },
+    {
+      "check": "Stage 3 locked",
+      "result": "PASS",
+      "detail": "status must equal LOCKED"
+    },
+    {
+      "check": "Stage 4 required fields",
+      "result": "PASS",
+      "detail": "Required: stage, status, design_version_used, fixture_version_used, sql_source_gate, r_a_fixtures, r_b_fixtures, r_a_status, r_b_status, reconciliation, structural_cross_review, lineage_attestation, validation_gate, unresolved_issues, artifact_paths"
+    },
+    {
+      "check": "Stage 4 used locked Stage 3 version",
+      "result": "PASS",
+      "detail": "Stage 3=stage3-v1-tcd-ig; Stage 4=stage3-v1-tcd-ig"
+    },
+    {
+      "check": "Stage 4 used frozen fixture version",
+      "result": "PASS",
+      "detail": "Stage 3=fixtures-v1-tcd-ig; Stage 4=fixtures-v1-tcd-ig"
+    },
+    {
+      "check": "Stage 4 sql_source_gate",
+      "result": "PASS",
+      "detail": "sql_source_gate must equal PASS"
+    },
+    {
+      "check": "Stage 4 r_a_fixtures",
+      "result": "PASS",
+      "detail": "r_a_fixtures must equal PASS"
+    },
+    {
+      "check": "Stage 4 r_b_fixtures",
+      "result": "PASS",
+      "detail": "r_b_fixtures must equal PASS"
+    },
+    {
+      "check": "Stage 4 r_a_status",
+      "result": "PASS",
+      "detail": "r_a_status must equal PASS"
+    },
+    {
+      "check": "Stage 4 r_b_status",
+      "result": "PASS",
+      "detail": "r_b_status must equal PASS"
+    },
+    {
+      "check": "Stage 4 reconciliation",
+      "result": "PASS",
+      "detail": "reconciliation must equal PASS"
+    },
+    {
+      "check": "Stage 4 structural_cross_review",
+      "result": "PASS",
+      "detail": "structural_cross_review must equal PASS"
+    },
+    {
+      "check": "Stage 4 lineage_attestation",
+      "result": "PASS",
+      "detail": "lineage_attestation must equal PASS"
+    },
+    {
+      "check": "Stage 4 validation_gate",
+      "result": "PASS",
+      "detail": "validation_gate must equal PASS"
+    },
+    {
+      "check": "Stage 4 unresolved issues",
+      "result": "PASS",
+      "detail": "unresolved_issues must equal 0"
+    },
+    {
+      "check": "Stage 4 overall status",
+      "result": "PASS",
+      "detail": "status must equal PASS"
+    },
+    {
+      "check": "Stage 4 artifact list nonempty",
+      "result": "PASS",
+      "detail": "artifact_paths must contain preserved evidence files"
+    },
+    {
+      "check": "Stage 4 declared artifacts exist",
+      "result": "PASS",
+      "detail": "All declared artifacts exist"
+    }
+  ]
+}

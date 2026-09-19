@@ -1,0 +1,758 @@
+# A08 Adjudicator — ChatGPT (TERMINAL DECISION)
+
+Adjudicator only. Highest reasoning. Exactly one of KEEP | REVERT | HALT.
+
+KEEP = shrink/loosen critical recon field list becomes canonical.
+REVERT = keep full exact SR_NUMBER-level critical recon list.
+HALT only for hard conflict / role breach / missing RAW MANIFEST. If P1 fails → REVERT.
+
+RAW MANIFEST present → do not HALT for missing historical R stdout.
+
+---
+# SPEC
+# A08 — Ablation specification (FROZEN)
+
+**Ablation ID:** A08  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target:** Stage 4 exact reconciliation / critical field set  
+**Constitution:** 1.0  
+**Frozen at CT:** 2026-09-19
+
+## Exact change being tested
+
+**Proposed change:** Shrink or loosen the critical reconciliation field list: replace the full exact SR_NUMBER-level and decision-field recon with a reduced/loosened check based only on aggregate decision counts and a smaller label summary. This is a counterfactual analysis; do not rewrite the locked Chicago 311 Stage 4 pack.
+
+The full locked check includes the SR_NUMBER set and row-level decision agreement (`n_inner`, `n_only_ra`, `n_only_rb`, `n_agree`, `n_disagree`), classification/action labels, integrity clauses, age/dormancy and peer fields used to explain decisions, plus portfolio counts. The candidate reduction must state exactly which fields are removed or relaxed.
+
+## Benefit predicate P1
+
+A shorter or looser recon is faster/cheaper while still detecting material path defects and semantic disagreements.
+
+P1 **fails** if the full critical list was necessary to catch the production 104-row clock-skew incident or the resulting label disagreements, including the 104 `STANDARD` (R-A) versus `ESCALATE` (R-B) rows.
+
+## Frozen surfaces and regression rules
+
+- Locked baseline: `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, `T_freeze=2026-09-12 23:59:59 America/Chicago`, κ=2.
+- Expected unchanged surfaces: SQL nonjudgment boundary, TCD-IG rules, exact fixture expecteds, SR_NUMBER grain, and the frozen Chicago 311 Stage 4 pack.
+- Any undeclared semantic change, missed row-set disagreement, missed label disagreement, or fixture/recon regression is a failure of the candidate.
+- Do not replace exact recon with a majority vote or aggregate-only assertion without documenting the lost detection coverage.
+
+## Critical reconciliation fields and checks
+
+Full locked list: SR_NUMBER key-set equality; n_decision; n_inner; n_only_ra; n_only_rb; n_agree; n_disagree; row-level classification/action labels; integrity clauses; `dormant_h`, `open_age_h`, `peer_n`, and `peer_p75_h` where present for diagnosis; and portfolio counts for ESCALATE/INCONCLUSIVE/STANDARD. Also check the fixture IDs and expected/observed results for both paths.
+
+## Allowed evidence scope
+
+Read-only use of frozen artifacts under `/workspace/chicago-311-run` and `/workspace/chicago-311-dispatch-priority`. No new extract, no browser AI, and no rewrite of locked labels or fixtures.
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+## Builder task
+
+Make an independent first pass from this frozen packet. Describe the conceptual recon diff, hard facts, what the reduced list would and would not detect, fixture implications, unchanged surfaces, risks, and claim→evidence map. Withhold any KEEP/REVERT/HALT decision.
+
+## Validator task
+
+The Validator independently recomputes the same hard facts after the Builder first pass remains blind. Withhold any KEEP/REVERT/HALT decision.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# BUILDER REPORT (DeepSeek)
+# A08 Builder — Independent First Pass
+
+## 1. Role attestation and ablation ID
+
+- **Role:** Builder (DeepSeek)
+- **Ablation ID:** A08
+- **Constitution:** 1.0, frozen
+- **Target:** Stage 4 exact reconciliation / critical field set
+- **Proposed change:** Shrink or loosen the critical reconciliation field list to aggregate decision counts plus a smaller label summary, replacing full exact `SR_NUMBER`-level and decision-field reconciliation.
+- **Decision status:** Withheld. No terminal decision issued.
+- **Barrier attestation:** I read only the frozen A08 packet. I did not infer or invent Validator or Adjudicator output. No browser AI was used; no `TERMINAL_STATE` or `ADJUDICATION` artifact was created.
+
+## 2. Conceptual/unified diff for the proposed change
+
+The locked full reconciliation joins R-A and R-B on `SR_NUMBER` and compares, per row, the full critical field set. The candidate replaces that with a reduced/loosened check.
+
+### Removed or relaxed under the candidate (conceptual)
+
+| Locked element | Candidate treatment |
+|---|---|
+| `SR_NUMBER` key-set equality (`n_only_ra`, `n_only_rb`) | Removed as a named gate; replaced by aggregate counts only |
+| `n_inner` | Removed or reduced to aggregate decision total |
+| Row-level `n_agree` / `n_disagree` | Removed; no row-level agreement check |
+| Row-level classification/action labels | Removed or replaced by a smaller label summary |
+| Integrity clauses (`I01_open_closed_date`, `I02_bad_clocks`, etc.) | Not stated as retained; at minimum loosened |
+| `dormant_h`, `open_age_h`, `peer_n`, `peer_p75_h` | Removed as diagnostic explanation fields |
+| Portfolio counts for `ESCALATE`/`INCONCLUSIVE`/`STANDARD` | Retained; this is the aggregate check |
+| Fixture IDs and expected/observed results for both paths | Scope unclear in the candidate; locked baseline requires both |
+
+**Retained:** aggregate decision counts (`ESCALATE`/`INCONCLUSIVE`/`STANDARD`), possibly a reduced label summary.
+
+**Net conceptual effect:** The candidate stops comparing the two paths row-by-row at `SR_NUMBER` grain and stops carrying the clock/age/peer fields that explain why a row received its label.
+
+## 3. Hard mechanical facts table
+
+Facts below are from the frozen packet only.
+
+| # | Hard mechanical fact | Frozen value | Source |
+|---|---|---|---|
+| H1 | R-A decision rows | 222,002 | `RECON_SUMMARY.csv`; `RA_portfolio_counts.csv` |
+| H2 | R-B decision rows | 222,002 | `RECON_SUMMARY.csv`; `RB_portfolio_counts.csv` |
+| H3 | Inner join rows | 222,002 | `RECON_SUMMARY.csv` |
+| H4 | Only-R-A rows | 0 | `RECON_SUMMARY.csv` |
+| H5 | Only-R-B rows | 0 | `RECON_SUMMARY.csv` |
+| H6 | Row-level agree | 222,002 | `RECON_SUMMARY.csv` |
+| H7 | Row-level disagree | 0 | `RECON_SUMMARY.csv` |
+| H8 | R-A ESCALATE / INCONCLUSIVE / STANDARD | 131,968 / 6,377 / 83,657 | `RA_portfolio_counts.csv`; `EXACT_RECON_REPORT.md` |
+| H9 | R-B ESCALATE / INCONCLUSIVE / STANDARD | 131,968 / 6,377 / 83,657 | `RB_portfolio_counts.csv`; `EXACT_RECON_REPORT.md` |
+| H10 | R-B out-of-set | 23,191 | `RB_portfolio_counts.csv` |
+| H11 | κ | 2 | Both portfolio files; fixtures |
+| H12 | Rule version | `RA-tcd-ig-v1` | `RA_portfolio_counts.csv` |
+| H13 | `T_freeze` | `2026-09-12 23:59:59 CDT` | `RA_portfolio_counts.csv`; frozen spec |
+| H14 | R-A fixture results | 14/14 PASS (head shows F01–F05 TRUE) | `r_a_fixture_results.csv` |
+| H15 | R-B fixture results | 14/14 PASS (head shows F01–F05 TRUE) | `r_b_fixture_results.csv` |
+| H16 | Prior production defect | 104 rows, STANDARD (R-A) vs ESCALATE (R-B) | `EXACT_RECON_REPORT.md` |
+| H17 | Defect cause | Naive wall clocks tagged UTC via readr; R-B POSIXct kept the wrong instant; approximately 5.0-hour systematic offset | `EXACT_RECON_REPORT.md` |
+| H18 | Defect location | All 104 within 5 hours of the κ×p75 threshold | `EXACT_RECON_REPORT.md` |
+| H19 | Locked rule | Character → parse as America/Chicago wall; never `force_tz`; never trust readr POSIXct for these columns | `EXACT_RECON_REPORT.md` |
+| H20 | Recon join grain | `full_join` on `SR_NUMBER`; no ID copying | `STRUCTURAL_CROSS_REVIEW.md` |
+| H21 | Boundary rule | `created > T_freeze` → INCONCLUSIVE; ESCALATE uses `>=` on κ×p75; F03 STANDARD at κ=2 | `STRUCTURAL_CROSS_REVIEW.md` |
+| H22 | Fixture versions | `fixtures-v1-tcd-ig` | `r_b_fixture_results.csv` |
+| H23 | κ in R-B fixtures | 2 | `r_b_fixture_results.csv` |
+
+**Critical mechanical observation H24:** H8 and H9 are identical aggregates. Aggregate counts alone cannot distinguish the pre-repair state (104 disagreeing rows) from the post-repair state, because the 104 flips were compensating: 104 rows moved out of STANDARD in R-A and into ESCALATE, while the locked report's aggregates are post-repair. The pre-repair aggregates are not supplied, but the defect description establishes that row-level flips existed while the paths' row sets were the same size.
+
+## 4. P1 assessment from frozen evidence only
+
+**P1:** A shorter or looser reconciliation is faster/cheaper while still detecting material path defects and semantic disagreements.
+
+**P1 fails if:** the full critical list was necessary to catch the 104-row clock-skew incident or the resulting label disagreements, including the 104 STANDARD (R-A) versus ESCALATE (R-B) rows.
+
+Assessment:
+
+- The 104-row incident was a row-level label disagreement with identical aggregate totals on both paths (H8, H9). The frozen A08 detection excerpt states explicitly that “aggregate portfolio counts alone could remain identical while compensating row-level flips cancel out.”
+- Exact reconciliation surfaced the defect because the paths were joined on `SR_NUMBER` and compared row-level decisions (H20 and the A08 detection excerpt).
+- The clock/age/peer fields (`dormant_h`, `open_age_h`, `peer_n`, `peer_p75_h`) were needed to explain the defect: the approximately 5.0-hour offset and near-threshold placement (H17, H18 and the A08 detection excerpt).
+- The candidate removes the `SR_NUMBER` join, row-level label comparison, and diagnostic clock/age/peer fields, retaining aggregate counts and a smaller label summary.
+- Under the candidate, the pre-repair 104-row state would have produced the same aggregate counts as the repaired state, so the candidate would not have surfaced the incident.
+
+**P1 result from frozen evidence:** P1 is not satisfied. The frozen evidence affirmatively states that aggregate-only checks could remain identical while row-level flips cancel, and that exact reconciliation was the mechanism that surfaced the 104-row incident. The candidate removes exactly that mechanism. This is the Builder's independent finding; no terminal decision is issued.
+
+## 5. Fixture and exact-recon implications
+
+### Fixture implications
+
+- The locked baseline requires both paths' fixture IDs and expected/observed results to be checked (frozen spec, critical field list). R-A and R-B each show 14/14 PASS (H14, H15).
+- The candidate's retained “smaller label summary” does not state whether it preserves fixture-ID execution, per-fixture expected versus observed results, or the integrity-clause column (for example, `I01_open_closed_date` and `I02_bad_clocks` in F04/F05).
+- F03 (STANDARD at κ=2 with `dormant_h=2400`, `peer_p75_h=2160`) and F04/F05 (INCONCLUSIVE via integrity clauses) are boundary/semantic cases. A reduced label summary that drops `dormant_h`/`peer_p75_h` or integrity-clause comparison loses the ability to distinguish F03-style near-threshold STANDARD from ESCALATE, and to distinguish integrity-driven INCONCLUSIVE from dormancy-driven decisions.
+
+### Exact-recon implications
+
+- The locked reconciliation is a `full_join` on `SR_NUMBER` with `n_inner=222,002`, `n_agree=222,002`, and `n_disagree=0` (H3, H6, H7, H20).
+- The candidate removes the `SR_NUMBER` join and row-level agreement/disagreement counts. The remaining aggregate check (H8 versus H9) is already equal and would have been equal even in the defective state, according to the frozen detection excerpt.
+- Therefore the candidate cannot re-establish the locked exact-recon result and cannot detect a recurrence of the 104-row class of defect.
+
+## 6. Semantic/regression risks and unchanged surfaces
+
+### Semantic/regression risks
+
+1. **Loss of row-level flip detection.** Aggregate counts are invariant to compensating row-level label swaps (H8, H9 and the A08 detection excerpt). This is exactly the failure mode of the 104-row incident.
+2. **Loss of `SR_NUMBER` grain.** Removing the key-set equality check (`n_only_ra`, `n_only_rb`) drops detection of row-set membership divergence. The locked value is 0/0 (H4, H5); the candidate does not preserve this gate.
+3. **Loss of diagnostic explanation fields.** Dropping `dormant_h`, `open_age_h`, `peer_n`, and `peer_p75_h` removes the evidence needed to diagnose a future clock/time-zone defect (H17, H18 and the A08 detection excerpt).
+4. **Loss or loosening of integrity-clause checks.** Fixtures F04 and F05 depend on `I01_open_closed_date` and `I02_bad_clocks` (H15). If the candidate drops integrity clauses, it cannot distinguish integrity-driven INCONCLUSIVE from dormancy-driven decisions.
+5. **Boundary semantics at risk.** κ×p75 `>=` for ESCALATE and F03 STANDARD at κ=2 (H21) are boundary rules that a loosened label summary may not preserve.
+6. **Undeclared semantic-change risk.** The candidate does not state exactly which fields are removed versus relaxed, while the frozen spec requires that exact statement. This is an incompleteness in the candidate specification as frozen.
+
+### Unchanged surfaces (expected per frozen spec)
+
+- SQL nonjudgment boundary — no evidence of change in the packet.
+- TCD-IG rules — rule version `RA-tcd-ig-v1` (H12); no declared change.
+- Exact fixture expecteds — `fixtures-v1-tcd-ig` (H22); no declared change.
+- Frozen Chicago 311 Stage 4 pack — the candidate is counterfactual and does not rewrite the pack; no rewrite declared.
+
+The `SR_NUMBER` grain is a locked recon grain (H20), but the candidate removes it; it is therefore not an unchanged surface under the candidate despite being expected to remain unchanged by the frozen spec.
+
+### Regression rule application (factual, no verdict)
+
+Any undeclared semantic change, missed row-set disagreement, missed label disagreement, or fixture/recon regression is a failure of the candidate. As described, the candidate removes the mechanism that caught the 104-row label disagreement and removes the `SR_NUMBER` row-set gate; these are the exact surfaces the regression rule protects.
+
+## 7. Claim → evidence citations
+
+| Claim | Evidence |
+|---|---|
+| Locked recon has 222,002 inner rows, 0 only-R-A, 0 only-R-B, and 0 disagree | `RECON_SUMMARY.csv`; H3–H7 |
+| Both paths have identical aggregate portfolio counts | `RA_portfolio_counts.csv`; `RB_portfolio_counts.csv`; H8, H9 |
+| R-B has 23,191 out-of-set rows | `RB_portfolio_counts.csv`; H10 |
+| Both fixture suites are 14/14 PASS | `r_a_fixture_results.csv`; `r_b_fixture_results.csv`; H14, H15 |
+| Fixtures cover integrity clauses and near-threshold STANDARD | `r_b_fixture_results.csv`, F03/F04/F05; H15, H21 |
+| The 104-row incident was STANDARD (R-A) versus ESCALATE (R-B) | `EXACT_RECON_REPORT.md`; H16 |
+| The incident was caused by time-zone/clock parsing, with an approximately 5.0-hour offset near threshold | `EXACT_RECON_REPORT.md`; H17, H18 |
+| Locked rule is character → America/Chicago wall parsing; never `force_tz` | `EXACT_RECON_REPORT.md`; H19 |
+| Recon is `full_join` on `SR_NUMBER`; no ID copying | `STRUCTURAL_CROSS_REVIEW.md`; H20 |
+| Aggregate counts alone could remain identical while row-level flips cancel | A08-specific detection excerpt; H8, H9 |
+| Exact recon surfaced the defect via `SR_NUMBER` join plus row-level decision comparison | A08-specific detection excerpt; H20 |
+| Clock/age/peer fields are needed to explain the defect | A08-specific detection excerpt; H17, H18 |
+| Boundary rules include `created > T_freeze` → INCONCLUSIVE and ESCALATE `>=` κ×p75 | `STRUCTURAL_CROSS_REVIEW.md`; H21 |
+| `T_freeze` and κ are locked | `RA_portfolio_counts.csv`; `RB_portfolio_counts.csv`; frozen spec; H11, H13 |
+| Candidate is counterfactual and must not rewrite the locked pack | Frozen spec; no rewrite declared in packet |
+| Candidate must state exactly which fields are removed or relaxed | Frozen spec; candidate description does not fully itemize removed versus relaxed fields |
+| RAW MANIFEST is present; the adjudicator note says not to halt for missing historical R stdout | RAW MANIFEST; adjudicator note in frozen spec |
+
+End of Builder first pass. No KEEP/REVERT/HALT issued. No `TERMINAL_STATE` or `ADJUDICATION` artifact created. Validator first pass remains blind to this output per constitution §1.
+
+---
+# VALIDATOR REPORT (Grok)
+# A08 Validator Report — Independent First Pass (Grok)
+
+**Role:** Validator only  
+**Ablation:** A08 — shrink/loosen Stage 4 critical reconciliation field list  
+**Constitution:** 1.0 (frozen)  
+**Blindness:** No Builder pack was read. This pass uses only the frozen validator packet (SPEC, CONSTITUTION, RAW MANIFEST, EVIDENCE EXCERPTS).  
+**Terminal adjudication:** Withheld. No KEEP / REVERT / HALT is returned.
+
+**Evidence-scope note.** The specification authorizes read-only use of `/workspace/chicago-311-run` and `/workspace/chicago-311-dispatch-priority`. Those trees are not present in this validator environment. Hard facts below are therefore recomputed from the frozen excerpts and manifest hashes in the packet, plus internal arithmetic identities. Raw row files, R stdout, and byte-level SHA-256 verification of the named artifacts could not be re-executed here. The packet itself states that a RAW MANIFEST is present and that missing historical R stdout is not, by itself, a halt condition.
+
+---
+
+## 1. What is being tested (conceptual recon diff)
+
+The locked Stage 4 recon is an **exact, SR_NUMBER-grained, two-path agreement check**. It is not a dashboard of totals.
+
+**Locked critical list (full):**
+
+| Layer | Fields / checks |
+|---|---|
+| Universe | SR_NUMBER key-set equality; `n_decision`; `n_inner`; `n_only_ra`; `n_only_rb` |
+| Decision identity | `n_agree`; `n_disagree`; row-level classification/action labels on the inner join |
+| Diagnosis | `dormant_h`, `open_age_h`, `peer_n`, `peer_p75_h` where present |
+| Integrity | integrity clauses (audit text; see residual note) |
+| Portfolio | counts of ESCALATE / INCONCLUSIVE / STANDARD |
+| Fixtures | fixture IDs and expected vs observed results on both paths |
+
+**Candidate reduction (as specified, not as an implemented patch):** replace that list with **aggregate decision counts plus a smaller label summary**. Exact membership of the reduced list is not enumerated field-by-field in this packet. The operational meaning of the candidate, taken from the SPEC, is:
+
+- keep some form of portfolio / n_decision totals;
+- drop or relax SR_NUMBER set equality, `n_only_*`, row-level label comparison, `n_disagree` identity, and the diagnostic clock/peer columns;
+- do not rewrite the locked Stage 4 pack, TCD-IG rules, fixtures, or SQL nonjudgment boundary.
+
+That is a **protocol ablation** (what the recon harness is required to look at), not a change to classification logic.
+
+The semantic gap is therefore:
+
+```
+full recon  = same keys ∧ same labels ∧ (optionally) same diagnostic fields
+reduced recon = same headline counts  (± a coarse label summary)
+```
+
+Those are not equivalent. Count equality is implied by exact recon; exact recon is not implied by count equality.
+
+---
+
+## 2. Independently recomputed hard facts
+
+All figures below are taken from the frozen excerpts and checked for internal consistency. They are the post-repair production state unless marked “prior mismatch.”
+
+### 2.1 Recon identities (post-fix)
+
+From `RECON_SUMMARY.csv` and `EXACT_RECON_REPORT.md`:
+
+| Fact | Value | Identity check |
+|---|---|---|
+| `n_ra` | 222,002 | given |
+| `n_rb` | 222,002 | given |
+| `n_inner` | 222,002 | `n_ra == n_inner + n_only_ra` holds |
+| `n_only_ra` | 0 | given |
+| `n_only_rb` | 0 | given |
+| `n_agree` | 222,002 | `n_agree + n_disagree == n_inner` holds |
+| `n_disagree` | 0 | given |
+| SR_NUMBER sets | identical | stated; implied by `n_only_* = 0` and `n_inner = n_ra = n_rb` |
+
+Post-fix recon status: **PASS (after clock-parse fix)**, dated 2026-09-19 13:46 CT in the excerpt.
+
+### 2.2 Portfolio (κ = 2), both paths
+
+From `EXACT_RECON_REPORT.md`, `RA_portfolio_counts.csv`, `RB_portfolio_counts.csv`:
+
+| Path | n_decision | ESCALATE | INCONCLUSIVE | STANDARD | other |
+|---|---|---|---|---|---|
+| R-A | 222,002 | 131,968 | 6,377 | 83,657 | (not in excerpt) |
+| R-B | 222,002 | 131,968 | 6,377 | 83,657 | `n_out_of_set = 23,191` |
+
+Independent sum: \(131{,}968 + 6{,}377 + 83{,}657 = 222{,}002\). Portfolio partitions the decision set exactly.
+
+R-B envelope reconstruction: \(222{,}002 + 23{,}191 = 245{,}193\), which matches the structural review’s “Open candidates ~245k → decision 222,002.”
+
+Shared locked parameters in the excerpts: `kappa = 2`, `T_freeze = 2026-09-12 23:59:59` America/Chicago (RA file prints `CDT`). RA also records `rule_version = RA-tcd-ig-v1`.
+
+Schema note (not a count disagreement): RA’s excerpted portfolio file does not carry `n_out_of_set`; RB’s does. That is an artifact-schema asymmetry, not a label mismatch on the decision set.
+
+### 2.3 Fixtures
+
+Both paths: **14/14 PASS**. Locked boundary example called out: **F03 → STANDARD** at κ = 2. Fixture result CSVs are named in the RAW MANIFEST (`r_a_fixture_results.csv`, `r_b_fixture_results.csv`) but their row contents are not excerpted beyond the 14/14 / F03 statement.
+
+### 2.4 Prior production mismatch (the P1 incident)
+
+From `EXACT_RECON_REPORT.md` and `structural_cross_review.md`, independently restated:
+
+- First production judged comparison disagreed on **104 rows**.
+- Disagreement was **uniform in direction**: R-A `STANDARD` vs R-B `ESCALATE` on those 104. No other pairing is attested.
+- Key sets were already aligned enough for a 104-row inner disagreement to be named (the incident is described as label flips on shared SR_NUMBERs, not as only-RA / only-RB membership errors).
+- `peer_n`, `peer_p75`, and κ **matched** on the disagreed rows.
+- `dormant_h` differed by a **systematic ~5.0 hours** (America/Chicago offset).
+- All 104 sat **within 5 hours of the κ × p75 threshold**.
+- Mechanism: naive SQL wall clocks (`created_ts` / `mod_ts`) tagged UTC by `readr`. R-B’s POSIXct path kept the wrong instant; R-A’s `force_tz` happened to restore Chicago wall digits.
+- Locked repair: always ingest clock columns as character and parse as `America/Chicago` wall time; do not `force_tz`; do not trust readr POSIXct for these columns.
+- Repair surfaces named: `R-A/run_RA.R` (`parse_ts_chicago` + `clock_col_types`); `R-B/R/10_io_parse.R` (`rb_parse_ts` / `rb_normalize_open` / TSV + character cols).
+- After repair: `n_disagree = 0`, portfolios identical, fixtures 14/14.
+
+**Causal reconstruction (Validator, not copied from a Builder narrative).**  
+CDT = UTC−5 in mid-September. If a Chicago wall timestamp is stored naive and then treated as UTC, the instant is five hours too early. Then
+
+\[
+\texttt{dormant\_h} = T_{\text{freeze}} - \texttt{mod\_ts}
+\]
+
+is inflated by ~5 h. Rows whose true dormancy lay in \((\kappa \cdot p75 - 5\text{h},\; \kappa \cdot p75)\) cross the `>=` ESCALATE threshold only on the skewed clock. That predicts exactly: (i) unidirectional STANDARD → ESCALATE flips, (ii) peer statistics unchanged, (iii) all flips inside a 5 h band of the threshold, (iv) R-B (wrong instant) = ESCALATE and R-A (recovered wall digits) = STANDARD. The frozen narrative is internally consistent with that mechanism.
+
+**Implied pre-fix portfolios, under the attested “R-A already on Chicago wall, R-B skewed, 104 the only flips” reading:**
+
+| Path | ESCALATE | STANDARD |
+|---|---|---|
+| R-A (pre-fix, if unchanged) | 131,968 | 83,657 |
+| R-B (pre-fix, +104 ESC) | 132,072 | 83,553 |
+
+This implication is **not printed as a first-run portfolio table** in the packet. It is the unique arithmetic consequence of “104 STANDARD(R-A) vs ESCALATE(R-B) on an otherwise identical decision set,” together with the post-fix totals and the statement that R-A’s parse happened to be the intended wall semantics. If both paths moved at repair time, the pre-fix totals would differ; the packet does not give first-run portfolio CSVs, so that branch remains unclosed. It does not affect the row-level facts that *are* attested: 104 IDs, one label pairing, ~5 h `dormant_h` bias, peers matched.
+
+Scale: \(104 / 222{,}002 \approx 0.0468\%\) of the decision set. Material as a **semantic path defect** (near-threshold rule sensitivity + tz bug), not as a volume share.
+
+### 2.5 Structural / process facts from the packet
+
+- Baseline identifiers: `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, `T_freeze=2026-09-12 23:59:59 America/Chicago`, κ = 2.
+- Two independent builders: R-A single-file tidyverse `run_RA.R`; R-B modular base/data.frame (`00_config.R`, `10_io_parse.R`, `20_integrity_and_classify.R`, `40_fixtures.R`) with named clauses I01–I06.
+- SQL is attested as nonjudgment: no label columns; peer aggregates only; Source Gate checks absence of labels.
+- Residual non-blocking note: parent-SR clause *wording* differs (`I05_parent_sr_present` vs design “orphan”); production labels still matched. Clause strings are audit text, not a demonstrated label disagreement.
+- RAW MANIFEST lists, among others: `EXACT_RECON_REPORT.md`, `RECON_SUMMARY.csv`, `RECON_DISAGREE_IDS.csv`, both portfolio CSVs, both fixture-result CSVs, `SOURCE_GATE_REPORT.md`, `structural_cross_review.md`, `stage4_validation_status.json`, `workflow_gate_status.json`, framework SHA, lineage attestation.
+- `RECON_DISAGREE_IDS.csv` is present in the manifest. Its body is not excerpted. Post-fix `n_disagree = 0` is compatible with an empty current disagree set, a historical 104-ID archive, or both; the packet does not say which.
+
+### 2.6 Facts that could **not** be independently recomputed here
+
+- Byte hashes of the RAW MANIFEST entries (files absent).
+- The actual 104 SR_NUMBER values.
+- Per-row `dormant_h`, `open_age_h`, `peer_n`, `peer_p75_h` tables.
+- First-run (pre-fix) recon CSVs and R stdout.
+- Fixture-level expected/actual tables beyond “14/14, F03 → STANDARD.”
+- Source-row extracts and SQL envelope contents.
+
+Those absences constrain *how far* recomputation can go. They do not contradict any printed identity in §2.1–§2.4.
+
+---
+
+## 3. What a reduced recon would and would not detect
+
+Assume the candidate is exactly what the SPEC says: aggregate decision counts + a smaller label summary, without SR_NUMBER set equality, without `n_only_*`, without row-level labels, and without diagnostic clocks/peers.
+
+### 3.1 This specific 104-row incident
+
+**Would likely detect that “the two paths are not identical at portfolio grain,” if first-run portfolio totals were compared.**  
+Under the unidirectional-flip reconstruction, ESCALATE would differ by 104 and STANDARD by 104. A count-only gate would have gone red. That is existence detection of a net transfer between two labels.
+
+**Would not detect the incident the SPEC names.**  
+The SPEC’s P1-failure clause is not “any inequality of totals.” It is the production **104-row clock-skew incident** and the **resulting label disagreements, including the 104 `STANDARD` (R-A) versus `ESCALATE` (R-B) rows**. Catching that object requires:
+
+1. SR_NUMBER inner join (otherwise there are no “104 rows,” only two histograms);
+2. row-level action labels (otherwise there is no STANDARD-vs-ESCALATE pairing);
+3. `n_disagree` / disagree-ID materialization (`RECON_DISAGREE_IDS.csv` exists in the manifest for a reason);
+4. `dormant_h` vs `peer_p75_h` (and `peer_n`, κ) to show the 5 h systematic bias and the “all 104 within 5 h of threshold” localization.
+
+None of (1)–(4) is available from portfolio totals. A “smaller label summary” that only reprints ESCALATE/INCONCLUSIVE/STANDARD counts is the same information as the portfolio table.
+
+**Diagnosis, not just detection.**  
+The structural review treats the tz bug as a §10.6 “Wrong date / tz semantics” risk that was found because recon exposed near-threshold flips with matched peers and skewed `dormant_h`. That diagnostic path is exactly the part of the locked list the candidate proposes to drop. Without it, the plausible first-line stories for a 104-count imbalance include: eligibility filter drift, duplicate/legacy parser divergence, different Open normalization, different T_freeze instant, different κ, different peer grain, or a real rule bug. The frozen evidence shows those alternatives were *ruled out* by the fields the candidate would relax.
+
+### 3.2 Defect classes the reduced list misses even when counts match
+
+These are in-scope for P1 (“material path defects and semantic disagreements”), not hypothetical decoration.
+
+| Defect | Full list | Aggregate + coarse summary |
+|---|---|---|
+| Offsetting label flips (k STANDARD↔ESCALATE in both directions) | `n_disagree = 2k`, IDs listed | portfolios can match; silent pass |
+| Same counts, different SR_NUMBER universes | `n_only_ra` / `n_only_rb` > 0 | `n_decision` can match |
+| Identical labels, different integrity-clause outcomes that later become load-bearing | clause compare (today residual-only) | invisible |
+| Clock/parse skew **inside** a bin, not yet across κ×p75 | `dormant_h` distribution / pairwise delta | invisible until a flip accumulates |
+| Peer-definition drift that moves the threshold under the same labels today | `peer_n`, `peer_p75_h` | invisible |
+| Fixture pass / production disagree (or the reverse) | fixtures + production recon are separate gates | a reduced production recon does not replace F03–F14 |
+| Unidirectional flips whose count is then “explained away” as rounding or late-arriving rows | disagree IDs force an account | a 104-count delta can be rationalized without IDs |
+
+The 104-row event happened to be **non-offsetting**. Coverage that works only because the bug was one-sided is not the same coverage as exact recon. The SPEC forbids replacing exact recon with aggregate-only assertion “without documenting the lost detection coverage.” This packet’s candidate statement does not document that loss; the Validator records it here.
+
+### 3.3 What the reduced list still sees
+
+- Gross volume disagreement (`n_decision` mismatch).
+- Net label-mix disagreement when flips do not cancel.
+- After the repair: the current green portfolio (`131,968 / 6,377 / 83,657`) — which is also what full recon reports, because full recon is stronger.
+
+So the reduced list is a **lossy projection** of the full list. On the frozen *post-fix* surface it would also read PASS. On the frozen *pre-fix* surface it would likely have flagged a count mismatch and then stopped short of the 104-row / 5 h diagnosis.
+
+---
+
+## 4. P1 assessment (no terminal call)
+
+**P1:** a shorter or looser recon is faster/cheaper **while still detecting material path defects and semantic disagreements.**
+
+**P1 fails if** the full critical list was necessary to catch the 104-row clock-skew incident or the resulting label disagreements, including the 104 STANDARD vs ESCALATE rows.
+
+Independent reading of the frozen evidence:
+
+1. **Speed/cost half of P1 is not evidenced.** No timing, I/O, or reviewer-hour measurements appear in the packet. “Shorter list is cheaper” is plausible and unmeasured. Constitution §6 rejects a subjective “the change is better” as a predicate; the speed claim is in that neighborhood until measured against frozen artifacts.
+2. **Detection half of P1 is not established.**  
+   - Semantic disagreement, as used in the locked recon, is **row-level label disagreement on a shared SR_NUMBER**. That is `n_disagree` and the disagree-ID set, not a histogram.  
+   - Catching *this* incident *as described* used the full list: key join + labels + `dormant_h` + peers.  
+   - A count-only gate would have seen a 104-wide net transfer (on the unidirectional reconstruction) and would have missed the row identities, the STANDARD/ESCALATE pairing as a set, and the tz mechanism.  
+   - The same gate would miss the entire family of offsetting or universe-mismatch defects.
+3. Therefore the **predeclared failure clause of P1 is met as a factual condition**: the full critical list was necessary to catch the 104-row clock-skew incident *and* the 104 STANDARD vs ESCALATE disagreements as such. A looser recon is not shown to “still detect” those disagreements; it is shown, at best, to detect a coincident 104-count imbalance.
+
+P1 is an operational predicate that must be checkable from frozen artifacts without asking the Builder what it meant. On that standard, P1 is **not satisfied** by this packet. That is a Validator finding on the predicate, not an adjudication under §7–§9.
+
+---
+
+## 5. Fixture implications
+
+- Fixture suite `fixtures-v1-tcd-ig` is an **unchanged surface**. A08 is not allowed to rewrite expecteds.
+- Both paths already lock **14/14 PASS**, including **F03 → STANDARD** at κ = 2. F03 sits on the same threshold family as the 104 production flips (near κ×p75). That is why F03 is called out in the recon report.
+- Fixtures are synthetic / hand-specified cases. They did **not** substitute for production exact recon: the 104-row event was a production-scale parse asymmetry, not a fixture miss. The structural review lists F13 (unparseable clocks → INCONCLUSIVE) and F07/F08 (duplicate/legacy) as coverage for other risks; none of those is the tz-tagging bug that produced the 104.
+- Dropping production row-level recon does not make the 14 fixtures a sufficient stand-in. Fixtures can stay green while 104 production rows disagree — which is what actually happened before the clock fix, relative to any fixture-only story.
+- If the candidate also intended to shrink *fixture* recon to aggregates, that is not stated. Even if it were, F03 is a single-row expected label; an aggregate summary of 14 fixtures can hide one wrong label if another fixture offsets it. The locked rule is exact expected vs observed per fixture ID.
+
+---
+
+## 6. Unchanged surfaces (regression boundary)
+
+The SPEC requires these to remain unchanged. Nothing in the frozen excerpts shows a rewrite of:
+
+- SQL nonjudgment boundary (no labels in SQL; Source Gate);
+- TCD-IG rules and `stage3-v1-tcd-ig`;
+- exact fixture expecteds / `fixtures-v1-tcd-ig`;
+- SR_NUMBER grain;
+- the locked Chicago 311 Stage 4 pack;
+- κ = 2 and `T_freeze`.
+
+A08 as specified is a **recon-harness field-list** change. If a later implementation silently altered parse rules, eligibility, or labels in order to make aggregates “good enough,” that would be an undeclared semantic change. This packet contains no candidate code diff to test for that. Validator treats “no pack rewrite” as a constraint to be enforced, not as a verified code fact (no candidate tree is in scope here).
+
+---
+
+## 7. Risks
+
+1. **False PASS on offsetting semantic disagreement.** Highest-severity coverage hole. Already realized in miniature: the only reason counts would have moved in 104-row lockstep is that every flip had the same direction.
+2. **Loss of disagree-ID artifact.** `RECON_DISAGREE_IDS.csv` is how an incident becomes a finite, auditable set. Aggregates cannot produce it.
+3. **Loss of tz/clock diagnostics.** `dormant_h` + `peer_p75_h` were the reason the 5 h CDT story is a finding rather than a guess. Future clock regressions (DST boundary, `force_tz` reintroduced, POSIXct shortcut) land in the same place.
+4. **Universe drift hidden by equal `n_decision`.** Without `n_only_ra` / `n_only_rb` / key-set equality, two paths can judge different Open subsets of the same size.
+5. **Integrity-clause vocabulary already differs** (I05 vs “orphan”). Today that is attested as non-blocking because labels matched. A looser recon that also drops labels would have no remaining proof that the wording drift is harmless.
+6. **Portfolio schema already differs** (`n_out_of_set` only on RB). Aggregate comparison across non-identical schemas is an easy place to compare the wrong columns and call it agreement.
+7. **Benefit unmeasured.** No frozen timing or cost artifact. Even a coverage-preserving shrink would still need that for P1’s “faster/cheaper” limb.
+8. **Counterfactual contamination.** The packet’s current recon is green *because* the clock bug was found and fixed with the full list. Using the post-fix green aggregates as evidence that a short list “would have been enough” inverts the causal order.
+9. **Evidence-environment gap.** Validator could not hash-check the manifest or re-query source rows. That limits how hard the “independent recompute” can be, and it is recorded rather than papered over.
+
+---
+
+## 8. Claim → evidence map
+
+| Claim | Evidence in this packet | Validator status |
+|---|---|---|
+| Post-fix decision sets identical at 222,002 | `RECON_SUMMARY.csv`; recon report | Internally consistent |
+| Post-fix `n_disagree = 0` | same | Internally consistent |
+| Post-fix portfolios identical at 131,968 / 6,377 / 83,657 | recon report + both portfolio CSVs | Sum checks; both files agree on the three labels |
+| RB `n_out_of_set = 23,191` | `RB_portfolio_counts.csv` | Consistent with ~245k envelope note |
+| Fixtures 14/14, F03 → STANDARD | recon report; structural review | Attested; fixture CSV bodies not excerpted |
+| Prior disagreement = 104 rows, STANDARD vs ESCALATE | recon report; structural review | Attested in two excerpts; IDs not excerpted |
+| Peers matched; `dormant_h` ~5 h systematic; all 104 near threshold | recon report; structural review | Attested; diagnostic columns not dumped |
+| Cause = naive clocks tagged UTC / asymmetric POSIXct | recon report; §10.6 table | Attested; mechanistically consistent with CDT |
+| Repair = character → America/Chicago wall parse on both paths | recon report | Attested as locked rule; source files not readable here |
+| Independence of R-A and R-B trees | structural review independence attestation | Attested; not re-verified from trees |
+| SQL nonjudgment | structural review; Source Gate named in manifest | Attested; SQL not re-read here |
+| RAW MANIFEST complete enough to name the recon artifacts | hash list in packet | Names present; bytes absent from this environment |
+| Candidate states *exactly* which fields are removed | SPEC describes the class of reduction | **Not field-enumerated.** Gap against SPEC sentence “The candidate reduction must state exactly which fields are removed or relaxed.” |
+| Reduced recon preserves detection coverage | none | **Not shown.** Opposite is shown for the 104-row incident as specified |
+| Reduced recon is faster/cheaper | none | **Not shown** |
+| P1 holds | P1 text + incident record | **Not established** (see §4) |
+
+---
+
+## 9. Blocking objections (supported by frozen evidence; not an adjudication)
+
+These are objections an Adjudicator would have to dispose of. They are not a verdict.
+
+**B1 — P1’s own failure clause is triggered.**  
+The full critical list was necessary to catch the 104-row clock-skew incident *as* 104 SR_NUMBER-level STANDARD vs ESCALATE disagreements and to attribute them to a ~5 h `dormant_h` bias. Aggregate counts do not identify those rows or that pairing. SPEC: P1 fails in that case.
+
+**B2 — Lost detection coverage is not documented by the candidate.**  
+SPEC regression rule: do not replace exact recon with majority vote or aggregate-only assertion without documenting lost coverage. Offsetting flips, key-set mismatch at equal `n_decision`, and diagnostic-only clock skew are uncovered and unnamed in the candidate statement.
+
+**B3 — Candidate field list is not exact.**  
+SPEC requires the reduction to state exactly which fields are removed or relaxed. This packet gives a class (“aggregate decision counts and a smaller label summary”), not a closed field inventory. That leaves “smaller label summary” ambiguous (portfolio three-way table? `n_agree` without IDs? fixture pass-count only?).
+
+**B4 — Speed/cost limb of P1 has no frozen measurement.**  
+Constitution §6: the predicate must be checkable from frozen artifacts. No runtime or cost artifact is in the manifest excerpts.
+
+**B5 — Post-fix green aggregates are not evidence that a short list would have caught the pre-fix defect.**  
+Using the repaired identical portfolios as a success signal for a looser recon confuses the outcome of full recon + repair with the power of the proposed check.
+
+**B6 — Environment cannot re-hash or re-query.**  
+Independent recomputation here is excerpt-internal. Disagree IDs, first-run portfolios, and file hashes were not mechanically re-derived. This does not invent a new success criterion; it limits how much additional confirmation exists beyond the printed tables.
+
+Non-objections (recorded so they are not treated as blockers):
+
+- Role split in the SPEC (Builder=DeepSeek, Validator=Grok, Adjudicator=ChatGPT) is well-formed on paper; this pass did not see a Builder artifact.
+- Post-fix mechanical identities in the excerpts do not contradict each other.
+- Integrity-clause wording drift is explicitly classified as non-blocking in the structural review because labels matched.
+- Historical R stdout is not required given the packet’s adjudicator note plus RAW MANIFEST.
+
+---
+
+## 10. Unchanged / out-of-scope for this pass
+
+- No rewrite of locked labels, fixtures, or Stage 4 pack was attempted.
+- No new extract, no browser AI, no candidate implementation.
+- No comparison to a Builder narrative (blind).
+- No constitutional KEEP / REVERT / HALT token is issued.
+
+---
+
+## 11. Validator summary
+
+The frozen post-repair Stage 4 recon is internally coherent at the printed grain: 222,002 / 222,002 keys, 0 disagrees, identical κ = 2 portfolios \(131{,}968 / 6{,}377 / 83{,}657\), fixtures 14/14 with F03 → STANDARD. Those are the hard facts of the *current* locked surface.
+
+The ablation does not ask whether that surface is presently green. It asks whether a **shorter recon field list** would still have caught material path defects, in particular the attested **104-row STANDARD vs ESCALATE clock-skew**.
+
+Independent recompute of that incident: peers and κ matched; `dormant_h` was biased by a systematic ~5 h CDT/UTC parse error; the 104 rows all sat inside that 5 h band of κ×p75; R-B’s wrong instant produced ESCALATE where R-A produced STANDARD. Reconstructing *that object* uses SR_NUMBER equality, row-level labels, `n_disagree`, and the diagnostic clock/peer fields — the exact layer the candidate drops.
+
+A portfolio-only check might have shown a 104-wide net label transfer if the first-run totals had been compared. That is not the same as catching the 104-row disagreement set, and it does not cover offsetting or universe-mismatch defects. P1’s detection requirement is therefore not met on the frozen evidence; P1’s cheaper/faster requirement is not measured at all.
+
+**End of Validator first pass. Terminal adjudication withheld.**
+---
+# EVIDENCE
+## RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+## EXACT_RECON_REPORT.md
+# Exact recon report — R-A vs R-B
+
+**Status:** PASS (after clock-parse fix)  
+**When:** 2026-09-19 13:46 CT  
+**Decision set:** 222,002 rows (identical SR_NUMBER sets)
+
+## Portfolio (κ = 2)
+
+| Path | ESCALATE | INCONCLUSIVE | STANDARD |
+|------|----------|--------------|----------|
+| R-A  | 131,968  | 6,377        | 83,657   |
+| R-B  | 131,968  | 6,377        | 83,657   |
+
+## Label agreement
+
+- Agree: **222,002 / 222,002**
+- Disagree: **0**
+- Only-RA / Only-RB: 0 / 0
+
+Fixtures: both paths **14/14 PASS** (F03 → STANDARD).
+
+## Prior mismatch (diagnosed, then fixed)
+
+First production run disagreed on **104** rows, all `STANDARD` (R-A) vs `ESCALATE` (R-B).  
+Peer `n` / `p75` / κ matched; `dormant_h` differed by a systematic **~5.0 hours** (America/Chicago offset). All 104 sat within 5h of the κ×p75 threshold.
+
+**Cause:** naive SQL wall clocks (`created_ts` / `mod_ts`) were tagged as UTC by `readr`. R-B’s POSIXct shortcut kept the wrong instant; R-A’s `force_tz` happened to recover Chicago wall digits. Locked rule now: **always character → parse as `America/Chicago` wall**; never `force_tz` / never trust readr POSIXct for these columns.
+
+**Fix files:** `R-A/run_RA.R` (`parse_ts_chicago` + `clock_col_types`); `R-B/R/10_io_parse.R` (`rb_parse_ts` / `rb_normalize_open` / TSV + character cols).
+
+## Next
+
+Structural cross-review + Validation Gate freeze (owner), then Stage 5.

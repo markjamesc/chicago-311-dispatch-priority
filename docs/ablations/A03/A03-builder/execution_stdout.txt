@@ -1,0 +1,8 @@
+A03 Builder execution via grok.com
+Mode selected: Expert (Comprehensive unavailable; Auto not used)
+Chat title: A03 Builder: Grok First-Pass SQL Ablation
+Role: Builder only; blind to Validator; no Validator or Adjudicator run.
+Packet source: /workspace/chicago-311-run/ablations/A03/packets/A03_BUILDER_PASTE.txt
+Response completed in Grok chat. Builder report written from the completed first-pass response.
+Observed conclusion: P1 not satisfied on frozen evidence; no KEEP/REVERT/HALT token issued.
+Hard facts reported: Source Gate PASS; n_inner=222002; n_agree=222002; n_disagree=0; fixtures 14/14 on both R paths; Open envelope 245193; decision set 222002.

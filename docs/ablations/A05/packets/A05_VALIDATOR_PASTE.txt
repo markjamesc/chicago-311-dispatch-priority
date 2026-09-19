@@ -1,0 +1,232 @@
+# A05 Validator — Grok (INDEPENDENT FIRST PASS)
+
+Validator only. Prefer Comprehensive else Expert. No KEEP/REVERT/HALT decision. Blind to Builder.
+
+Sections: role attestation; test plan; hard facts; single-knob notes; P1 assessment; blocking objections; missing evidence (RAW MANIFEST present); summary.
+
+---
+# SPEC
+# A05 — Ablation specification (FROZEN)
+
+**Ablation ID:** A05  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target:** Stage 3 (locked knob)  
+**Constitution:** 1.0  
+
+## Exact change being tested
+
+**Proposed change:** Allow multiple owner-tunable knobs (or treat method constants W / n_min as knobs) instead of a single locked owner knob (κ).
+
+## Benefit predicate P1
+
+Multiple knobs improve Stage 5 portfolio usefulness (e.g. shrink ESCALATE) without harming Stage 4 exact recon / fixture Pass, with equal detection coverage.
+
+P1 **fails** if multi-knob designs create silent Stage 4 disagreement, greenwash, or convert constants into undeclared tunables that invalidate the Design Gate lock.
+
+## Evidence
+
+Chicago: single κ=2 locked; W=365, n_min=50 constants; κ grid descriptive only in Stage 5; Finish Gate did not change κ.
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+---
+# kappa_sensitivity.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152292,6377,63333
+1.5,222002,140340,6377,75285
+2,222002,131968,6377,83657
+3,222002,118246,6377,97379
+

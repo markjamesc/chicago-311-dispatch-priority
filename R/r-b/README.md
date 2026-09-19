@@ -1,9 +1,12 @@
-# R-B — Independent Judged Implementation
+**HOLD:** Do not execute until parent clears Stage 3 three-AI Design pass.
 
-R-B is the second independent Stage 4 implementation of the locked Stage 3 contract.
+# R-B (rule-table join)
 
-R-B receives the same frozen Stage 3 specification and the same verified SQL source package as R-A, but does not receive R-A code, judged request IDs, action outputs, or shared judged helper functions before first-pass freeze.
+Independent Stage 4 judged implementation. Construction: predicate feature table + exclusion/action rule-table joins.
 
-Owner-familiar tidyverse idioms are preferred. Independence comes from separate construction and context, not superficial syntax differences.
+```bash
+Rscript R/r-b/r_b_judge.R fixtures
+Rscript R/r-b/r_b_judge.R production data/source_open_envelope.tsv outputs/r_b_judged.csv
+```
 
-Status: **Not started.**
+Do not share judged helpers or ID lists with R-A.

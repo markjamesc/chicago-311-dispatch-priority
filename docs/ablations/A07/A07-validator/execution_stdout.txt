@@ -1,0 +1,3 @@
+DeepThink: on
+Terminal-verdict-leaked: no
+Method note: packet was attached as the exact 16.33 KB TXT file because the web textbox rejected oversized direct paste; the validator reply was run blind to Builder.

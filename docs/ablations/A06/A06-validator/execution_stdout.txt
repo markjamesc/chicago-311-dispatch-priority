@@ -1,0 +1,11 @@
+A06 validator execution
+model=ChatGPT
+role=Validator
+reasoning=High
+input=/workspace/chicago-311-run/ablations/A06/packets/A06_VALIDATOR_PASTE.txt
+input_mode=attached full packet (ChatGPT browser)
+blindness=builder_report.md not read
+chat=https://chatgpt.com/c/6aaf114e-01d0-83e8-9a9e-b80b9eaa80a4
+output=/workspace/chicago-311-run/ablations/A06/A06-validator/validator_report.md
+validator_report_chars=6970
+status=completed

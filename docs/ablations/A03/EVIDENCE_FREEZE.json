@@ -1,0 +1,37 @@
+{
+  "ablation_id": "A03",
+  "roles": {
+    "Builder": "Grok",
+    "Validator": "ChatGPT",
+    "Adjudicator": "DeepSeek"
+  },
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A03/A03-builder/builder_report.md",
+      "bytes": 5394,
+      "sha256": "626d6e60752ba70065739dcfa381d7ff4c353c508cd355399178ce451625b66f"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A03/A03-builder/execution_stdout.txt",
+      "bytes": 661,
+      "sha256": "ab2d651354f95b7b64aa1b4f29d68473a35eb6a029e55cce3c42527d2e77c260"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A03/A03-validator/validator_report.md",
+      "bytes": 7165,
+      "sha256": "46d0fe09002ecdad01d28c09af629452a2f4b092b5b0f39f16ffb9615c45b645"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A03/A03-validator/execution_stdout.txt",
+      "bytes": 7165,
+      "sha256": "46d0fe09002ecdad01d28c09af629452a2f4b092b5b0f39f16ffb9615c45b645"
+    }
+  ],
+  "raw_manifest_sha256": {
+    "path": "/workspace/chicago-311-run/ablations/_raw_evidence/MANIFEST.sha256",
+    "bytes": 1302,
+    "sha256": "5938990302c20877745fd3c5ddffb2d2e15a2f5d2a045b5b250092e8c3bce883"
+  }
+}

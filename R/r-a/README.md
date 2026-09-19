@@ -1,9 +1,14 @@
-# R-A — Independent Judged Implementation
+**HOLD:** Do not execute until parent clears Stage 3 three-AI Design pass.
 
-R-A is one independent Stage 4 implementation of the locked Stage 3 contract.
+# R-A (sequential mutate)
 
-R-A receives the frozen Stage 3 specification and the same verified SQL source package as R-B, but does not receive R-B code, judged request IDs, action outputs, or shared judged helper functions before first-pass freeze.
+Independent Stage 4 judged implementation. Construction: sequential `dplyr::mutate` / `case_when`.
 
-Owner-familiar tidyverse idioms are preferred. Independence comes from separate construction and context, not from forcing a different language or obscure syntax.
+```bash
+# From repo root (fixture gate):
+Rscript R/r-a/r_a_judge.R fixtures
+# Production (after Source Gate PASS):
+Rscript R/r-a/r_a_judge.R production data/source_open_envelope.tsv outputs/r_a_judged.csv
+```
 
-Status: **Not started.**
+Do not share judged helpers or ID lists with R-B.

@@ -1,0 +1,4 @@
+Paste completed in a new ChatGPT chat using the complete A01_BUILDER_PASTE packet.
+Reply extracted via page DOM evaluate.
+reply_chars=9238
+mode=High reasoning; role=Builder ChatGPT; validator_seen=false

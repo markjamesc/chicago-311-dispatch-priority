@@ -1,23 +1,5 @@
-# Stage 4 — Execution and Independent Validation
+# Stage 4 — Execution, Independent Validation, and Analysis
 
-Canonical architecture:
+Method B: controlled SQL → Source Gate → independent R-A / R-B → fixtures → exact recon → structural cross-review → validated freeze → workflow_gate.R.
 
-```text
-LOCKED STAGE 3
-      ↓
-CONTROLLED SQL SOURCE
-      ↓
-SQL SOURCE GATE
-      ↓
-R-A       R-B
-      ↓
-EXACT RECONCILIATION
-      ↓
-STRUCTURAL CROSS-REVIEW
-      ↓
-VALIDATED DATA FREEZE
-```
-
-This folder is for Stage 4 narrative records, handoffs, gate decisions, and validation summaries. Executable SQL, R, and detailed validation artifacts live in their dedicated top-level folders.
-
-Status: **Not started.**
+Do **not** start Stage 5 until `validation/workflow-gate/workflow_gate_status.json` reports PASS and owner confirms.

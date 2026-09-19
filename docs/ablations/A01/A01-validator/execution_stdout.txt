@@ -1,0 +1,2 @@
+validator_report.md chars: 13575
+assistant_reply chars: 13322

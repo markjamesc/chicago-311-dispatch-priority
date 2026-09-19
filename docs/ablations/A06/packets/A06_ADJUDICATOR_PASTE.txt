@@ -1,0 +1,344 @@
+# A06 Adjudicator — DeepSeek (TERMINAL DECISION)
+
+Adjudicator only. DeepThink on. Exactly one of KEEP | REVERT | HALT.
+
+KEEP = soft residual / STANDARD-by-default for integrity fails becomes canonical.
+REVERT = keep hard INCONCLUSIVE for integrity fails (thin_type_or_missing_peer and peers).
+HALT only for hard conflict / role breach / missing RAW MANIFEST. If P1 fails → REVERT.
+
+RAW MANIFEST is present → do not HALT for missing historical R stdout.
+
+---
+# SPEC
+# A06 — Ablation specification (FROZEN)
+
+**Ablation ID:** A06  
+**Roles:** Builder=Grok · Validator=ChatGPT · Adjudicator=DeepSeek  
+**Target:** Stage 3 integrity / INCONCLUSIVE  
+**Constitution:** 1.0  
+
+## Exact change being tested
+
+**Proposed change:** Soften integrity-gate INCONCLUSIVE into a soft residual / STANDARD-by-default when evidence is thin (instead of hard INCONCLUSIVE for integrity fails such as thin peer).
+
+## Benefit predicate P1
+
+Soft residual reduces INCONCLUSIVE share and improves actionable portfolio size without increasing wrong ESCALATE labels or breaking fixtures/recon.
+
+P1 **fails** if hard INCONCLUSIVE was necessary to quarantine thin/missing-peer and other integrity failures (Chicago: all 6,377 INCONCLUSIVE = thin_type_or_missing_peer).
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# BUILDER REPORT (Grok)
+# A06 Builder Pack — Grok (Independent First Pass)
+
+**Ablation ID:** A06  
+**Role:** Builder only (Grok)  
+**Mode:** Expert fallback (Comprehensive was not offered in the visible model selector)  
+**Blindness:** Validator pack and Adjudicator output were not consulted.  
+**Decision withheld:** This Builder report does not return KEEP, REVERT, or HALT.
+
+## 1. Role attestation
+
+I am the designated Builder for A06 under Constitution 1.0. The analysis is limited to the frozen A06 specification, the constitution, the RAW MANIFEST hashes, and the excerpted RECON_SUMMARY.csv, RA_portfolio_counts.csv, and inconclusive_by_clause.csv. The manifest is present. Missing bodies of hashed artifacts are recorded as coverage gaps rather than filled by inference.
+
+Baseline framework hash: `86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08`.
+Rule stamp: `RA-tcd-ig-v1`, kappa=2, freeze `2026-09-12 23:59:59 CDT`.
+
+## 2. Conceptual Stage 3 diff
+
+Baseline Stage 3 is an integrity gate in front of actionable labels. A failed `thin_type_or_missing_peer` check emits hard INCONCLUSIVE, removes the row from the actionable portfolio, and prevents downstream operations from treating it as a certified priority. The proposed change makes that failure a soft residual and STANDARD-by-default. That changes Stage 3 from fail-closed certification to an advisory residual on a live decision.
+
+There are two implementation shapes to distinguish. S1 is a label rewrite only: INCONCLUSIVE becomes STANDARD, optionally retaining a residual flag; ESCALATE remains unchanged and actionable size rises by exactly 6,377. S2 lifts the gate and re-enters rows into scoring; some rows could become ESCALATE. The supplied evidence does not include the candidate diff or candidate label mix, so S1/S2 cannot be resolved in this pass.
+
+## 3. Hard facts from supplied frozen excerpts
+
+- RECON_SUMMARY: `n_ra=222002`, `n_rb=222002`, `n_inner=222002`, `n_only_ra=0`, `n_only_rb=0`, `n_agree=222002`, `n_disagree=0`.
+- RA portfolio: total 222,002; ESCALATE 131,968; INCONCLUSIVE 6,377; STANDARD 83,657.
+- Arithmetic check: 131,968 + 6,377 + 83,657 = 222,002.
+- `inconclusive_by_clause.csv` contains one clause only: `thin_type_or_missing_peer`, n=6,377, share=1. Thus 100% of the observed INCONCLUSIVE mass is that quarantine class.
+- The manifest names baseline, RA/RB portfolio files, fixture results, recon, source gate, Stage 4 validation, workflow gate, and framework documents.
+
+The zero-disagreement recon result is mechanically compatible with several possibilities: RB could be a replicate; the decision label could be outside the recon grain; the change could be only a side-channel residual; or the candidate could be a no-op. The Builder does not choose among these without the missing bodies.
+
+## 4. P1 assessment
+
+P1 is: reduce INCONCLUSIVE share and increase actionable portfolio size without increasing wrong ESCALATE labels or breaking fixtures/recon. Its checkable limbs are:
+
+1. Candidate INCONCLUSIVE count is below 6,377.
+2. Candidate ESCALATE + STANDARD exceeds 215,625.
+3. No newly released thin/missing-peer row is a wrong ESCALATE (or S1 keeps ESCALATE flat).
+4. RB fixture results match frozen expecteds.
+5. Critical-field reconciliation has zero mismatch and no undeclared semantic drift.
+
+The excerpts establish the baseline denominator, the 6,377 target population, and zero disagreement on the supplied recon summary. They do not establish RB counts, candidate changed files or hash, fixture actuals/expecteds, critical-field membership, or Stage 4/workflow status. Therefore P1-A through P1-D are not shown; P1-E is only partially shown.
+
+The explicit fail condition remains material: P1 fails if hard INCONCLUSIVE was necessary to quarantine thin/missing-peer and other integrity failures. Hard INCONCLUSIVE is protecting against numerically computable but non-comparable scores (thin type) and absent peer joins (missing peer). Releasing these rows as STANDARD ships uncertified decisions. The candidate must demonstrate that this safety loss is acceptable under the frozen predicate, not merely that the portfolio is larger.
+
+## 5. Risks and required evidence
+
+Primary risks are semantic: a STANDARD-by-default label can be mistaken for certified priority; S2 can leak thin rows into ESCALATE; and a side-channel residual may not be visible in the current recon. Required evidence to resolve these risks is the RB portfolio body, both fixture bodies, exact recon body and critical-field list, candidate/changed-file hash and diff, Stage 4/workflow gate bodies, and per-row identity or a locked fixture proving the 6,377 rows are safely handled.
+
+## 6. Claim-to-evidence map
+
+- 6,377 INCONCLUSIVE and 100% thin/missing-peer: RA_portfolio_counts.csv plus inconclusive_by_clause.csv excerpt.
+- Identical 222,002-row universes and zero disagreement: RECON_SUMMARY.csv excerpt.
+- Baseline identity: BASELINE_FRAMEWORK.sha256 manifest entry.
+- Candidate benefit, fixture safety, unchanged ESCALATE behavior, and delivery gates: not established by the supplied excerpts; require RB/fixture/recon/gate bodies.
+
+This is an independent Builder first pass. It intentionally withholds a constitutional disposition and does not infer missing mechanical evidence.
+
+---
+# VALIDATOR REPORT (ChatGPT)
+# A06 Validator — ChatGPT (INDEPENDENT FIRST PASS)
+
+## Role Attestation
+
+Role: Independent Validator for A06. I am operating only as Validator and did not inspect or rely on any Builder report, Builder conclusions, or Builder interpretation. This is an independent first-pass assessment based solely on the frozen A06 ablation specification, constitution, and supplied evidence packet. The frozen packet defines Builder=Grok, Validator=ChatGPT, and Adjudicator=DeepSeek, targeting Stage 3 integrity / INCONCLUSIVE under Constitution 1.0. The instructions require role separation and no terminal KEEP/REVERT/HALT determination.
+
+## Independent Test Plan
+
+The objective is to evaluate whether softening the integrity-gate INCONCLUSIVE outcome into a soft residual / STANDARD-by-default when evidence is thin has sufficient evidence support. The stated benefit predicate is that soft residual should reduce INCONCLUSIVE share and improve actionable portfolio size without increasing wrong ESCALATE labels or breaking fixtures/reconciliation. The specification says P1 fails if hard INCONCLUSIVE was necessary to quarantine thin/missing-peer and related integrity failures, identifying Chicago's 6,377 INCONCLUSIVE cases as thin_type_or_missing_peer.
+
+The validation approach is to verify the frozen artifacts and manifest; confirm portfolio size, decision distribution, reconciliation agreement, and integrity-clause distribution; evaluate whether integrity failures remain identifiable and whether uncertain cases are converted into actionable decisions without evidence; assess reduced INCONCLUSIVE volume, preserved ESCALATE correctness, and preserved fixtures/reconciliation; and identify unresolved evidence gaps without substituting assumptions.
+
+## Hard Facts From Frozen Evidence
+
+The RAW MANIFEST is present and supplies hashes/references for the baseline framework, reconciliation report, lineage attestation, manifest, portfolio counts, disagreement files, source gate report, fixture results, validation status, cross review, and framework documents. Per the packet's adjudicator note, missing historical R stdout is not treated as a halt condition when the RAW MANIFEST is present.
+
+The supplied reconciliation summary reports n_ra=222,002; n_rb=222,002; n_inner=222,002; n_only_ra=0; n_only_rb=0; n_agree=222,002; and n_disagree=0. Thus the supplied RA/RB reconciliation summary agrees completely.
+
+The RA portfolio counts report total decisions 222,002, comprising ESCALATE=131,968, INCONCLUSIVE=6,377, and STANDARD=83,657, with kappa=2, rule_version=RA-tcd-ig-v1, and freeze timestamp 2026-09-12 23:59:59 CDT. The integrity breakdown reports thin_type_or_missing_peer count=6,377 and share=1, indicating that the supplied INCONCLUSIVE population is entirely attributed to this integrity condition.
+
+## Integrity / INCONCLUSIVE Notes
+
+The key question is not merely whether the INCONCLUSIVE population is large; it is whether INCONCLUSIVE is a necessary integrity quarantine or an unnecessarily conservative residual. The evidence establishes that the current population is specifically associated with thin_type_or_missing_peer, not random uncertainty. A thin-peer condition directly affects whether comparative evidence is adequate. Converting such records to STANDARD by default may create a semantic change by erasing the distinction between supported non-escalation and insufficient evidence.
+
+The frozen constitution states that schema or mechanical agreement alone does not prove semantic equality and requires behavioral fixtures and decision-changing semantic checks. The central validation question is whether soft residual handling preserves the original integrity guarantee while improving portfolio usability.
+
+## P1 Assessment
+
+The frozen evidence establishes complete reconciliation agreement, 6,377 current INCONCLUSIVE cases, and attribution of all of them to thin_type_or_missing_peer. However, it does not directly establish the counterfactual outcome of replacing those integrity-gated cases with STANDARD-by-default. The packet does not show the candidate soft-residual output distribution, whether former INCONCLUSIVE cases become incorrect STANDARD classifications, whether ESCALATE precision/error characteristics remain unchanged, whether fixture behavior remains identical, or whether the distinction between insufficient evidence and evidence-backed STANDARD outcomes is preserved. The current evidence supports analysis of existing behavior, but the benefit claim requires candidate-behavior evidence.
+
+## Blocking Objections
+
+1. **Semantic risk from integrity downgrade.** The proposed change modifies the meaning of the integrity gate: records previously marked INCONCLUSIVE for insufficient peer evidence would become STANDARD-by-default, and the packet does not demonstrate preserved decision validity.
+2. **No demonstrated counterfactual comparison.** Baseline facts show the existing state but not the candidate state. A lower INCONCLUSIVE count alone would not establish improvement.
+3. **Insufficient evidence regarding false STANDARD outcomes.** The P1 predicate requires no increase in wrong ESCALATE labels and preservation of safeguards, but the evidence does not show whether STANDARD classifications created from thin-peer cases are reliable.
+4. **Integrity distinction may be weakened.** Because A06 changes an explicit integrity outcome, the candidate must demonstrate equivalent or improved protection against undeclared semantic change.
+
+## Missing Evidence
+
+The RAW MANIFEST is present; no missing-manifest issue is identified. Remaining evidence needed for complete P1 evaluation includes candidate A06 portfolio counts, candidate-versus-baseline reconciliation results, candidate fixture execution results, classification evidence for former thin_type_or_missing_peer cases, measurement of any ESCALATE behavior change, and evidence that candidate behavior preserves intended integrity semantics. These are behavioral consequences of the proposed semantic change, not basic artifact-availability issues.
+
+## Summary
+
+The packet provides a complete frozen specification, constitutional rules, RAW MANIFEST, reconciliation summary, baseline portfolio counts, and integrity-clause distribution. It confirms that all 6,377 current INCONCLUSIVE classifications are associated with thin_type_or_missing_peer and that the supplied RA/RB reconciliation summary has zero disagreements. The proposed change addresses a meaningful design boundary, but the supplied evidence establishes current behavior rather than the counterfactual safety of softening the integrity gate. The primary validation issue is semantic preservation: reducing INCONCLUSIVE volume is beneficial only if insufficient evidence is not converted into unsupported decisions. Further candidate-behavior evidence is required to fully assess the stated P1 predicate. No terminal adjudication decision is made in this independent validator first pass.
+
+---
+# EVIDENCE EXCERPTS
+## RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+## RA_portfolio_counts.csv
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+
+## RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+/workspace/chicago-311-run/stage-05/deeper/inconclusive_by_clause.csv
+## inconclusive_by_clause.csv
+integrity_clause,n,share
+thin_type_or_missing_peer,6377,1

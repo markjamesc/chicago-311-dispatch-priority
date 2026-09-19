@@ -1,0 +1,309 @@
+# A07 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Validator only. DeepThink on. Blind to Builder. Do NOT return KEEP | REVERT | HALT.
+
+Independently recompute hard facts from frozen evidence. Assess P1. List blocking objections and missing evidence. Withhold terminal adjudication.
+
+---
+# SPEC
+# A07 — Ablation specification (FROZEN)
+
+**Ablation ID:** A07  
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok  
+**Target:** Stage 3 measurement / Stage 4 age implementation  
+**Constitution:** 1.0  
+**Frozen at CT:** 2026-09-19
+
+## Exact change being tested
+
+**Proposed change:** Use raw open age instead of the TCD-IG age construction: compute `open_age_days`/`open_age_h` directly from `T_freeze - CREATED_DATE` and remove the type-conditional dormancy construction from the age metric, or simplify the age metric only if the simplification is mechanically equivalent and explicitly documented. This is a counterfactual analysis; do not rewrite the locked Chicago 311 Stage 4 pack.
+
+## Benefit predicate P1
+
+Raw open age (or an equivalent simpler age metric) improves interpretability and reduces construction complexity without materially changing Stage 4 PASS status or locked fixture semantics.
+
+P1 **fails** if TCD-IG age was necessary for the locked Design Gate metric (`open_age_days >= 14` with `T_freeze`), for the TCD-IG decision construct, or for the locked fixture expecteds (including F03 → STANDARD).
+
+## Frozen surfaces and regression rules
+
+- Locked baseline: `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, `T_freeze=2026-09-12 23:59:59 America/Chicago`, κ=2.
+- Expected unchanged surfaces: SQL nonjudgment boundary, integrity-first ordering, exact recon controls, SR_NUMBER grain, fixture IDs/expecteds, and the frozen Chicago 311 Stage 4 pack.
+- Any semantic change to ESCALATE / INCONCLUSIVE / STANDARD not declared by this ablation is a regression.
+- Do not treat age as a City SLA or dispatch order; capacity/ranking remains out of scope.
+
+## Critical age and reconciliation checks
+
+- `T_freeze` and timezone treatment; raw `CREATED_DATE` parse success and `created_ts <= T_freeze`.
+- Locked age/dormancy fields and thresholds relevant to the candidate, including F03 and the `open_age_days >= 14` Design Gate check.
+- Exact recon fields: SR_NUMBER set, n_decision, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree, classification/action labels, integrity clauses, and portfolio counts.
+
+## Allowed evidence scope
+
+Read-only use of frozen artifacts under `/workspace/chicago-311-run` and `/workspace/chicago-311-dispatch-priority`. No new extract, no browser AI, and no rewrite of locked labels or fixtures.
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+## Builder task
+
+Make an independent first pass from this frozen packet. Describe the conceptual diff, hard facts, age/fixture implications, unchanged surfaces, risks, and claim→evidence map. Withhold any KEEP/REVERT/HALT decision.
+
+## Validator task
+
+The Validator independently recomputes the same hard facts after the Builder first pass remains blind. Withhold any KEEP/REVERT/HALT decision.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# EVIDENCE EXCERPTS
+## RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+## RA_portfolio_counts.csv
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+
+## RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+## r_a_fixture_results.csv (head)
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+
+## r_b_fixture_results.csv (head)
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## Fixture F03 / age-related rows
+/workspace/chicago-311-run/ablations/_raw_evidence/r_a_fixture_results.csv:fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+/workspace/chicago-311-run/ablations/_raw_evidence/r_a_fixture_results.csv:F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+/workspace/chicago-311-run/ablations/_raw_evidence/r_a_fixture_results.csv:F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+/workspace/chicago-311-run/ablations/_raw_evidence/r_a_fixture_results.csv:F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+/workspace/chicago-311-run/ablations/_raw_evidence/r_b_fixture_results.csv:SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig

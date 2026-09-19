@@ -1,0 +1,929 @@
+# A01 Adjudicator — Grok (TERMINAL DECISION)
+
+You are the **Adjudicator** for framework ablation A01.
+Constitution v1.0 is frozen. You may NOT rewrite the ablation, rerun the build, invent criteria, or alter the constitution.
+You receive ONLY the frozen Builder and Validator evidence packs below (already hashed).
+
+Mode: Expert or Comprehensive if available (state which).
+
+## Your job
+Apply the constitution and return **exactly one** terminal state: KEEP | REVERT | HALT.
+
+Remember:
+- KEEP = the *proposed change* (weaken dual-path / allow shared judged helpers) becomes canonical — only if all 9 KEEP conditions pass.
+- REVERT = mechanics coherent but proposed change should NOT become canonical (conservative default if KEEP not established).
+- HALT = harness/evidence not trustworthy (Builder/Validator hard mechanical disagreement, missing raw evidence, barrier breach, etc.).
+
+Cite frozen evidence for each constitutional condition.
+
+## Required output
+1. Role attestation (Adjudicator=Grok; saw only frozen packs)
+2. Hard mechanical agreement check (Builder vs Validator)
+3. Checklist of constitution KEEP conditions 1–9 (pass/fail each)
+4. Benefit predicate P1 ruling
+5. **Terminal state: KEEP or REVERT or HALT** (exactly one)
+6. If KEEP: exact Stage 3/4 doc edit instructions (section-level)
+7. If REVERT/HALT: one-paragraph rationale
+
+---
+# FROZEN SPEC
+# A01 — Ablation specification (FROZEN)
+
+**Ablation ID:** A01  
+**Constitution version:** 1.0  
+**Baseline frameworks:**  
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`  
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`  
+**Role assignment (canonical rotation):** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok  
+**Target stage(s):** Stage 4 (primary); Stage 3 only if independence lock text lives there  
+**Frozen at CT:** 2026-09-19 ~14:46
+
+## Exact change being tested
+
+**Proposed canonical change:** Weaken Method B Stage 4 so independent R-A/R-B may share judged helper modules / a common judged library (dual-path independence no longer mandatory for judged labels).
+
+**Surfaces expected to change if KEEP:** Stage 4 validation framework sections on R-A/R-B independence and “no shared judged helpers.”
+
+**Expected unchanged surfaces:** Stage 1/2; Chicago 311 frozen Stage 4 pack (never rewritten); fixture expected labels F01–F14; κ/T_freeze locks.
+
+## Named evidence / fixture suite
+
+Chicago 311 Dataset 2 frozen evidence (post clock-parse fix):
+- Exact recon: 222002/222002 agree after fix; earlier run 104 STANDARD↔ESCALATE disagrees
+- Fixtures: 14/14 both paths (fixtures-v1-tcd-ig)
+- Validation Gate PASS; workflow gate PASS
+- Structural cross-review notes tz/force_tz asymmetry between independent paths
+
+## Critical reconciliation fields (hard mechanical)
+
+From stage3-v1-tcd-ig: SR_NUMBER, classification/action agreement counts:
+- n_decision, n_agree, n_disagree, n_only_ra, n_only_rb
+- Portfolio ESCALATE/INCONCLUSIVE/STANDARD at κ=2
+
+## Allowed source/data scope
+
+Read-only use of frozen Chicago artifacts under `/workspace/chicago-311-dispatch-priority` and `/workspace/chicago-311-run`. No new MySQL extract. No rewrite of frozen labels.
+
+## Operational benefit predicate (predeclared)
+
+**P1:** If dual-path independence were dropped (shared judged helpers allowed), the framework would still have caught the production 104-row near-threshold ESCALATE/STANDARD disagreement (or an equivalent seeded path-asymmetry defect) with equal or better detection coverage, while reducing duplicated judged implementation cost.
+
+Benefit is **satisfied** only if evidence shows detection coverage is preserved without dual-path.  
+Benefit is **failed** if evidence shows dual-path (or independent parse implementations) was necessary to surface the 104-row defect.
+
+## Regression rules
+
+- Must not authorize rewriting Chicago frozen pack.
+- Must not remove Fixture Gate or exact recon requirements in the same ablation (those are A02/A08).
+- Undeclared semantic change to ESCALATE/INCONCLUSIVE/STANDARD definitions → REVERT.
+
+## Builder task
+
+Using only frozen evidence + baseline Stage 4 text, produce an evidence pack arguing what happens under the proposed weakening. Include mechanical facts from recon/fixture files (raw numbers). Do **not** output KEEP/REVERT/HALT.
+
+## Validator task
+
+Independently recompute the same hard mechanical facts from frozen artifacts; list blocking objections to the proposed weakening. Do **not** see Builder pack before first pass. Do **not** output KEEP/REVERT/HALT.
+
+
+---
+# FROZEN CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+
+---
+# EVIDENCE FREEZE RECORD
+{
+  "ablation_id": "A01",
+  "frozen_at_ct": "2026-09-19 ~15:15 CT",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-builder/builder_report.md",
+      "bytes": 9605,
+      "sha256": "b7a84548bd8bb9910dcac060fbe770f635add8756f80ce50e3387448e27a0ac8"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-builder/execution_stdout.txt",
+      "bytes": 203,
+      "sha256": "3d577110e462fababef562b64f097442a87101c986126bd2e32e446dcb405195"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-validator/validator_report.md",
+      "bytes": 13615,
+      "sha256": "ca03eb7b073db70de399eccb7ea3e6c682c6a4a45324a3d22c2d1b251433d763"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-validator/execution_stdout.txt",
+      "bytes": 62,
+      "sha256": "6e44906296f57a45760b2d1378e14c08393cafaf5ef895dd128c27f1c5d34219"
+    }
+  ]
+}
+
+
+---
+# FROZEN BUILDER PACK
+# A01 Builder Report
+
+- **Model/mode:** ChatGPT — High reasoning (highest available on account; Pro 4/4 required upgrade)
+- **CT timestamp:** 2026-09-19 14:55 CT (frozen packet: ~14:46 CT)
+- **Role:** Builder ChatGPT
+- **Blindness:** Independent first pass; no Validator or Adjudicator outputs seen
+
+1. Ablation ID + Role Attestation
+Ablation ID
+
+A01 — Weakening Stage 4 Dual-Path Independence by Allowing Shared Judged Helpers
+
+Role Attestation
+
+Role: Builder
+
+Assigned model: ChatGPT
+
+Constitution version: 1.0
+
+Ablation specification: A01 (frozen)
+
+First-pass condition: Independent first pass
+
+Validator outputs seen: No
+
+Adjudicator outputs seen: No
+
+This pack analyzes only the proposed Stage 4 change:
+
+Allow Method B independent paths (R-A/R-B) to share judged helper modules or a common judged library, weakening the current no-shared-judged-helper independence rule.
+
+No decision outcome is issued.
+
+2. Proposed Framework Text Diff (Conceptual Unified Diff Against Stage 4 Independence Rules)
+Current Stage 4 Independence Rule (baseline)
+Diff
+- R-A and R-B must implement judged logic independently.
+- No shared judged helper modules.
+- No copied judged ID lists.
+- Independent parsing, normalization, eligibility, and classification paths
+  are required before reconciliation.
+- Agreement is evaluated only after independent construction.
+Proposed A01 Change
+Diff
++ R-A and R-B may share approved judged helper modules or a common
++ judged library.
++
++ Shared helpers may contain:
++ - timestamp normalization
++ - parsing functions
++ - eligibility utilities
++ - classification utilities
++ - common decision-rule implementations
++
++ Independent reconciliation remains required.
++ Exact recon fields remain mandatory.
++ Fixture Gate remains mandatory.
++ Validation Gate remains mandatory.
+Surfaces affected
+
+Changed:
+
+Stage 4 Method B independence requirements.
+
+Definition of acceptable independent-path construction.
+
+Audit requirement for helper provenance.
+
+Unchanged:
+
+Stage 1 decision lock.
+
+Stage 2 framing.
+
+Frozen Chicago 311 artifacts.
+
+Fixture expected labels F01–F14.
+
+κ threshold lock.
+
+T_freeze lock.
+
+Exact reconciliation requirement.
+
+3. Hard Mechanical Facts Table
+Metric	Frozen Evidence Result
+Decision set size (n_decision)	222,002
+SR_NUMBER set identity	Identical between R-A and R-B
+Post-fix agreement	222,002 / 222,002
+Post-fix disagreement	0
+Only R-A labels	0
+Only R-B labels	0
+ESCALATE count (κ=2)	131,968
+INCONCLUSIVE count (κ=2)	6,377
+STANDARD count (κ=2)	83,657
+Fixtures executed	14
+R-A fixture result	14/14 PASS
+R-B fixture result	14/14 PASS
+F03 expected behavior	STANDARD
+Prior production disagreement	104 rows
+Prior disagreement direction	STANDARD (R-A) vs ESCALATE (R-B)
+Threshold distance of affected rows	Within ~5 hours of κ×p75 threshold
+Detected defect source	Timestamp interpretation asymmetry
+4. Benefit Predicate P1 Assessment
+P1 Definition
+
+The proposed weakening provides benefit only if:
+
+Shared judged helpers preserve detection coverage of the 104-row near-threshold disagreement (or equivalent seeded path-asymmetry defect) while reducing duplicated judged implementation cost.
+
+Evidence Supporting Possible Benefit
+1. The defect was ultimately detectable through reconciliation
+
+The frozen evidence shows:
+
+R-A and R-B produced different outputs.
+
+Exact reconciliation detected:
+
+104 row disagreements.
+
+STANDARD vs ESCALATE divergence.
+
+The disagreement triggered structural investigation.
+
+This indicates that the reconciliation layer, not only independent implementation, surfaced the existence of a production defect.
+
+2. Shared helpers could preserve detection of some classes of defects
+
+A shared helper architecture could still detect:
+
+downstream integration mistakes;
+
+misuse of helper outputs;
+
+rule application differences outside shared code;
+
+configuration differences;
+
+implementation defects occurring after helper execution.
+
+The existing exact recon requirement would remain capable of identifying output disagreement.
+
+Evidence Against Preserved Detection Coverage
+1. The specific 104-row defect depended on asymmetric implementations
+
+The defect arose because:
+
+R-B used a POSIXct shortcut.
+
+R-A used force_tz.
+
+The two paths interpreted naive timestamps differently.
+
+The disagreement was approximately a 5-hour Chicago offset.
+
+The resulting labels changed only near the κ×p75 boundary.
+
+Evidence:
+
+"Structural cross-review notes tz/force_tz asymmetry between independent paths."
+
+The defect existed because two independent implementations provided two different interpretations of the same raw field.
+
+2. A shared timestamp helper could remove the disagreement signal
+
+Under the proposed weaker architecture:
+
+Raw timestamp
+      |
+      v
+Shared parser
+      |
+   +--+--+
+   |     |
+  R-A   R-B
+
+Both paths would inherit the same parsing assumption.
+
+A timestamp interpretation error inside the shared helper could produce:
+
+Raw timestamp
+      |
+      v
+Incorrect shared parser
+      |
+   +--+--+
+   |     |
+  R-A   R-B
+
+Result:
+
+identical outputs;
+
+zero reconciliation disagreement;
+
+defect not exposed through independence comparison.
+
+P1 Evidence Assessment
+
+The frozen evidence demonstrates:
+
+exact reconciliation detected the actual 104-row defect;
+
+the defect was caused by independent parsing asymmetry;
+
+removing independent parsing paths could remove this detection mechanism.
+
+Therefore:
+
+The evidence provides support that dual-path independence contributed directly to detecting the observed defect.
+
+The evidence does not establish that shared helpers would preserve equal detection coverage.
+
+5. Semantic / Regression Risks
+Risk 1 — Common-mode implementation failure
+
+A shared judged library creates a larger common-mode failure surface.
+
+Example:
+
+Current:
+
+R-A parser ──┐
+             ├── compare outputs
+R-B parser ──┘
+
+Proposed:
+
+       Shared parser
+            |
+      +-----+-----+
+      |           |
+     R-A         R-B
+
+A single semantic mistake may propagate identically.
+
+Risk 2 — Reduced ability to challenge hidden assumptions
+
+The original design intentionally creates two independent interpretations.
+
+The Chicago evidence demonstrates why:
+
+timestamp semantics;
+
+timezone interpretation;
+
+wall-clock conversion;
+
+were not merely coding details but decision-changing assumptions.
+
+Risk 3 — Independence becomes audit-only rather than computational
+
+If judged logic is shared:
+
+the second path validates execution;
+
+it no longer validates independent reasoning about the rule.
+
+This changes the meaning of Method B.
+
+Risk 4 — Possible engineering benefit
+
+The proposed change does reduce:
+
+duplicated parsing logic;
+
+duplicated rule maintenance;
+
+divergence risk from intentional code drift.
+
+However, the frozen evidence does not quantify maintenance savings.
+
+6. Builder Evidence Summary
+Mechanical Summary
+
+The Chicago 311 Stage 4 experiment produced:
+
+222,002 decision rows.
+
+Exact agreement after repair.
+
+Zero remaining mismatches.
+
+Identical κ=2 portfolio.
+
+Full fixture pass.
+
+The original disagreement consisted of:
+
+104 rows.
+
+STANDARD vs ESCALATE.
+
+Caused by timezone parsing differences.
+
+Concentrated near the decision threshold.
+
+Interpretation Summary
+
+The observed defect was not merely a final output mismatch.
+
+It was a disagreement created by independent implementations interpreting raw timestamps differently.
+
+The independence requirement therefore functioned as a detection mechanism:
+
+Independent paths interpreted inputs.
+
+Outputs diverged.
+
+Exact reconciliation exposed the difference.
+
+Structural review identified the timezone cause.
+
+Repairs restored agreement.
+
+Allowing shared judged helpers would likely reduce duplicated work, but the frozen evidence does not demonstrate that it preserves this specific detection capability.
+
+7. Manifest of Claims → Evidence Citations
+Claim	Evidence Source
+Decision set contained 222,002 rows	EXACT_RECON_REPORT — "Decision set: 222,002 rows"
+R-A and R-B agreed after fix	EXACT_RECON_REPORT — "Agree: 222,002 / 222,002"
+Disagreement count became zero	EXACT_RECON_REPORT — "Disagree: 0"
+Prior disagreement was 104 rows	EXACT_RECON_REPORT — "First production run disagreed on 104 rows"
+Prior disagreement labels were STANDARD vs ESCALATE	EXACT_RECON_REPORT — "all STANDARD (R-A) vs ESCALATE (R-B)"
+Disagreement came from timezone offset	EXACT_RECON_REPORT — "dormant_h differed by systematic ~5.0 hours"
+Cause involved asymmetric timestamp handling	EXACT_RECON_REPORT — "R-B POSIXct shortcut kept wrong instant; R-A force_tz happened to recover Chicago wall digits"
+Fixture suite contained 14 fixtures	EXACT_RECON_REPORT — "Fixtures: both paths 14/14 PASS"
+Portfolio counts matched	EXACT_RECON_REPORT Portfolio table
+Independent trees had no shared judged helpers	STRUCTURAL_CROSS_REVIEW — "Separate trees; no shared judged helper modules"
+Structural review passed after repair	STRUCTURAL_CROSS_REVIEW — "Verdict: PASS"
+Timestamp semantics were a Stage 4 risk	STRUCTURAL_CROSS_REVIEW §10.6 checklist
+Shared judged helpers were absent in baseline	STRUCTURAL_CROSS_REVIEW — "Shared judged helpers: None. PASS"
+Builder Closing Observation
+
+The frozen evidence shows a tradeoff:
+
+Engineering benefit: shared judged helpers may reduce duplicated implementation effort.
+
+Validation cost: the observed Chicago 311 failure mode was exposed precisely because judged logic was independently implemented.
+
+The available evidence demonstrates the value of independent paths for this defect class, but does not provide a measured estimate of duplicated implementation savings.
+
+
+---
+# FROZEN VALIDATOR PACK
+# A01 Validator Report
+
+- Model/mode: DeepSeek DeepThink
+- CT timestamp: 2026-09-19, 15:15:32 CT
+- Role: Independent Validator
+- Blindness attestation: I did not see, receive, or assume the Builder report or any Builder output before this first pass.
+
+1. Role attestation
+
+Validator = DeepSeek. DeepThink ON.
+I did not see, receive, or assume the Builder report/pack. I reconstruct the checks only from the frozen A01 spec, frozen constitution, and frozen evidence provided above. I make no KEEP/REVERT/HALT decision.
+
+Role separation from my side: no Builder artifact was visible before this first pass.
+
+2. Independent test plan
+
+Planned independent checks, constrained to frozen read-only Chicago artifacts and no new MySQL extract:
+
+Frozen-input integrity
+
+Compute SHA-256 of baseline frameworks and compare to:
+
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c
+
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e
+
+Verify constitution version 1.0 is the controlling version.
+
+Verify role assignment: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok.
+
+Exact recon recomputation
+
+From raw R-A/R-B decision outputs, join on SR_NUMBER.
+
+Recompute n_ra, n_rb, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree.
+
+Recompute portfolio counts for ESCALATE, INCONCLUSIVE, STANDARD at κ=2.
+
+Confirm the decision set is the same SR_NUMBER set on both paths.
+
+Prior 104-row mismatch reconstruction
+
+Locate the pre-fix R-A/R-B outputs or diff.
+
+Recompute the 104 rows.
+
+Verify label direction: R-A STANDARD vs R-B ESCALATE.
+
+Recompute dormant_h delta and threshold proximity.
+
+Confirm whether all 104 were within 5h of the κ×p75 threshold.
+
+Clock-parse fix verification
+
+Diff R-A/run_RA.R and R-B/R/10_io_parse.R before/after if available.
+
+Verify clock columns are read as character and parsed as America/Chicago wall.
+
+Verify no force_tz reliance and no trusted readr POSIXct for created_ts / mod_ts.
+
+Fixture verification
+
+Load fixtures-v1-tcd-ig expected labels F01–F14.
+
+Run both paths and compare actual vs expected per fixture.
+
+Specifically verify F03 → STANDARD at κ=2.
+
+Confirm 14/14 both paths from raw fixture output, not just summary text.
+
+Proposed weakening test
+
+No candidate shared-judged-helper implementation is present in the frozen evidence.
+
+If one existed, run same frozen recon and fixture suite under shared judged helpers.
+
+Seed or replay an equivalent path-asymmetry defect and test whether exact recon still catches it.
+
+Measure duplicated judged implementation cost reduction, if claimed.
+
+Regression checks
+
+Confirm Chicago frozen pack not rewritten.
+
+Confirm Fixture Gate and exact recon requirements remain present.
+
+Confirm ESCALATE / INCONCLUSIVE / STANDARD definitions unchanged.
+
+Confirm no undeclared semantic change to Stage 4.
+
+3. Hard mechanical facts table
+#	Fact	Frozen/declared value	Independent recomputation from provided evidence	Status
+1	Baseline framework hash #1	70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c	Declared in spec; raw baseline file not provided	Cannot recompute
+2	Baseline framework hash #2	24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e	Declared in spec; raw baseline file not provided	Cannot recompute
+3	Constitution version	1.0	Present in frozen spec	Verified from text
+4	Role assignment	Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok	Present in frozen spec	Verified from text
+5	n_ra	222002	222002 from RECON_SUMMARY.csv	Recomputed from inline CSV
+6	n_rb	222002	222002 from RECON_SUMMARY.csv	Recomputed from inline CSV
+7	n_inner	222002	222002 from RECON_SUMMARY.csv	Recomputed from inline CSV
+8	n_only_ra	0	0 from RECON_SUMMARY.csv	Recomputed from inline CSV
+9	n_only_rb	0	0 from RECON_SUMMARY.csv	Recomputed from inline CSV
+10	n_agree	222002	222002 from RECON_SUMMARY.csv	Recomputed from inline CSV
+11	n_disagree	0	0 from RECON_SUMMARY.csv	Recomputed from inline CSV
+12	Agreement identity check	—	n_inner = n_agree + n_disagree = 222002 + 0 = 222002	Arithmetic passes
+13	Path count identity check	—	n_ra = n_agree + n_only_ra = 222002 + 0 = 222002; n_rb = n_agree + n_only_rb = 222002 + 0 = 222002	Arithmetic passes
+14	Decision set rows	222,002 identical SR_NUMBER sets	Reported in EXACT_RECON_REPORT; raw join output absent	Reported only
+15	R-A portfolio at κ=2	ESCALATE 131,968; INCONCLUSIVE 6,377; STANDARD 83,657	Sum = 131,968 + 6,377 + 83,657 = 222,002	Arithmetic passes
+16	R-B portfolio at κ=2	ESCALATE 131,968; INCONCLUSIVE 6,377; STANDARD 83,657	Sum = 222,002; identical to R-A	Arithmetic passes
+17	Fixture results	Both paths 14/14 PASS; F03 → STANDARD	Reported; raw fixture actuals/expecteds absent	Cannot independently verify per fixture
+18	Pre-fix mismatch count	104 rows	Reported; raw diff/list absent	Reported only
+19	Pre-fix mismatch direction	R-A STANDARD vs R-B ESCALATE	Reported; raw labels absent	Reported only
+20	Pre-fix dormant_h delta	Systematic ~5.0 hours America/Chicago offset	Reported; raw values absent	Reported only
+21	Pre-fix threshold proximity	All 104 within 5h of κ×p75 threshold	Reported; raw distances absent	Reported only
+22	Diagnosed cause	R-B POSIXct shortcut kept wrong instant; R-A force_tz recovered Chicago wall digits	Reported in EXACT_RECON_REPORT	Reported only
+23	Locked rule after fix	Always character → parse as America/Chicago wall; never force_tz / never trust readr POSIXct	Reported in EXACT_RECON_REPORT	Reported only
+24	Fix files	R-A/run_RA.R; R-B/R/10_io_parse.R	Reported; raw diffs/hashes absent	Cannot independently verify
+25	Structural cross-review verdict	PASS	Reported	Reported only
+26	design_version	stage3-v1-tcd-ig	Reported	Reported only
+27	fixture_version	fixtures-v1-tcd-ig	Reported	Reported only
+28	Current independence attestation	No shared judged helper modules or copied ID lists	Reported in STRUCTURAL_CROSS_REVIEW	Reported only
+29	Proposed weakening implementation	Shared judged helpers / common judged library allowed	No candidate artifact, diff, or run present	Missing
+30	Cost-reduction evidence	Reducing duplicated judged implementation cost	No measurement present	Missing
+31	Validation Gate	PASS	Reported; raw gate output absent	Reported only
+32	Workflow gate	PASS	Reported; raw gate output absent	Reported only
+4. Fixture / recon notes
+
+Exact recon after the clock-parse fix reports PASS with:
+
+222,002 inner rows,
+
+222,002 agreements,
+
+0 disagreements,
+
+0 only-R-A and 0 only-R-B.
+
+Portfolio counts are identical between R-A and R-B at κ=2:
+
+ESCALATE: 131,968
+
+INCONCLUSIVE: 6,377
+
+STANDARD: 83,657
+
+Fixtures are reported as 14/14 PASS for both paths, with F03 explicitly returning STANDARD.
+
+The pre-fix production mismatch was 104 rows, all R-A STANDARD vs R-B ESCALATE.
+
+The 104-row defect was diagnosed as a timezone/clock asymmetry:
+
+R-B’s POSIXct shortcut kept the wrong instant.
+
+R-A’s force_tz happened to recover Chicago wall digits.
+
+dormant_h differed by a systematic ~5.0-hour America/Chicago offset.
+
+All 104 sat within 5h of the κ×p75 threshold.
+
+The current structural cross-review attests:
+
+separate trees,
+
+no shared judged helper modules,
+
+no copied ID lists,
+
+first production judged outputs compared only at recon.
+
+Residual non-blocking note: parent-SR integrity clause wording differs slightly; production labels matched exactly.
+
+Raw fixture actuals/expecteds, raw recon decision outputs, raw pre-fix 104-row diff, and raw gate outputs are not included in the frozen evidence shown here.
+
+5. Benefit predicate P1 independent assessment
+
+P1 stated benefit: If dual-path independence were dropped and shared judged helpers were allowed, the framework would still catch the production 104-row near-threshold ESCALATE/STANDARD disagreement, or an equivalent seeded path-asymmetry defect, with equal or better detection coverage, while reducing duplicated judged implementation cost.
+
+Evidence relevant to P1:
+
+The 104-row defect was surfaced by comparing two independent paths.
+
+The diagnosis depended on R-A and R-B behaving differently:
+
+R-B kept the wrong instant via POSIXct shortcut.
+
+R-A recovered Chicago wall digits via force_tz.
+
+The disagreement itself was the detection signal.
+
+The frozen evidence contains no run of a shared-judged-helper variant.
+
+The frozen evidence contains no seeded equivalent path-asymmetry defect under shared judged helpers.
+
+The frozen evidence contains no measurement of reduced duplicated judged implementation cost.
+
+Assessment:
+
+P1 is not supported by the frozen evidence. More strongly, the evidence matches P1’s stated failure condition: independent parse implementations were necessary to surface the 104-row defect. The only path-asymmetry defect in evidence was found because R-A and R-B did not share the same parse/clock behavior. If dual-path independence were weakened in the relevant judged-label or shared-helper sense, the evidence does not show the same detection coverage would remain. No equal-or-better detection coverage under shared judged helpers is demonstrated.
+
+Therefore: P1 is failed by the frozen evidence as presented.
+
+6. Blocking objections
+
+No candidate implementation of the weakening exists in the evidence.
+There is no shared judged helper library, no diff, no file manifest, and no run showing what changes under A01.
+
+No detection-coverage test under shared judged helpers.
+The evidence shows detection with independent paths. It does not show detection with shared judged helpers.
+
+The 104-row defect was discovered by path asymmetry.
+The exact recon found the problem because R-A and R-B differed. If the relevant independence is weakened, the differential signal may disappear or become less sensitive.
+
+The defect was in parse/clock handling, not judged label logic.
+The proposed weakening targets judged helpers, but the only hard defect in evidence arose from independent parse implementations. This makes the benefit claim misaligned with the observed failure mode.
+
+Fixtures alone did not catch the 104-row production defect.
+Both paths reportedly passed 14/14 fixtures, yet the production near-threshold mismatch still occurred. Therefore fixture PASS under shared helpers would not by itself prove preserved detection coverage.
+
+Cost reduction is unmeasured.
+P1 requires reduced duplicated judged implementation cost. No raw artifact measures or quantifies that reduction.
+
+No replacement safeguard is proposed for the removed independence lock.
+If dual-path independence is weakened, there is no frozen replacement such as differential fuzzing, mutation testing, seeded path-asymmetry tests, or an independent oracle proving equal-or-better detection.
+
+Exact recon may become less diagnostic for shared judged logic.
+The regression rules forbid removing exact recon, but weakening dual-path independence may make exact recon vacuous or weaker for the shared portion. No evidence shows exact recon remains meaningful under the proposed weakening.
+
+The current independence attestation would no longer hold as written.
+STRUCTURAL_CROSS_REVIEW currently attests “no shared judged helper modules.” The proposed weakening would invalidate that attestation, but no new attestation standard or control is supplied.
+
+Missing raw artifacts prevent full independent verification.
+The hard counts can be partially recomputed from the inline summary, but the underlying raw decision files, fixture actuals, diffs, and gate outputs are absent.
+
+7. Unvalidated / missing raw evidence list
+
+If I were adjudicator, the following missing raw artifacts would force HALT under Constitution §3 and §9. Flagging only:
+
+Raw R-A and R-B decision outputs with SR_NUMBER, label, peer aggregates, dormant_h, and threshold distance.
+
+Raw exact recon join output and SQL/R/tool stdout/stderr.
+
+Raw 104-row pre-fix mismatch list.
+
+Raw pre-fix and post-fix label files showing STANDARD vs ESCALATE.
+
+Raw dormant_h values and computed timezone offsets for the 104 rows.
+
+Raw fixture actuals and expecteds for fixtures-v1-tcd-ig, all F01–F14.
+
+Raw F03 fixture output proving STANDARD at κ=2.
+
+Raw diff output for R-A/run_RA.R and R-B/R/10_io_parse.R.
+
+Before/after SHA-256 hashes of the fix files.
+
+SHA-256 manifests for all frozen evidence files.
+
+Raw baseline framework files to recompute the declared SHA-256 hashes.
+
+Raw Validation Gate PASS artifact.
+
+Raw Workflow Gate PASS artifact.
+
+Raw structural cross-review tree manifests proving no shared judged helper modules.
+
+Raw source row counts / envelope counts, e.g. the ~245k Open candidates and 222,002 decision rows.
+
+Candidate shared-judged-helper implementation, diff, and run.
+
+Any seeded equivalent path-asymmetry defect test under shared judged helpers.
+
+Any measurement of duplicated judged implementation cost reduction.
+
+8. Validator summary
+
+I independently recomputed the inline hard mechanical counts where possible. The RECON_SUMMARY.csv arithmetic is internally consistent: 222,002 rows, 222,002 agreements, 0 disagreements, 0 only-R-A, 0 only-R-B. The reported portfolio counts sum correctly and are identical between R-A and R-B.
+
+However, many required raw artifacts are absent. I cannot independently verify fixture actuals, the 104-row pre-fix diff, the clock-parse fix diffs, gate PASS outputs, file hashes, or the proposed weakening’s implementation.
+
+P1 is not supported by the frozen evidence. The evidence indicates that the 104-row defect was surfaced because independent parse implementations behaved differently. No evidence shows equal-or-better detection coverage under shared judged helpers, and no cost reduction is measured.
+
+Blocking objections remain. No terminal adjudication decision is made here.
+

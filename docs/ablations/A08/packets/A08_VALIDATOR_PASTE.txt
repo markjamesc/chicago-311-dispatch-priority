@@ -1,0 +1,335 @@
+# A08 Validator — Grok (INDEPENDENT FIRST PASS)
+
+Validator only. Expert or Comprehensive (prefer Comprehensive). Blind to Builder. Do NOT return KEEP | REVERT | HALT.
+
+Independently recompute hard facts from frozen evidence. Assess P1 (especially whether full recon was necessary to catch the 104-row clock-skew / STANDARD vs ESCALATE disagreements). List blocking objections. Withhold terminal adjudication.
+
+---
+# SPEC
+# A08 — Ablation specification (FROZEN)
+
+**Ablation ID:** A08  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target:** Stage 4 exact reconciliation / critical field set  
+**Constitution:** 1.0  
+**Frozen at CT:** 2026-09-19
+
+## Exact change being tested
+
+**Proposed change:** Shrink or loosen the critical reconciliation field list: replace the full exact SR_NUMBER-level and decision-field recon with a reduced/loosened check based only on aggregate decision counts and a smaller label summary. This is a counterfactual analysis; do not rewrite the locked Chicago 311 Stage 4 pack.
+
+The full locked check includes the SR_NUMBER set and row-level decision agreement (`n_inner`, `n_only_ra`, `n_only_rb`, `n_agree`, `n_disagree`), classification/action labels, integrity clauses, age/dormancy and peer fields used to explain decisions, plus portfolio counts. The candidate reduction must state exactly which fields are removed or relaxed.
+
+## Benefit predicate P1
+
+A shorter or looser recon is faster/cheaper while still detecting material path defects and semantic disagreements.
+
+P1 **fails** if the full critical list was necessary to catch the production 104-row clock-skew incident or the resulting label disagreements, including the 104 `STANDARD` (R-A) versus `ESCALATE` (R-B) rows.
+
+## Frozen surfaces and regression rules
+
+- Locked baseline: `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, `T_freeze=2026-09-12 23:59:59 America/Chicago`, κ=2.
+- Expected unchanged surfaces: SQL nonjudgment boundary, TCD-IG rules, exact fixture expecteds, SR_NUMBER grain, and the frozen Chicago 311 Stage 4 pack.
+- Any undeclared semantic change, missed row-set disagreement, missed label disagreement, or fixture/recon regression is a failure of the candidate.
+- Do not replace exact recon with a majority vote or aggregate-only assertion without documenting the lost detection coverage.
+
+## Critical reconciliation fields and checks
+
+Full locked list: SR_NUMBER key-set equality; n_decision; n_inner; n_only_ra; n_only_rb; n_agree; n_disagree; row-level classification/action labels; integrity clauses; `dormant_h`, `open_age_h`, `peer_n`, and `peer_p75_h` where present for diagnosis; and portfolio counts for ESCALATE/INCONCLUSIVE/STANDARD. Also check the fixture IDs and expected/observed results for both paths.
+
+## Allowed evidence scope
+
+Read-only use of frozen artifacts under `/workspace/chicago-311-run` and `/workspace/chicago-311-dispatch-priority`. No new extract, no browser AI, and no rewrite of locked labels or fixtures.
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+## Builder task
+
+Make an independent first pass from this frozen packet. Describe the conceptual recon diff, hard facts, what the reduced list would and would not detect, fixture implications, unchanged surfaces, risks, and claim→evidence map. Withhold any KEEP/REVERT/HALT decision.
+
+## Validator task
+
+The Validator independently recomputes the same hard facts after the Builder first pass remains blind. Withhold any KEEP/REVERT/HALT decision.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# EVIDENCE EXCERPTS
+## RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+## EXACT_RECON_REPORT.md (excerpt)
+# Exact recon report — R-A vs R-B
+
+**Status:** PASS (after clock-parse fix)  
+**When:** 2026-09-19 13:46 CT  
+**Decision set:** 222,002 rows (identical SR_NUMBER sets)
+
+## Portfolio (κ = 2)
+
+| Path | ESCALATE | INCONCLUSIVE | STANDARD |
+|------|----------|--------------|----------|
+| R-A  | 131,968  | 6,377        | 83,657   |
+| R-B  | 131,968  | 6,377        | 83,657   |
+
+## Label agreement
+
+- Agree: **222,002 / 222,002**
+- Disagree: **0**
+- Only-RA / Only-RB: 0 / 0
+
+Fixtures: both paths **14/14 PASS** (F03 → STANDARD).
+
+## Prior mismatch (diagnosed, then fixed)
+
+First production run disagreed on **104** rows, all `STANDARD` (R-A) vs `ESCALATE` (R-B).  
+Peer `n` / `p75` / κ matched; `dormant_h` differed by a systematic **~5.0 hours** (America/Chicago offset). All 104 sat within 5h of the κ×p75 threshold.
+
+**Cause:** naive SQL wall clocks (`created_ts` / `mod_ts`) were tagged as UTC by `readr`. R-B’s POSIXct shortcut kept the wrong instant; R-A’s `force_tz` happened to recover Chicago wall digits. Locked rule now: **always character → parse as `America/Chicago` wall**; never `force_tz` / never trust readr POSIXct for these columns.
+
+**Fix files:** `R-A/run_RA.R` (`parse_ts_chicago` + `clock_col_types`); `R-B/R/10_io_parse.R` (`rb_parse_ts` / `rb_normalize_open` / TSV + character cols).
+
+## Next
+
+Structural cross-review + Validation Gate freeze (owner), then Stage 5.
+
+## RA_portfolio_counts.csv
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+
+## RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+## structural_cross_review.md (excerpt)
+# Structural Cross-Review — Chicago 311 Stage 4 Method B
+
+**Verdict:** **PASS**  
+**When:** 2026-09-19 ~14:00 CT  
+**design_version:** `stage3-v1-tcd-ig` (TCD-IG B-leaning hybrid)  
+**fixture_version:** `fixtures-v1-tcd-ig`  
+**Builders:** R-A single-file `run_RA.R`; R-B modular `R/00_config.R` + `10_io_parse.R` + `20_integrity_and_classify.R` + `40_fixtures.R`
+
+## Independence attestation
+
+- Separate trees; no shared judged helper modules or copied ID lists between paths.
+- Distinct construction: R-A tidyverse pipeline; R-B base/data.frame rule-table style with named integrity clauses I01–I06.
+- First production judged outputs compared only at recon (barriers removed after exact recon PASS).
+
+## §10.6 checklist
+
+| Risk | Finding | Status |
+|------|---------|--------|
+| Wrong date / tz semantics | First run: ~5h CDT skew from readr UTC-tagged naive ISO + asymmetric POSIXct handling → 104 near-threshold label flips. **Fixed:** both paths force clock cols to character and parse as America/Chicago wall. Re-run recon 0 disagrees. | PASS (after repair) |
+| Status / open misinterpretation | Both require Open (normalized); non-Open excluded from decision set. | PASS |
+| Accidental exclusion | DUPLICATE / LEGACY true-like excluded; envelope Open candidates ~245k → decision 222,002 both paths. | PASS |
+| Duplicate / legacy handling | Truthy parsers on both; fixtures F07/F08 cover. | PASS |
+| Parse / null handling | Unparseable clocks → INCONCLUSIVE; fixtures F13. | PASS |
+| Boundary errors | T_freeze locked; created > T → INCONCLUSIVE; κ×p75 threshold with `>=` for ESCALATE. F03 STANDARD at κ=2 locked. | PASS |
+| Judged logic in SQL | SQL comments forbid labels; Source Gate checks absence of label columns; peer aggregates only. | PASS |
+| Envelope = final universe | SQL delivers Open mechanical envelope; R applies eligibility/integrity. | PASS |
+| Source-field misunderstanding | type_key = coalesce(short_code, type); dormant = T − mod_ts; open_age diagnostic only. | PASS |
+| Post-hoc ID manipulation | Recon is full_join on SR_NUMBER; no ID copying between paths. | PASS |
+| Shared judged helpers | None. | PASS |
+
+## Exact recon evidence
+
+- n_inner = 222,002; n_agree = 222,002; n_disagree = 0 (post-fix).
+- Portfolio identical at κ=2: ESCALATE 131,968 · INCONCLUSIVE 6,377 · STANDARD 83,657.
+- Fixtures: R-A 14/14, R-B 14/14 (F03 → STANDARD).
+
+## Residual notes (non-blocking)
+
+- Parent-SR integrity wording differs slightly in clause names (R-B `I05_parent_sr_present` vs design “orphan”); production labels still matched exactly — treat clause-string vocabulary as audit text, not a recon-critical field mismatch.
+- Old draft cross-review (age-threshold / fixtures-v0.1) is superseded by this document.
+
+## Freeze readiness
+
+Analytical chain ready for owner **Validation Gate**. Do not start Stage 5 until Validation Gate PASS + R Workflow Gate PASS.

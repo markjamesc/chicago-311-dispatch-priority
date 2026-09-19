@@ -1,0 +1,38 @@
+{
+  "ablation_id": "A01",
+  "frozen_at_ct": "2026-09-19 ~15:15 CT",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-builder/builder_report.md",
+      "bytes": 9605,
+      "sha256": "b7a84548bd8bb9910dcac060fbe770f635add8756f80ce50e3387448e27a0ac8"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-builder/execution_stdout.txt",
+      "bytes": 203,
+      "sha256": "3d577110e462fababef562b64f097442a87101c986126bd2e32e446dcb405195"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-validator/validator_report.md",
+      "bytes": 13615,
+      "sha256": "ca03eb7b073db70de399eccb7ea3e6c682c6a4a45324a3d22c2d1b251433d763"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A01/A01-validator/execution_stdout.txt",
+      "bytes": 62,
+      "sha256": "6e44906296f57a45760b2d1378e14c08393cafaf5ef895dd128c27f1c5d34219"
+    }
+  ]
+}

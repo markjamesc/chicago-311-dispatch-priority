@@ -1,0 +1,792 @@
+# A02 Adjudicator RE-RUN — ChatGPT (after harness fix)
+
+Prior adjudication returned HALT solely for missing raw artifacts (Constitution §3).
+Harness fix: raw evidence bundle now attached below with SHA-256 MANIFEST.
+Builder and Validator first-pass packs are UNCHANGED (same hashes as prior freeze).
+
+You are Adjudicator. Return exactly one of KEEP | REVERT | HALT.
+Do not invent new criteria. If packs + raw bundle now satisfy §3 completeness for the mechanical claims both packs already agree on, do not HALT for missing files that are now present.
+P1 still must be evaluated honestly (Fixture Gate vs recon complementarity).
+
+---
+# SPEC
+# A02 — Ablation specification (FROZEN)
+
+**Ablation ID:** A02  
+**Constitution version:** 1.0  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target stage(s):** Stage 3 (fixture freeze before builders) and Stage 4 (Fixture Gate enforcement)  
+**Baseline SHAs:** see BASELINE_FRAMEWORK.sha256
+
+## Exact change being tested
+
+**Proposed canonical change:** Remove or make optional the requirement that a frozen known-case Fixture Gate must PASS before R-A/R-B production builders run (allow production-first; fixtures optional/post-hoc).
+
+## Operational benefit predicate P1
+
+Removing mandatory pre-builder Fixture Gate reduces steps while detection coverage remains equal: Chicago’s production clock-skew defect (104-row disagree) and construct boundaries (F03→STANDARD) would still have been caught by exact recon / other controls alone, with no increase in shipped wrong labels.
+
+Benefit **fails** if evidence shows Fixture Gate was necessary for construct sign-off (e.g. F03) or that optional fixtures would have allowed greenwash / silent design drift.
+
+## Critical mechanical facts
+
+- Fixture results: R-A 14/14, R-B 14/14, F03→STANDARD  
+- Production first recon: 104 disagrees; post-fix: 0  
+- Fixtures use in-process clocks (did not catch CSV tz bug)
+
+## Expected unchanged
+
+Chicago frozen pack; κ/T_freeze; SQL nonjudgment; dual-path (A01 REVERT already kept).
+
+## Regression
+
+Must not authorize rewriting fixtures after fail to match code.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# PRIOR FREEZE RECORD
+{
+  "ablation_id": "A02",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "DeepSeek",
+    "Validator": "Grok",
+    "Adjudicator": "ChatGPT"
+  },
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-builder/builder_report.md",
+      "bytes": 5475,
+      "sha256": "af566a4ea43ddc294dc5afca3d316570d569dabd81018c6d19e39f153101be48"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-builder/execution_stdout.txt",
+      "bytes": 34,
+      "sha256": "0f84678d8c9f55fae4d2311ffad4158ce058e64fdec3599f49454e683ebf9bc9"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-validator/validator_report.md",
+      "bytes": 26192,
+      "sha256": "8f180e8d1e46404c56310ebe7ae4a5ff56b970dd1402a5cdf10bfda9881edf42"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A02/A02-validator/execution_stdout.txt",
+      "bytes": 37,
+      "sha256": "054472ee096a044720e5f140f9445b6edb67ba7499470ff8692c695afaae0be7"
+    }
+  ]
+}
+
+---
+# RAW EVIDENCE BUNDLE (NEW)
+## MANIFEST.sha256
+```
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+```
+
+## RECON_SUMMARY.csv
+```
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+```
+
+## r_a_fixture_results.csv
+```
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+
+```
+
+## r_b_fixture_results.csv
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+```
+
+## RA_portfolio_counts.csv
+```
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+
+```
+
+## RB_portfolio_counts.csv
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+```
+
+## BASELINE_FRAMEWORK.sha256
+```
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+```
+
+## RECON_DISAGREE_IDS.csv
+```
+sr_number,class_ra,class_rb
+
+```
+
+---
+# BUILDER (unchanged)
+# A02 Builder Report
+
+- DeepThink: ON
+- CT: 2026-09-19 15:28 CT
+- Builder: DeepSeek
+- Blindness: Independent first pass; blind to Validator pack/input
+
+## A02 Builder — Independent First Pass
+
+### Role attestation
+I am Builder for ablation A02, DeepSeek, DeepThink ON, independent first pass. I am blind to any Validator pack and have no Validator input. I am not Adjudicator. I make no KEEP/REVERT/HALT determination in this report. Constitution version 1.0. Target stages: Stage 3 fixture freeze before builders; Stage 4 Fixture Gate enforcement.
+
+### Conceptual framework diff
+Baseline requires a frozen known-case Fixture Gate to PASS before R-A/R-B production builders run. Stage 3 therefore freezes fixtures before production; Stage 4 enforces the gate. The candidate change removes or makes optional that requirement, allowing production-first and optional/post-hoc fixtures. Operationally this shifts fixtures from a pre-builder absolute semantic gate to a later optional check. Exact recon remains a dual-path differential control; SQL nonjudgment, κ/T_freeze, Chicago frozen pack, and dual-path are expected unchanged. The key semantic difference: exact recon can detect R-A vs R-B disagreement, but it cannot detect a shared wrong construct rule if both paths agree on the same wrong labels. Known-case fixtures are the absolute check for F03→STANDARD and related construct boundaries.
+
+### Hard mechanical facts (from frozen paste)
+- R-A fixtures: 14/14 PASS, including F03→STANDARD.
+- R-B fixtures: 14/14 PASS, including F03→STANDARD; F14 is F14A/F14B both STANDARD.
+- Production decision set: 222,002 rows; identical SR_NUMBER sets.
+- Post-fix exact recon: agree 222,002/222,002; disagree 0; only-RA/only-RB 0/0.
+- Portfolio at κ=2 identical: ESCALATE 131,968; INCONCLUSIVE 6,377; STANDARD 83,657.
+- First production run: 104 disagreements, all STANDARD (R-A) vs ESCALATE (R-B); peer n/p75/κ matched; dormant_h differed by systematic ~5.0 h America/Chicago offset; all within 5 h of κ×p75 threshold.
+- Cause: naive SQL wall clocks tagged UTC by readr; R-B POSIXct shortcut kept wrong instant; R-A force_tz recovered Chicago wall digits. Locked rule: character → parse as America/Chicago wall; never force_tz / never trust readr POSIXct for these columns.
+- Fix files: `R-A/run_RA.R` (`parse_ts_chicago`, `clock_col_types`); `R-B/R/10_io_parse.R` (`rb_parse_ts`, `rb_normalize_open`, TSV + character cols).
+- Fixtures use in-process clocks and did not catch the CSV tz bug.
+- Structural cross-review: PASS after repair. `design_version=stage3-v1-tcd-ig`; `fixture_version=fixtures-v1-tcd-ig`.
+- Missing from paste: baseline SHAs, raw stdout/stderr, SQL/R output, file manifests, SHA-256 hashes. These are evidence gaps for constitutional verification, not adjudicated here.
+
+### P1 assessment from evidence
+P1 requires reduced steps while detection coverage remains equal: the Chicago clock-skew defect and construct boundaries F03→STANDARD would still be caught by exact recon / other controls alone, with no increase in shipped wrong labels. For the clock-skew defect, evidence supports the claim: fixtures used in-process clocks, did not catch the CSV tz bug, and exact recon caught the 104 near-threshold flips; post-fix recon is 0. For construct boundaries, evidence does not establish equal coverage. F03 is an absolute known-case fixture. Exact recon only compares R-A vs R-B. If both paths shared the same wrong construct interpretation, exact recon would show 0 disagreements and would not catch it. The paste provides no independent control proving F03 semantics outside the Fixture Gate. Under the spec’s own failure condition—if Fixture Gate was necessary for construct sign-off (e.g. F03)—P1 is not demonstrated by the provided evidence. I do not decide the outcome.
+
+### Risks
+- Silent design drift/greenwash: optional/post-hoc fixtures may allow both builders to share a wrong semantic rule; exact recon remains green.
+- Fixture freeze timing: production-first may let observed production behavior influence fixture interpretation unless the regression rule is strictly enforced.
+- Fixture limitation: in-process clocks cannot catch CSV/I-O tz defects; exact recon did catch this class, but another integration defect class may not be covered.
+- Regression rule: must not authorize rewriting fixtures after fail to match code; optional sequencing increases temptation.
+- Evidence gaps: no raw artifacts/hashes/baseline SHAs in paste; no Validator first pass yet; hard mechanical agreement not established.
+
+### Claim → evidence map
+- R-A 14/14, R-B 14/14 → RA/RB fixture tables all `pass=TRUE`.
+- F03→STANDARD → both fixture tables.
+- First recon 104 disagrees → EXACT_RECON prior mismatch.
+- Post-fix 0 disagrees → EXACT_RECON status PASS and label agreement.
+- Fixtures did not catch tz bug → EXACT_RECON cause plus spec statement on in-process clocks.
+- Exact recon caught clock skew → prior mismatch section: 104 near-threshold STANDARD/ESCALATE flips.
+- Construct-boundary coverage gap → F03 is absolute fixture; exact recon is differential only; no counter-evidence in paste.
+- Structural PASS → STRUCTURAL verdict PASS after repair.
+- SQL nonjudgment unchanged → structural checklist: SQL comments forbid labels; Source Gate checks absence of label columns.
+- Regression rule → A02 spec: must not authorize rewriting fixtures after fail to match code.
+
+No KEEP/REVERT/HALT determination made.
+
+---
+# VALIDATOR (unchanged)
+# A02 Validator — Grok (INDEPENDENT FIRST PASS)
+
+**Ablation ID:** A02  
+**Constitution version:** 1.0 (as supplied; not re-derived)  
+**Role:** Validator  
+**Model:** Grok  
+**Pass type:** Independent first pass (blind to Builder pack)  
+**Mode:** Comprehensive  
+**When written:** 2026-09-19 15:51 CDT  
+**Terminal decision:** NONE (this pack does not return KEEP / REVERT / HALT)
+
+---
+
+## 1. Role attestation
+
+- Assigned role is **Validator** only. Builder is specified as DeepSeek. Adjudicator is specified as ChatGPT. This pack does not assume any other role.
+- This pass is **blind to the Builder report**. No Builder artifact, SHA, or narrative was present in the workspace or in the supplied prompt beyond the frozen SPEC / CONSTITUTION / EVIDENCE block.
+- Workspace at validation time contained no baseline tree, no `BASELINE_FRAMEWORK.sha256`, no R-A/R-B source, no fixture JSON/CSV originals, and no raw stdout. Evaluation is therefore confined to the **pasted evidence pack** treated as the candidate frozen surface.
+- Information barrier: Validator did not receive Builder first-pass text. Adjudicator is not addressed and is not given a terminal recommendation.
+- Independence constraint honored: no attempt to repair code, rerun builders, rewrite fixtures, or invent missing hashes.
+- Constitution §1 and §10 limits accepted as binding on this pack.
+
+Mode selection: **Comprehensive** (preferred). Expert/Auto not used.
+
+---
+
+## 2. Independent test plan
+
+The proposed change is process-order and gate-strength, not a scoring-rule change:
+
+> Remove or make optional the requirement that a frozen known-case Fixture Gate must PASS before R-A/R-B production builders run (allow production-first; fixtures optional/post-hoc).
+
+Validator tests are therefore about **what each control actually detected**, **whether those detections are substitutable**, and **whether optional/post-hoc fixtures preserve construct lock**.
+
+### 2.1 Questions this pass must answer from frozen evidence only
+
+1. Do the predeclared hard mechanical facts in the SPEC match the EVIDENCE tables/reports?
+2. Did the Fixture Gate detect the Chicago production clock-skew (104-row disagree)?
+3. Did exact recon detect that defect, and after which repair?
+4. Is F03→STANDARD a construct-boundary sign-off that lives in fixtures rather than in production recon?
+5. If Fixture Gate is optional/post-hoc, what common-mode failure would recon miss?
+6. Does the pack show any rewriting of fixtures after a fail to match code (locked regression)?
+7. Is P1 checkable without asking Builder what it meant?
+8. Are required raw artifacts (hashes, stdout, manifests, fixture source files) present or absent?
+
+### 2.2 Planned checks (executed as desk review; no live rerun)
+
+| ID | Check | Method | Gate it informs |
+|----|--------|--------|-----------------|
+| T1 | Count fixture IDs and pass bits on R-A and R-B tables | Row audit of supplied CSVs | Hard mechanical facts; §7.5 |
+| T2 | Confirm F03 expected=observed=STANDARD on both paths; record dormant_h, peer_p75_h, implied κ·p75 | Arithmetic on supplied rows | Construct lock / P1 fail clause |
+| T3 | Cross-walk R-A vs R-B fixture *inputs* (not only labels) | Field-by-field compare | Semantic protection §5; silent drift |
+| T4 | Record first-production disagree count and post-fix disagree count | EXACT_RECON narrative | P1 clock-skew clause |
+| T5 | Record stated fixture clock source (in-process vs CSV parse path) | SPEC critical facts + EXACT_RECON cause | Coverage equality |
+| T6 | Ask whether any production row is identified as an F03 analogue | Search EXACT_RECON / STRUCTURAL | Substitutability of recon for F03 |
+| T7 | Inventory expected-unchanged surfaces claimed vs evidenced | SPEC “Expected unchanged” vs pack | Scope creep |
+| T8 | Inventory missing constitutionally required raw artifacts | §2 Frozen inputs, §3 Evidence | Completeness (Adjudicator later) |
+| T9 | Test P1 as written, conjuncts separately | Benefit predicate §6 | P1 assessment |
+| T10 | Test regression rule: fixture rewrite after fail | Presence/absence in pack | §7.7 / SPEC Regression |
+
+No live SQL/R execution was possible. Absence of a rerun is recorded under Missing evidence, not treated as a silent pass.
+
+---
+
+## 3. Hard mechanical facts
+
+Facts below are read off the supplied pack. They are **Validator-observed**, not Builder-asserted. Agreement with Builder is deferred (Builder pack unseen).
+
+### 3.1 Fixture label results (as tabulated)
+
+| Path | IDs executed | Pass bits | F03 |
+|------|--------------|-----------|-----|
+| R-A | F01–F14 (14 rows) | 14/14 TRUE | expected STANDARD, observed STANDARD |
+| R-B | SYN-F01–SYN-F13 + SYN-F14A\|SYN-F14B mapped to F01–F14 | 14/14 TRUE | expected STANDARD, observed STANDARD |
+
+F14 is a two-grain case (FIX-F14A / FIX-F14B or SYN-F14A\|SYN-F14B) with both labels STANDARD. Both tables mark the combined fixture PASS.
+
+This matches the SPEC critical fact: “Fixture results: R-A 14/14, R-B 14/14, F03STANDARD”.
+
+### 3.2 F03 construct arithmetic (from both tables)
+
+- dormant_h = 2400
+- peer_p75_h = 2160
+- κ stated on R-B row = 2
+- κ · peer_p75_h = 2 × 2160 = **4320**
+- 2400 < 4320 → clause `S_dormant_lt_kappa_p75` / `within_type_dormancy` → **STANDARD**
+- STRUCTURAL text: “F03 STANDARD at =2 locked”
+
+F03 is therefore a **known-case lock that STANDARD remains STANDARD when dormancy is large in absolute hours but still below κ·p75**. It is not a near-threshold production row.
+
+### 3.3 Exact recon
+
+From EXACT_RECON:
+
+- Decision set after repair: **222,002** rows, identical SR_NUMBER sets
+- Post-fix disagree: **0**
+- Post-fix agree: **222,002 / 222,002**
+- Portfolio κ=2 identical: ESCALATE 131,968 · INCONCLUSIVE 6,377 · STANDARD 83,657
+- First production run: **104** disagrees, all STANDARD (R-A) vs ESCALATE (R-B)
+- Systematic dormant_h offset ~**5.0 hours** (America/Chicago)
+- All 104 sat within 5h of the κ×p75 threshold
+- Cause attributed to naive SQL wall clocks tagged UTC by readr; R-B POSIXct shortcut vs R-A `force_tz`
+- Locked repair rule stated: always character → parse as `America/Chicago` wall
+- Fix files named: `R-A/run_RA.R`; `R-B/R/10_io_parse.R`
+
+This matches SPEC: “Production first recon: 104 disagrees; post-fix: 0”.
+
+### 3.4 Fixture clock source
+
+SPEC critical fact: “Fixtures use in-process clocks (did not catch CSV tz bug).”
+
+EXACT_RECON and STRUCTURAL corroborate: the 104-row defect was an **I/O parse / tz tagging** defect on production CSV columns, not a mis-implementation of the dormant≥κ·p75 predicate on already-parsed instants. Fixture tables carry pre-baked `dormant_h` / `peer_p75_h` numbers; they do not exercise `readr` POSIXct or TSV clock columns.
+
+### 3.5 Dual-path / unchanged surfaces (claimed, not independently hashed)
+
+Pack *claims*:
+
+- Chicago frozen pack unchanged
+- κ / T_freeze locked
+- SQL nonjudgment (Source Gate checks absence of label columns; peer aggregates only)
+- Dual-path retained (A01 REVERT already kept)
+- design_version `stage3-v1-tcd-ig`
+- fixture_version `fixtures-v1-tcd-ig`
+
+No SHA-256 of baseline framework, Chicago pack, fixture suite, or builder trees is in this pack. Those claims are **narrative**, not mechanically verified here.
+
+### 3.6 Structural review status (as written)
+
+STRUCTURAL verdict: **PASS** after repair, ~2026-09-19 14:00 CT. Independence attestation: separate trees, no shared judged helpers, first judged outputs compared only at recon. Residual: parent-SR clause vocabulary differs (`I05_parent_sr_present` vs design “orphan”); production labels still matched.
+
+---
+
+## 4. Fixture / recon notes
+
+### 4.1 What fixtures covered
+
+Label-level known cases on both paths:
+
+- ESCALATE: F01, F11 (dormant ≥ κ·p75)
+- STANDARD: F02, F03, F10, F14 pair
+- INCONCLUSIVE: F04, F05, F06, F09, F13 (integrity / clocks / thin peer / parent / unparseable)
+- OUT_OF_SET: F07, F08, F12
+
+F03 is the explicit large-dormancy-still-STANDARD construct lock.
+
+### 4.2 What fixtures did **not** cover
+
+The production clock-skew. In-process / synthetic clocks skip:
+
+- CSV/TSV column types
+- readr POSIXct UTC tagging of naive ISO wall strings
+- asymmetric `force_tz` vs instant-preserving parse
+- America/Chicago offset on `created_ts` / `mod_ts`
+
+That is a **coverage hole in the fixture harness relative to production I/O**, not a proof that fixtures are redundant for construct lock.
+
+### 4.3 R-A vs R-B fixture *input* discrepancies (labels still match)
+
+Both paths report the same expected/observed **labels**. The baked numeric and clause fields are **not identical**:
+
+| ID | Field | R-A | R-B | Same? |
+|----|--------|-----|-----|-------|
+| F04 | dormant_h | 120 | 240 | NO |
+| F04 | clause | open_with_closed_date | I01_open_closed_date | vocab only |
+| F05 | dormant_h | 240 | (empty) | NO |
+| F05 | clause | inverted_clocks | I02_bad_clocks | related, not string-equal |
+| F06 | dormant_h | 480 | 720 | NO |
+| F06 | peer_p75_h | 240 | 96 | NO |
+| F06 | peer_n | (absent) | 8 | R-B only |
+| F09 | dormant_h | 480 | 360 | NO |
+| F09 | clause | orphan_parent_nonblank | I05_parent_sr_present | vocab |
+| F12 | dormant_h | 48 | 120 | NO |
+| F13 | dormant_h | 120 | (empty) | NO |
+
+F01, F02, F03, F07, F08, F10, F11 label-and-magnitude fields align.
+
+Interpretation for this ablation (not a KEEP/REVERT call):
+
+- Label agreement on independently constructed fixtures is consistent with dual-path design.
+- Input-parameter disagreement means the two tables are **not a single frozen fixture vector**. If Fixture Gate is defined as “execute the frozen known-case suite,” it is unclear which numeric vector is the frozen suite.
+- STRUCTURAL already treats clause-string vocabulary as audit text, not a recon-critical field. Numeric dormant_h / p75 drift is a different class: it can hide that paths are not executing the same known case.
+- This is a **fixture-identity** observation. It does not by itself prove the proposed process change safe or unsafe, but it weakens any claim that “the Fixture Gate” is a single mechanical object.
+
+### 4.4 Recon vs fixtures: different oracles
+
+```
+Fixture Gate  = known-case oracle against DESIGN (expected labels frozen before code)
+Exact recon   = agreement oracle of PATH A vs PATH B on PRODUCTION rows
+```
+
+These are not interchangeable:
+
+- Recon **did** catch a path-asymmetric I/O bug (104 near-threshold flips).
+- Recon **cannot** catch a common-mode construct error (both paths implement the same wrong threshold or the same wrong F03 rule). After repair, recon is 0 disagrees; that is agreement, not design-correctness.
+- Fixtures **did** lock F03→STANDARD on both paths.
+- Fixtures **did not** catch the I/O bug.
+
+Production-first + recon-only is therefore a different detection profile from Fixture-Gate-then-builders. P1 asserts the profiles are equal. The pack shows they are **complementary**, not equal.
+
+### 4.5 Order of events as narrated (timestamps incomplete)
+
+- First production recon: 104 disagrees (time not given)
+- Repair of parse helpers
+- Exact recon PASS at 2026-09-19 13:46 CT (0 disagrees)
+- Structural PASS ~14:00 CT
+- Fixture tables presented as 14/14 on both paths; **no timestamp of fixture freeze vs first production run**
+- STRUCTURAL “Next”: Validation Gate freeze, then Stage 5; “Do not start Stage 5 until Validation Gate PASS + R Workflow Gate PASS”
+
+The pack describes a run that **already executed production-first recon**, found the tz bug, repaired, then froze. That is historical sequence, not a controlled ablation of “mandatory pre-builder Fixture Gate ON vs OFF.”
+
+### 4.6 Regression rule surface
+
+SPEC Regression: “Must not authorize rewriting fixtures after fail to match code.”
+
+No fixture-rewrite diff is supplied. Both tables show PASS with expected=observed. There is no evidence in this pack that anyone changed F03 (or any other expected) after a fail. There is also no evidence that the proposed optional/post-hoc rule includes a mechanical prohibition stronger than the sentence in the SPEC.
+
+Making fixtures post-hoc **increases the opportunity** for rewrite-to-match-code even if this particular run did not do it.
+
+---
+
+## 5. P1 assessment
+
+### 5.1 Predicate restated as checkable conjuncts
+
+P1 (SPEC):
+
+> Removing mandatory pre-builder Fixture Gate reduces steps while detection coverage remains equal: Chicago’s production clock-skew defect (104-row disagree) and construct boundaries (F03→STANDARD) would still have been caught by exact recon / other controls alone, with no increase in shipped wrong labels.
+
+Benefit **fails** if:
+
+- Fixture Gate was necessary for construct sign-off (e.g. F03), **or**
+- optional fixtures would have allowed greenwash / silent design drift.
+
+Checkable conjuncts:
+
+| Conjunct | What would satisfy it | Pack finding |
+|----------|------------------------|--------------|
+| P1.A Steps reduced | Pre-builder Fixture Gate is a real extra step that can be removed without dropping another required gate | **Not mechanically shown.** No step inventory, no gate DAG, no timing of Fixture Gate as a blocking job. Narrative only. |
+| P1.B Coverage equal for clock-skew | Same defect still detected by recon / other controls | **Supported for this defect.** Fixtures did not catch it; recon did. Optional fixtures would not have removed the recon signal that found the 104 rows. |
+| P1.C Coverage equal for F03 construct | F03 (or equivalent) still caught by recon / other controls *alone* | **Not supported.** No production row is identified as an F03 analogue. F03 numbers (2400 / 2160) are synthetic. Recon compares path labels, not labels-to-design. STRUCTURAL itself treats F03 STANDARD at κ=2 as a **locked fixture fact**. |
+| P1.D No increase in shipped wrong labels | Production-first + optional fixtures would not have shipped the 104 or a wrong construct | **Partially supported for the 104; unsupported for construct.** The 104 were caught by recon *before* the pack’s freeze language. A common-mode wrong construct would have reconcilled 222,002/222,002 and looked shippable if fixtures were optional or rewritten post-hoc. |
+| P1.E Fail clause — Fixture Gate necessary for F03 sign-off | Evidence that F03 lock lives in fixtures | **This fail clause is triggered by the pack.** F03 is a fixture-native construct lock. |
+| P1.F Fail clause — greenwash / silent drift | Optional/post-hoc fixtures enable matching code after the fact or skipping known-case review | **Risk is live in the proposed change text itself** (“fixtures optional/post-hoc”). Pack does not show that this run greenwashed. Pack also does not show a remaining mechanical lock that would forbid post-hoc expected-label edits if the gate is no longer mandatory. R-A/R-B fixture input drift is a mild existing drift signal. |
+
+### 5.2 Clock-skew arm (P1.B) — detailed
+
+The 104-row event is the cleanest fact in the pack:
+
+- Asymmetric parse → dormant_h off by ~5h
+- Only rows within 5h of κ·p75 flipped
+- Peer n / p75 / κ matched; clocks did not
+- Fixtures used in-process clocks → green while production was wrong
+- Exact recon on full decision set caught it
+- Repair + rerun → 0 disagrees
+
+Conclusion on this arm: **mandatory pre-builder Fixture Gate was not the detector of this defect.** Production-first recon was. Removing a *pre-builder* fixture *requirement* would not, on this evidence, have hidden the 104-row event **provided exact recon remains mandatory and blocking**.
+
+Caveats on this arm:
+
+- Recon is path-vs-path. If both paths had shared the same readr POSIXct mistake, recon would have been 0 disagrees and **104 would have been 0**. STRUCTURAL independence attestation says distinct I/O construction; that independence, not fixtures, is what made the bug visible.
+- A01 already kept dual-path. P1 “other controls alone” therefore leans on dual-path + recon, which are declared expected-unchanged. That is coherent **only if** those controls stay mandatory. The proposed change must not be read as weakening recon.
+- “Shipped wrong labels”: pack says first run disagreed, then fix, then PASS. It does not exhibit a shipped production snapshot of the 104. So “no increase in shipped wrong labels” for this defect is historically true in this run, not a general proof.
+
+### 5.3 Construct arm (P1.C / P1.E) — detailed
+
+F03 is the SPEC’s own example of the fail clause.
+
+Why recon does not substitute:
+
+1. F03 is not claimed to exist in the 222,002-row Chicago decision set. No SR_NUMBER, no “production row with dormant_h=2400 and p75=2160,” no nearest-neighbor list.
+2. Even if some production rows have dormant << κ·p75 at large absolute hours, recon only says R-A label == R-B label. It does not say the label matches the frozen design.
+3. Common-mode misspecification of the inequality (`>` vs `>=`), of κ, or of “within_type_dormancy vs escalate-if-old” would pass recon and fail F03. The fixture exists precisely because that class is not visible in A-vs-B agreement.
+4. STRUCTURAL §10.6 “Boundary errors … F03 STANDARD at =2 locked” treats the fixture as the lock, not recon.
+
+Therefore: **Fixture Gate (or some other known-case-vs-design oracle) is necessary for F03 construct sign-off.** Exact recon is not that oracle.
+
+P1’s phrase “would still have been caught by exact recon / other controls alone” bundles two different defects under one “alone.” The pack splits them. The construct half of P1 is not established.
+
+### 5.4 Greenwash / silent drift arm (P1.F)
+
+Proposed change language: “allow production-first; fixtures optional/post-hoc.”
+
+Risks that follow from that wording, independent of Builder intent:
+
+- Optional = production can freeze with fixtures unrun.
+- Post-hoc = expected labels or fixture inputs can be aligned to whatever production already emitted.
+- SPEC Regression forbids rewrite-after-fail, but the change under test is exactly the process that makes rewrite easier to perform unnoticed.
+- R-A vs R-B numeric fixture drift already shows two “14/14 PASS” tables that are not the same vector. Optional suites make that divergence cheaper.
+
+The pack does **not** contain a demonstrated greenwash event. Under Constitution §6 / §8, absence of demonstrated greenwash is not the same as P1 being satisfied. P1 requires equal coverage *and* no increase in shipped wrong labels *and* not hitting the stated fail clauses.
+
+### 5.5 Step-reduction arm (P1.A)
+
+No frozen artifact lists:
+
+- current ordered stages with Fixture Gate as a blocking predecessor of builders
+- candidate ordered stages after A02
+- wall-clock or review-step counts
+- whether fixtures still run later as a Validation Gate item (STRUCTURAL still requires Validation Gate before Stage 5)
+
+If fixtures remain mandatory later (Validation Gate) and only the *pre-builder* slot is removed, step reduction may be real and small. If “optional/post-hoc” means they can be skipped entirely, step reduction is real and coverage is not equal. The SPEC text includes both “optional” and “post-hoc,” which is the stronger (coverage-reducing) reading.
+
+### 5.6 P1 verdict for this pack (non-terminal)
+
+P1 is **not established** on the frozen evidence as written.
+
+- Clock-skew half is empirically supported **conditional on dual-path exact recon remaining mandatory**.
+- Construct half (F03) is not supported; the SPEC’s own fail clause is activated.
+- Equal-coverage claim is false if taken as “fixtures and recon detect the same set.” They detected **disjoint** defect classes in this run.
+- Step reduction is unmeasured.
+- Greenwash is a live process risk of the proposed change, not a demonstrated incident.
+
+This is a P1 assessment, not a KEEP/REVERT/HALT.
+
+---
+
+## 6. Blocking objections
+
+Objections below are **supported enough by this pack to remain live for the Adjudicator**. They are not a Validator terminal call.
+
+**BO-1 — P1 construct clause fails on F03.**  
+Evidence: F03 is a synthetic known-case; recon has no F03 production analogue; STRUCTURAL cites F03 as locked fixture fact. Removing a mandatory known-case gate removes the only control in the pack that signs off that boundary against design.
+
+**BO-2 — “Coverage remains equal” is contradicted by the pack’s own complementary-control story.**  
+Fixtures missed tz/I/O; recon missed (would miss) common-mode construct error. Equality is not shown.
+
+**BO-3 — Proposed change text authorizes the exact process the regression rule exists to prevent.**  
+“Optional/post-hoc fixtures” plus “must not rewrite fixtures after fail” are in tension. No mechanical remaining lock (hash-pinned expected file + fail-closed gate) is exhibited that would survive making the gate optional.
+
+**BO-4 — Fixture suite identity is not a single frozen vector.**  
+R-A and R-B tables disagree on dormant_h / p75 / clause strings for F04, F05, F06, F09, F12, F13. A Fixture Gate that “must PASS” is ill-defined if two PASSes are not the same cases. This matters more if the gate becomes optional/post-hoc rather than if a single frozen suite is hash-pinned before builders.
+
+**BO-5 — This run is not a controlled ON-vs-OFF ablation of the gate.**  
+The narrative is: production-first happened, bug found by recon, parse fixed, fixtures 14/14, recon 0. That does not isolate “what would have shipped if Fixture Gate had been optional.” It also does not show that a mandatory *pre-builder* Fixture Gate caused extra cost that can be removed. Historical coincidence ≠ predicate satisfaction.
+
+**BO-6 — Frozen-input / raw-evidence holes (constitutional, not semantic).**  
+See §7. These do not prove the *change* is wrong; they limit how far any later KEEP could go. Listed as objections because Constitution §2 and §3 treat missing frozen inputs / raw artifacts as HALT-class for the experiment, which the Adjudicator must weigh. Validator does not issue HALT.
+
+Non-objections (explicitly dropped):
+
+- Dual-path itself: declared expected-unchanged; A01 REVERT already kept; not in scope to reopen.
+- SQL nonjudgment: STRUCTURAL checklist PASS; no contrary raw SQL in pack, but also no contradiction.
+- Post-fix recon 0 and identical portfolios: accepted as stated.
+- F03 arithmetic 2400 < 4320 → STANDARD: internally consistent on both tables.
+
+---
+
+## 7. Missing evidence
+
+Required by Constitution §2–§3 and by a checkable P1, but **absent from this pack and from the workspace**:
+
+1. `BASELINE_FRAMEWORK.sha256` and any candidate-framework SHA (SPEC points at it; file not supplied).
+2. SHA-256 of frozen fixture suite source (not the printed result tables).
+3. SHA-256 of Chicago frozen pack, T_freeze artifact, κ lock file.
+4. File manifests for R-A / R-B trees and declared changed-file set for A02 (A02 is a process-gate change; if no code change, that fact still needs a manifest saying so).
+5. Raw stdout/stderr of fixture runners (R-A `run_RA.R` fixture branch; R-B `R/40_fixtures.R`).
+6. Raw exact-recon tool output for the 104-row run **and** the 0-row run (only a markdown summary is present). The 104 SR_NUMBERs themselves are not listed.
+7. Fixture source definitions (JSON/CSV/R objects) that would explain R-A vs R-B input drift.
+8. Timestamped proof that fixtures were frozen **before** first production builder run — or proof they were not. P1 is about that order.
+9. Gate DAG / stage checklist showing Fixture Gate as a mandatory predecessor of builders in the baseline constitution of the *framework* (distinct from this Ablation Constitution).
+10. Any production row that instantiates F03 (needed if P1 claims recon would have caught F03).
+11. Hash-pinned “expected” column that would remain immutable if fixtures become post-hoc.
+12. Builder pack (correctly unseen here; Adjudicator will need both packs).
+13. Diff of `parse_ts_chicago` / `rb_parse_ts` vs baseline (repair is described, not exhibited).
+14. Source Gate SQL output proving absence of label columns (claimed, not attached).
+
+Under Constitution §3: “If a required raw artifact is unavailable, return HALT.” That rule is for the experiment’s terminal posture. This Validator pack **records the absences** and does not issue the token.
+
+Also missing but not constitutionally listed: measurement of “reduces steps” (P1.A).
+
+---
+
+## 8. Summary (no terminal decision)
+
+**Role / mode.** Validator only; Comprehensive; blind to Builder; no KEEP / REVERT / HALT.
+
+**Mechanics as stated.** R-A 14/14, R-B 14/14, F03→STANDARD on both; first production recon 104 disagrees (STANDARD vs ESCALATE, ~5h Chicago offset, near κ·p75); post-fix recon 0/222,002 with identical κ=2 portfolios. Fixtures used in-process clocks and did not see the CSV tz bug. Those facts are internally consistent with the SPEC’s “critical mechanical facts” *as narratives*. They are not hash-backed.
+
+**Controls are complementary, not substitutes.**  
+- Exact recon caught an asymmetric I/O/tz bug that fixtures missed.  
+- Fixtures locked a design construct (F03 STANDARD at large dormant_h still below κ·p75) that recon cannot lock unless that case exists in production **and** one path implements it differently.
+
+**P1.** Not established. Clock-skew detection-by-recon is supported; construct detection-by-recon-alone is not; the SPEC’s own fail example (F03 sign-off) is exactly the unsupported arm; “coverage remains equal” overclaims; step reduction is unmeasured; optional/post-hoc fixtures reopen rewrite-to-match-code even though this run does not exhibit a rewrite.
+
+**Live objections for Adjudicator:** BO-1 through BO-6 above, especially F03 substitutability and missing frozen hashes/raw runs.
+
+**Expected-unchanged surfaces.** Claimed (Chicago pack, κ/T_freeze, SQL nonjudgment, dual-path). Not independently hashed in this pack.
+
+**What this pass is not.** It is not an adjudication. It does not prefer production-first as policy. It does not deny that a *later* mandatory Validation Gate could still run fixtures; it only notes that the change under test is removal/optionality of the **pre-builder** Fixture Gate, and that P1 as written is broader than “move the same gate later.”
+
+---
+
+*End of Independent First Pass. No terminal token.*
+

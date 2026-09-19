@@ -1,0 +1,450 @@
+# A05 Adjudicator — ChatGPT (TERMINAL DECISION)
+
+Adjudicator only. Highest reasoning. Exactly one of KEEP | REVERT | HALT.
+
+KEEP = multi-knob / treat constants as knobs becomes canonical.
+REVERT = keep single owner knob (κ) with W/n_min as constants.
+HALT only for hard conflict / role breach / missing RAW MANIFEST. If P1 fails → REVERT.
+
+---
+# SPEC
+# A05 — Ablation specification (FROZEN)
+
+**Ablation ID:** A05  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target:** Stage 3 (locked knob)  
+**Constitution:** 1.0  
+
+## Exact change being tested
+
+**Proposed change:** Allow multiple owner-tunable knobs (or treat method constants W / n_min as knobs) instead of a single locked owner knob (κ).
+
+## Benefit predicate P1
+
+Multiple knobs improve Stage 5 portfolio usefulness (e.g. shrink ESCALATE) without harming Stage 4 exact recon / fixture Pass, with equal detection coverage.
+
+P1 **fails** if multi-knob designs create silent Stage 4 disagreement, greenwash, or convert constants into undeclared tunables that invalidate the Design Gate lock.
+
+## Evidence
+
+Chicago: single κ=2 locked; W=365, n_min=50 constants; κ grid descriptive only in Stage 5; Finish Gate did not change κ.
+
+## Adjudicator note
+
+RAW MANIFEST present → do not HALT for missing historical R stdout; REVERT when P1 fails.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# FREEZE
+{
+  "ablation_id": "A05",
+  "roles": {
+    "Builder": "DeepSeek",
+    "Validator": "Grok",
+    "Adjudicator": "ChatGPT"
+  },
+  "builder_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A05/A05-builder/builder_report.md",
+      "bytes": 8918,
+      "sha256": "061cb80aa55ae0fdfb41410790c85d05df5dec634007d5e7ec5cd235dcca4193"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A05/A05-builder/execution_stdout.txt",
+      "bytes": 26,
+      "sha256": "d5c272342ec250b97c8fc1b85b75c14629eceff0bfe7b67d1266db8796efa787"
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "/workspace/chicago-311-run/ablations/A05/A05-validator/validator_report.md",
+      "bytes": 5990,
+      "sha256": "860a8e1b556ebf2fce7c617eb81524877856532867f7d1da87aaf0a75b66f6fa"
+    },
+    {
+      "path": "/workspace/chicago-311-run/ablations/A05/A05-validator/execution_stdout.txt",
+      "bytes": 28,
+      "sha256": "75e5679d2bcb1811f100eb22faad5a3b3f31241595ab79fec0ae48c33ffdb1c7"
+    }
+  ],
+  "raw_manifest": {
+    "path": "/workspace/chicago-311-run/ablations/_raw_evidence/MANIFEST.sha256",
+    "bytes": 1472,
+    "sha256": "0c412aaaa7524c1e6466d364ffde1cc393f7b6a3301db194df245b18aff84926"
+  }
+}
+---
+# RAW MANIFEST
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  LINEAGE_ATTESTATION.md
+5d5692fff57b5012a78fced6b7e763a0f8f5ab73f288370b516a78493fdb5cca  MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  workflow_gate_status.json
+
+---
+# RECON_SUMMARY.csv
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+
+---
+# BUILDER
+# A05 Builder — DeepSeek DeepThink (INDEPENDENT FIRST PASS)
+
+## Role attestation
+
+- **Ablation:** A05
+- **Builder:** DeepSeek
+- **Validator:** Grok
+- **Adjudicator:** ChatGPT
+- **Constitution:** 1.0
+- **Target:** Stage 3 locked knob
+- **Mode:** Builder only. DeepThink ON. Independent first pass. Blind to Validator.
+- **Decision limit:** I do not issue KEEP / REVERT / HALT. Final adjudication belongs to ChatGPT.
+- **Frozen inputs used:** SPEC, CONSTITUTION 1.0, RAW MANIFEST, RECON_SUMMARY.csv, kappa_sensitivity.csv, and FINISH_GATE_RECEIPT excerpt.
+- **Manifest note:** RAW MANIFEST is present. Per the adjudicator note, missing historical R stdout is not treated as a HALT condition in this Builder pass.
+
+## Conceptual Stage 3 diff (multi-knob)
+
+### Current frozen Stage 3 surface
+
+The supplied evidence states:
+
+- single locked owner knob: **κ = 2**;
+- method constants: **W = 365**, **n_min = 50**;
+- κ grid is descriptive only in Stage 5;
+- Finish Gate did not change κ.
+
+Conceptually:
+
+```yaml
+stage3:
+  owner_tunable_knobs:
+    - kappa
+  locked_knob:
+    kappa: 2
+  constants:
+    W: 365
+    n_min: 50
+```
+
+### Proposed conceptual change
+
+Allow multiple owner-tunable knobs, or treat method constants W / n_min as knobs, instead of only the single locked owner knob κ. A candidate surface could be:
+
+```yaml
+stage3:
+  owner_tunable_knobs:
+    - kappa
+    - W
+    - n_min
+  defaults:
+    kappa: 2
+    W: 365
+    n_min: 50
+  knob_policy:
+    ranges: <not specified in frozen pack>
+    lock_state: <not specified in frozen pack>
+    owner_approval: <not specified in frozen pack>
+  design_gate_lock:
+    status: <not specified in frozen pack>
+```
+
+The exact candidate is not mechanically pinned in the supplied pack. It is unspecified whether W and n_min are definitely converted to knobs, whether κ remains locked, what ranges apply, what the full candidate config hash is, which Stage 4 reconciliation fields cover knob-induced semantic changes, and what lock attestation authorizes conversion of constants to tunables. Thus the proposed multi-knob surface is conceptual only; the frozen evidence supports a locked single-knob baseline and a descriptive κ grid, not a tested multi-knob candidate.
+
+## Hard facts
+
+From the frozen artifacts:
+
+- RAW MANIFEST is present and includes hashed artifacts, including:
+  - `BASELINE_FRAMEWORK.sha256` — `86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08`
+  - `EXACT_RECON_REPORT.md` — `85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16`
+  - `RECON_SUMMARY.csv` — `110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09`
+  - `stage4_validation_status.json` — `81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb`
+  - `r_a_fixture_results.csv` — `33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110`
+  - `r_b_fixture_results.csv` — `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- Exact reconciliation summary: `n_ra = 222002`, `n_rb = 222002`, `n_inner = 222002`, `n_only_ra = 0`, `n_only_rb = 0`, `n_agree = 222002`, `n_disagree = 0`.
+- κ sensitivity is descriptive:
+  - κ=1: ESCALATE 152,292; INCONCLUSIVE 6,377; STANDARD 63,333.
+  - κ=1.5: ESCALATE 140,340; INCONCLUSIVE 6,377; STANDARD 75,285.
+  - κ=2: ESCALATE 131,968; INCONCLUSIVE 6,377; STANDARD 83,657.
+  - κ=3: ESCALATE 118,246; INCONCLUSIVE 6,377; STANDARD 97,379.
+  - Total decisions are 222,002 at every grid value.
+- Finish Gate receipt excerpt: **PASS**, approved at `2026-09-19 14:41 CT`, design version `stage3-v1-tcd-ig`, fixture version `fixtures-v1-tcd-ig`.
+- Locked Stage 5 stance accepts frozen κ=2 labels: ESCALATE 131,968, INCONCLUSIVE 6,377, STANDARD 83,657; no live dispatch from the ESCALATE file; framing return on capacity is required before any operational focus list or ranking.
+- Spec-stated baseline: Chicago has single κ=2 locked; W=365 and n_min=50 are constants; κ grid is descriptive only in Stage 5; Finish Gate did not change κ.
+
+## P1 assessment
+
+**P1:** Multiple knobs improve Stage 5 portfolio usefulness (for example, shrink ESCALATE) without harming Stage 4 exact reconciliation / fixture Pass, with equal detection coverage.
+
+### Benefit side
+
+The provided κ grid shows that increasing κ alone shrinks ESCALATE: 152,292 at κ=1, 140,340 at κ=1.5, 131,968 at κ=2, and 118,246 at κ=3. INCONCLUSIVE remains constant at 6,377. This supports single-knob descriptive sensitivity, not a multi-knob benefit. There is no frozen candidate run showing that treating W and/or n_min as knobs improves Stage 5 portfolio usefulness. There is also no operational focus-list metric in the pack; the Finish Gate explicitly requires framing return on capacity before any operational focus list or ranking. Therefore the multi-knob benefit portion of P1 is not established by the frozen evidence.
+
+### Harm side
+
+Baseline exact reconciliation passes with `n_disagree = 0`; Finish Gate is PASS; and fixture version `fixtures-v1-tcd-ig` is frozen. However, no candidate multi-knob exact recon, fixture actuals/expecteds, or Stage 4 validation run is provided. Equal detection coverage is not defined or measured in the provided artifacts. Therefore “without harming Stage 4 exact recon / fixture Pass” is not demonstrated for the proposed multi-knob change.
+
+### P1 failure triggers
+
+- **Silent Stage 4 disagreement:** not observed in baseline, but untested for multi-knob.
+- **Greenwash:** not assessed; there is no detection-coverage metric or candidate portfolio comparison.
+- **Constants converted into undeclared tunables:** this is a live risk. W=365 and n_min=50 are currently constants. No lock amendment, owner approval, or Design Gate re-attestation authorizing their conversion appears in the frozen pack.
+
+### Builder P1 conclusion
+
+On the frozen evidence provided, P1 is not established for the multi-knob proposal. The only demonstrated effect is descriptive single-κ ESCALATE shrink. The multi-knob benefit, equal detection coverage, and Stage 4 non-harm remain unsupported without a frozen candidate multi-knob run. I make no KEEP / REVERT / HALT decision here.
+
+## Risks
+
+1. **Design Gate lock invalidation:** converting W / n_min from constants to tunables may invalidate the Stage 3 lock unless explicitly declared and approved; no lock amendment is included.
+2. **Undeclared tunables:** the proposal could create undeclared tunables if ranges, defaults, ownership, and config hashes are not frozen. This directly matches a P1 failure condition.
+3. **Silent Stage 4 disagreement:** multi-knob interactions could alter decision semantics while exact reconciliation still passes if critical fields omit those semantics; no candidate recon artifact is present.
+4. **Greenwash / coverage loss:** shrinking ESCALATE is insufficient if detection coverage drops or INCONCLUSIVE/STANDARD shifts mask missed cases; no candidate fixture behavior or coverage metric is provided.
+5. **Portfolio overfitting:** κ sensitivity already shows ESCALATE shrink, but the Finish Gate requires framing return on capacity before operational focus lists. Multi-knob tuning could optimize counts without proving operational usefulness.
+6. **Reproducibility/config explosion:** multiple knobs expand the configuration space; a full candidate config hash is absent, while only baseline and κ sensitivity artifacts are frozen.
+7. **Ambiguous exact change:** the spec allows “or treat method constants W / n_min as knobs,” which is not one mechanically frozen candidate. Without a pinned candidate, Builder/Validator agreement on the changed-file and config set is difficult.
+
+## Claim → evidence
+
+| Claim | Evidence | Builder assessment |
+|---|---|---|
+| Baseline exact reconciliation passes | `RECON_SUMMARY.csv`: `n_disagree=0`, `n_agree=222002` | Supported |
+| κ=2 is locked baseline | Finish Gate locked Stage 5 stance; SPEC Chicago note | Supported |
+| W=365 and n_min=50 are constants | SPEC evidence block | Supported |
+| κ grid is descriptive only in Stage 5 | SPEC and `kappa_sensitivity.csv` | Supported |
+| Finish Gate passed | Receipt excerpt: Result PASS | Supported |
+| Fixture version is frozen | Receipt: `fixtures-v1-tcd-ig` | Supported |
+| Raw manifest exists | RAW MANIFEST with hashes | Supported |
+| Multiple knobs improve Stage 5 usefulness | No candidate multi-knob run; only single-κ grid | Not established |
+| Multi-knob change does not harm Stage 4 or fixtures | No candidate multi-knob recon or fixture actuals | Not established |
+| Equal detection coverage | No detection-coverage metric in frozen pack | Missing |
+| Constants converting to tunables may invalidate Design Gate lock | W/n_min currently constants; no lock amendment | Supported as risk |
+| Silent disagreement / greenwash under multi-knob | No candidate run; not observed but untested | Unexcluded |
+
+**Builder first pass complete. No KEEP / REVERT / HALT decision issued.**
+
+---
+# VALIDATOR
+# A05 Validator — Grok independent first pass
+
+**Ablation:** A05  
+**Role:** Validator only (Builder visibility: none)  
+**Constitution:** 1.0  
+**Requested response style:** Comprehensive; the Grok model picker exposed Expert, so Expert was selected. Grok rendered the pass in a Comprehensive style.  
+**Decision scope:** This is not an adjudication. No KEEP/REVERT/HALT decision is issued.
+
+## Role attestation
+
+This pass is independent of the Builder. It inventories frozen inputs, reconstructs a checkable test plan from the specification and P1, extracts only mechanical facts present in the pasted excerpts, assesses whether P1 is supported, and records objections and missing evidence. It does not rewrite the proposed change, retune κ/W/n_min, modify the constitution, or claim that the change is better. The Adjudicator note is applied only to the stdout scope: the RAW MANIFEST means missing historical R stdout is not treated as a blocker, but it does not make absent candidate artifacts available.
+
+## Test plan
+
+P1 requires that multiple owner-tunable knobs improve Stage 5 portfolio usefulness (for example, reduce ESCALATE) without harming Stage 4 exact reconciliation or fixture pass, with equal detection coverage. P1 fails for silent Stage 4 disagreement, greenwash, or undeclared tunables that break the Design-Gate lock. A scorable comparison needs six artifact gates:
+
+1. **Design-Gate identity:** establish knob cardinality, keep W=365 and n_min=50 as constants unless explicitly declared otherwise, prove Finish Gate did not retune after seeing Stage 5, and label any κ grid sensitivity-only.
+2. **Dual-rail Stage 4 identity:** verify identical row universes, zero ID-level disagreement, status PASS for the same lock, and a separate recon pair for the multi-knob candidate.
+3. **Fixture pass:** verify both rails and the candidate under the declared vector; inspect expected decision values, not merely schemas.
+4. **Coverage equality:** compare decision census, eligible ID sets, inconclusive identity, and RA/RB coverage between baseline and candidate.
+5. **Stage 5 benefit:** compare predeclared portfolio counts with κ held at 2 when still the owner knob, and prove the gain is from an additional declared knob rather than a κ retune.
+6. **Fail-mode scan:** check silent disagreement, greenwash/holdout behavior, undeclared W or n_min changes, and a runtime knob vector that conflicts with the single-knob Design Gate.
+
+## Hard facts from the frozen excerpts
+
+The SPEC states the Chicago production lock is single κ=2; W=365 and n_min=50 are method constants; the κ grid is descriptive only in Stage 5; and Finish Gate did not change κ. The pasted RECON_SUMMARY row is mechanically internally consistent: n_ra=222002, n_rb=222002, n_inner=222002, n_only_ra=0, n_only_rb=0, n_agree=222002, n_disagree=0. This establishes identical rails and zero disagreement for one run, but the excerpt does not bind that row to a candidate multi-knob vector.
+
+The pasted sensitivity table has n_decision=222002 and n_INCONCLUSIVE=6377 for κ=1, 1.5, 2, and 3. At κ=2, ESCALATE=131968 and STANDARD=83657. At κ=3, ESCALATE=118246 and STANDARD=97379: a 13,722-row partition shift, with no change in census or inconclusive count. This is a single-κ sensitivity slide, not evidence of a second knob and not a permitted Finish-Gate retune.
+
+The RAW MANIFEST is an inventory of hashed filenames, including recon, fixture, portfolio, status, lineage, and framework entries. The pasted packet supplies neither the bodies of the fixture CSVs/status files nor a candidate multi-knob contrast. Filename presence alone cannot establish fixture PASS, candidate equality, or semantic equality.
+
+## P1 assessment and blocking objections
+
+The baseline-like recon excerpt supports B1/B2 for one run, but the candidate’s own RA′/RB′ recon is not supplied. Fixture gate C is unscored from content because the fixture bodies and expected/actual values are absent. Coverage gate D is not established for a second knob: the κ grid only demonstrates stability while moving κ. Benefit gate E is not established: the only visible reduction in ESCALATE is obtained by moving κ from 2 to 3, which the frozen evidence explicitly says was not done and which cannot be counted as a multi-knob benefit.
+
+The blocking objection is therefore evidentiary, not a claim that the proposed change is mechanically impossible: there is no declared candidate knob vector, candidate Design-Gate/lineage record, candidate dual-rail recon, candidate fixture result pair, candidate ID-level coverage join, or side-by-side baseline/candidate portfolio counts with κ held at 2. There is also no evidence in the excerpts that W and n_min remain constants in a candidate implementation. Without those artifacts, equal detection coverage, exact Stage 4 preservation, and a non-greenwashed Stage 5 benefit cannot be independently checked.
+
+## Missing evidence required for a scorable candidate
+
+Provide the locked Design-Gate declaration and constant list; baseline and candidate dual-rail recon at their respective declared vectors; both baseline and candidate fixture actuals/expecteds; an ID-level eligible-set join; side-by-side portfolio counts for both arms; explicit W/n_min treatment; and lineage attestation that no post-inspection retune occurred. Hash and freeze those artifacts. The RAW MANIFEST exception concerns only historical R stdout and does not waive these candidate-comparison requirements.
+
+## Summary
+
+The supplied evidence is coherent for a single-knob baseline and its κ sensitivity table. It does not reproduce or evaluate a multiple-knob candidate. P1 is therefore not supported by the frozen excerpts: the observed ESCALATE reduction is a κ-only descriptive movement, while the required candidate Stage 4, fixture, coverage, and Stage 5 evidence is missing. This independent Validator pass intentionally issues no KEEP/REVERT/HALT decision; adjudication remains outside scope.
+

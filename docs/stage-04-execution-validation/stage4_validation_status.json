@@ -1,0 +1,52 @@
+{
+  "stage": 4,
+  "status": "PASS",
+  "design_version_used": "stage3-v1-tcd-ig",
+  "fixture_version_used": "fixtures-v1-tcd-ig",
+  "sql_source_gate": "PASS",
+  "r_a_fixtures": "PASS",
+  "r_b_fixtures": "PASS",
+  "r_a_status": "PASS",
+  "r_b_status": "PASS",
+  "reconciliation": "PASS",
+  "structural_cross_review": "PASS",
+  "lineage_attestation": "PASS",
+  "validation_gate": "PASS",
+  "unresolved_issues": 0,
+  "portfolio": {
+    "n_decision": 222002,
+    "n_ESCALATE": 131968,
+    "n_INCONCLUSIVE": 6377,
+    "n_STANDARD": 83657,
+    "kappa": 2.0
+  },
+  "prepared_at_ct": "2026-09-19 14:06 CT",
+  "artifact_paths": [
+    "sql/source-delivery/source_delivery.sql",
+    "sql/source-delivery/source_gate_checks.sql",
+    "validation/source-gate/SOURCE_GATE_REPORT.md",
+    "R/r-a/run_RA.R",
+    "R/r-b/run_RB.R",
+    "R/r-b/R/00_config.R",
+    "R/r-b/R/10_io_parse.R",
+    "R/r-b/R/20_integrity_and_classify.R",
+    "R/r-b/R/40_fixtures.R",
+    "validation/fixtures/r_a_fixture_results.csv",
+    "validation/fixtures/r_b_fixture_results.csv",
+    "validation/reconciliation/RECON_SUMMARY.csv",
+    "validation/reconciliation/RECON_DISAGREE_IDS.csv",
+    "validation/reconciliation/EXACT_RECON_REPORT.md",
+    "validation/cross-review/structural_cross_review.md",
+    "docs/stage-04-execution-validation/LINEAGE_ATTESTATION.md",
+    "docs/stage-04-execution-validation/EXACT_RECON_REPORT.md",
+    "docs/stage-04-execution-validation/VALIDATION_GATE_PACKAGE.md",
+    "outputs/validated_action_list.csv",
+    "outputs/RA_portfolio_counts.csv",
+    "outputs/RB_portfolio_counts.csv"
+  ],
+  "owner_approval": {
+    "quote": "Approve Validation Gate: freeze stage3-v1-tcd-ig / fixtures-v1-tcd-ig labels at \u03ba=2; ESCALATE n=131968; proceed to workflow_gate then Stage 5",
+    "approved_at_ct": "2026-09-19 14:07 CT"
+  },
+  "frozen_at_ct": "2026-09-19 14:07 CT"
+}
