@@ -1,3 +1,6 @@
+<!-- SUPERSEDED 2026-09-19 CT: superseded scratch — authoritative lock is MEASUREMENT_DESIGN_LOCKED.md / stage3-v1-tcd-ig (B-leaning hybrid κ). -->
+> **SUPERSEDED:** This file is prior coordinator scratch (open_age_days_threshold). Authoritative Stage 3 lock: `MEASUREMENT_DESIGN_LOCKED.md` (`stage3-v1-tcd-ig`).
+
 # MEASUREMENT_DESIGN — Chicago 311 Dispatch Priority (Stage 3)
 
 **Design version:** `stage3-v0.1-PENDING`  
