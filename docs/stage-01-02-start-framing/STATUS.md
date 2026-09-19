@@ -1,5 +1,5 @@
 # STATUS — Stages 1–2
-**Updated:** 2026-09-18 22:17 CT
+**Updated:** 2026-09-19 04:35 CT
 
 | Item | Status |
 |---|---|
@@ -7,7 +7,7 @@
 | stage1_decision.json | LOCKED |
 | Stage 2 Framing Gate | **LOCKED** (CQ-F02) |
 | stage2_framing.json | LOCKED |
-| Stage 3 handoff inputs | Present (`STAGE3_HANDOFF_INPUTS.md`) — design **not** started |
-| Stage 3 | **NOT STARTED** (owner stop) |
+| Stage 3 | **IN PROGRESS** — Design Gate package READY_FOR_OWNER; awaiting owner confirm |
+| Stage 4 | NOT STARTED |
 
-Stages 1–2 complete. Waiting for owner to authorize Stage 3.
+Stages 1–2 complete. Stage 3 measurement design drafted overnight; **stopped at Design Gate** (not LOCKED). See `docs/stage-03-measurement-design/STATUS.md`.

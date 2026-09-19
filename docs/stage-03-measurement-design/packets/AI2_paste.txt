@@ -1,0 +1,1 @@
+See AI2_STAGE3_COUNTERDESIGN_PROMPT.md — paste into Grok Comprehensive; blind to AI1/AI3.

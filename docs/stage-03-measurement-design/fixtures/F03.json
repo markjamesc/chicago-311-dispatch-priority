@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F03",
+  "intent": "age 13 \u2192 STANDARD",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F03",
+    "SR_TYPE": "Graffiti Removal Request",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-08-30 23:59:59",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "2",
+    "COMMUNITY_AREA": "24"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": true,
+    "open_age_days": 13,
+    "action": "STANDARD",
+    "selected": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F05",
+  "intent": "info-only excluded",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F05",
+    "SR_TYPE": "311 INFORMATION ONLY CALL",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-08-01 10:00:00",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "",
+    "COMMUNITY_AREA": ""
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": false,
+    "exclusion_reason": "info_only",
+    "action": null,
+    "selected": false
+  }
+}

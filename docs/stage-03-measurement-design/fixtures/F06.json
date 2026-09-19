@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F06",
+  "intent": "missing CREATED_DATE",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F06",
+    "SR_TYPE": "Rodent Baiting/Rat Complaint",
+    "STATUS": "Open",
+    "CREATED_DATE": "",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "3",
+    "COMMUNITY_AREA": "28"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": false,
+    "exclusion_reason": "bad_created",
+    "action": null,
+    "selected": false
+  }
+}

@@ -1,0 +1,1 @@
+See AI1_STAGE3_PRIMARY_DESIGN_PROMPT.md — paste that prompt + locked CQ-F02 + MEASUREMENT_DESIGN.md into ChatGPT Chat (high reasoning).

@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F04",
+  "intent": "Completed not in open set",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F04",
+    "SR_TYPE": "Pothole in Street Complaint",
+    "STATUS": "Completed",
+    "CREATED_DATE": "2026-01-01 10:00:00",
+    "CLOSED_DATE": "2026-01-05 10:00:00",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "1",
+    "COMMUNITY_AREA": "8"
+  },
+  "expected": {
+    "is_open": false,
+    "is_eligible": false,
+    "exclusion_reason": "not_open",
+    "action": null,
+    "selected": false
+  }
+}
