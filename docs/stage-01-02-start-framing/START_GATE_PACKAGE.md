@@ -1,48 +1,52 @@
 # Start Gate Package — Chicago 311 Dispatch Priority
-**Generated:** 2026-09-18 20:22 CT  
-**Status:** `READY_FOR_OWNER` + `PENDING_INDEPENDENT_AI_REVIEWS` + `BLOCKED_NO_COMPUTERUSE_ON_EXECUTOR`  
-**Not:** `LOCKED` (do not create stage1_decision.json with LOCKED until owner approves and AI 2/AI 3 Start reviews exist)
+**Updated:** 2026-09-18 21:00 CT  
+**Status:** `READY_FOR_OWNER` (independent AI reviews complete)  
+**Not:** `LOCKED` until human owner approves
 
 ## Decision statement (Dana-confirmed T010)
 
 Dana Brooks (311 Ops Duty Manager, portfolio simulation) must decide which open eligible 311 requests in a frozen decision window should receive **ESCALATE**, **INCONCLUSIVE**, or **STANDARD** dispatch priority, in order to focus limited shift attention on unresolved requests that deserve elevation without forcing uncertain cases into either bucket, subject to treating results as a portfolio simulation (not live City dispatch and not employee scoring) and without inventing an official City SLA. Exact window dates and urgency formulas are deferred to measurement design. Output: **one row per request**.
 
+## Independent Start reviews
+
+| Role | Model / mode | Verdict |
+|---|---|---|
+| AI 2 Decision reconstruction | Grok **Comprehensive** (verified) | **Pass** |
+| AI 3 Ambiguity red team | DeepSeek **DeepThink** | **Revise** |
+
+### AI 2 (Pass) — gist
+Owner, three actions, request-level unit, frozen window, outcome, and simulation constraints are confirmed. Deferred items (dates, eligibility detail, urgency) do not block naming the decision. Watch item for Framing: define “open eligible.”
+
+### AI 3 (Revise) — gist
+May confuse **output format** (label every row) with the **decision** (where to put scarce attention). If many rows are ESCALATE, capacity/ranking is missing. Strongest falsifier: if more ESCALATE than Dana can handle, is the decision still a complete three-way label for every row, or a ranked shortlist/subset?
+
+## Coordinator reconciliation (not owner approval)
+
+Both reviews are coherent. AI 3’s capacity concern is real for Framing/Stage 3, but Dana already locked the three-way request-level menu and rejected force-fit / ward / policy frames. Recommendation for owner:
+
+- **Approve Start** if the locked decision is the three-way classification list (as Dana T010 and project lock), and treat capacity/ranking as Framing or Stage 3 open items.
+- **Revise Start** if you want the decision itself redefined as ranked shortlist / subset selection before Framing.
+
 ## Start Gate checklist
 
-| Requirement | Status | Evidence |
-|---|---|---|
-| Decision owner | Met (Dana); owner approval pending | T000, T010 |
-| Action or choice | Met — ESCALATE / INCONCLUSIVE / STANDARD | T004, T010 |
-| Alternatives | Met — three-way menu, no fourth | T004, T010 |
-| Outcome | Met — focus limited attention; protect uncertain cases | T009–T010 |
-| Constraint | Met — capacity; simulation; no employee scores; no fake City SLA | T008, T010 |
-| Time scope | Principle met — frozen window; dates → Stage 3 | T006 |
-| Analytical relevance | Met — different classifications → different actions | T002, T004 |
-| Stakeholder (Dana) confirmation | Met | T010 |
-| AI 2 independent Start review | **BLOCKED** | Executor lacks Task/computerUse; packet ready; not invented |
-| AI 3 independent Start review | **BLOCKED** | Executor lacks Task/computerUse; packet ready; not invented |
-| Human-owner approval | **PENDING_OWNER** | Owner must approve — do not fabricate |
+| Requirement | Status |
+|---|---|
+| Decision owner | Met (Dana); human-owner approval **this step** |
+| Action or choice | Met — ESCALATE / INCONCLUSIVE / STANDARD |
+| Alternatives | Met — three-way; no fourth |
+| Outcome | Met |
+| Constraint | Met — simulation; no employee scores; no fake City SLA |
+| Time scope | Principle met — frozen window; dates later |
+| Analytical relevance | Met |
+| Stakeholder (Dana) confirmation | Met (T010) |
+| AI 2 Start review | Complete — Pass |
+| AI 3 Start review | Complete — Revise (capacity/ranking) |
+| Human-owner approval | **PENDING_OWNER** |
 
 ## Explicit non-locks (Stage 3)
 
-- Exact decision-window calendar dates / snapshot cutoff semantics  
-- Eligible-universe definition details  
-- Open definition formula  
-- Urgency / lateness / portfolio threshold formulas  
-- SQL, R, fixtures, Source Gate  
+Exact window dates; open/eligible definitions; urgency formulas; capacity/ranking rules; SQL; R; fixtures.
 
-## Coordinator attestation
+## Next
 
-- Dialogue discovered the destination decision class; it was not handed to AI 1 on turn 1.  
-- Full Dana secret brief was **not** pasted into analyst-facing turns.  
-- No Stage 3 measurement design started.  
-- Independent AI reviews were **not invented**.  
-
-## Next human / parent step
-
-1. ~~Finish three-AI access verification~~ — owner confirmed ChatGPT / Grok / DeepSeek accessible.  
-2. Parent must dispatch **computerUse** (executor cannot): AI2=Grok then AI3=DeepSeek Start reviews using prepared packets.  
-3. Reconcile reviews into this package.  
-4. **Owner** approves or revises this Start Gate package (`PENDING_OWNER`).  
-5. Only then write `stage1_decision.json` with `status: LOCKED` (or keep PENDING files).  
-6. Framing lock only after owner Start approval. Stage 3 forbidden until Framing locked.  
+Owner approves or revises. Only then write `stage1_decision.json` LOCKED and begin Framing. Stage 3 still forbidden until Framing Gate passes.
