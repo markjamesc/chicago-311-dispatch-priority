@@ -8,7 +8,10 @@
 | A004 | Cannot-classify path | Third action | Material | T003 | **Resolved (T004):** INCONCLUSIVE required |
 | A005 | Live dispatch vs simulation | Legal/comms | Material | T007 | **Resolved (T008):** portfolio simulation only |
 | A006 | Official City SLA | Must not invent policy | Material | T007–T008 | **Resolved (T008):** no invented City SLA; portfolio urgency later |
-| A007 | Eligible definition (what “open eligible” excludes) | Population boundary | Deferred | Stage 3 | **Open — Stage 3** |
+| A007 | Eligible definition (what “open eligible” excludes) | Population boundary | Framing→Stage 3 | T011 | **Principle resolved (T012):** open = unresolved at frozen cutoff; eligible = in-scope for portfolio. **Exact formulas OPEN → Stage 3** |
 | A008 | Urgency / lateness evidence rules | Action thresholds | Deferred | Stage 3 | **Open — Stage 3** |
-| A009 | Independent AI 2/AI 3 Start review not yet run | Framework requires independent reviews before honest Start Gate lock | Blocking (process) | Await owner three-AI access check; then run real AI 2 & AI 3 | **Open — PENDING_THREE_AI_ACCESS** |
-| A010 | Human-owner Start Gate approval | Receipts must not fake LOCKED | Blocking (governance) | Owner reviews Start Gate package | **Open — PENDING_OWNER** |
+| A009 | Independent AI 2/AI 3 Start review | Framework Start reviews | Process | computerUse Start reviews | **Resolved:** AI2 Pass (Grok Comprehensive); AI3 Revise noted; Start LOCKED 2026-09-18 21:07 CT |
+| A010 | Human-owner Start Gate approval | Governance | Process | Owner Start approval | **Resolved:** Start LOCKED; capacity/ranking later |
+| A011 | Capacity / ranking if ESCALATE exceeds attention | Could imply shortlist vs full-row classification | Material (Framing note) | T013 | **Resolved for Framing question (T014):** three-way classification enough; ranking/capacity **OPEN later (Framing note / Stage 3)** — do not redefine Start |
+| A012 | Independent AI 2/AI 3 Framing reviews | Framing Gate requires blind reviews | Blocking (process) | computerUse Framing packets | **Open — PENDING_COMPUTERUSE** |
+| A013 | Human-owner Framing Gate approval | Must not invent LOCKED | Blocking (governance) | Owner reviews Framing Gate package | **Open — PENDING_OWNER** |

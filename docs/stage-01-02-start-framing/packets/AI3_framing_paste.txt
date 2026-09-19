@@ -1,3 +1,60 @@
+# ROLE: AI 3 — Skeptical Framing Reviewer / Bias and scope audit
+# Project: Chicago 311 Dispatch Priority — Stage 2 Framing Gate
+# Mode required: DeepSeek **DeepThink**
+# Blindness: Do NOT see or invent AI 2's Framing review. Review from evidence below only.
+# Do NOT design Stage 3 metrics, SQL, R, or urgency formulas.
+# Do NOT invent owner Framing approval.
+
+You are performing an independent Framing red-team review. Return ALL items:
+
+1. Is the question leading toward a predetermined recommendation?
+2. Does it assume causality beyond what the project may establish?
+3. Does it combine multiple decisions?
+4. Does it privilege a metric before the outcome is defined?
+5. Does it omit a realistic decision option (consider capacity/ranking carefully without forcing a Start reopen)?
+6. Is any clause unsupported by the dialogue?
+7. Could the question be answered accurately yet remain useless for action?
+8. Has data convenience distorted the business need?
+9. Has a material stakeholder exception disappeared?
+10. Strongest alternative wording (exact sentence)
+11. Framing gate verdict: **Pass** / **Pass with required revision** / **Fail** — with exact reasons.
+
+Keep Stage 3 formulas out of scope. Capacity/ranking was deferred by owner and Dana (T014) as an open later note — judge whether the CQ is still decision-fit under that deferral, or whether Framing must revise.
+
+---
+# Framing Review Packet — independent AI 2 / AI 3
+**Do not include dana_brief_COORDINATOR_ONLY.md contents.**  
+**AI 2 and AI 3 must not see each other's first-pass Framing conclusions.**  
+**Do not design Stage 3 metrics, SQL, R, fixtures, or urgency formulas.**
+
+## Organizational context
+- Project: Chicago 311 Dispatch Priority — Dataset 2 of methodology evaluation
+- Stakeholder: Dana Brooks (fictional 311 Ops Duty Manager; synthetic portfolio stakeholder)
+- Not a live City deployment; not Kaggle
+- Data source later: City of Chicago 311 Service Requests (v6vf-nfxy) — do not design metrics yet
+
+## Locked Start (OWNER-LOCKED — do not redefine)
+Decision statement: Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority (one row per request).
+Constraints: portfolio simulation only — not live City dispatch; not employee performance scoring; do not invent official City SLA.
+Deferred (explicit): exact window dates; open/eligible definitions (formulas); urgency formulas; capacity/ranking if ESCALATE volume exceeds attention.
+Owner approval note: Approve Start Gate as three-way ESCALATE/INCONCLUSIVE/STANDARD classification; capacity/ranking later.
+
+## Candidate analytical question CQ-F01 (Dana T016 accepted; Framing Gate not owner-locked)
+> Among open eligible 311 requests in the frozen decision window, which requests should receive ESCALATE, which INCONCLUSIVE, and which STANDARD dispatch priority so limited shift attention can focus on unresolved requests that deserve elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)?
+
+## Framing dialogue highlights
+- T012: open = unresolved/not closed at frozen cutoff; eligible = in-scope for portfolio; exact rules → Stage 3
+- T014: three-way classification enough for the question; capacity/ranking open later — do not redefine Start
+- T016: Dana accepts CQ-F01
+
+## Unresolved / deferred (must remain open unless dialogue locks them)
+- Exact window dates
+- Open/eligible formulas
+- Urgency / evidence rules
+- Capacity/ranking if ESCALATE exceeds attention
+- Independent Framing AI reviews (this packet)
+- Human-owner Framing Gate approval
+
 # Verbatim Dialogue Ledger — Chicago 311 Dispatch Priority (Stages 1–2)
 
 | Field | Value |

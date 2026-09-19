@@ -1,7 +1,10 @@
-# Stage 1–2 — Start and Framing
+# Stages 1–2 — Start and Framing
 
-This folder will preserve the stakeholder dialogue, independent reconstruction and ambiguity reviews, the approved decision statement, the final framing question, open items, and the Stage 3 handoff.
+| Artifact | Status |
+|---|---|
+| `stage1_decision.json` | **LOCKED** |
+| `FRAMING_GATE_PACKAGE.md` | READY_FOR_OWNER (AI Framing reviews pending computerUse) |
+| `stage2_framing.json` | **Not LOCKED** — see `stage2_framing.PENDING.md` |
+| Stage 3 | Not started — see `STAGE3_HANDOFF_INPUTS.md` (inputs only) |
 
-No production SQL or R belongs here.
-
-Status: **Not started.**
+Do not push coordinator-only Dana secret briefs to this folder.

@@ -18,3 +18,7 @@
 - Human-owner Start Gate and Framing Gate approvals are distinct from fictional Dana confirmation.
 - Full Dana brief is coordinator-only and must **not** appear on public GitHub.
 - Analyst turns T001+ labeled COORDINATOR_DRAFT because real AI 1 (ChatGPT) was not called yet (browser paused for access check).
+| R008 | Start PENDING_OWNER | Start LOCKED (`stage1_decision.json`) | Human owner | 2026-09-18 21:07 CT; AI2 Pass; AI3 Revise noted | Capacity/ranking deferred; Framing may begin |
+| R009 | Open/eligible undefined at Framing | Principle: open=unresolved at cutoff; eligible=in-scope portfolio | Dana | T011–T012 | Exact formulas remain Stage 3 |
+| R010 | Capacity/ranking risk (AI3 Start) | Three-way CQ enough; ranking open later | Dana + owner Start note | T013–T014 | Do not redefine Start into ranked shortlist |
+| R011 | CQ-DRAFT-01 provisional | CQ-F01 Dana-confirmed Framing candidate | Coordinator AI1 draft + Dana | T015–T016 | Framing Gate package READY_FOR_OWNER; AI reviews pending computerUse |

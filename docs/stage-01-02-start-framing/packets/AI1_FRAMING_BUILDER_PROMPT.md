@@ -1,3 +1,40 @@
+# ROLE: AI 1 — Dialogue Lead / Framing Builder
+# Project: Chicago 311 Dispatch Priority — Stage 2 Framing
+# Mode required: ChatGPT Chat + highest reasoning available
+# Do NOT design Stage 3 metrics, SQL, R, thresholds, or urgency formulas.
+# Do NOT invent owner Framing Gate approval.
+
+You are AI 1 Builder for Framing. Start is OWNER-LOCKED. Produce the Framing Builder output below from the evidence only.
+
+## Required return
+1. Proposed final analytical question (ONE primary question)
+2. One-sentence decision linkage to the locked Start
+3. Stakeholder statements supporting each clause (cite Turn IDs)
+4. Explicit working assumptions (must remain Stage 3 / open — not locked in the question)
+5. The one remaining weakness, if any
+6. Whether you Keep the coordinator CQ-F01 wording, Tighten it, or propose a Branch (exact revised wording if Tighten/Branch)
+
+## Locked Start (do not redefine)
+Decision: Among open eligible 311 requests in a frozen decision window, assign ESCALATE / INCONCLUSIVE / STANDARD (one row per request). Simulation only; no fake City SLA; no employee scoring.
+Owner note: capacity/ranking later — do NOT redefine Start into a ranked-shortlist decision.
+Machine receipt: stage1_decision.json status LOCKED.
+
+## Coordinator candidate CQ-F01 (Dana T016 accepted — review/refine, do not ignore)
+> Among open eligible 311 requests in the frozen decision window, which requests should receive ESCALATE, which INCONCLUSIVE, and which STANDARD dispatch priority so limited shift attention can focus on unresolved requests that deserve elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)?
+
+## Framing principles already confirmed
+- T012: open = unresolved/not closed at frozen cutoff; eligible = in-scope for portfolio; exact formulas → Stage 3
+- T014: three-way classification enough for the question; capacity/ranking open later
+
+## Constraints
+- No Stage 3 KPI/SQL/R/threshold lock
+- No invented City SLA
+- Capacity/ranking = open note, not a new Start decision
+- One primary analytical question only
+
+---
+## Full verbatim dialogue (T000–T016)
+
 # Verbatim Dialogue Ledger — Chicago 311 Dispatch Priority (Stages 1–2)
 
 | Field | Value |
