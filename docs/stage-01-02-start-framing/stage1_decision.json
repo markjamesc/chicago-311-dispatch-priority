@@ -1,0 +1,26 @@
+{
+  "stage": 1,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T21:07:00-05:00",
+  "decision_statement": "Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority (one row per request).",
+  "decision_owner": "Dana Brooks simulation / human owner approval",
+  "actions": [
+    "ESCALATE",
+    "INCONCLUSIVE",
+    "STANDARD"
+  ],
+  "constraints": [
+    "portfolio simulation only \u2014 not live City dispatch",
+    "not employee performance scoring",
+    "do not invent official City SLA"
+  ],
+  "deferred_to_later": [
+    "exact window dates",
+    "open/eligible definitions",
+    "urgency formulas",
+    "capacity/ranking if ESCALATE volume exceeds attention"
+  ],
+  "owner_approval": "Approve Start Gate as three-way ESCALATE/INCONCLUSIVE/STANDARD classification; capacity/ranking later",
+  "ai2_verdict": "Pass (Grok Comprehensive)",
+  "ai3_verdict": "Revise noted; owner chose not to redefine decision; capacity/ranking later"
+}
