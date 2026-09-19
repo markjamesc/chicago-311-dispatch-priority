@@ -1,6 +1,6 @@
 # Start Gate Package — Chicago 311 Dispatch Priority
 **Generated:** 2026-09-18 20:22 CT  
-**Status:** `READY_FOR_OWNER` + `PENDING_INDEPENDENT_AI_REVIEWS`  
+**Status:** `READY_FOR_OWNER` + `PENDING_INDEPENDENT_AI_REVIEWS` + `BLOCKED_NO_COMPUTERUSE_ON_EXECUTOR`  
 **Not:** `LOCKED` (do not create stage1_decision.json with LOCKED until owner approves and AI 2/AI 3 Start reviews exist)
 
 ## Decision statement (Dana-confirmed T010)
@@ -19,8 +19,8 @@ Dana Brooks (311 Ops Duty Manager, portfolio simulation) must decide which open 
 | Time scope | Principle met — frozen window; dates → Stage 3 | T006 |
 | Analytical relevance | Met — different classifications → different actions | T002, T004 |
 | Stakeholder (Dana) confirmation | Met | T010 |
-| AI 2 independent Start review | **PENDING** | Browser paused for three-AI access check |
-| AI 3 independent Start review | **PENDING** | Browser paused for three-AI access check |
+| AI 2 independent Start review | **BLOCKED** | Executor lacks Task/computerUse; packet ready; not invented |
+| AI 3 independent Start review | **BLOCKED** | Executor lacks Task/computerUse; packet ready; not invented |
 | Human-owner approval | **PENDING_OWNER** | Owner must approve — do not fabricate |
 
 ## Explicit non-locks (Stage 3)
@@ -38,9 +38,11 @@ Dana Brooks (311 Ops Duty Manager, portfolio simulation) must decide which open 
 - No Stage 3 measurement design started.  
 - Independent AI reviews were **not invented**.  
 
-## Next human step
+## Next human / parent step
 
-1. Finish three-AI access verification (ChatGPT / Grok / DeepSeek).  
-2. Run real AI 2 and AI 3 Start reviews on the dialogue packet.  
-3. **Owner** approves or revises this Start Gate package.  
-4. Only then write `stage1_decision.json` with `status: LOCKED` (or keep PENDING files).  
+1. ~~Finish three-AI access verification~~ — owner confirmed ChatGPT / Grok / DeepSeek accessible.  
+2. Parent must dispatch **computerUse** (executor cannot): AI2=Grok then AI3=DeepSeek Start reviews using prepared packets.  
+3. Reconcile reviews into this package.  
+4. **Owner** approves or revises this Start Gate package (`PENDING_OWNER`).  
+5. Only then write `stage1_decision.json` with `status: LOCKED` (or keep PENDING files).  
+6. Framing lock only after owner Start approval. Stage 3 forbidden until Framing locked.  

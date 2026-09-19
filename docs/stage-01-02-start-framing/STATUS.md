@@ -1,33 +1,32 @@
 # STATUS — Chicago 311 Stages 1–2
-**Updated:** 2026-09-18 20:24 CT
+**Updated:** 2026-09-18 20:15 CT
 
 ## Completed (non-browser)
 - [x] Frameworks confirmed under `/workspace/chicago-311-run/`
 - [x] Working dir `/workspace/chicago-311-run/stage-01-02/`
 - [x] `dana_brief_COORDINATOR_ONLY.md` (local only — **not on public GitHub**)
 - [x] Start dialogue T000–T010; ledgers; provisional CQ
-- [x] Start Gate package READY_FOR_OWNER
-- [x] Public docs pushed to GitHub (no secret Dana brief)
+- [x] Start Gate package READY_FOR_OWNER (Dana T010 confirmed)
+- [x] Public docs previously pushed to GitHub (no secret Dana brief)
+- [x] AI2/AI3 Start review **prompt packets** prepared (blind, no Dana secret)
 
 ## Gate status (honest)
 | Gate | Status |
 |---|---|
 | Dana Start confirmation | Done (T010) |
-| AI 2 / AI 3 Start reviews | **PENDING** — browser paused for three-AI access check; reviews not invented |
-| Start Gate human-owner | **PENDING_OWNER** |
+| AI 2 / AI 3 Start reviews | **BLOCKED** — executor has no Task/computerUse/browserUse; reviews **not invented** |
+| Start Gate human-owner | **PENDING_OWNER** — do not invent Mark’s approval |
 | `stage1_decision.json` LOCKED | **Not created** — see `stage1_decision.PENDING.md` |
-| Framing Gate | Not locked (provisional CQ only) |
+| Framing Gate | Not locked (provisional CQ only); Framing candidate not locked |
 | Stage 3 | **Not started** |
 
 ## Browser / three-AI
-**PAUSED** — awaiting parent message that ChatGPT / Grok / DeepSeek access check is done. Desktop not opened.
-
-## GitHub URLs
-- https://github.com/markjamesc/chicago-311-dispatch-priority/blob/main/docs/stage-01-02-start-framing/STATUS.md
-- https://github.com/markjamesc/chicago-311-dispatch-priority/blob/main/docs/stage-01-02-start-framing/START_GATE_PACKAGE.md
-- https://github.com/markjamesc/chicago-311-dispatch-priority/blob/main/docs/stage-01-02-start-framing/verbatim_dialogue_ledger.md
-- https://github.com/markjamesc/chicago-311-dispatch-priority/blob/main/docs/stage-01-02-start-framing/stage1_decision.PENDING.md
-- https://github.com/markjamesc/chicago-311-dispatch-priority/blob/main/docs/orchestration/grokbot-conversation-transcript.md
+Owner confirmed access: ChatGPT (Work), Grok (Pagan Traditionalist), DeepSeek (Pagan Traditionalist signed in).  
+**This executor cannot drive the browser** (no Task/computerUse tool). See `reviews/BLOCKER_no_computerUse_tool.md`.  
+Packets ready for sequential computerUse:
+- AI2=Grok → `packets/AI2_START_REVIEW_PROMPT.md`
+- AI3=DeepSeek → `packets/AI3_START_REVIEW_PROMPT.md`
 
 ## Exact stop / next
-Stopped before Framing lock and Stage 3. Next after three-AI OK: real independent Start reviews → owner Start Gate approval → Framing.
+**Stopped at:** Start Gate ready for independent AI reviews + owner — waiting on parent to dispatch computerUse for real AI2 then AI3 reviews.  
+**Not done:** invent reviews, lock stage1, Framing lock, Stage 3.
