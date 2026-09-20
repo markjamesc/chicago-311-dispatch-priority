@@ -6,6 +6,33 @@ Chicago 311 Dispatch Priority is **Dataset 2 of 3** in a portfolio evaluation of
 
 The project tests whether the same decision-first workflow used in FulfillIQ 2.0 can control a much larger operational dataset with request-level triage, time-window logic, ambiguous operational warrant, and a three-way action decision.
 
+## Executive result
+
+**Completed methodology simulation. Finish Gate PASS: September 19, 2026.** This is not a live City dispatch system.
+
+The frozen rules classify **222,002 requests** from a source snapshot containing **14,635,395 rows**:
+
+| Classification | Requests |
+|---|---:|
+| ESCALATE | 131,968 |
+| INCONCLUSIVE | 6,377 |
+| STANDARD | 83,657 |
+| Total decision set | 222,002 |
+
+![Frozen simulation classifications](assets/chicago-311-decision-summary.svg)
+
+**Decision:** accept the frozen labels as a methodology result. Return to Framing to define an attention budget and ranking before producing any operational focus list. Approximately 59% of the decision set is ESCALATE; a validated classification alone does not establish a workable shift plan.
+
+[Finish Gate receipt](docs/stage-05-interpretation/FINISH_GATE_RECEIPT.md) · [Decision interpretation](docs/stage-05-interpretation/FINISH_GATE_PACKAGE.md) · [Reconciliation evidence](validation/reconciliation/EXACT_RECON_REPORT.md)
+
+## What validation caught
+
+The first production comparison found **104 label disagreements** caused by a roughly five-hour timezone-parsing difference. After repair against the locked contract, both independent R paths agreed on all **222,002** labels, with **14/14 fixtures passing on each path**. Agreement demonstrates implementation consistency on the frozen pack; it does not prove causal neglect, official SLA breaches, or live dispatch priority.
+
+## My contribution and AI roles
+
+I own the portfolio project and its human gate approvals. AI builders and reviewers support design, implementation, and critique; their reports and the owner approval are preserved in the evidence records. My responsibility is to assess the question, validation evidence, limitations, and proportionate next action.
+
 ## Five-stage method
 
 1. **Start**
@@ -185,7 +212,9 @@ The raw 311 CSV is not committed to this repository.
 
 ## Status
 
-**Raw database setup and raw-source verification complete. Analytical stages not yet started. Deterministic R workflow enforcement is now defined for the upcoming run.**
+**Completed frozen methodology simulation; Finish Gate PASS on September 19, 2026. Operational focus-list design remains a separate Framing task.**
+
+Historical stage packages and receipts retain their original wording and timestamps. The final Finish Gate receipt governs the completion status. Later prospective framework upgrades do not retrofit this frozen run.
 
 The master orchestration prompt is the controlling project prompt and is preserved at:
 
