@@ -1,0 +1,4 @@
+url=https://chat.deepseek.com/a/chat/s/6e52543f-162e-49f8-a4bb-16f3b5d9a8a8
+sent=2026-10-10 12:21:50 CDT
+reply_complete=2026-10-10 12:24:25 CDT (approx upper bound; observed complete at first check after send; UI "Thought for 43 seconds")
+notes: New chat, DeepThink ON, Search OFF (verified via toggle state before send). Packet packets/C24V3_2_VALIDATOR_DeepSeek.txt (55656 B, sha256 matches PACKETS_C24V3.sha256; END line "END C24 VALIDATOR REPORT" specified near the top, line 15 — no closing END reminder at packet bottom) sent as a single file attachment with no message text. Capture: select rendered reply (answer only, no thoughts), copy, clipget; unchanged + final newline.

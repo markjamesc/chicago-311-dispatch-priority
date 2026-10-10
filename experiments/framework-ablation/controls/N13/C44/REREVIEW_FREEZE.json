@@ -1,0 +1,13 @@
+{
+  "ablation_id": "C44",
+  "frozen_at_ct": "2026-10-03 12:23:37 CDT",
+  "records": [
+    {"id": "FULL_reply", "path": "C48/C48-audit-ai3/ai3_second_audit.md", "bytes": 3053, "sha256": "8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2"},
+    {"id": "C48_AUDIT_FREEZE", "path": "C48/AUDIT_FREEZE.json", "bytes": 874, "sha256": "c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878"},
+    {"id": "FULL_packet", "path": "C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt", "bytes": 58214, "sha256": "dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96"},
+    {"id": "DELTA_reply", "path": "C44/C44-rereview-delta/delta_rereview.md", "bytes": 2834, "sha256": "d0635883ab82f4bf5d1f3fc94200715d5d4b66746aaf2023a99c64b43a9cebfb"},
+    {"id": "DELTA_times", "path": "C44/C44-rereview-delta/TIMES.txt", "bytes": 850, "sha256": "69f5275511e873b072369fc4beb09e84711ad8c21444c29bad02dc0979048590"},
+    {"id": "DELTA_packet", "path": "C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt", "bytes": 18691, "sha256": "a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb"}
+  ]
+}
+

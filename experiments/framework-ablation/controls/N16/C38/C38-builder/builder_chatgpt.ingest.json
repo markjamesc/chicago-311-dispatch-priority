@@ -1,0 +1,38 @@
+{
+ "cid": "C38",
+ "role": "builder",
+ "source": "C38/C38-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 19567,
+ "source_sha256": "d116b720f1bee20c2cdbbaf2935ba27dc1e560b22513dc07d8da3ad771f687f7",
+ "output": "C38/C38-builder/builder_report.md",
+ "output_bytes": 19564,
+ "output_sha256": "a78a58a91cbb3111a8c7c9ef2c7e94c674e3187d10526b1d3682c4d42d50f158",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 1,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 05:46:51\nreply_complete=2026-10-09 05:54:07\n# reply_complete = first-seen (upper bound; still streaming at ~05:51:30, finish seen 05:54:07; true finish not observed)"
+}

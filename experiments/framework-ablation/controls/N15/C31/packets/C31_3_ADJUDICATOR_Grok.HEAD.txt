@@ -1,0 +1,333 @@
+# C31 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Lineage Attestation (catalog #31) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C31 ADJUDICATION
+
+---
+# COORDINATOR NOTES (added 2026-10-03 after the run, before any Grok chat; nothing in the spec, predicate or numbers changed)
+- N1 (open finding): in clean arm B, R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the two paths; this is not confirmed. The finding is latent in the frozen pack, which is not changed. Consequence: any regime that gates on full-field recon (dormant_h/open_age_h, |d| > 1e-6) raises an alarm on the clean pair. The H2 line of the RESULTS shows these baseline mismatches ("B full-field recon mismatches: dormant_h 1, open_age_h 2").
+
+---
+# SPEC
+# C31 — Ablation specification (FROZEN)
+
+**Ablation ID:** C31 (owner Remaining Ablation Program, catalog #31 "Lineage Attestation")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (provenance of data and code versions)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Before outputs are trusted, the run attests explicit source/data version and snapshot identity: a manifest of the SHA-256 of every input (source files and code) is checked against the frozen record.
+
+## Exact change being tested (ablation)
+There is no lineage attestation. An undocumented change can reach both paths identically. Trust rests on exit 0, fixtures on both paths, and exact recon R-A vs R-B (key set + classification).
+**Caught without the control (D_abl):** crash, recon key/label mismatch, or a fixture failure on any path.
+**Caught with the control:** the above, or any input-file SHA-256 that differs from the frozen record.
+
+## Seeded undocumented changes (frozen before execution; applied to both paths)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **L_STALE24** (paths run: RA+RB): Both paths read the stale snapshot (undocumented snapshot change).
+  - source variant `V_STALE24/src_open_candidates.csv` SHA-256 `8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58`, 118267409 bytes
+  - source variant `V_STALE24/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+- **L_PEER10** (paths run: RA+RB): Both paths read the altered peer stats (undocumented).
+  - source variant `V_PEER10/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, 118671837 bytes (unchanged, equals the frozen file)
+  - source variant `V_PEER10/src_peer_stats.csv` SHA-256 `573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8`, 16276 bytes
+  - variant note: type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+- **L_TF24** (paths run: RA+RB): Both paths' T_freeze moved +24 h (undocumented config change).
+  - code seed `seeds/C31/RA_TF24__run_RA.R` → `R-A\run_RA.R`, SHA-256 `4694d22d2bc81220bbb0326971e12782de5a88e5a9065291062c6f492e175bcd`
+  - code seed `seeds/C31/RB_TF24__00_config.R` → `R-B\R\00_config.R`, SHA-256 `3484c86e27dbe704f8017bc76606ff7ec95dec97aa6d8768e2f485a8bfe03daf`
+- **L_K25** (paths run: RA+RB): Both paths' kappa 2.0 -> 2.5 (undocumented knob change).
+  - code seed `seeds/C31/RA_K25__run_RA.R` → `R-A\run_RA.R`, SHA-256 `7b3e23dc17b242353b552febde9c7fbd4447fd200ac5d0996e25435a18a44051`
+  - code seed `seeds/C31/RB_K25__00_config.R` → `R-B\R\00_config.R`, SHA-256 `401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90`
+- **L_COMMENT** (paths run: RA+RB): Comment-only edit in both paths (bytes differ, no semantic change).
+  - code seed `seeds/C31/RA_COMMENT__run_RA.R` → `R-A\run_RA.R`, SHA-256 `51a47bd1c613d8570f2a8f52436b5b7580a40cc924fe89ccb15a980baad80be9`
+  - code seed `seeds/C31/RB_COMMENT__00_config.R` → `R-B\R\00_config.R`, SHA-256 `bdf1f3cb821d3ed8798e6698b59be2094681f0632637f4fff68d0260a150a5e2`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No ambiguity in data/code versions. Fail: Undocumented changes found (keep rule)."
+Definitions:
+- **H:** harm set (above).
+- **D_abl:** seeded arms caught without the control (definition above).
+Outcomes:
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. L_COMMENT (comment-only) shows whether attestation alarms on a benign change.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C31_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C31 RESULTS — Lineage Attestation (catalog #31) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 5/5
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path (no lineage/manifest attestation)]: {}
+- H6 H minus caught-without-control: {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H7 arms with no locked-field change: {L_COMMENT}
+- H8 caught with the control [crash, any input file SHA-256 (source or code) differs from the frozen record, recon key/label mismatch, or fixture failure]: {L_STALE24,L_PEER10,L_TF24,L_K25,L_COMMENT}
+- H9 caught with the control but no locked-field change: {L_COMMENT}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| L_STALE24 | RA+RB | Both paths read the stale snapshot (undocumented snapshot change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | 1546 | 1546 | TRUE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| L_PEER10 | RA+RB | Both paths read the altered peer stats (undocumented) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | 538 | 538 | TRUE | data\source\src_peer_stats.csv | TRUE | FALSE |
+| L_TF24 | RA+RB | Both paths' T_freeze moved +24 h (undocumented config change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | 889154 | 1146 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_K25 | RA+RB | Both paths' kappa 2.0 -> 2.5 (undocumented knob change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | 13786 | 13786 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_COMMENT | RA+RB | Comment-only edit in both paths (bytes differ, no semantic change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+
+
+---
+# C31_EVIDENCE.sha256
+d0b21c9c07eb49034afe1a9f2c4168b650dbda1c2bfd92bf02f73a4c9b61d46f  C31_ARM_MANIFESTS.txt
+3e32165c5d367b925f1a90cb3f0b179435ba457ca92fa1f9ecd633302c02d30f  C31_arms.csv
+d2ba0b1dbff37f963c29f9f8cfbef35450b95590f78e97989d77e97c64c00e5d  C31_RESULTS.md
+

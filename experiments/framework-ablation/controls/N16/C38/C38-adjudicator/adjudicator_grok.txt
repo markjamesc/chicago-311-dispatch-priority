@@ -1,0 +1,169 @@
+Role attestation.
+
+I am Grok, Adjudicator only (Expert), for ablation C38 (owner list #38: Monitoring / next-question tag, follow-up deletion checklist), batch N16, Stage 5 interpretation. Builder is ChatGPT; Validator is DeepSeek. I hold no other role. I issue one terminal state and do not rerun, repair, add criteria, or relax a gate. Extra chats: 0. Capture mode is text-only, as declared. Dependency (order only): C04 terminal state at assembly is REVERT, so the Stage 5 auditors this control refers to are not removed by that dependency.
+
+Freeze check.
+
+The FREEZE RECORD (frozen_at_ct 2026-10-09 06:53:03 CT) identifies the Builder pack as C38/C38-builder/builder_report.md (19564 bytes, SHA-256 a78a58a91cbb3111a8c7c9ef2c7e94c674e3187d10526b1d3682c4d42d50f158, verdict_token_leak: false) and the Validator pack as C38/C38-validator/validator_report.md (9730 bytes, SHA-256 25368ee9f3b7898a5a9d0a8ae0e15cd68f78cacbb5f9832359a5ec7c30682d03, verdict_token_leak: false). The reports embedded in this packet are those frozen packs. Each is complete and ends with its END line: Builder ends END C38 BUILDER REPORT; Validator ends END C38 VALIDATOR REPORT. Neither report contains a KEEP, REVERT, or HALT token. Constitution 1.0 hash e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 matches SPEC and PREFLIGHT. Scorer hashes in the SPEC match C38_EVIDENCE.sha256: score_s5.py d0f8c42b…, s5text.py d3f2d61f…. n16lib.py 4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47 is quoted in the SPEC and supplied verbatim in the supplement. Seed and results hashes match across SPEC, evidence list, and C38_RESULTS.md prefixes: ORIG 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932, FOLLOWUP_DELETED 8c2587125cf01601916853b5795b16f5f02c45116e65b671ef469817aa7b0ad6, SEED_FINALITY bf09d37b7ae4ca39df2d19548ba799e371bc71dfe0c8751c5a841f7945c5cf86, C38_RESULTS.md 13679ddf9d19bd2b34176e849a040f3afc28c60299dba7bfd0fc4a2e990d63dd. PREFLIGHT PASS, failures: 0.
+
+Hard-fact agreement table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkORIG SHA-25673f448d4…7932 exactsame; equals frozen AI1 original and seed ORIGprefix 73f448d4526c4779agreeFOLLOWUP_DELETED SHA-2568c258712…0ad6 exactsame; distinct from ORIG and seedprefix 8c2587125cf01601agreeSEED_FINALITY SHA-256bf09d37b…cf86 exactsame; distinct from the other two armsprefix bf09d37b7ae4ca39agreeORIG follow-up sections 8 and 9 non-empty222agreeFOLLOWUP_DELETED follow-up sections000agreeSEED_FINALITY follow-up sections000agreeSection 4 non-empty limitation lines, all arms101010agreeFinality sentences ORIG / deleted / seed0 / 0 / 10 / 0 / 10 / 0 / 1agreeAdverse flag ORIG / deleted / seedNo / No / Yesfalse / false / trueok / ok / ADVERSEagreeSeeded sentencethe declared FS on the recommendation linesame sentence, FIN hit, no NEGF exemptionthat sentence, one hitagreeP1 conditions 1, 2, 3MET, MET, METtrue, true, trueMET, MET, MET; P1 MET (all 3)agreeChanged sectionsdeleted {8,9}; seed {7,8,9}same diffs, 45 removed lines plus the seed sentenceseed diffs matchagreePortfolio sum222,002222,002quoted in frozen text, not a C38 predicate inputagreeC38_RESULTS.md hashquoted as matching13679ddf…63dd matches SPEC and evidencefile is that results textagreeScorer file hashesquoted from packetscore_s5.py and s5text.py match SPEC and evidencesource quoted at those hashesagree
+No row disagrees on a hard number or classification that decides a P1 condition. Validator’s timestamp note (results 02:21:36 CT, preflight 02:21:42 CT) is the ordering the supplement explains (scorer write, then preflight of unchanged frozen inputs). Validator’s note that n16lib.py source was absent from the original evidence list is closed by the supplement, which quotes the source at the SPEC hash. Neither note is a hard-fact conflict.
+
+The nine KEEP conditions of constitution §7.
+PASS. Builder and Validator packs are the FREEZE RECORD files, complete, and end with their END lines; scorer results, seed diffs, frozen AI1 text, scorer source including n16lib.py, and hashes are in the packet; PREFLIGHT failures: 0.
+PASS. Roles are ChatGPT / DeepSeek / Grok, one each; both first passes attest blindness; verdict_token_leak: false; extra chats 0 (FREEZE RECORD, both reports, SPEC).
+PASS. Section 3: Builder, Validator, and scorer RESULTS agree on the arm hashes, section counts, limitation lines, finality counts, adverse flags, and all three P1 conditions.
+PASS (not applicable). SPEC: no R run and no reconciliation required for this text-only control. Text-level equivalents are the three known-answer arms; hashes and checklist rows agree. Historical 0 disagreements / 222,002 rows is quoted from frozen Stage 5 text, not a C38 rerun.
+PASS (not applicable). SPEC: no fixture suite. Known-answer cases are ORIG, FOLLOWUP_DELETED, and SEED_FINALITY; all three match the declared checklist (ok / ok / ADVERSE).
+PASS. Frozen inputs are only read (PREFLIGHT PASS). Deletion of sections 8 and 9, and the seed sentence, are the declared arms (SPEC, seed diffs, scorer drop / seedf). Residual follow-up language is declared INFO and not scored. No undeclared change to frozen inputs.
+PASS. No locked regression on the known-answer arms. N1 / OF-1 cannot enter N16 (coordinator note; no R path). Conditions 6–7 are the read-only preflight, which passed.
+PASS. Predeclared P1 is satisfied: deleted arm unflagged, seeded finality flagged, original unflagged. Scorer: MET (all 3). Builder and Validator independently recompute the same three conditions as met. Direction is not inverted: P1 MET maps to KEEP.
+PASS. Validator blocking objections: none that should block the text-level P1 assessment. The non-blocking notes are not supported as blockers by the frozen evidence (section 6).
+HALT conditions of §9.
+
+
+Hard mechanical conflict: absent. Section 3, no disagree row on a P1-deciding fact (constitution §4; SPEC regression/HALT rule).
+Required raw evidence missing: absent. Scorer RESULTS, checklist table, scorer source, seed diffs, verbatim frozen AI1 text, and hashes are present. A historical stdout is not required (role instruction; text-only capture).
+Hash or frozen-version mismatch: absent. Constitution, owner sheet, owner answer, scorer, seed, results, and ORIG hashes agree across SPEC, PREFLIGHT, evidence list, and RESULTS prefixes.
+Baseline or constitution changed mid-run: absent. Baseline hashes and constitution 1.0 are the frozen values; PREFLIGHT OK.
+Role separation violated: absent. Three distinct roles; freeze record matches the SPEC assignment.
+Information barrier breached before first-pass freeze: absent. Both reports attest blindness; verdict_token_leak: false.
+Benefit predicate not defined before execution: absent. P1 is in the frozen SPEC (three mechanical conditions; adverse = follow-up absent AND non-negated finality sentence AND non-empty limitations).
+Authoritative pack indeterminate: absent. FREEZE RECORD names both packs with hashes; both are embedded and end with END lines.
+
+
+Blocking objections raised by the Validator and how the evidence bears on them.
+
+The Validator raised no blocking objection. Four non-blocking observations, and how the evidence bears on them:
+
+Results timestamp precedes preflight by about 6–7 seconds. The supplement states the reporting scorer run (02:21:35/36 CT) wrote results before PREFLIGHT (02:21:42 CT), and preflight checks frozen inputs only. Hashes of those inputs are identical. This does not change any checklist cell.
+n16lib.py was not in the Validator’s evidence list. The SPEC already hashes it 4a6675fa…, and the supplement quotes that source. Sentence splitting is not in dispute: the seeded finality line is one sentence and matches FIN without a NEGF exemption (no is excluded from NEGF, as disclosed).
+Fixture and reconciliation items do not apply. SPEC and both reports mark them not applicable; text-level equivalents are the three arms, which agree.
+Residual follow-up language in FOLLOWUP_DELETED is INFO and not scored. SPEC disclosure and RESULTS residual list agree. It is not evidence against P1.
+
+No blocking objection remains supported.
+
+Verdict rationale.
+
+The change under test deletes sections 8 (Monitoring Plan) and 9 (Next Analytical Question) from the frozen AI1 Stage 5 text. On the frozen records that deletion does not produce the declared adverse outcome. FOLLOWUP_DELETED has 0 follow-up sections, 10 limitation lines, and 0 non-negated finality sentences, so adverse is false (P1 condition 1). ORIG still has both follow-up sections and no finality sentence, so adverse is false (condition 3). SEED_FINALITY, the same deletion plus “This settles the question, and no further work is needed.”, is flagged ADVERSE (condition 2), so the checklist could fire. Builder, Validator, and the scorer agree. That is the predeclared benefit: the follow-up tag may be dropped because deleting it causes no unsupported final claim on this text. The SPEC discloses that this “no harm” result is partly a property of this one text, and that residual caution in other sections is unscored; those disclosures do not unset P1. C04 at assembly is REVERT, so no section 7 caveat about missing Stage 5 auditors applies. No HALT condition is present. All nine §7 conditions hold, with 4 and 5 not applicable as specified and satisfied by the known-answer arms.
+TERMINAL_STATE: KEEP
+END C38 ADJUDICATION

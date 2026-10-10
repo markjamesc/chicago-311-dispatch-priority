@@ -1,0 +1,10 @@
+mutant,rule_removed,exit,rb_fixtures,rb_fixtures_failed,recon_n_rb,recon_only_ra,recon_only_rb,recon_disagree,prod_rows_changed_vs_clean_RB,detected_baseline_regime,detected_ablated_regime
+M01,"kappa rule uses peer p50 instead of p75 (F01-F03,F10,F11)",0,12/14,F03;F10,222002,0,0,16973,16973,TRUE,TRUE
+M02,I01 Open+CLOSED_DATE contradiction deleted (F04),0,13/14,F04,222002,0,0,0,0,TRUE,FALSE
+M03,I02 mod<created sub-clause deleted (F05),0,14/14,,222002,0,0,0,0,FALSE,FALSE
+M04,I04 thin peer_n<n_min deleted (F06),0,13/14,F06,222002,0,0,6377,6377,TRUE,TRUE
+M05,DUPLICATE exclusion deleted (F07),0,13/14,F07,245014,0,23012,0,23012,TRUE,TRUE
+M06,LEGACY_RECORD exclusion deleted (F08),0,13/14,F08,222176,0,174,0,174,TRUE,TRUE
+M07,I05 PARENT_SR_NUMBER clause deleted (F09),0,13/14,F09,222002,0,0,0,0,TRUE,FALSE
+M08,not-Open exclusion deleted (F12),0,13/14,F12,222002,0,0,0,0,TRUE,FALSE
+M09,I02 unparseable/missing CREATED sub-clause deleted (F13),0,14/14,,222002,0,0,0,0,FALSE,FALSE

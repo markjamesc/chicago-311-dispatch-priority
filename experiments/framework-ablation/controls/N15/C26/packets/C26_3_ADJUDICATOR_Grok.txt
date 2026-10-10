@@ -1,0 +1,656 @@
+# C26 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Frozen Source Package (catalog #26) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C26 ADJUDICATION
+
+---
+# COORDINATOR NOTES (added 2026-10-03 after the run, before any Grok chat; nothing in the spec, predicate or numbers changed)
+- N1 (open finding): in clean arm B, R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the two paths; this is not confirmed. The finding is latent in the frozen pack, which is not changed. Consequence: any regime that gates on full-field recon (dormant_h/open_age_h, |d| > 1e-6) raises an alarm on the clean pair. The H2 line of the RESULTS shows these baseline mismatches ("B full-field recon mismatches: dormant_h 1, open_age_h 2").
+
+---
+# SPEC
+# C26 — Ablation specification (FROZEN)
+
+**Ablation ID:** C26 (owner Remaining Ablation Program, catalog #26 "Frozen Source Package")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (source identity of the two execution paths)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Both R-A and R-B must use the identical verified source. Before either path runs, the SHA-256 of `src_open_candidates.csv` and `src_peer_stats.csv` is checked against the frozen record.
+
+## Exact change being tested (ablation)
+There is no source checksum check. R-B may read a source copy that differs from R-A's. R-B is trusted if it exits 0, its fixtures pass, and exact recon against R-A (key set + classification, the frozen recon) is clean.
+**Caught without the control (D_abl):** crash, recon key/label mismatch (n_only_ra + n_only_rb + n_disagree > 0), or a fixture failure on any path.
+**Caught with the control:** the above, or any source-file SHA-256 that differs from the frozen source.
+
+## Seeded divergences (frozen before execution; R-B reads the variant, R-A reads the frozen source)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **S_STALE24** (paths run: RB): R-B reads a stale snapshot: rows with created_ts >= 2026-09-11 23:59:59 removed.
+  - source variant `V_STALE24/src_open_candidates.csv` SHA-256 `8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58`, 118267409 bytes
+  - source variant `V_STALE24/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+- **S_PEER10** (paths run: RB): R-B reads peer stats with peer_p75_h of the most frequent open type_key x1.10.
+  - source variant `V_PEER10/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, 118671837 bytes (unchanged, equals the frozen file)
+  - source variant `V_PEER10/src_peer_stats.csv` SHA-256 `573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8`, 16276 bytes
+  - variant note: type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+- **S_ONEROW** (paths run: RB): R-B source: one in-set row's mod_ts/LAST_MODIFIED_DATE moved 30 days earlier.
+  - source variant `V_ONEROW/src_open_candidates.csv` SHA-256 `64b660283b781bc9c6057220df5b09be53a9bd330e6761573cc48a3a000b93df`, 118671837 bytes
+  - source variant `V_ONEROW/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: SR_NUMBER SR18-00191995: mod_ts 2020-02-13 17:43:49.000000 -> 2020-01-14 17:43:49.000000; LAST_MODIFIED_DATE 02/13/2020 05:43:49 PM -> 01/14/2020 05:43:49 PM
+- **S_LF** (paths run: RB): R-B source re-saved with LF line endings (bytes differ, content identical).
+  - source variant `V_LF/src_open_candidates.csv` SHA-256 `37f6de07df7324c790150986bc397348086b10619a3ce12d1e81bbdbcf13c7d0`, 118426643 bytes
+  - source variant `V_LF/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: line endings CRLF -> LF; content identical
+- **S_REVERSE** (paths run: RB): R-B source with data rows in reverse order (bytes differ, same rows).
+  - source variant `V_REVERSE/src_open_candidates.csv` SHA-256 `a441b14eb120c50c64df4cd92dc4769c6cd799012689fbe478d8b649e6dce558`, 118671837 bytes
+  - source variant `V_REVERSE/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: data rows reversed; same row set
+- **S_BOOLCASE** (paths run: RB): R-B source with DUPLICATE/LEGACY_RECORD true/false written as TRUE/FALSE.
+  - source variant `V_BOOLCASE/src_open_candidates.csv` SHA-256 `cf4ed65fe419eef300251e2fed955d246d839c8982de6d7a5858c5979bca041d`, 118671837 bytes
+  - source variant `V_BOOLCASE/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: DUPLICATE and LEGACY_RECORD values upper-cased (true/false -> TRUE/FALSE)
+## Operational benefit predicate P1
+Owner threshold: "Pass: Two sources were identical by default. Fail: Divergence detected when differing (keep rule)."
+Definitions:
+- **H:** harm set (above).
+- **D_abl:** seeded arms caught without the control (definition above).
+Outcomes:
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. Byte-only variants (S_LF, S_REVERSE) show whether the checksum control raises alarms on content-identical copies.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C26_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C26 RESULTS — Frozen Source Package (catalog #26) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 6/6
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {S_STALE24,S_PEER10,S_ONEROW}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path (no source checksum check)]: {S_STALE24,S_PEER10}
+- H6 H minus caught-without-control: {S_ONEROW}
+- H7 arms with no locked-field change: {S_LF,S_REVERSE,S_BOOLCASE}
+- H8 caught with the control [crash, source-file SHA-256 differs from the frozen source, recon key/label mismatch, or fixture failure on any path]: {S_STALE24,S_PEER10,S_ONEROW,S_LF,S_REVERSE,S_BOOLCASE}
+- H9 caught with the control but no locked-field change: {S_LF,S_REVERSE,S_BOOLCASE}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| S_STALE24 | RB | R-B reads a stale snapshot: rows with created_ts >= 2026-09-11 23:59:59 removed | RB=0 | 14/14 | 14/14 | 773 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | 773 | 773 | TRUE | data\source\src_open_candidates.csv | TRUE | TRUE |
+| S_PEER10 | RB | R-B reads peer stats with peer_p75_h of the most frequent open type_key x1.10 | RB=0 | 14/14 | 14/14 | 0 | 0 | 269 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | 269 | 269 | TRUE | data\source\src_peer_stats.csv | TRUE | TRUE |
+| S_ONEROW | RB | R-B source: one in-set row's mod_ts/LAST_MODIFIED_DATE moved 30 days earlier | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 2 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=1 open_age=0 | 1 | 0 | TRUE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| S_LF | RB | R-B source re-saved with LF line endings (bytes differ, content identical) | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| S_REVERSE | RB | R-B source with data rows in reverse order (bytes differ, same rows) | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| S_BOOLCASE | RB | R-B source with DUPLICATE/LEGACY_RECORD true/false written as TRUE/FALSE | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | data\source\src_open_candidates.csv | TRUE | FALSE |
+
+
+---
+# C26_EVIDENCE.sha256
+1b9a4276f4fd9a57e61a31e0d4eaa67c7d6ba79933dd1a9b561c9207de818cce  C26_ARM_MANIFESTS.txt
+021281d87bad7e203316e3856bb97e72badfe71bb6f61988cbb1a4e1fa3802b8  C26_arms.csv
+50b891574fe6c48f6a12df96587af7b47a7be0dd80afcec94014d0a378c6fd82  C26_RESULTS.md
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C26",
+  "frozen_at_ct": "2026-10-03 05:33:46 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C26/C26-builder/builder_report.md", "bytes": 18500, "sha256": "9cc758256e5654760b318da4242c88b703c898a6892207644f3d84b679c128ce", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C26/C26-validator/validator_report.md", "bytes": 7706, "sha256": "1703313644f81699ff65a0c8d84017708ed2a334159033fcd838515295acdcae", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "24990425f4afb1c8321fb23e832de91e8a94914784751ce2a62363e83864783a"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as the Builder** for this independent first pass, blind to the Validator, and that I am not issuing an adjudicative terminal state. The ablation is **C26 — Frozen Source Package**, catalog #26, N15 batch 1 of 3. The packet assigns Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok, with Stage 4 source identity as the target.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+The frozen frameworks are:
+
+| Artifact | Frozen SHA-256 |
+| --- | --- |
+| `three-ai-measurement-design-framework.md` | `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c` |
+| `three-ai-validation-and-analysis-framework.md` | `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e` |
+
+The frozen source package contains `src_open_candidates.csv` with **245,193 rows** and frozen SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, plus `src_peer_stats.csv` with frozen SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.  [source: C26_1_BUILDER_ChatGPT]
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The frozen control requires both R-A and R-B to use the **identical verified source package**. Before either execution path runs, the SHA-256 of both source files is checked against the frozen record. C26 removes that source-checksum gate. Under the ablated regime, R-B can therefore read source bytes different from R-A's source and can still pass the frozen downstream regime if the run exits successfully, fixtures pass, and the frozen key/classification reconciliation is clean.  [source: C26_1_BUILDER_ChatGPT]
+
+The **exact seeded code diff is empty**. `SEED DIFFS` states: **“(no code seeds; source variants only)”**. Thus C26 is not testing altered R logic; it is testing whether downstream execution, fixtures, and frozen reconciliation make the source-file identity check redundant.  [source: C26_1_BUILDER_ChatGPT]
+
+The exact source mutations are:
+
+| Arm | Exact seeded source change |
+| --- | --- |
+| `S_STALE24` | R-B's `src_open_candidates.csv` removes rows with `created_ts >= 2026-09-11 23:59:59`; **848 rows** removed. Variant SHA-256 `8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58`. `src_peer_stats.csv` remains frozen-hash-identical. |
+| `S_PEER10` | `src_peer_stats.csv`: WCA2 `peer_p75_h` changes **2250 → 2475**, affecting a type with **72,732 in-set rows**. Variant peer hash `573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8`; open-candidate source remains frozen-hash-identical. |
+| `S_ONEROW` | For `SR18-00191995`, `mod_ts` changes from `2020-02-13 17:43:49` to `2020-01-14 17:43:49`, with the corresponding `LAST_MODIFIED_DATE` moved 30 days earlier. Open-candidate variant hash `64b660283b781bc9c6057220df5b09be53a9bd330e6761573cc48a3a000b93df`. |
+| `S_LF` | `src_open_candidates.csv` is re-saved from CRLF to LF. Data content is stated to be identical, but byte hash changes to `37f6de07df7324c790150986bc397348086b10619a3ce12d1e81bbdbcf13c7d0`. |
+| `S_REVERSE` | Same open-candidate rows, but data rows are reversed. Hash becomes `a441b14eb120c50c64df4cd92dc4769c6cd799012689fbe478d8b649e6dce558`. |
+| `S_BOOLCASE` | `DUPLICATE` and `LEGACY_RECORD` textual values change from `true/false` to `TRUE/FALSE`. Hash becomes `cf4ed65fe419eef300251e2fed955d246d839c8982de6d7a5858c5979bca041d`. |
+
+These transformations and hashes were frozen before execution and re-verified immediately before the arms ran.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+## 3. Hard mechanical facts table.
+
+Notation: **R = independently recomputed from the supplied evidence rows/hashes; Q = quoted because the underlying artifact needed to recompute the value itself is not present in the packet.**
+
+| Hard mechanical fact | Result | Status |
+| --- | --- | --- |
+| Number of seeded arms in `C26_arms.csv` | **6** | R |
+| Seeded arms with an execution record | **6/6** | R |
+| Seeded RB executions with exit code 0 | **6/6** | R |
+| Baseline executions with exit code 0 | RA **0**, RB **0** | Q |
+| Raw baseline fixture rows | **28** = 14 RA + 14 RB | R |
+| Raw seeded fixture rows | **84** = 6 × 14 RB | R |
+| Total raw executed fixture rows | **112** | R |
+| Total raw fixture passes | **112/112** | R |
+| B RA fixtures | **14/14** | R |
+| B RB fixtures | **14/14** | R |
+| Each seeded RB fixture suite | **14/14**, 6/6 arms | R |
+| B RA vs frozen RA: key/label/dormant/open-age differences | **0/0/0/0** | Q |
+| B RB vs frozen RB: key/label/dormant/open-age differences | **0/0/0/0** | Q |
+| B `n_ra` | **222,002** | Q |
+| B `n_rb` | **222,002** | Q |
+| B `n_inner` | **222,002** | Q |
+| B `n_disagree` | **0** | Q |
+| B `n_agree = n_inner − n_disagree` | **222,002** | R |
+| B identity `n_agree + n_disagree = n_inner` | **222,002 + 0 = 222,002** | R |
+| B `n_only_ra / n_only_rb / n_disagree` | **0/0/0** | Q |
+| B RA↔RB dormant mismatch | **1** | Q |
+| B RA↔RB open-age mismatch | **2** | Q |
+| `S_STALE24` derived RB row count | **221,229 = 222,002 − 773** | R |
+| `S_STALE24` derived `n_inner` | **221,229** | R |
+| `S_STALE24` `n_agree + n_disagree = n_inner` | **221,229 + 0 = 221,229** | R |
+| `S_STALE24` source rows removed | **848** | Q |
+| `S_STALE24` removed source rows not represented as lost output keys | **75 = 848 − 773** | R |
+| `S_STALE24` locked-field changes vs B | **773** | R |
+| `S_STALE24` decision changes vs B | **773** | R |
+| `S_PEER10` derived `n_inner` | **222,002** | R |
+| `S_PEER10` classification agreements | **221,733 = 222,002 − 269** | R |
+| `S_PEER10` identity | **221,733 + 269 = 222,002** | R |
+| `S_PEER10` locked-field changes vs B | **269** | R |
+| `S_PEER10` decision changes vs B | **269** | R |
+| `S_ONEROW` derived `n_inner` | **222,002** | R |
+| `S_ONEROW` identity | **222,002 + 0 = 222,002** | R |
+| `S_ONEROW` locked-field changes vs B | **1** | R |
+| `S_ONEROW` decision changes vs B | **0** | R |
+| `S_LF` locked-field / decision changes | **0 / 0** | R |
+| `S_REVERSE` locked-field / decision changes | **0 / 0** | R |
+| `S_BOOLCASE` locked-field / decision changes | **0 / 0** | R |
+| Sum of locked-field changes across seeded arms | **1,043 = 773 + 269 + 1** | R |
+| Sum of decision changes across seeded arms | **1,042 = 773 + 269** | R |
+| Locked-field changes not accompanied by a decision change | **1** | R |
+| Harm set `H` | **{S_STALE24, S_PEER10, S_ONEROW}**, size **3** | R |
+| `D_abl`, caught without checksum control | **{S_STALE24, S_PEER10}**, size **2** | R |
+| `H ∩ D_abl` | **{S_STALE24, S_PEER10}**, size **2** | R |
+| `D_abl \ H` | **∅**, size **0** | R |
+| `H \ D_abl` | **{S_ONEROW}**, size **1** | R |
+| Caught with checksum control | all **6/6** seeded arms | R |
+| Harmful arms caught with checksum control | **3/3** | R |
+| Non-harm arms caught with checksum control | **3/3** | R |
+| Total detection-count delta, with vs without checksum | **+4 arms = 6 − 2** | R |
+| Harmful-arm detection delta, with vs without checksum | **+1 arm = 3 − 2** | R |
+| Additional no-locked-change catches due to checksum | **3 arms** | R |
+| Seed arms whose `src_open_candidates.csv` hash equals B | **1/6** (`S_PEER10`) | R |
+| Seed arms whose `src_peer_stats.csv` hash equals B | **5/6** (all except `S_PEER10`) | R |
+| Seed arms with exactly one of the two principal source hashes changed | **6/6** | R |
+| Seed arms with lineage hash equal to B | **6/6** | R |
+| Listed R-B code-hash comparisons equal to B | **18/18** = 6 arms × 3 listed code files | R |
+| Seed RB fixture-result output hashes equal to B fixture-result hash | **6/6** | R |
+| Seed RB classification output hashes equal byte-for-byte to B | **2/6** (`S_LF`, `S_BOOLCASE`) | R |
+| Seed arms with no locked-field change | **3/6** (`S_LF`, `S_REVERSE`, `S_BOOLCASE`) | R |
+| No-change arm with a classification CSV byte hash different from B | **1/3** (`S_REVERSE`) | R |
+
+The raw arm rows independently reproduce the reported set structure: `S_STALE24` has **773** RA-only keys; `S_PEER10` has **269** classification disagreements; `S_ONEROW` has neither key nor classification disagreement but changes one RB dormant value relative to B; the remaining three arms have zero locked-field changes.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+The baseline counts independently satisfy the requested identity. From `n_inner=222002` and `n_disagree=0`, `n_agree=222002`; therefore `222002 + 0 = 222002`. For `S_PEER10`, the same reconstruction gives `221733 + 269 = 222002`; for `S_STALE24`, `221229 + 0 = 221229`.  [source: C26_1_BUILDER_ChatGPT]
+
+The hash comparisons are also mechanically informative. All six seeded R-B fixture-result files have exactly the B fixture-result hash `0d72245...`; `S_LF` and `S_BOOLCASE` also reproduce the exact B R-B classification-file hash `a0e42b...`. `S_REVERSE`, despite zero locked-field changes, has a different classification-file byte hash, consistent with the changed output ordering being byte-visible while the locked values remain equivalent.  [source: C26_1_BUILDER_ChatGPT]
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen predicate is explicit:
+
+**P1 is satisfied iff `H ⊆ D_abl`.**
+
+The independently reconstructed sets are:
+
+`H = {S_STALE24, S_PEER10, S_ONEROW}`
+
+`D_abl = {S_STALE24, S_PEER10}`
+
+Therefore:
+
+`H \ D_abl = {S_ONEROW}`
+
+and hence:
+
+`H ⊆ D_abl = FALSE`.
+
+Under the SPEC's frozen definition, **P1 is not satisfied**. The specific counterexample is `S_ONEROW`: it changes a locked field (`dormant_h`) relative to arm B but has exit 0, fixtures 14/14, zero key-set discrepancy, and zero classification disagreement, so it passes the defined no-check detection regime. The checksum-enabled regime catches it because its `src_open_candidates.csv` SHA-256 differs from the frozen source.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+The three no-harm variants do not enter the P1 inclusion test. `S_LF`, `S_REVERSE`, and `S_BOOLCASE` have zero locked-field changes, although the checksum control detects all three because their source bytes differ from the frozen package. This is exactly the separate byte-identity behavior the frozen SPEC says those variants are intended to expose.  [source: C26_1_BUILDER_ChatGPT]
+
+## 5. Fixture and reconciliation implications.
+
+The fixture suite supplies **no detection of any of the six source variants** in this experiment. Every executed seeded R-B path passes F01–F14, and all six seeded fixture-result output files are byte-identical to the baseline R-B fixture-result file. This includes all three harmed arms. Therefore, within this frozen test design, fixture success does not establish source identity and does not establish absence of locked-field divergence.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+The frozen key/classification reconciliation does catch two materially divergent source variants. `S_STALE24` produces **773 RA-only keys**, so the key-set reconciliation detects it. `S_PEER10` preserves the key set but produces **269 classification disagreements**, so classification reconciliation detects it.  [source: C26_1_BUILDER_ChatGPT]
+
+`S_ONEROW` exposes the narrower coverage of that reconciliation. Its RB output differs from B on **one `dormant_h` value**, but there are **0 RA-only keys, 0 RB-only keys, and 0 classification disagreements**. Its RA↔RB dormant mismatch count is **2**, compared with baseline B's **1**, but the frozen `D_abl` definition does not treat dormant/open-age numeric reconciliation mismatches as a catch; it is defined using crash, key/label mismatch, or fixture failure. Thus the extra numeric divergence is observable in the supplied full-field diagnostics but does not enter the frozen no-check catch set.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+Arm B itself is mechanically stable against its frozen path-specific outputs: both B paths reproduce their corresponding frozen classifications with zero key, label, dormant, or open-age differences. At the same time, B's RA-vs-RB comparison contains one dormant and two open-age numeric mismatches. Those two facts are compatible: each current B path reproduces its own frozen reference, while the two independently implemented paths are not byte/numeric-identical on every full-field value. The frozen required B reconciliation gate is the reported **0/0/0 key/key/classification result**.  [source: C26_1_BUILDER_ChatGPT]
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The primary semantic risk demonstrated by the ablation is **silent locked-field drift beneath successful execution, green fixtures, and clean key/classification reconciliation**. `S_ONEROW` is the concrete case: one source timestamp is moved 30 days earlier; the resulting RB classification file changes in a locked `dormant_h` field; the decision classification does not change; all fixtures remain green; and the frozen key/label reconciliation remains clean. Without source identity verification, those frozen downstream checks do not expose that source divergence.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+A second, opposite operational characteristic is that SHA-256 source identity is deliberately **stricter than semantic-output identity**. `S_LF`, `S_REVERSE`, and `S_BOOLCASE` have no locked-field changes, yet all are detected by the source check. `S_LF` changes only line endings; `S_REVERSE` preserves the same row set in a different order; `S_BOOLCASE` changes textual Boolean capitalization that the pipeline evidently normalizes without altering locked outputs. Thus a frozen byte-hash contract detects source-package reserialization and representational changes even when the specified analytical locked fields are invariant.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+`S_REVERSE` further shows why output-file SHA equality and locked-field semantic equality must not be conflated. Its locked-field delta is zero, but its R-B classification output hash differs from B. The altered row order is therefore visible at the file-byte level even though the locked comparison is unchanged. By contrast, `S_LF` and `S_BOOLCASE` reproduce the exact baseline R-B classification-output hash.  [source: C26_1_BUILDER_ChatGPT]
+
+The unchanged surfaces supported by the evidence are substantial. There are no seeded code changes; all six seeded arms preserve the listed R-B hashes for `00_config.R`, `20_integrity_and_classify.R`, and `run_RB.R`; all six preserve the source-lineage hash; all six seeded executions exit 0; every executed fixture passes; and arm B reproduces both frozen path-specific classification packs. The preflight additionally reports the frozen source/code checks and read-only COUNT preflight as passing before execution.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT]
+
+Accordingly, the observed C26 differences are isolated to the deliberately substituted source variants and their consequences. The evidence does not show a concurrent seeded implementation/code change.
+
+## 7. Claim → evidence map.
+
+| Claim | Frozen evidence location |
+| --- | --- |
+| C26 removes the pre-run source SHA-256 identity check and otherwise relies on exit, fixtures, and frozen reconciliation. | **SPEC → “Control under test” / “Exact change being tested”**, lines 34–40.  [source: C26_1_BUILDER_ChatGPT] |
+| There are no seeded code changes. | **SEED DIFFS**, row `(no code seeds; source variants only)`, lines 552–553.  [source: C26_1_BUILDER_ChatGPT] |
+| All six seeded runs were recorded and exited 0. | **RUN LOG**, rows `S_STALE24` through `S_BOOLCASE`, lines 305–314; **C26_RESULTS H3**, line 326.  [source: C26_1_BUILDER_ChatGPT] |
+| Arm B reproduces each frozen path-specific output with zero locked-field differences and has key/key/classification recon 0/0/0. | **C26_RESULTS H2** and **Arm B repro / Arm B recon** rows, lines 323–343.  [source: C26_1_BUILDER_ChatGPT] |
+| Harm set is `{S_STALE24,S_PEER10,S_ONEROW}`. | **C26_RESULTS H4**, line 327; **Seeded arms** rows `S_STALE24`, `S_PEER10`, `S_ONEROW`, lines 348–350.  [source: C26_1_BUILDER_ChatGPT] |
+| No-check catch set is `{S_STALE24,S_PEER10}`. | **C26_RESULTS H5**, line 328; **C26_arms.csv** rows `S_STALE24` and `S_PEER10`, lines 359–360.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT] |
+| `S_ONEROW` is the single member of `H \ D_abl`. | **C26_RESULTS H6**, line 329; **C26_arms.csv** row `S_ONEROW`, line 361.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT] |
+| `S_ONEROW` changes one locked field but zero decisions and is not caught without the checksum control. | **Seeded arms** row `S_ONEROW`, line 350; raw **C26_arms.csv** row, line 361.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT] |
+| `S_LF`, `S_REVERSE`, and `S_BOOLCASE` have zero locked-field changes. | **C26_RESULTS H7** and seeded-arm rows, lines 330–353.  [source: C26_1_BUILDER_ChatGPT] |
+| The checksum-enabled regime detects all six seeded source variants, including the three with no locked-field changes. | **C26_RESULTS H8–H9**, lines 331–332; seeded-arm `caught_with_control` column, lines 348–353.  [source: C26_1_BUILDER_ChatGPT] |
+| Every executed fixture passes. | **FIXTURE RESULTS**, B RA/RB and six seeded RB blocks, lines 367–480.  [source: C26_1_BUILDER_ChatGPT] |
+| Seeded fixture output hashes are identical to B's fixture-output hash. | **ARM MANIFESTS**, B fixture hash and seeded fixture hashes, lines 498–549.  [source: C26_1_BUILDER_ChatGPT] |
+| All listed seeded R-B code hashes remain equal to B. | **ARM MANIFESTS**, `00_config.R`, `20_integrity_and_classify.R`, `run_RB.R` rows for B and each seeded arm, lines 491–549.  [source: C26_1_BUILDER_ChatGPT] |
+| Formal P1 condition is `H ⊆ D_abl`; arms with no locked-field change are excluded from the predicate. | **SPEC → Operational benefit predicate P1**, lines 71–79.  [source: C26_1_BUILDER_ChatGPT] |
+| The reconstructed sets make `H ⊆ D_abl` false because `S_ONEROW ∈ H \ D_abl`. | Derived from **C26_RESULTS H4–H6** and raw **C26_arms.csv** rows.  [source: C26_1_BUILDER_ChatGPT]  [source: C26_1_BUILDER_ChatGPT] |
+
+END C26 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. **Role attestation and ablation ID**  
+   I am the Validator (DeepSeek), operating blind to the Builder. I have not seen, requested, or used the Builder’s output. Ablation ID: **C26** — “Frozen Source Package”, N15 batch 1 of 3. I am not returning a terminal state.
+2. **Independent test plan: what I checked, and how**
+
+- Read the frozen SPEC, constitution, preflight, run log, `C26_RESULTS.md`, `C26_arms.csv`, fixture rows, evidence hashes, and arm manifests.
+- Recomputed identity relations in the recon tables: `n_inner = n_ra - n_only_ra = n_rb - n_only_rb`.
+- Recomputed the harm set `H`, the caught-without-control set `D_abl`, `H \ D_abl`, caught-with-control set, and no-locked-field-change set.
+- Checked source-variant SHA-256 values against the frozen source hashes and the variant table.
+- Checked cross-arm hash equalities in the manifests for code, source inputs, and output files.
+- Counted fixture rows and pass/fail values across paths and seeded arms.
+- Checked internal consistency of the runner’s stated mechanical facts against the raw `C26_arms.csv` and manifest tables.
+
+3. **Independently recomputed hard facts**
+
+**Arm B recon identity**
+
+| quantity | value | recomputation |
+| --- | --- | --- |
+| `n_ra` | 222002 | given |
+| `n_rb` | 222002 | given |
+| `n_inner` | 222002 | `222002 - 0 = 222002`; `222002 - 0 = 222002` |
+| `n_only_ra` | 0 | given |
+| `n_only_rb` | 0 | given |
+| `n_disagree` | 0 | given |
+| key/label recon sum | 0 | `0 + 0 + 0 = 0` |
+| `n_dormant_mismatch` | 1 | given |
+| `n_open_age_mismatch` | 2 | given |
+
+**Seeded-arm recon and locked-field facts**
+
+| arm | `only_ra` | `only_rb` | `disagree` | key/label sum | locked changes vs B | decision changes vs B | harm | caught without control | caught with control |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| S_STALE24 | 773 | 0 | 0 | 773 | 773 | 773 | TRUE | TRUE | TRUE |
+| S_PEER10 | 0 | 0 | 269 | 269 | 269 | 269 | TRUE | TRUE | TRUE |
+| S_ONEROW | 0 | 0 | 0 | 0 | 1 | 0 | TRUE | FALSE | TRUE |
+| S_LF | 0 | 0 | 0 | 0 | 0 | 0 | FALSE | FALSE | TRUE |
+| S_REVERSE | 0 | 0 | 0 | 0 | 0 | 0 | FALSE | FALSE | TRUE |
+| S_BOOLCASE | 0 | 0 | 0 | 0 | 0 | 0 | FALSE | FALSE | TRUE |
+
+Recomputed `S_STALE24` RB key count: `RB_vs_B only_B=773`, so `n_rb = 222002 - 773 = 221229`. Its recon identity is `n_inner = 222002 - 773 = 221229`, and `n_rb = 221229 + 0 = 221229`.
+
+**D-sets**
+
+- `H = {S_STALE24, S_PEER10, S_ONEROW}`
+- `D_abl = {S_STALE24, S_PEER10}`
+- `H \ D_abl = {S_ONEROW}`
+- No locked-field change: `{S_LF, S_REVERSE, S_BOOLCASE}`
+- Caught with control: `{S_STALE24, S_PEER10, S_ONEROW, S_LF, S_REVERSE, S_BOOLCASE}`
+- Caught with control but no locked-field change: `{S_LF, S_REVERSE, S_BOOLCASE}`
+
+**Cross-arm hash equalities from manifests**
+
+- `B RB_classifications.csv` = `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193` = `S_LF`, `S_REVERSE`, `S_BOOLCASE` RB classifications.
+- `B RB_fixture_results.csv` = `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9` = all seeded RB fixture results.
+- Seeded code hashes equal B code hashes: `00_config.R` `6c9b0e...`, `20_integrity_and_classify.R` `72ac5d...`, `run_RB.R` `6786fc...`.
+- Differing RB classification hashes: `S_ONEROW` `43af16...`, `S_PEER10` `0bd73e...`, `S_STALE24` `088b4d...` with bytes `41819931` versus B RB `41963733`.
+- Source variant hashes match the preflight variant table: `S_STALE24` open `8268fb...`; `S_PEER10` peer `573b41...`; `S_ONEROW` open `64b660...`; `S_LF` open `37f6de...`; `S_REVERSE` open `a441b1...`; `S_BOOLCASE` open `cf4ed6...`. Unchanged files equal frozen `ba089f...` or `cb78ae...`.
+
+**Fixture count and pass/fail**
+
+- B RA: 14 rows, all `pass=TRUE`.
+- B RB: 14 rows, all `pass=TRUE`.
+- Each seeded RB: 14 rows, all `pass=TRUE`.
+- No fixture failure appears in the raw fixture rows.
+
+**Internal inconsistency flags**
+
+- `H2` states “B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2.” This is consistent only if “recon” means key/label recon. The SPEC defines exact recon as key set + classification, so the dormant/open_age values are full-field mismatches, not the frozen recon. This is a terminology ambiguity in the runner output, not a numerical contradiction.
+- In the source-variant preflight, the `V_STALE24 src_peer_stats.csv` line repeats “rows dropped: 848” even though peer stats is unchanged. This is a note misapplied to the peer-stats line.
+- No other numerical inconsistency was found between `C26_RESULTS.md`, `C26_arms.csv`, the run log, and the manifests.
+
+4. **Facts that cannot be recomputed from this packet**
+
+- The actual byte-level contents and row-level differences behind the 773 `S_STALE24` key losses, the 269 `S_PEER10` label disagreements, and the single `S_ONEROW` dormant change.
+- Frozen RA/RB row-level classifications; only aggregate comparisons are present.
+- Full stdout/stderr for each R run beyond exit codes and fixture rows.
+- Full contents of `runner/SEEDS_b1.sha256`, `runner/SEED_DIFFS_b1.txt`, `runner/source_variants.R`, and `seeds/C26/ARMS.tsv`.
+- Full arm-manifest list; only key files are shown.
+- Independent hashes of the evidence files themselves; only the provided `C26_EVIDENCE.sha256` values are available.
+- MySQL preflight details beyond the reported counts `245193 / 104`.
+
+5. **P1 assessment against the frozen predicate in the SPEC**  
+   Facts only:
+
+- Frozen `H = {S_STALE24, S_PEER10, S_ONEROW}`.
+- Frozen `D_abl` definition: crash, recon key/label mismatch where `n_only_ra + n_only_rb + n_disagree > 0`, or fixture failure on any path.
+- From the evidence, `D_abl = {S_STALE24, S_PEER10}`.
+- `H \ D_abl = {S_ONEROW}`.
+- `S_ONEROW` has RB exit `0`, fixtures `14/14`, recon key/label `0/0/0`, but `RB_vs_B dormant=1` and `locked_field_changes_vs_B=1`. It is not caught without the control.
+- Therefore the condition `H ⊆ D_abl` is false because `S_ONEROW ∈ H` and `S_ONEROW ∉ D_abl`.
+- `S_LF`, `S_REVERSE`, and `S_BOOLCASE` have no locked-field change and are not in `H`; they are caught with the control only by source SHA-256 difference.
+
+6. **Blocking objections**  
+   None supported by the frozen evidence. The only ambiguity is the `H2` use of “recon” for key/label `0/0/0` while also reporting full-field dormant/open_age mismatches; the SPEC defines exact recon as key set + classification, so this is an output-labeling ambiguity rather than a hard mechanical conflict. No harness, seed, predicate-application, or evidence defect in this packet blocks a verdict.
+7. **Claim → evidence map**  
+   | claim | evidence |  
+   |---|---|  
+   | Arm B exits 0 on both paths | run log; `C26_RESULTS.md` H1 |  
+   | Arm B fixtures 14/14 on both paths | fixture rows for B RA and B RB; H1 |  
+   | Arm B reproduces frozen pack | `C26_RESULTS.md` H2; Arm B repro table |  
+   | B recon key/label is 0/0/0 | Arm B recon table; H2 |  
+   | B full-field recon has dormant 1, open_age 2 | Arm B recon table; H2 |  
+   | All six seeded arms recorded | run log; H3; `C26_arms.csv` |  
+   | Harm set H | H4; `C26_arms.csv` `harm` column |  
+   | Caught without control | H5; `C26_arms.csv` `caught_without_control` |  
+   | `H \ D_abl` | H6; recomputation from H4 and H5 |  
+   | No locked-field change arms | H7; `C26_arms.csv` `locked_field_changes_vs_B=0` |  
+   | Caught with control | H8; `C26_arms.csv` `caught_with_control` |  
+   | Caught with control but no locked-field change | H9; recomputation |  
+   | Source variant hashes | preflight variant lines; arm manifests |  
+   | Cross-arm output hash equalities | arm manifests |  
+   | Fixture rows all pass | fixture results per arm and path |
+
+END C26 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C26 ADJUDICATION'.

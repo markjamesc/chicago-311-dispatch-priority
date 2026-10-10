@@ -1,0 +1,38 @@
+{
+ "cid": "C09",
+ "role": "builder",
+ "source": "C09/C09-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 21978,
+ "source_sha256": "bcde89988167c5f1b3e0460f4915805c906a8cc7b5ee86e53c326e5faf487f26",
+ "output": "C09/C09-builder/builder_report.md",
+ "output_bytes": 21975,
+ "output_sha256": "efb16473f80b24595f3e185c778ff5097a66747a7b0861e86466008a296d769c",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 1,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 03:02:16\nreply_complete=2026-10-09 03:07:35"
+}

@@ -1,0 +1,8 @@
+# N15 re-adjudication (C26, C45) Grok capture freeze 2026-10-03 10:03:43 CDT (extractor extract_grok.py sha 0a48092352dbd3235ca2dd17adffc8f8d4cda27ab47d00eed31cb2486eba3aec); raw = turn 1 (full reply ending TERMINAL_STATE + END <CID> ADJUDICATION); on-screen verdicts C26 REVERT, C45 KEEP: both match
+a0e17a6dd87e512001be7424ab7a7a0760ec3af2f856ea41a2f765042901a160  C26/C26-adjudicator-reaj/adjudicator_grok.html
+756b25c9bd66cd2e129c2a407bbd607a4351040f21f40593364cba5dd56368cc  C26/C26-adjudicator-reaj/adjudicator_grok.md
+756b25c9bd66cd2e129c2a407bbd607a4351040f21f40593364cba5dd56368cc  C26/C26-adjudicator-reaj/adjudicator_raw.md
+eff24f44d3eaa7375694a4eaa1bc0b993da6932f877e91953bfbc0c6ec077b45  C45/C45-adjudicator-reaj/adjudicator_grok.html
+cc05d3e8cc77c7b5aa174fb090a7f93770f38e1101bfbb9a9cdb57a7eac9d87c  C45/C45-adjudicator-reaj/adjudicator_grok.md
+62b3d3f2785a4f8fc068275ae56cf782e3557e3713e55997bf3c375bb0b2f066  C45/C45-adjudicator-reaj/adjudicator_raw.md
+ffd0b9477a0ce3c0e72f585b6a1c0bb57f12da1291c1ed7a05e2d60710c2a271  ADJ_GROK_REAJ_EXTRACTION_LOG.jsonl

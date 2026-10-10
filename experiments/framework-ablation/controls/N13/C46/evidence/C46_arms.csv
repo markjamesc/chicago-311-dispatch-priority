@@ -1,0 +1,7 @@
+arm,regime,ra_order,rb_order,thresh,rb_drop,jerr_RA,jerr_RB,recon,events,max_abs_dp,fail_p,fail_p_pct1,fail_flag,extra_rebuilds
+BASE,baseline,natural,reversed,1e-7,-,0,0,FAIL,2,0.008446989841342178,0,17564,11,2
+DECL,declared,canonical,canonical,1e-12,-,0,0,PASS,0,0,0,0,0,0
+THRESH_ONLY,baseline,natural,reversed,1e-12,-,0,0,FAIL,1,9.44668978275498e-6,0,30,0,1
+ORDER_ONLY,baseline,canonical,canonical,1e-7,-,0,0,PASS,0,0,0,0,0,0
+DEFECT_DECL,declared,canonical,canonical,1e-12,x_log_peer_p75,0,0,FAIL,3,0.766791177978111,193060,111789,2070,3
+DEFECT_BASE,baseline,natural,reversed,1e-7,x_log_peer_p75,0,0,FAIL,3,0.7656221672416856,12890,111885,2082,3

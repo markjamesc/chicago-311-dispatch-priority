@@ -1,0 +1,482 @@
+# C33 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C33 VALIDATOR REPORT
+
+---
+# SPEC
+# C33 — Ablation specification (FROZEN)
+
+**Ablation ID:** C33 (owner Remaining Ablation Program, catalog #33 "Naive Clock Contract")
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58` (104 types).
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 03:32 CT)
+**Target stage:** Stage 4 (export clock contract)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Naive SQL export clocks (`created_ts`, `mod_ts`, `closed_ts`, `CREATED_DATE`, `LAST_MODIFIED_DATE`, `CLOSED_DATE`) must be read as character and parsed as America/Chicago wall time. No readr POSIXct shortcut, no `force_tz`.
+
+## Exact change being tested (ablation)
+Remove the contract. Each R path parses the naive clocks however its builder chose. Three arms run on identical frozen inputs:
+- **B (contract ON):** frozen R-A + frozen R-B. This is the truth reference and the reproduction check against the frozen pack.
+- **X1 (contract OFF on R-B):** frozen R-A + the historical pre-contract R-B parser. This is `10_io_parse.R` SHA-256 `8df344f5…0c4866` from `R-B_bundle.tgz`, the code that ran at 12:56 CT on 2026-09-19. It is genuine pre-contract code, not a synthetic seed.
+- **X2 (contract OFF on both):** R-A seeded with the same readr-POSIXct shortcut, plus the X1 R-B. Seed: `seeds/C33/X2_RA_run_RA.R` SHA-256 `65772bee…31f03`. Two edits are allowed: the clock col_types are reduced to `col_guess`, and the POSIXct branch of the parser keeps readr's instant. It tests a common-mode clock error.
+Seed diffs are in `runner/SEED_DIFFS.txt`.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, run on every R execution, on both paths.
+
+## Critical reconciliation fields (hard mechanical)
+SR_NUMBER key set; n_ra, n_rb, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree; row-level classification; portfolio ESCALATE/INCONCLUSIVE/STANDARD; plus `dormant_h` and `open_age_h` deltas against arm B.
+
+## Allowed source/data scope
+Frozen PC pack `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only and copied into the new work folder `...\ablation-runs\C27_C33`. No new MySQL extract (MySQL is used only for a read-only COUNT preflight). No rewrite of frozen labels.
+
+## Expected unchanged surfaces
+SQL extract and Source Gate; TCD-IG rules; κ; fixture expecteds; SR_NUMBER grain; the frozen Chicago 311 Stage 4 pack.
+
+## Operational benefit predicate P1 (owner doc #33 thresholds, operationalized)
+Owner doc thresholds: "Pass: No timezone misinterpretation occurred. Fail: Ambiguity in timing found (keep rule)."
+- **P1 satisfied:** In X1 and X2, every ablated path's labels equal arm B's labels for all SR_NUMBERs (0 label flips), and no row has |Δdormant_h| > 1e-6 h.
+- **P1 failed:** Any ablated path has ≥ 1 label flip or ≥ 1 row with a clock-derived shift.
+Detection by recon and by fixtures in X1/X2 is reported as supporting evidence. It is not the predicate.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack: label diffs ≠ 0 or only-rows ≠ 0 vs frozen RA/RB classifications, or recon n_disagree ≠ 0.
+- HALT if any run is missing or exits non-zero, or if Builder and Validator disagree on any hard number in `C33_RESULTS.md`.
+- Byte-hash equality of the outputs with the 2026-09-19 run is INFO only. R 4.6.1 vs the original 4.5.1 may change formatting; label-level equality is the gate.
+- RAW evidence present (runner logs, manifests, CSVs) → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass from the frozen packet: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   65772beeee4618f93e5bb49b1912ce6db82f8c1adcf59855030ca3c8552b9a6d seeds/C33/X2_RA_run_RA.R
+seed   OK   8df344f5480c0a8ab36e08e05830d6cddd5851143811e28c3c968de59f0c4866 seeds/C33/X_RB_10_io_parse.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUN LOG (this control)
+03:48:19 C33 arms
+03:48:36   B RA exit=0 secs=16.2
+03:49:04   B RB exit=0 secs=28.4
+03:49:29   X1 RB exit=0 secs=24.5
+03:49:45   X2 RA exit=0 secs=15.2
+
+---
+# C33_RESULTS.md (runner output)
+# C33 RESULTS — Naive Clock Contract ablation (runner output, mechanical facts only)
+
+Contract = naive SQL clocks read as character and parsed as America/Chicago wall time. Truth reference = arm B (contract ON).
+
+## Mechanical facts
+- H1 all four runs exit 0: TRUE
+- H2 contract arm B reproduces frozen labels (0 label diffs, 0 only-rows vs frozen RA/RB; recon 0 disagree): TRUE
+- H3 label flips vs contract arm: X1/X2 R-B=104; X2 R-A=104 (total 208)
+- H4 clock-field shift vs contract arm: R-B rows with |d dormant_h|>1e-6 = 222002 (max 6 h); R-A = 222002 (max 6 h)
+- H5 cross-path recon detects the ablated defect: X1 n_disagree=104; X2 n_disagree=0
+- H6 fixtures detect the ablated defect: B-RA 14/14; B-RB 14/14; X1-RB 14/14; X2-RA 14/14
+
+## Runs
+| arm | path | code | exit | secs | fixtures_pass | fixtures_failed |
+|---|---|---|---|---|---|---|
+| B | RA | frozen R-A | 0 | 16.2 | 14/14 |  |
+| B | RB | frozen R-B | 0 | 28.4 | 14/14 |  |
+| X1 | RB | R-B pre-contract parser (historical 12:56 CT 2026-09-19) | 0 | 24.5 | 14/14 |  |
+| X2 | RA | R-A seeded no-contract parser | 0 | 15.2 | 14/14 |  |
+
+## Reconciliation (frozen recon logic: full join on sr_number, compare classification)
+| pair | n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_agree | n_disagree |
+|---|---|---|---|---|---|---|---|
+| B: R-A(frozen) vs R-B(frozen) [contract ON both] | 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+| X1: R-A(frozen) vs R-B(pre-contract) [contract OFF on R-B] | 222002 | 222002 | 222002 | 0 | 0 | 221898 | 104 |
+| X2: R-A(seeded no-contract) vs R-B(pre-contract) [contract OFF both] | 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+
+## Ablated paths vs contract arm (and repro vs frozen pack)
+| cmp | n_x | n_truth | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | max_abs_d_dormant_h | max_abs_d_open_age_h |
+|---|---|---|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications (repro check) | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications (repro check) | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| X1/X2 R-B(pre-contract) vs B R-B(contract) | 222002 | 222002 | 0 | 0 | 104 | 222002 | 6 | 6 |
+| X2 R-A(no-contract) vs B R-A(contract) | 222002 | 222002 | 0 | 0 | 104 | 222002 | 6 | 6 |
+
+## Portfolio
+| run | n_decision | ESCALATE | INCONCLUSIVE | STANDARD |
+|---|---|---|---|---|
+| B R-A | 222002 | 131968 | 6377 | 83657 |
+| B R-B | 222002 | 131968 | 6377 | 83657 |
+| X1 R-B(pre-contract) | 222002 | 132072 | 6377 | 83553 |
+| X2 R-A(no-contract) | 222002 | 132072 | 6377 | 83553 |
+
+## Disagreeing label pairs (R-A label a vs R-B label b)
+| pair | a | b | n |
+|---|---|---|---|
+| X1 | STANDARD | ESCALATE | 104 |
+
+
+---
+# C33_EVIDENCE.sha256
+7254bf15d079ce3f4d92c53275e925346c3a17caa7c054378718635e55f58339  C33_ARM_MANIFESTS.txt
+377a1db7f420ed586353d8298d9593c45c6d66cbded542c7b0242ab70b174b78  C33_disagree_pairs.csv
+3050ef9b8db0a68d7abada5ede9c76210d7c0c39ec707c5583c41e0ab0a15a7f  C33_portfolio.csv
+0494a75646141c5454b573eafee037a9daced14383c322c0ed33784d518b6934  C33_recon.csv
+a550ad1f4cd77acbe9be5a72da092295bec290e9e647e003ea397a87aa52935a  C33_RESULTS.md
+6d0013307751d87059cba4be3fe2f103285d5fbabcaded79de1e487ed0bd6122  C33_runs.csv
+0eedf53dccbcf295a92e0461176d9fb360a19cc5ada7ba7ea88ee2fdb03086ea  C33_vs_contract.csv
+a79dcd2a95a708b360509946ce4db5b100c390d7b830c912e4bfeebf289f7f4c  C33_X1_RB_label_flips.csv
+
+---
+# ARM MANIFESTS (per-arm SHA-256, bytes, path) — key files only (full list in evidence)
+Note on manifests: MANIFEST_inputs is hashed before each run, MANIFEST_outputs after. The runner's file filter for RUN_* logs is case-insensitive. Because of that, run_RA.R / run_RB.R are listed under MANIFEST_outputs instead of MANIFEST_inputs. They are inputs and are not modified by the run.
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+X1 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+X1 in  :: 8df344f5480c0a8ab36e08e05830d6cddd5851143811e28c3c968de59f0c4866  5765  R-B\R\10_io_parse.R
+X1 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+X1 out :: 87c15c8815935166f55a53417461e7e9eb34f2caa39c502b150b2ea80074f00e  41963341  R-B\outputs\RB_classifications.csv
+X2 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+X2 out :: a67a9b9dff05556bcfacbe92294e5c36cc6609ecf2b603199ded921120eb964b  22273051  R-A\outputs\RA_classifications.csv
+X2 out :: 65772beeee4618f93e5bb49b1912ce6db82f8c1adcf59855030ca3c8552b9a6d  24798  R-A\run_RA.R
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C33/X_RB_10_io_parse.R
+@@ -12,14 +12,7 @@
+ 
+ #' Parse timestamps into America/Chicago POSIXct; unparseable → NA
+ rb_parse_ts <- function(x) {
+-  # If somehow POSIXct arrives, recover printed digits in its tagged tz then re-parse as Chicago
+-  if (inherits(x, "POSIXt")) {
+-    tz_src <- attr(x, "tzone")
+-    if (is.null(tz_src) || !nzchar(tz_src[[1]])) tz_src <- "UTC"
+-    xch <- format(x, format = "%Y-%m-%d %H:%M:%S", tz = tz_src[[1]])
+-  } else {
+-    xch <- trimws(as.character(x))
+-  }
++  xch <- trimws(as.character(x))
+   xch[rb_is_blank(xch)] <- NA_character_
+   # Strip trailing Z / offset loosely; treat wall as Chicago per locked contract
+   xch <- sub("T", " ", xch, fixed = TRUE)
+@@ -60,22 +53,9 @@
+ 
+ rb_read_csv_flex <- function(path) {
+   if (!file.exists(path)) stop("Missing required file: ", path, call. = FALSE)
+-  # MySQL --batch exports are tab-separated. Force clock cols to character so
+-  # rb_parse_ts owns America/Chicago wall-clock (never trust readr POSIXct/UTC).
+-  clock_cols <- readr::cols(
+-    created_ts = readr::col_character(),
+-    mod_ts = readr::col_character(),
+-    closed_ts = readr::col_character(),
+-    CREATED_DATE = readr::col_character(),
+-    LAST_MODIFIED_DATE = readr::col_character(),
+-    CLOSED_DATE = readr::col_character(),
+-    .default = readr::col_guess()
+-  )
++  # MySQL --batch exports are tab-separated (fields like LOCATION contain commas)
+   if (requireNamespace("readr", quietly = TRUE)) {
+-    df <- tryCatch(
+-      readr::read_tsv(path, col_types = clock_cols, show_col_types = FALSE, progress = FALSE, guess_max = 100000),
+-      error = function(e) readr::read_csv(path, col_types = clock_cols, show_col_types = FALSE, progress = FALSE)
+-    )
++    df <- readr::read_tsv(path, show_col_types = FALSE, progress = FALSE, guess_max = 100000)
+     return(as.data.frame(df, stringsAsFactors = FALSE))
+   }
+   utils::read.delim(path, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("", "NA", "NULL"))
+@@ -110,21 +90,25 @@
+   mod_raw <- getc(col_mod)
+   closed_raw <- getc(col_closed)
+ 
+-  # Always character → America/Chicago wall parse (no POSIXct shortcut / force_tz)
+   created_ts <- if (!is.na(col_created_ts)) rb_parse_ts(raw[[col_created_ts]]) else rb_parse_ts(created_raw)
+-  if (!is.na(col_created) && any(is.na(created_ts) & !rb_is_blank(created_raw))) {
+-    miss <- is.na(created_ts)
+-    created_ts[miss] <- rb_parse_ts(created_raw[miss])
++  # If created_ts column already POSIXct-like strings from MySQL, parse covers it;
++  # also try numeric epoch? skip.
++  if (!is.na(col_created_ts) && inherits(raw[[col_created_ts]], "POSIXt")) {
++    created_ts <- as.POSIXct(raw[[col_created_ts]], tz = "America/Chicago")
+   }
+-  mod_ts <- if (!is.na(col_mod_ts)) rb_parse_ts(raw[[col_mod_ts]]) else rb_parse_ts(mod_raw)
+-  if (!is.na(col_mod) && any(is.na(mod_ts) & !rb_is_blank(mod_raw))) {
+-    miss <- is.na(mod_ts)
+-    mod_ts[miss] <- rb_parse_ts(mod_raw[miss])
++  mod_ts <- if (!is.na(col_mod_ts) && inherits(raw[[col_mod_ts]], "POSIXt")) {
++    as.POSIXct(raw[[col_mod_ts]], tz = "America/Chicago")
++  } else if (!is.na(col_mod_ts)) {
++    rb_parse_ts(raw[[col_mod_ts]])
++  } else {
++    rb_parse_ts(mod_raw)
+   }
+-  closed_ts <- if (!is.na(col_closed_ts)) rb_parse_ts(raw[[col_closed_ts]]) else rb_parse_ts(closed_raw)
+-  if (!is.na(col_closed) && any(is.na(closed_ts) & !rb_is_blank(closed_raw))) {
+-    miss <- is.na(closed_ts)
+-    closed_ts[miss] <- rb_parse_ts(closed_raw[miss])
++  closed_ts <- if (!is.na(col_closed_ts) && inherits(raw[[col_closed_ts]], "POSIXt")) {
++    as.POSIXct(raw[[col_closed_ts]], tz = "America/Chicago")
++  } else if (!is.na(col_closed_ts)) {
++    rb_parse_ts(raw[[col_closed_ts]])
++  } else {
++    rb_parse_ts(closed_raw)
+   }
+ 
+   type_key <- if (!is.na(col_tk)) {
+
+--- frozen/R-A/run_RA.R
++++ seeds/C33/X2_RA_run_RA.R
+@@ -105,9 +105,7 @@
+   # shifts the instant by the CDT/CST offset (~5h), flipping near-threshold labels.
+   # Always recover printed digits, then parse as America/Chicago wall clock.
+   if (inherits(x, "POSIXt")) {
+-    tz_src <- attr(x, "tzone")
+-    if (is.null(tz_src) || !nzchar(tz_src[[1]])) tz_src <- "UTC"
+-    s <- format(x, format = "%Y-%m-%d %H:%M:%S", tz = tz_src[[1]])
++    return(as.POSIXct(x, tz = "America/Chicago"))  # C33 SEED: POSIXct shortcut (keeps readr's instant)
+   } else {
+     s <- str_trim(as.character(x))
+   }
+@@ -139,14 +137,8 @@
+ 
+ # Force naive clock columns to character so parse_ts_chicago owns tz (not readr)
+ clock_col_types <- readr::cols(
+-  created_ts = readr::col_character(),
+-  mod_ts = readr::col_character(),
+-  closed_ts = readr::col_character(),
+-  CREATED_DATE = readr::col_character(),
+-  LAST_MODIFIED_DATE = readr::col_character(),
+-  CLOSED_DATE = readr::col_character(),
+   .default = readr::col_guess()
+-)
++)  # C33 SEED: clock contract removed; readr guesses naive clocks as POSIXct (UTC-tagged)
+ 
+ 
+ read_table_flex <- function(path_csv, path_tsv = NULL) {
+
+
+---
+# C33_X1_RB_label_flips.csv (first 12 of 104 rows; full file in evidence)
+sr_number,class_ablated,dormant_h_ablated,class_contract,dormant_h_contract
+SR21-00793000,ESCALATE,12372.888611111111,STANDARD,12367.888611111111
+SR21-00917343,ESCALATE,12372.845833333333,STANDARD,12367.845833333333
+SR21-00957712,ESCALATE,12372.78388888889,STANDARD,12367.78388888889
+SR21-01134530,ESCALATE,12372.650277777779,STANDARD,12367.650277777779
+SR21-01144917,ESCALATE,12372.631111111112,STANDARD,12367.631111111112
+SR21-01166534,ESCALATE,12372.600555555555,STANDARD,12367.600555555555
+SR21-01217368,ESCALATE,12372.541388888889,STANDARD,12367.541388888889
+SR21-01233453,ESCALATE,12372.506111111112,STANDARD,12367.506111111112
+SR21-01285919,ESCALATE,12372.398888888889,STANDARD,12367.398888888889
+SR21-01294140,ESCALATE,12372.266944444444,STANDARD,12367.266944444444
+SR21-01301346,ESCALATE,12372.2425,STANDARD,12367.2425
+SR21-01326967,ESCALATE,12372.211944444445,STANDARD,12367.211944444445
+Context (frozen pack, 2026-09-19): the first production run had 104 STANDARD (R-A) vs ESCALATE (R-B) disagreements, from a ~5 h clock skew. Historical R-B output size then was 41,963,341 bytes and portfolio ESCALATE=132,072. The contract was added afterwards.
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C33 VALIDATOR REPORT

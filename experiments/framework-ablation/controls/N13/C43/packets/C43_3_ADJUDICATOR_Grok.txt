@@ -1,0 +1,1278 @@
+# C43 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the freeze scope is narrowed: only gate-feeding artifacts (final captures, deployed code, outputs and gate evidence) are frozen and hashed; intermediate captures, failed copies, partial replies, scratch runs, bundles and assembly inputs are no longer hashed.
+- REVERT: the full freeze scope stays: every intermediate capture, failed copy and partial reply is frozen, hashed and logged.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–5: the audit writes nothing into any pipeline; its known-answer cases are the self-test declared in the SPEC (P1 condition 3; failing it is a HALT). 'Needed' is the SPEC's mechanical citation rule; apply it as written, do not substitute a judgment of your own.
+- Items the SPEC marks "not measured" or "not tested" (e.g. the C44 unchanged-file seed, the C49 Grok and ChatGPT-zip arms, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Freeze scope (Addendum 01b #43)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C43 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C43 audits the coordinator's hash trail only; it reruns no R path and reads no clock value, so N1 cannot change any C43 number.
+---
+# SPEC
+# C43 — Ablation specification (FROZEN)
+
+**Ablation ID:** C43 (Addendum 01b, candidate #43 "Freeze scope")
+**Batch:** N13 batch 6 (controls C43, C49, C44, C40; owner approval 2026-10-03 10:52 CT; built the way batch b5 was built)
+**Definitions and approval (operational definitions, constitution §9):** Definitions: `ablation_plan/ADDENDUM_01_control_39.md` SHA-256 `a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f` (#40, #43) and `ablation_plan/ADDENDUM_02_pricepoint_candidates.md` SHA-256 `5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6` (#44, #49; #40 evidence). Owner approval of #43, #49, #44, #40: 2026-10-03 10:52 CT (blockers in `N13/SELECTION_N13.md` SHA-256 `f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f`). Owner rulings batch 01 (`OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba`) apply where cited (41A depth gate, 48A, 53A clock rule).
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Extra chats:** none. The test is a box-side audit of the coordinator's own trail, run by an R auditor on the PC from a frozen index; only the standard Builder/Validator/Adjudicator chats follow.
+**Usage priority (owner):** SuperGrok usage is the scarcest resource; extra chats are kept to the smallest number the test validly allows, and no extra chat uses Grok.
+**Target stage:** All stages (governance of the coordinator's freeze/hash trail)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b6/run_batch_v6.ps1`, evaluator `runner_b6/eval_b6.R`; R only, no MySQL, no git)
+
+## Control under test (Addendum 01b #43)
+Rule as it stands: every intermediate capture, failed copy and partial reply is frozen, hashed and logged. Variant: hash only gate-feeding artifacts (final captures, deployed code, outputs and gate evidence). Addendum metric: "whether any audit or reconstruction question needed an intermediate artifact". SELECTION_N13 blocker: "only possible as a box-side audit of the coordinator's own trail, and 'needed' is judgment-laden" — so this spec fixes a mechanical definition of "needed" before execution.
+
+## Verdict convention (Addendum 01b)
+**KEEP = narrow the freeze scope (no audit or reconstruction record needed an intermediate artifact). REVERT = keep the full scope (one did).** HALT as in constitution §9.
+
+## Exact change being tested
+- **Trail (frozen input):** every file of the coordinator's two run trees on the box, `runs/N15/` and `runs/N13/`, with modification time ≤ **2026-10-03 10:52:00 CT** (the owner's approval instant; nothing built for this batch is in it). `make_seeds_b6.py` writes `seeds/C43/TRAIL_INDEX.tar` (deterministic): `INVENTORY.tsv` (run-qualified path, bytes, SHA-256, mtime of every trail file), `lists/<path>` (verbatim copies of every hash list: `*.sha256`, `*.jsonl`, `*FREEZE*.json`, `*_ARM_MANIFESTS.txt`) and `records/<path>` (verbatim copies of every audit/reconstruction record, `RECORD_RULES.tsv`). The auditor re-verifies every copy against INVENTORY before use.
+- **Hashed artifacts:** every (path, SHA-256) pair in any hash list (text lists, arm-manifest lines `arms/<arm>/MANIFEST :: sha bytes path`, JSON/JSONL keys `sha256` / `*_sha256`). Paths are resolved against the inventory; a listed path that is not on the box (PC-side arm files that were never pulled) is kept with its logical path and reported as unresolved.
+- **Classes (`CLASS_RULES.tsv`, first match wins):** I1 scratch (`_smoke*`, `_preflight*`, `_interim*` folders, `smoke_*.tgz`); I2 superseded (`_superseded*` folders, `.bak`, `.HEAD.vN.txt`, `evidence_first_*` folders, `.partial`); I3 transfer bundles (`.tar`, `.tgz`, `.zip`, `pull_*.lst`); I4 saved-page assets (`*_files/`); I5 assembly inputs (`.HEAD.txt`, `.TEMPLATE.txt`, whose full text is inside the assembled hashed packet). **G0 = everything else** (gate-feeding: final captures, deployed code and seeds, frozen pack files, arm outputs, specs, packets, evidence, results, terminal states). Variant scope = hash class G only.
+- **Records (`RECORD_RULES.tsv`):** R1 narrative (`RESULTS_*.md`, `SUMMARY_*.md`, `TOOLS_PATCH_LOG.txt`, `PROGRESS_*.md`, `PLAN_*.md`, `SELECTION_*.md`); R2 re-adjudication (`N15/REAJ/**/*.md|txt`); R3 disclosure (`PRECHECK_*.json`, `README*`, `INTERIM.txt`, `REAJ_RECORD.txt`). A record that is itself class I is not scanned.
+- **"Needed" (mechanical definition, declared now):** a class-I hashed artifact is NEEDED when a scanned record cites it (a) by SHA-256 — the full hash or a prefix of ≥ 8 hex characters — and no class-G artifact has the same SHA-256 (if a gate-feeding copy with the same bytes exists, the narrowed scope still holds that hash, so the citation is reported as `hash_but_G_copy_exists` and not counted); or (b) by its path inside the run (either slash), or by its file name when that name is unique in the trail, ≥ 12 characters and not the name of a class-G artifact; or (c) by the name of the intermediate folder that holds it (`_smoke*`, `_preflight*`, `_interim*`, `_superseded*`, `evidence_first_*`).
+- **Disclosed limits of the definition:** citation is an upper-bound proxy for "needed" (a record may mention an artifact without the audit having depended on it), and silent use (an audit that read an intermediate file without writing its name or hash) is invisible to it. The trail is the box-side copy only (PC-only files enter as hash-list entries, not as files). Records are coordinator-written; chat replies are not scanned as records.
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C43 audits the coordinator's hash trail only; it reruns no R path and reads no clock value, so N1 cannot change any C43 number.
+
+## Arms (runner v6, `seeds/C43/AUDIT`)
+- **AUDIT**: `Rscript c43_audit.R TRAIL_INDEX.tar CLASS_RULES.tsv RECORD_RULES.tsv outputs` on the PC (R 4.6.1). Runs a self-test first (planted intermediate cited by hash prefix must be found; a hash with a gate-feeding copy must not be counted; class rules must give the declared classes on 6 known paths); aborts if it fails. Writes HASHED_ARTIFACTS.csv, CITATIONS.csv, NEEDED.csv, SUMMARY.txt, AUDIT_RESULT.txt, SELFTEST.txt, UNHASHED_TRAIL_FILES.txt.
+
+## Operational benefit predicate P1 (made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. no class-I artifact is NEEDED by hash (rule a);
+2. no class-I artifact is NEEDED by path or file name (rule b) and no intermediate folder is cited (rule c);
+3. harness validity: the auditor self-test passes.
+REVERT side: 1 or 2 fails (an audit or reconstruction record needed an intermediate artifact). If 3 fails: HALT (harness defect).
+Cost (reported, not scored): number and bytes of class-I hashed artifacts the narrowed scope would no longer hash.
+
+## Regression / HALT rules
+- HALT if the audit run is missing or fails, if an index copy does not match INVENTORY, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 conditions 4–5: the audit writes nothing into any pipeline; its known-answer cases are the self-test (declared now). Conditions 6–7: the trail is only read (copied into a frozen index).
+
+## Allowed source/data scope
+The coordinator's own box trail (N15 + N13, cut at 10:52:00 CT), frozen into the index. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+**Runner-side files for this control (frozen list `runner_b6/SEEDS_b6.sha256`; preflight gating):**
+- `runner_b6/seeds/C43/ARMS.tsv` SHA-256 `25d004971a97c26af0e468dc50bb45d3788a8efd9eb1692cdcd80ac938a84d67`
+- `runner_b6/seeds/C43/AUDIT` SHA-256 `b0fcc932c071cf7d9a8ebe459130b898fcd94797157d76d6ad106068c7e5c1a3`
+- `runner_b6/seeds/C43/CLASS_RULES.tsv` SHA-256 `f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794`
+- `runner_b6/seeds/C43/RECORD_RULES.tsv` SHA-256 `4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220`
+- `runner_b6/seeds/C43/TRAIL_INDEX.tar` SHA-256 `0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9`
+- `runner_b6/seeds/C43/TRAIL_INDEX_INVENTORY.tsv` SHA-256 `cbe2903cbcb915f6e708efb075146a060a372a596b217af16d4b060c1957b6a9`
+- `runner_b6/seeds/C43/c43_audit.R` SHA-256 `4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406`
+- `runner_b6/eval_b6.R` SHA-256 `6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a`
+- `runner_b6/run_batch_v6.ps1` SHA-256 `5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb` (the runner; carries the preflight list above)
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; definitions files as above. This spec is hashed in `SPEC_FREEZE_b6.sha256` before the reporting run.
+**Trail index:** `runner_b6/seeds/C43/TRAIL_INDEX.tar` (hash above) holds every input the auditor reads; `TRAIL_INDEX_INVENTORY.tsv` is the same inventory, beside it for reading. (The frozen-pack preflight runs for every batch; C43 reads none of the pack.)
+## Pre-execution check (disclosed)
+The predicate text (`eval_b6.R`) and every harness script were hashed in `SEEDS_b6.sha256` before any PC execution. The complete runner was exercised on the PC in scratch folders (non-reporting, NON_REPORTING.txt in each): `N13\_preflight_b6` (runner tar v1) stopped at the preflight because the C49 marker file `seeds/C49/DELIVERY` collided with the folder `seeds/C49/delivery/` on Windows (case-insensitive paths); nothing executed. The marker was renamed `DELIVCHK` (runner and evaluator updated; first builds kept in `runner_b6/_superseded_v0` and `_superseded_v1` with README). `N13\_preflight_b6_2` (runner tar v2) was killed during the C43 audit when the remote session dropped (no result). `N13\_preflight_b6_3` (runner tar v2, SHA-256 7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc, started detached) ran to completion at 11:27:46 PC time (4.18 min, preflight PASS). Before that, the R scripts were dry-run on the box (R 4.5) with synthetic replies for the post-chat scorers; a Q-answer parsing bug in c49_score.R was fixed then. C43 in the scratch run: self-test PASS; needed_by_hash = 10, needed_by_path_or_name = 2, needed_by_directory = 3 (the same numbers as the box dry-run, which ran after the decision rule was fixed in PROGRESS_b6.md 11:05 CT). No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   25d004971a97c26af0e468dc50bb45d3788a8efd9eb1692cdcd80ac938a84d67 seeds/C43/ARMS.tsv
+seed   OK   b0fcc932c071cf7d9a8ebe459130b898fcd94797157d76d6ad106068c7e5c1a3 seeds/C43/AUDIT
+seed   OK   f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794 seeds/C43/CLASS_RULES.tsv
+seed   OK   4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220 seeds/C43/RECORD_RULES.tsv
+seed   OK   0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9 seeds/C43/TRAIL_INDEX.tar
+seed   OK   cbe2903cbcb915f6e708efb075146a060a372a596b217af16d4b060c1957b6a9 seeds/C43/TRAIL_INDEX_INVENTORY.tsv
+seed   OK   4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406 seeds/C43/c43_audit.R
+seed   OK   6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a eval_b6.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b6 (R-only; batches C52 and C24 hold the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 14871 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+25d004971a97c26af0e468dc50bb45d3788a8efd9eb1692cdcd80ac938a84d67  154  runner_b6/seeds/C43/ARMS.tsv
+b0fcc932c071cf7d9a8ebe459130b898fcd94797157d76d6ad106068c7e5c1a3  35  runner_b6/seeds/C43/AUDIT
+f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794  991  runner_b6/seeds/C43/CLASS_RULES.tsv
+4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220  518  runner_b6/seeds/C43/RECORD_RULES.tsv
+0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9  4065280  runner_b6/seeds/C43/TRAIL_INDEX.tar
+cbe2903cbcb915f6e708efb075146a060a372a596b217af16d4b060c1957b6a9  1170107  runner_b6/seeds/C43/TRAIL_INDEX_INVENTORY.tsv
+4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406  12940  runner_b6/seeds/C43/c43_audit.R
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  10336  runner_b6/eval_b6.R
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  11125  runner_b6/run_batch_v6.ps1 (runner; hashed in SPEC_FREEZE_b6.sha256)
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b6.sha256` (written before the reporting run):
+# N13 batch b6 spec freeze, written 2026-10-03 11:30 CDT before the reporting run (scratch checks in N13/_preflight_b6, _preflight_b6_2, _preflight_b6_3 disclosed in each spec)
+eb91577bac56117d32a4f95a6370831b1521ee54d24cababe36c318654207c2c  C43/ABLATION_SPEC.md
+5630d48511557ac288f689595f649122037c31442c776f1aab7dcabda05f87ab  C49/ABLATION_SPEC.md
+a4811cdf2b2632515964e7f0e826fae70e040c7c8595d05dc7abe112ff0760d9  C44/ABLATION_SPEC.md
+7c1edd58a89b9b7b35faea14ce7bc84a1ede6cf67919cba2296eaf348fd2c663  C40/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C40/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C43/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C44/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C49/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C40/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C43/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C44/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C49/BASELINE_FRAMEWORK.sha256
+3a201b23c77ac5bd9ddc747ae276a7223d5cb05e6e1ed861ec5849595c681327  runner_b6/SEEDS_b6.sha256
+729ed8cad382ae82805499d493bf7eb8fa38687665286649bb3746330f0b1e2d  runner_b6/SEED_DIFFS_b6.txt
+5822febe57e51e8ef04afdbbcf6e610c79cb9fc95c34560250300c75b5f985c8  runner_b6/PRECHECK_b6.json
+bae228cbf71a25b6b68c9863e4a68f88ca89fa4647ac81acb0ff14332d89bd84  runner_b6/make_seeds_b6.py
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  runner_b6/run_batch_v6.ps1
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  runner_b6/eval_b6.R
+a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb  C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1  C49/packets/C49_R_DS_ZIP.txt
+9fa6cc58745d144a5c53a371f0b41db69d0503b212c2b1ce08a33eb84998f7a2  C49/packets/C49_R_DS_FILES.txt
+bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2  C49/packets/C49_R_GPT_FILES.txt
+e140717693b1bf86a0ab1cad9f0575a40b8289e291145de8ce7e5772765021a4  C40/packets/C40_1_INC_BUILDER_ChatGPT.txt
+6a7c477a0d034c992bbcb3544600e455b7e0b217c9d77a125a6acdf575c86bfc  C40/packets/C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+eeed4af084b2630f1a6c4a0fc30a87923043631942b50c185409c622849f0c3e  tools_build_extra_b6.py
+8640118c731510dee2dddbe24d8c0f3693f58d22c8406a37135ecbc6b53a0494  tools_make_specs_b6.py
+f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f  SELECTION_N13.md
+7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc  N13_runner_b6_v2.tar
+a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f  ablation_plan/ADDENDUM_01_control_39.md
+5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6  ablation_plan/ADDENDUM_02_pricepoint_candidates.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+
+---
+# RUN LOG (this control)
+11:31:29 C43 arms
+11:32:05   AUDIT AUDIT exit=0 secs=35.7 timeout=0
+
+---
+# C43_RESULTS.md (runner output, pre-chat part)
+# C43 RESULTS (mechanical; generated 2026-10-03 11:34:22 CDT)
+
+**Mechanical predicate result: P1 NOT MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. no intermediate (class I) artifact is cited by SHA-256 in an audit or reconstruction record (citations whose hash also belongs to a gate-feeding artifact excluded) | NOT MET |
+| 2. no intermediate artifact is cited by path or unique file name, and no intermediate directory is cited, in an audit or reconstruction record | NOT MET |
+| 3. harness validity: the auditor self-test passes (planted citation found; citation of a hash with a gate-feeding copy not counted; class rules give the declared classes) | MET |
+
+## Arms
+| arm | exit | secs | selftest | needed_by_hash | needed_by_path_or_name | needed_by_directory | status | trail_index_sha256 |
+|---|---|---|---|---|---|---|---|---|
+| AUDIT | 0 | 35.7 | PASS | 10 | 2 | 3 | INTERMEDIATE_NEEDED | 0fcc3b64ac8d464a |
+
+## SUMMARY.txt
+```
+trail_files=7804
+hash_list_files=598
+hash_records=16261
+unparsed_hash_lines=0
+distinct_hashed_artifacts=14095
+unresolved_paths=6868
+class_G=8130
+class_I=5965
+by_rule: I1_scratch=1650 I2_superseded=62 I3_bundle=3 I4_page_asset=4210 I5_assembly=40 G0_gate=8130
+class_I_bytes_known=500660758
+hash_records_class_I=6380
+records_scanned=21
+records_excluded_class_I=3
+intermediate_dirs=_interim_b4|_superseded_v0|_smoke_b3|evidence_first_0500
+citations_total=11214
+citations_hash_with_G_copy=11198
+needed_by_hash=10
+needed_by_path_or_name=2
+needed_by_directory=3
+trail_files_not_in_any_hash_list=598
+```
+
+## NEEDED.csv (every intermediate artifact or directory that an audit/reconstruction record cites; full file)
+| artifact | sha256 | rule | kind | n_citing_lines | records |
+|---|---|---|---|---|---|
+| (directory) _interim_b4 |  | I1_scratch | directory | 2 | N13/pc_run/b4/C46/INTERIM.txt/N13/pc_run/b4/C51/INTERIM.txt |
+| (directory) _superseded_v0 |  | I2_superseded | directory | 1 | N13/runner_b5/PRECHECK_b5.json |
+| N15/pc_run_b2.tgz | db734301fb914fb16cbd4dea00547fc48d410672e2c34569000a12e9d741ff31 | I3_bundle | path | 1 | N15/RESULTS_N15.md |
+| N15/pc_run_b3.tgz | 23e0467649521c0c1d93fc7825b1dbc9571b01c9ba8d67798a38237175ad0b44 | I3_bundle | path | 1 | N15/RESULTS_N15.md |
+| (directory) _smoke_b3 |  | I1_scratch | directory | 1 | N15/RESULTS_N15.md |
+| N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt | a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 | I5_assembly | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.v1.txt | a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 | I2_superseded | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt | 4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf | I5_assembly | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.v1.txt | 4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf | I2_superseded | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt | 927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 | I5_assembly | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.v1.txt | 927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 | I2_superseded | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt | 312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec | I5_assembly | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.v1.txt | 312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec | I2_superseded | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt | 9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 | I5_assembly | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+| N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.v1.txt | 9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 | I2_superseded | hash | 1 | N15/TOOLS_PATCH_LOG.txt |
+
+## Counted citing lines (CITATIONS.csv rows of kind hash / path / file_name / directory; the rows of kind 'hash_but_G_copy_exists' are not counted and are listed in full only in outputs/CITATIONS.csv)
+rows of kind hash_but_G_copy_exists (not counted): 11198
+
+| artifact | kind | record | line | text |
+|---|---|---|---|---|
+| (directory) _interim_b4 | directory | N13/pc_run/b4/C46/INTERIM.txt | 1 | Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C46 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C46 arm folders at 2026-10-03 09:41 CD |
+| (directory) _interim_b4 | directory | N13/pc_run/b4/C51/INTERIM.txt | 1 | Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C51 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C51 arm folders at 2026-10-03 09:41 CD |
+| (directory) _superseded_v0 | directory | N13/runner_b5/PRECHECK_b5.json | 12 | "chg": " (one harness change was made before the scratch run, not after it: `recon_c53.R` gained the RECON_IDS.csv output so the baseline rule could subtract clean B's mismatch rows; the earlier seed set is kept unexecuted in `runner_b5/_superseded_v0/`)" |
+| N15/pc_run_b2.tgz | path | N15/RESULTS_N15.md | 91 | - Evidence: `pc_run_b2.tgz`, extracted to `pc_run/b2/`. `tools_verify_run_b.py b2`: RUN VERIFY PASS. |
+| N15/pc_run_b3.tgz | path | N15/RESULTS_N15.md | 120 | - Evidence: `pc_run_b3.tgz` → `pc_run/b3/`. RUN VERIFY PASS. |
+| (directory) _smoke_b3 | directory | N15/RESULTS_N15.md | 109 | - Two smoke runs on the PC: `_smoke_b3` (05:58–06:04 CDT; it overlapped the tail of the b2 run, so its C45 timings are not used) and `_smoke_b3b` (06:07–06:09 CDT). |
+| N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt | hash | N15/TOOLS_PATCH_LOG.txt | 3 | 2026-10-03 05:17:54 CDT C26 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 new=da61dd169825e6940b6d9f4d31216df6e56e30a31a7737bb224b498a988211e3 |
+| N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.v1.txt | hash | N15/TOOLS_PATCH_LOG.txt | 3 | 2026-10-03 05:17:54 CDT C26 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 new=da61dd169825e6940b6d9f4d31216df6e56e30a31a7737bb224b498a988211e3 |
+| N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt | hash | N15/TOOLS_PATCH_LOG.txt | 4 | 2026-10-03 05:17:54 CDT C31 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf new=0ae64be47cd4a3ec049203ba0225530375748244455d679e65428d45c952826f |
+| N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.v1.txt | hash | N15/TOOLS_PATCH_LOG.txt | 4 | 2026-10-03 05:17:54 CDT C31 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf new=0ae64be47cd4a3ec049203ba0225530375748244455d679e65428d45c952826f |
+| N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt | hash | N15/TOOLS_PATCH_LOG.txt | 5 | 2026-10-03 05:17:54 CDT C39 Grok HEAD: coordinator notes N1 (+C39 note) inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 new=3aa8ccf5b76b9f6165b57deb5064fd347537ac37a75dc57596fccb68531782e5 |
+| N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.v1.txt | hash | N15/TOOLS_PATCH_LOG.txt | 5 | 2026-10-03 05:17:54 CDT C39 Grok HEAD: coordinator notes N1 (+C39 note) inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 new=3aa8ccf5b76b9f6165b57deb5064fd347537ac37a75dc57596fccb68531782e5 |
+| N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt | hash | N15/TOOLS_PATCH_LOG.txt | 6 | 2026-10-03 05:17:54 CDT C30 Grok HEAD: coordinator notes N1+N2 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec new=54e2ecadc5f3809e38a4d2e84d9475aee0e6be95af193463573f227fa74447ce |
+| N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.v1.txt | hash | N15/TOOLS_PATCH_LOG.txt | 6 | 2026-10-03 05:17:54 CDT C30 Grok HEAD: coordinator notes N1+N2 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec new=54e2ecadc5f3809e38a4d2e84d9475aee0e6be95af193463573f227fa74447ce |
+| N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt | hash | N15/TOOLS_PATCH_LOG.txt | 7 | 2026-10-03 05:17:54 CDT C29 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 new=d404045578b2faae55337124bf24be4c579ddde5e561eb3ea36cbec1138741b2 |
+| N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.v1.txt | hash | N15/TOOLS_PATCH_LOG.txt | 7 | 2026-10-03 05:17:54 CDT C29 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 new=d404045578b2faae55337124bf24be4c579ddde5e561eb3ea36cbec1138741b2 |
+
+## Hashed artifacts by class and rule
+| class | rule | Freq |
+|---|---|---|
+| G | G0_gate | 8130 |
+| I | I1_scratch | 1650 |
+| I | I2_superseded |   62 |
+| I | I3_bundle |    3 |
+| I | I4_page_asset | 4210 |
+| I | I5_assembly |   40 |
+
+
+---
+# C43_arms.csv (raw, full file)
+arm,exit,secs,selftest,needed_by_hash,needed_by_path_or_name,needed_by_directory,status,trail_index_sha256
+AUDIT,0,35.7,PASS,10,2,3,INTERMEDIATE_NEEDED,0fcc3b64ac8d464a
+
+---
+# RAW PER-ARM FILES (verbatim; bulky files summarized with their SHA-256)
+## arms/AUDIT/RUN_AUDIT.exit
+0,35.7,2026-10-03T11:32:05-05:00,0,1800
+
+## arms/AUDIT/outputs/AUDIT_RESULT.txt
+selftest=PASS needed_by_hash=10 needed_by_path_or_name=2 needed_by_directory=3 status=INTERMEDIATE_NEEDED
+
+## arms/AUDIT/outputs/NEEDED.csv
+"artifact","sha256","rule","kind","n_citing_lines","records"
+"(directory) _interim_b4","","I1_scratch","directory",2,"N13/pc_run/b4/C46/INTERIM.txt|N13/pc_run/b4/C51/INTERIM.txt"
+"(directory) _superseded_v0","","I2_superseded","directory",1,"N13/runner_b5/PRECHECK_b5.json"
+"N15/pc_run_b2.tgz","db734301fb914fb16cbd4dea00547fc48d410672e2c34569000a12e9d741ff31","I3_bundle","path",1,"N15/RESULTS_N15.md"
+"N15/pc_run_b3.tgz","23e0467649521c0c1d93fc7825b1dbc9571b01c9ba8d67798a38237175ad0b44","I3_bundle","path",1,"N15/RESULTS_N15.md"
+"(directory) _smoke_b3","","I1_scratch","directory",1,"N15/RESULTS_N15.md"
+"N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt","a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2","I5_assembly","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.v1.txt","a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2","I2_superseded","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt","4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf","I5_assembly","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.v1.txt","4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf","I2_superseded","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt","927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79","I5_assembly","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.v1.txt","927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79","I2_superseded","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt","312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec","I5_assembly","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.v1.txt","312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec","I2_superseded","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt","9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9","I5_assembly","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+"N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.v1.txt","9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9","I2_superseded","hash",1,"N15/TOOLS_PATCH_LOG.txt"
+
+## arms/AUDIT/outputs/SELFTEST.txt
+selftest=PASS seed_cite_detected=TRUE clean_not_flagged_with_G_copy=TRUE class_rules=TRUE
+
+## arms/AUDIT/outputs/SUMMARY.txt
+trail_files=7804
+hash_list_files=598
+hash_records=16261
+unparsed_hash_lines=0
+distinct_hashed_artifacts=14095
+unresolved_paths=6868
+class_G=8130
+class_I=5965
+by_rule: I1_scratch=1650 I2_superseded=62 I3_bundle=3 I4_page_asset=4210 I5_assembly=40 G0_gate=8130
+class_I_bytes_known=500660758
+hash_records_class_I=6380
+records_scanned=21
+records_excluded_class_I=3
+intermediate_dirs=_interim_b4|_superseded_v0|_smoke_b3|evidence_first_0500
+citations_total=11214
+citations_hash_with_G_copy=11198
+needed_by_hash=10
+needed_by_path_or_name=2
+needed_by_directory=3
+trail_files_not_in_any_hash_list=598
+
+## outputs/CITATIONS.csv (SHA-256 d8039778c6bf7525860a2525b07adc1db68a3500a29046e081e808f108f6e880, 11214 rows): every COUNTED row verbatim (16 rows)
+artifact,kind,record,line,text
+(directory) _interim_b4,directory,N13/pc_run/b4/C46/INTERIM.txt,1,"Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C46 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C46 arm folders at 2026-10-03 09:41 CD"
+(directory) _interim_b4,directory,N13/pc_run/b4/C51/INTERIM.txt,1,"Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C51 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C51 arm folders at 2026-10-03 09:41 CD"
+(directory) _superseded_v0,directory,N13/runner_b5/PRECHECK_b5.json,12,"'chg': ' (one harness change was made before the scratch run, not after it: `recon_c53.R` gained the RECON_IDS.csv output so the baseline rule could subtract clean B's mismatch rows; the earlier seed set is kept unexecuted in `runner_b5/_superseded_v0/`)'"
+N15/pc_run_b2.tgz,path,N15/RESULTS_N15.md,91,"- Evidence: `pc_run_b2.tgz`, extracted to `pc_run/b2/`. `tools_verify_run_b.py b2`: RUN VERIFY PASS."
+N15/pc_run_b3.tgz,path,N15/RESULTS_N15.md,120,"- Evidence: `pc_run_b3.tgz` → `pc_run/b3/`. RUN VERIFY PASS."
+(directory) _smoke_b3,directory,N15/RESULTS_N15.md,109,"- Two smoke runs on the PC: `_smoke_b3` (05:58–06:04 CDT; it overlapped the tail of the b2 run, so its C45 timings are not used) and `_smoke_b3b` (06:07–06:09 CDT)."
+N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt,hash,N15/TOOLS_PATCH_LOG.txt,3,"2026-10-03 05:17:54 CDT C26 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 new=da61dd169825e6940b6d9f4d31216df6e56e30a31a7737bb224b498a988211e3"
+N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.v1.txt,hash,N15/TOOLS_PATCH_LOG.txt,3,"2026-10-03 05:17:54 CDT C26 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2 new=da61dd169825e6940b6d9f4d31216df6e56e30a31a7737bb224b498a988211e3"
+N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt,hash,N15/TOOLS_PATCH_LOG.txt,4,"2026-10-03 05:17:54 CDT C31 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf new=0ae64be47cd4a3ec049203ba0225530375748244455d679e65428d45c952826f"
+N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.v1.txt,hash,N15/TOOLS_PATCH_LOG.txt,4,"2026-10-03 05:17:54 CDT C31 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf new=0ae64be47cd4a3ec049203ba0225530375748244455d679e65428d45c952826f"
+N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt,hash,N15/TOOLS_PATCH_LOG.txt,5,"2026-10-03 05:17:54 CDT C39 Grok HEAD: coordinator notes N1 (+C39 note) inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 new=3aa8ccf5b76b9f6165b57deb5064fd347537ac37a75dc57596fccb68531782e5"
+N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.v1.txt,hash,N15/TOOLS_PATCH_LOG.txt,5,"2026-10-03 05:17:54 CDT C39 Grok HEAD: coordinator notes N1 (+C39 note) inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79 new=3aa8ccf5b76b9f6165b57deb5064fd347537ac37a75dc57596fccb68531782e5"
+N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt,hash,N15/TOOLS_PATCH_LOG.txt,6,"2026-10-03 05:17:54 CDT C30 Grok HEAD: coordinator notes N1+N2 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec new=54e2ecadc5f3809e38a4d2e84d9475aee0e6be95af193463573f227fa74447ce"
+N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.v1.txt,hash,N15/TOOLS_PATCH_LOG.txt,6,"2026-10-03 05:17:54 CDT C30 Grok HEAD: coordinator notes N1+N2 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec new=54e2ecadc5f3809e38a4d2e84d9475aee0e6be95af193463573f227fa74447ce"
+N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt,hash,N15/TOOLS_PATCH_LOG.txt,7,"2026-10-03 05:17:54 CDT C29 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 new=d404045578b2faae55337124bf24be4c579ddde5e561eb3ea36cbec1138741b2"
+N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.v1.txt,hash,N15/TOOLS_PATCH_LOG.txt,7,"2026-10-03 05:17:54 CDT C29 Grok HEAD: coordinator notes N1 inserted before # SPEC (parent decision 05:08 CT); v1 kept as .HEAD.v1.txt old=9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9 new=d404045578b2faae55337124bf24be4c579ddde5e561eb3ea36cbec1138741b2"
+
+Rows of kind hash_but_G_copy_exists (not counted; the cited bytes are also held by a gate-feeding artifact), summarized by citing record and rule of the intermediate copy (11198 rows):
+record,rule,rows
+N13/RESULTS_N13.md,I1_scratch,29
+N15/REAJ/C26/C26-adjudicator-reaj/adjudicator_grok.md,I1_scratch,48
+N15/REAJ/C26/C26-adjudicator-reaj/adjudicator_raw.md,I1_scratch,48
+N15/REAJ/C26/C26-adjudicator/adjudicator_raw.md,I1_scratch,48
+N15/REAJ/C26/C26_3_ADJUDICATOR_Grok_REAJ.txt,I1_scratch,3965
+N15/REAJ/C26/C26_3_ADJUDICATOR_Grok_REAJ.txt,I2_superseded,3
+N15/REAJ/C45/C45-adjudicator-reaj/adjudicator_grok.md,I1_scratch,407
+N15/REAJ/C45/C45-adjudicator-reaj/adjudicator_raw.md,I1_scratch,407
+N15/REAJ/C45/C45-adjudicator/adjudicator_raw.md,I1_scratch,407
+N15/REAJ/C45/C45_3_ADJUDICATOR_Grok_REAJ.txt,I1_scratch,5229
+N15/RESULTS_N15.md,I1_scratch,414
+N15/SUMMARY_TONIGHT.md,I1_scratch,193
+
+## outputs/HASHED_ARTIFACTS.csv (SHA-256 5f547e70bf5a6bf052296e09145c46f8d866ffb3bdf0c312d3d5ff918cf73914, 14095 rows) summarized: class, rule, artifacts, bytes known, unresolved
+class,rule,artifacts,bytes_known,unresolved
+G,G0_gate,8130,66669293,5738
+I,I1_scratch,1650,7353129,1128
+I,I2_superseded,62,1675268,2
+I,I3_bundle,3,2504801,0
+I,I4_page_asset,4210,487189756,0
+I,I5_assembly,40,1937804,0
+
+Class-I artifacts by rule and top folder (run/first two levels):
+rule,folder,artifacts
+I1_scratch,N13/pc_run/b4,386
+I1_scratch,N15/_smoke_b3/C15,249
+I1_scratch,N15/_smoke_b3/C32,282
+I1_scratch,N15/_smoke_b3/C35,247
+I1_scratch,N15/_smoke_b3/C36,207
+I1_scratch,N15/_smoke_b3/C45,279
+I2_superseded,N13/runner_b5/_superseded_v0,31
+I2_superseded,N15/C11/packets,1
+I2_superseded,N15/C14/packets,1
+I2_superseded,N15/C15/packets,1
+I2_superseded,N15/C16/packets,1
+I2_superseded,N15/C18/packets,1
+I2_superseded,N15/C26/packets,1
+I2_superseded,N15/C29/packets,1
+I2_superseded,N15/C30/packets,1
+I2_superseded,N15/C31/packets,1
+I2_superseded,N15/C32/packets,1
+I2_superseded,N15/C34/packets,1
+I2_superseded,N15/C35/packets,1
+I2_superseded,N15/C36/packets,1
+I2_superseded,N15/C39/packets,1
+I2_superseded,N15/C45/packets,1
+I2_superseded,N15/pc_run/b1,16
+I3_bundle,N13/pull_b4a.tar,1
+I3_bundle,N15/pc_run_b2.tgz,1
+I3_bundle,N15/pc_run_b3.tgz,1
+I4_page_asset,N13/C46/C46-adjudicator,199
+I4_page_asset,N13/C46/C46-builder,19
+I4_page_asset,N13/C46/C46-validator,8
+I4_page_asset,N13/C51/C51-adjudicator,200
+I4_page_asset,N13/C51/C51-builder,20
+I4_page_asset,N13/C51/C51-validator,8
+I4_page_asset,N15/C11/C11-adjudicator,199
+I4_page_asset,N15/C11/C11-builder,15
+I4_page_asset,N15/C11/C11-validator,7
+I4_page_asset,N15/C14/C14-adjudicator,200
+I4_page_asset,N15/C14/C14-builder,20
+I4_page_asset,N15/C14/C14-validator,7
+I4_page_asset,N15/C15/C15-adjudicator,199
+I4_page_asset,N15/C15/C15-builder,16
+I4_page_asset,N15/C15/C15-validator,8
+I4_page_asset,N15/C16/C16-adjudicator,199
+I4_page_asset,N15/C16/C16-builder,15
+I4_page_asset,N15/C16/C16-validator,8
+I4_page_asset,N15/C18/C18-adjudicator,199
+I4_page_asset,N15/C18/C18-builder,16
+I4_page_asset,N15/C18/C18-validator,8
+I4_page_asset,N15/C26/C26-adjudicator,202
+I4_page_asset,N15/C26/C26-builder,19
+I4_page_asset,N15/C26/C26-validator,8
+I4_page_asset,N15/C29/C29-adjudicator,199
+I4_page_asset,N15/C29/C29-builder,20
+I4_page_asset,N15/C29/C29-validator,8
+I4_page_asset,N15/C30/C30-adjudicator,199
+I4_page_asset,N15/C30/C30-builder,16
+I4_page_asset,N15/C30/C30-validator,8
+I4_page_asset,N15/C31/C31-adjudicator,200
+I4_page_asset,N15/C31/C31-builder,16
+I4_page_asset,N15/C31/C31-validator,8
+I4_page_asset,N15/C32/C32-adjudicator,199
+I4_page_asset,N15/C32/C32-builder,16
+I4_page_asset,N15/C32/C32-validator,8
+I4_page_asset,N15/C34/C34-adjudicator,199
+I4_page_asset,N15/C34/C34-builder,16
+I4_page_asset,N15/C34/C34-validator,8
+I4_page_asset,N15/C35/C35-adjudicator,199
+I4_page_asset,N15/C35/C35-builder,16
+I4_page_asset,N15/C35/C35-validator,8
+I4_page_asset,N15/C36/C36-adjudicator,199
+I4_page_asset,N15/C36/C36-builder,16
+I4_page_asset,N15/C36/C36-validator,8
+I4_page_asset,N15/C39/C39-adjudicator,199
+I4_page_asset,N15/C39/C39-builder,15
+I4_page_asset,N15/C39/C39-validator,8
+I4_page_asset,N15/C45/C45-adjudicator,199
+I4_page_asset,N15/C45/C45-builder,16
+I4_page_asset,N15/C45/C45-validator,8
+I4_page_asset,N15/REAJ/C26,199
+I4_page_asset,N15/REAJ/C45,201
+I5_assembly,N13/C41/packets,1
+I5_assembly,N13/C46/packets,1
+I5_assembly,N13/C47/packets,1
+I5_assembly,N13/C48/packets,3
+I5_assembly,N13/C51/packets,1
+I5_assembly,N13/C53/packets,1
+I5_assembly,N15/C11/packets,2
+I5_assembly,N15/C14/packets,2
+I5_assembly,N15/C15/packets,2
+I5_assembly,N15/C16/packets,2
+I5_assembly,N15/C18/packets,2
+I5_assembly,N15/C26/packets,2
+I5_assembly,N15/C29/packets,2
+I5_assembly,N15/C30/packets,2
+I5_assembly,N15/C31/packets,2
+I5_assembly,N15/C32/packets,2
+I5_assembly,N15/C34/packets,2
+I5_assembly,N15/C35/packets,2
+I5_assembly,N15/C36/packets,2
+I5_assembly,N15/C39/packets,2
+I5_assembly,N15/C45/packets,2
+I5_assembly,N15/REAJ/C26,1
+I5_assembly,N15/REAJ/C45,1
+
+Every I2 / I3 / I5 artifact verbatim (105 rows; I1 scratch and I4 page assets are in the counts above and in the full file):
+logical,sha256,rule,resolved,n_records,bytes
+N13/C51/packets/C51_3_ADJUDICATOR_Grok.HEAD.txt,9a4ba967228ea961e714aa87eb6234977808a5600cd3acec9af8b53086433d7a,I5_assembly,TRUE,1,117256
+N13/C46/packets/C46_3_ADJUDICATOR_Grok.HEAD.txt,5b095034965c960741a5ec656f1298ef704f2aa5313cac7cf7846767b2c24e5c,I5_assembly,TRUE,1,59673
+N13/pull_b4a.tar,773462590082253888bf0662c2ec2a7256ef308ac54dbf94791c4cf400470577,I3_bundle,TRUE,1,992768
+N13/C41/packets/C41_3_ADJUDICATOR_Grok.HEAD.txt,3e67937e2d418c2c833da4c559a450489c9d1aa0959266ed4617b36cd41f0cb8,I5_assembly,TRUE,1,92857
+N13/C47/packets/C47_3_ADJUDICATOR_Grok.HEAD.txt,34620070181a40d5c52e1dc67dac10bd894f0a28dd99165941159848fad82cb5,I5_assembly,TRUE,1,53011
+N13/C53/packets/C53_3_ADJUDICATOR_Grok.HEAD.txt,2ad9d99db284a5769e93a02e5d972f6a5044bf9491a6e6cb1dcedf45fe868b6e,I5_assembly,TRUE,1,107070
+N13/C48/packets/C48_1_BUILDER_ChatGPT.TEMPLATE.txt,3f68e32a5ec1208ab22cad41bb5c794b6b25ca20eda3daea5dc4afcb90355b6c,I5_assembly,TRUE,1,50423
+N13/C48/packets/C48_2_VALIDATOR_DeepSeek.TEMPLATE.txt,2a4f932f69eccbef8d2169e5efb5752bc62ee6454abc275ee2dfc9e7452548fa,I5_assembly,TRUE,1,50431
+N13/C48/packets/C48_3_ADJUDICATOR_Grok.HEAD.TEMPLATE.txt,270e57cb54e754428994b5f3e566eebb79d0db7468b36a11bf49b8d6128fbdae,I5_assembly,TRUE,1,51860
+N13/runner_b5/_superseded_v0/seeds/C41/ARMS.tsv,f4b056059bf732dba1f355261abcccf83a54c92b2983c092f107a7122028e344,I2_superseded,TRUE,1,1190
+N13/runner_b5/_superseded_v0/seeds/C41/FIXDEPTH,95a108c0c1890a0b22b538a5af927679ef001291e637ea8f24c226082e7394ac,I2_superseded,TRUE,1,81
+N13/runner_b5/_superseded_v0/seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R,d11c2d2c146c240bbc8eeaf56b85fecfaa57673b932894d0c0628db110dbbabc,I2_superseded,TRUE,1,6027
+N13/runner_b5/_superseded_v0/seeds/C41/RB_P_DATESWAP__10_io_parse.R,87513149cc081c2c433a90aacafda727277270c7177a00260023a25e636c0af6,I2_superseded,TRUE,1,6683
+N13/runner_b5/_superseded_v0/seeds/C41/RB_P_DUPINT__10_io_parse.R,e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3,I2_superseded,TRUE,1,6748
+N13/runner_b5/_superseded_v0/seeds/C41/RB_P_TZUTC__10_io_parse.R,33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c,I2_superseded,TRUE,1,6645
+N13/runner_b5/_superseded_v0/seeds/C41/RB_STUB_F11__40_fixtures.R,0961a79bf1b451b72450aac141290444514248e59abd88d9e5a6b699f968bca3,I2_superseded,TRUE,1,7408
+N13/runner_b5/_superseded_v0/seeds/C41/fixdepth.R,5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd,I2_superseded,TRUE,1,6775
+N13/runner_b5/_superseded_v0/seeds/C47/ARMS.tsv,b887a2d4fa959e8185f9620711312fd6b9d6ff4ad4bda42c25c17f876c6b4b0c,I2_superseded,TRUE,1,619
+N13/runner_b5/_superseded_v0/seeds/C47/DOMCHK,047e783a9c351ef1db14a3b1f4acd572d88d79498b0627b1d208a6ce9c53ee78,I2_superseded,TRUE,1,37
+N13/runner_b5/_superseded_v0/seeds/C47/SYN_BAL.csv,89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54,I2_superseded,TRUE,1,390034
+N13/runner_b5/_superseded_v0/seeds/C47/SYN_DOM60.csv,eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5,I2_superseded,TRUE,1,416034
+N13/runner_b5/_superseded_v0/seeds/C47/SYN_SMALLN.csv,d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61,I2_superseded,TRUE,1,39634
+N13/runner_b5/_superseded_v0/seeds/C47/dom_check.R,582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145,I2_superseded,TRUE,1,2017
+N13/runner_b5/_superseded_v0/seeds/C48/AI1_ORIGINAL.md,73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932,I2_superseded,TRUE,1,7929
+N13/runner_b5/_superseded_v0/seeds/C48/ARMS.tsv,5d228c54043896574feacd72a025a7c6c0dda5094402debf632f6d079f230b29,I2_superseded,TRUE,1,241
+N13/runner_b5/_superseded_v0/seeds/C48/REVCHK,a271c99e3c9deab96e553503c037aa15bd6d24195b4cb40036eac131e846d1cf,I2_superseded,TRUE,1,40
+N13/runner_b5/_superseded_v0/seeds/C48/REVISED_CLEAN.md,d92e480b9531d5018ca02e6dbd116dbaaa3a2df53981e690e48eff13eb00278c,I2_superseded,TRUE,1,8215
+N13/runner_b5/_superseded_v0/seeds/C48/REVISED_SEED.md,c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63,I2_superseded,TRUE,1,8215
+N13/runner_b5/_superseded_v0/seeds/C48/REVISIONS.json,970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4,I2_superseded,TRUE,1,2651
+N13/runner_b5/_superseded_v0/seeds/C48/rev_check.R,6cc4ea649d67c1d22a90bfcbcbf3756a69837d900f26943940f0b6bb57297156,I2_superseded,TRUE,1,2824
+N13/runner_b5/_superseded_v0/seeds/C53/ARMS.tsv,478144088be5d82902de0e5cbb9a749300a07d3ee4b73b24c4647269cadb954b,I2_superseded,TRUE,1,663
+N13/runner_b5/_superseded_v0/seeds/C53/RB_U_CLOCKLATE__10_io_parse.R,e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528,I2_superseded,TRUE,1,6826
+N13/runner_b5/_superseded_v0/seeds/C53/RB_U_DORMINC__run_RB.R,5da344a4218687b000c2df674a6d69f00dd921169d7615208c71b23c22ddc784,I2_superseded,TRUE,1,6003
+N13/runner_b5/_superseded_v0/seeds/C53/RB_U_P75THIN__run_RB.R,d3351d6fb90603124432d63afa09c7fadb078cbe980a5732b3cbe224a6dc717a,I2_superseded,TRUE,1,6030
+N13/runner_b5/_superseded_v0/seeds/C53/RB_U_PEERNBLANK__run_RB.R,82735a70bdc6dcf676cc30b274e7053cbeda0144208b4939f5445e091ce9e9ed,I2_superseded,TRUE,1,6010
+N13/runner_b5/_superseded_v0/seeds/C53/TABLECHK,5e3fa83043a2c2a3e2d854811fbe9fc428bff118254a2add80b7823fd9b0f420,I2_superseded,TRUE,1,39
+N13/runner_b5/_superseded_v0/seeds/C53/recon_c53.R,62d0b2690130bba6903734c2eec82ac5948ca1b3700742b3622381067d48adbd,I2_superseded,TRUE,1,1884
+N13/runner_b5/_superseded_v0/seeds/C53/table_check.R,90a5104b4fa8264ba4ce82cd27fe055a8c1ee24dd1ac39a90dc640224d02dd97,I2_superseded,TRUE,1,5392
+N13/runner_b5/_superseded_v0/run_batch_v5.ps1,e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810,I2_superseded,FALSE,1,NA
+N13/runner_b5/_superseded_v0/eval_b5.R,9954da34bd16f39cb002469489872bbcfaaca083fed13b9d07710d5ba54ab7ef,I2_superseded,FALSE,1,NA
+N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt,a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2,I5_assembly,TRUE,1,21543
+N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt,9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9,I5_assembly,TRUE,1,19680
+N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt,312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec,I5_assembly,TRUE,1,20256
+N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt,4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf,I5_assembly,TRUE,1,20125
+N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt,927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79,I5_assembly,TRUE,1,19658
+N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.txt,da61dd169825e6940b6d9f4d31216df6e56e30a31a7737bb224b498a988211e3,I5_assembly,TRUE,1,21543
+N15/C26/packets/C26_3_ADJUDICATOR_Grok.HEAD.v1.txt,a83f3dfd26174a3184547a8cbd309d182756d5ca28c7be6d8e65e8bf71fe32f2,I2_superseded,TRUE,1,20789
+N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.txt,d404045578b2faae55337124bf24be4c579ddde5e561eb3ea36cbec1138741b2,I5_assembly,TRUE,1,19680
+N15/C29/packets/C29_3_ADJUDICATOR_Grok.HEAD.v1.txt,9091862ab7155487cfa05812412d32a8762d30e11390e8a9ae08f285c5387dc9,I2_superseded,TRUE,1,18926
+N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.txt,54e2ecadc5f3809e38a4d2e84d9475aee0e6be95af193463573f227fa74447ce,I5_assembly,TRUE,1,20256
+N15/C30/packets/C30_3_ADJUDICATOR_Grok.HEAD.v1.txt,312c5643b1f0f58c1eeef4f41e67b5f86ed2ad6e9aaafda94a39487b8a7053ec,I2_superseded,TRUE,1,19066
+N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.txt,0ae64be47cd4a3ec049203ba0225530375748244455d679e65428d45c952826f,I5_assembly,TRUE,1,20125
+N15/C31/packets/C31_3_ADJUDICATOR_Grok.HEAD.v1.txt,4322e60a10a67e5863350bc32c3deea845f9b1eddfa09b0777b8d0328dd240bf,I2_superseded,TRUE,1,19371
+N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.txt,3aa8ccf5b76b9f6165b57deb5064fd347537ac37a75dc57596fccb68531782e5,I5_assembly,TRUE,1,19658
+N15/C39/packets/C39_3_ADJUDICATOR_Grok.HEAD.v1.txt,927807b6d718eb38bb0fb7aacd31620ee801a80700e2e6bd40408dc3cac1ca79,I2_superseded,TRUE,1,18547
+N15/C11/packets/C11_3_ADJUDICATOR_Grok.HEAD.txt,f9df2e7beaedfa8fe463e0575e9d5ef380c40964c34349b8d8f156d809e2be18,I5_assembly,TRUE,1,44952
+N15/C14/packets/C14_3_ADJUDICATOR_Grok.HEAD.txt,33b164cfe2f6d10ed3ca59f02b13935b0cfd4fc7b48f60de4cf4680b6cadb1ee,I5_assembly,TRUE,1,57977
+N15/C16/packets/C16_3_ADJUDICATOR_Grok.HEAD.txt,29601887d154a1285616ddb2b3b88a18cd36ddc0db12b8c5593806117293878d,I5_assembly,TRUE,1,53563
+N15/C18/packets/C18_3_ADJUDICATOR_Grok.HEAD.txt,f29c49984c1f58a623694de9197426e58bff883684d1a30f886353d3f98d978e,I5_assembly,TRUE,1,71898
+N15/C34/packets/C34_3_ADJUDICATOR_Grok.HEAD.txt,bbc5c220cf2c2a0b8d9163a2fdfdc9ff35c89a04391cc5bb56121f9580426977,I5_assembly,TRUE,1,75075
+N15/pc_run_b2.tgz,db734301fb914fb16cbd4dea00547fc48d410672e2c34569000a12e9d741ff31,I3_bundle,TRUE,1,144897
+N15/C14/packets/C14_3_ADJUDICATOR_Grok.HEAD.txt,1e7cc9077e647a8625e53cf9e40456da4e9cf0dde3c4c3f63ea544ab70e4bb9c,I5_assembly,TRUE,1,57977
+N15/C14/packets/C14_3_ADJUDICATOR_Grok.HEAD.v1.txt,33b164cfe2f6d10ed3ca59f02b13935b0cfd4fc7b48f60de4cf4680b6cadb1ee,I2_superseded,TRUE,1,57606
+N15/C11/packets/C11_3_ADJUDICATOR_Grok.HEAD.txt,eadf0d4bedff768b61cdf9a9de222e9367de5585ed5016d1ccdf6ab6f6c842ec,I5_assembly,TRUE,1,44952
+N15/C11/packets/C11_3_ADJUDICATOR_Grok.HEAD.v1.txt,f9df2e7beaedfa8fe463e0575e9d5ef380c40964c34349b8d8f156d809e2be18,I2_superseded,TRUE,1,44581
+N15/C34/packets/C34_3_ADJUDICATOR_Grok.HEAD.txt,fd8c15b5ef0306ad014a75f784c8cd9db5fbc7c7f40a3a074e637f698131d936,I5_assembly,TRUE,1,75075
+N15/C34/packets/C34_3_ADJUDICATOR_Grok.HEAD.v1.txt,bbc5c220cf2c2a0b8d9163a2fdfdc9ff35c89a04391cc5bb56121f9580426977,I2_superseded,TRUE,1,74704
+N15/C16/packets/C16_3_ADJUDICATOR_Grok.HEAD.txt,8d3b3a69943e057f8ca30c2b80e978378b45cf85fb64ee3cfe436fcebc54d671,I5_assembly,TRUE,1,53563
+N15/C16/packets/C16_3_ADJUDICATOR_Grok.HEAD.v1.txt,29601887d154a1285616ddb2b3b88a18cd36ddc0db12b8c5593806117293878d,I2_superseded,TRUE,1,53192
+N15/C18/packets/C18_3_ADJUDICATOR_Grok.HEAD.txt,35c9a2e5cd85adc22c9fb600f25d10a795ed2b2d33cb7b62347958f07fd6afbd,I5_assembly,TRUE,1,71898
+N15/C18/packets/C18_3_ADJUDICATOR_Grok.HEAD.v1.txt,f29c49984c1f58a623694de9197426e58bff883684d1a30f886353d3f98d978e,I2_superseded,TRUE,1,71527
+N15/C36/packets/C36_3_ADJUDICATOR_Grok.HEAD.txt,8f0af7e721dc8b5b97b109ca8924fcb613b5a707e62808eb95a7a041d2a1aa83,I5_assembly,TRUE,1,43586
+N15/C36/packets/C36_3_ADJUDICATOR_Grok.HEAD.v1.txt,8fbcc742d3adc9e61404fa0493402c94f04fd97fb443dc8fa167441224cc1f5d,I2_superseded,TRUE,1,43215
+N15/C35/packets/C35_3_ADJUDICATOR_Grok.HEAD.txt,09dc33f63857e618c6d994e84e8afa36497cae030910468166643a05287fd779,I5_assembly,TRUE,1,45743
+N15/C35/packets/C35_3_ADJUDICATOR_Grok.HEAD.v1.txt,8d0b01e4d03c4c6887918a157ec2f2b69ecdbfc284657a3e18ec29608c4dfef4,I2_superseded,TRUE,1,45372
+N15/C32/packets/C32_3_ADJUDICATOR_Grok.HEAD.txt,801afd7a584297f8ea7304575403da3289022d6cd96a18622a457730206291ae,I5_assembly,TRUE,1,48865
+N15/C32/packets/C32_3_ADJUDICATOR_Grok.HEAD.v1.txt,8f7c8467011ac316cf17a81f4eb9f67fb9a4569eb6caa7d2e15e2e927ab08940,I2_superseded,TRUE,1,48494
+N15/C15/packets/C15_3_ADJUDICATOR_Grok.HEAD.txt,80baf199cfe9c577c4b5cebd2d2ee52f6bb129fdfc8013b7da114cc06867f161,I5_assembly,TRUE,1,47003
+N15/C15/packets/C15_3_ADJUDICATOR_Grok.HEAD.v1.txt,341d1d96c72a0551af9d73301e14cee718bbc8628b4966e1aab651141df6a15c,I2_superseded,TRUE,1,46632
+N15/C45/packets/C45_3_ADJUDICATOR_Grok.HEAD.txt,db33a402d343731a205429e81e36d7d39233823a3a093aa7e1d7137486f154b5,I5_assembly,TRUE,1,42041
+N15/C45/packets/C45_3_ADJUDICATOR_Grok.HEAD.v1.txt,f2031c96f54dc3dd2108a23e6f2ddc12d9ed87e365bf94abf1856359fce1467b,I2_superseded,TRUE,1,41670
+N15/C15/packets/C15_3_ADJUDICATOR_Grok.HEAD.txt,341d1d96c72a0551af9d73301e14cee718bbc8628b4966e1aab651141df6a15c,I5_assembly,TRUE,1,47003
+N15/C32/packets/C32_3_ADJUDICATOR_Grok.HEAD.txt,8f7c8467011ac316cf17a81f4eb9f67fb9a4569eb6caa7d2e15e2e927ab08940,I5_assembly,TRUE,1,48865
+N15/C35/packets/C35_3_ADJUDICATOR_Grok.HEAD.txt,8d0b01e4d03c4c6887918a157ec2f2b69ecdbfc284657a3e18ec29608c4dfef4,I5_assembly,TRUE,1,45743
+N15/C36/packets/C36_3_ADJUDICATOR_Grok.HEAD.txt,8fbcc742d3adc9e61404fa0493402c94f04fd97fb443dc8fa167441224cc1f5d,I5_assembly,TRUE,1,43586
+N15/C45/packets/C45_3_ADJUDICATOR_Grok.HEAD.txt,f2031c96f54dc3dd2108a23e6f2ddc12d9ed87e365bf94abf1856359fce1467b,I5_assembly,TRUE,1,42041
+N15/pc_run_b3.tgz,23e0467649521c0c1d93fc7825b1dbc9571b01c9ba8d67798a38237175ad0b44,I3_bundle,TRUE,1,1367136
+N15/pc_run/b1/C26/evidence_first_0500/C26_ARM_MANIFESTS.txt,1b9a4276f4fd9a57e61a31e0d4eaa67c7d6ba79933dd1a9b561c9207de818cce,I2_superseded,TRUE,1,14974
+N15/pc_run/b1/C26/evidence_first_0500/C26_arms.csv,021281d87bad7e203316e3856bb97e72badfe71bb6f61988cbb1a4e1fa3802b8,I2_superseded,TRUE,1,1866
+N15/pc_run/b1/C26/evidence_first_0500/C26_RESULTS.md,50b891574fe6c48f6a12df96587af7b47a7be0dd80afcec94014d0a378c6fd82,I2_superseded,TRUE,1,4196
+N15/pc_run/b1/C29/evidence_first_0500/C29_ARM_MANIFESTS.txt,00eb01b4262c405b3162129fe125c4ef2a3b7d04ddf1c4e882db0033ce1fb92d,I2_superseded,TRUE,1,9708
+N15/pc_run/b1/C29/evidence_first_0500/C29_arms.csv,84b72a42e5b880ae210c7b90f46328567d0aab90db4ec84af68449502229f3a7,I2_superseded,TRUE,1,1356
+N15/pc_run/b1/C29/evidence_first_0500/C29_resolution.csv,2e093ad0062a9cd6d5fc362a27f9afdacbbb3055f2891c9752864925968e5d70,I2_superseded,TRUE,1,487
+N15/pc_run/b1/C29/evidence_first_0500/C29_RESULTS.md,a99df78117af6d2c0d8c86e772db9980f83d266157c843416735cf6b1eaa7494,I2_superseded,TRUE,1,4418
+N15/pc_run/b1/C30/evidence_first_0500/C30_ARM_MANIFESTS.txt,3dec2f94f4e818dfe37b9759885db10d0471500d79f699636fbe2a203ec5a318,I2_superseded,TRUE,1,17612
+N15/pc_run/b1/C30/evidence_first_0500/C30_arms.csv,7a8eca9b77e2f0fb4dd1413a48be8faa17fa73ad1c7699d8f805aa98347084f5,I2_superseded,TRUE,1,1663
+N15/pc_run/b1/C30/evidence_first_0500/C30_RESULTS.md,5c613b4a4654c18103faaa23e2f6860331c8ce6990d5b541bcac561ffda35bba,I2_superseded,TRUE,1,3672
+N15/pc_run/b1/C31/evidence_first_0500/C31_ARM_MANIFESTS.txt,d0b21c9c07eb49034afe1a9f2c4168b650dbda1c2bfd92bf02f73a4c9b61d46f,I2_superseded,TRUE,1,17525
+N15/pc_run/b1/C31/evidence_first_0500/C31_arms.csv,3e32165c5d367b925f1a90cb3f0b179435ba457ca92fa1f9ecd633302c02d30f,I2_superseded,TRUE,1,1601
+N15/pc_run/b1/C31/evidence_first_0500/C31_RESULTS.md,d2ba0b1dbff37f963c29f9f8cfbef35450b95590f78e97989d77e97c64c00e5d,I2_superseded,TRUE,1,3870
+N15/pc_run/b1/C39/evidence_first_0500/C39_ARM_MANIFESTS.txt,6783dbfdb3d573022cdb1e81d4119cb6385692ba65950de005c2da0e3589eaea,I2_superseded,TRUE,1,10872
+N15/pc_run/b1/C39/evidence_first_0500/C39_arms.csv,433e3fd14bc69d6b08fddda0c2a4aca61e1bf7e7f2407f061ba6a4a44a5d2bc0,I2_superseded,TRUE,1,1333
+N15/pc_run/b1/C39/evidence_first_0500/C39_RESULTS.md,8b0c8d647501225b6177dfc2fb9c430a3fc207ef7193e3cba68754cbddda3888,I2_superseded,TRUE,1,3529
+N15/REAJ/C26/C26_3_ADJUDICATOR_Grok_REAJ.HEAD.txt,7a524c04806e005bb852efc3a695b6c37bc8b965c3ca0d1a97754ee5d8ada93b,I5_assembly,TRUE,1,46320
+N15/REAJ/C45/C45_3_ADJUDICATOR_Grok_REAJ.HEAD.txt,0dce5a010c1a3d3955093d78af3f0c99e33d4f047286afa3999f56680f50f933,I5_assembly,TRUE,1,44973
+
+## outputs/UNHASHED_TRAIL_FILES.txt (SHA-256 68ebb5eedb6ccd0978e2ca9a1cf5ed88ffbdd428b0da8458648ced85c5d73287, 598 trail files listed in no hash list) by kind: .jsonl 3, .sha256 449, other 146
+
+
+---
+# C43_EVIDENCE.sha256
+16a70ce40a247244eeb9420b437e479e60280397354da3da495fcd55d6b58110  C43_ARM_MANIFESTS.txt
+5615083eef5e8fec6bb0411e3c2a5ed85d112d18eb5c570e10214925d89881a3  C43_arms.csv
+575ccb4991f3711fd902e05e7c21a9d16c9a162687f643178b9d19bf1005f5fc  C43_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files, the C43 trail index and its unpacked copy) are listed by hash and size only.
+arms/AUDIT in  :: 4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406  12940  c43_audit.R
+arms/AUDIT in  :: f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794  991  CLASS_RULES.tsv
+arms/AUDIT in  :: 4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220  518  RECORD_RULES.tsv
+arms/AUDIT in  :: 0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9  4065280  TRAIL_INDEX.tar
+arms/AUDIT out :: d81bd991e79dd93d591529e3afa7b144820bf1575ce6f50021fdcb56c6f8df2e  107  outputs\AUDIT_RESULT.txt
+arms/AUDIT out :: d8039778c6bf7525860a2525b07adc1db68a3500a29046e081e808f108f6e880  4169227  outputs\CITATIONS.csv
+arms/AUDIT out :: 5f547e70bf5a6bf052296e09145c46f8d866ffb3bdf0c312d3d5ff918cf73914  2180893  outputs\HASHED_ARTIFACTS.csv
+arms/AUDIT out :: 229b5739b6f9d0780964667ddd6d4e81d4d86ce6578908013be01604cf300ec5  2308  outputs\NEEDED.csv
+arms/AUDIT out :: 121257bea423d255fb442496e3e6760f381e9eb11c03adee3d55bec66c435f24  91  outputs\SELFTEST.txt
+arms/AUDIT out :: 637501375cb1396ea8e2df568a22be9aef30366f97e21d5ff2c9a8c32f1b3cef  613  outputs\SUMMARY.txt
+arms/AUDIT out :: 68ebb5eedb6ccd0978e2ca9a1cf5ed88ffbdd428b0da8458648ced85c5d73287  28650  outputs\UNHASHED_TRAIL_FILES.txt
+arms/AUDIT out :: db3e105396c28123552071e194f1386147e19f05cab91f26d67f5f4317b44fae  41  RUN_AUDIT.exit
+arms/AUDIT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_AUDIT.stderr.txt
+arms/AUDIT out :: 431bf0f4f6e59bf1c84c2a374968f40d35af193dd6de249c0afdd896a406fa60  108  RUN_AUDIT.stdout.txt
+
+---
+# SEED / HARNESS FILES (full text of new runner-side files; binary or verbatim-copied files by hash)
+### seeds/C43/TRAIL_INDEX.tar (4065280 bytes, sha256 0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9) — trail index: 7804 files of N15+N13 with mtime <= 2026-10-03 10:52:00 CT; 598 hash lists; 24 record files (copies verified against INVENTORY.tsv by c43_audit.R)
+### seeds/C43/TRAIL_INDEX_INVENTORY.tsv (1170107 bytes, sha256 cbe2903cbcb915f6e708efb075146a060a372a596b217af16d4b060c1957b6a9)
+(TRAIL_INDEX_INVENTORY.tsv = INVENTORY.tsv inside the tar, kept beside it for reading)
+### seeds/C43/c43_audit.R (12940 bytes, sha256 4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406)
+#!/usr/bin/env Rscript
+# C43 freeze-scope audit (N13 batch b6; Addendum 01 #43). R only; reads a frozen trail index, writes only under <OUTDIR>.
+# Usage: Rscript c43_audit.R <TRAIL_INDEX.tar> <CLASS_RULES.tsv> <RECORD_RULES.tsv> <OUTDIR>
+# "Needed" (mechanical, declared in the SPEC): an intermediate (class I) hashed artifact is NEEDED when an audit or reconstruction
+# record cites it by (a) its SHA-256 (full, or a prefix of >= 8 hex characters) and no gate-feeding (class G) artifact has the same
+# SHA-256, or (b) its path inside the run, or its file name when that name is unique in the trail and >= 12 characters, or (c) the name
+# of the intermediate directory that holds it. Records that are themselves class I are not scanned.
+suppressPackageStartupMessages({ library(digest); library(jsonlite) })
+a <- commandArgs(trailingOnly = TRUE); if (length(a) != 4) { cat("usage: Rscript c43_audit.R <TRAIL_INDEX.tar> <CLASS_RULES.tsv> <RECORD_RULES.tsv> <OUTDIR>\n"); quit(status = 2) }
+tarf <- a[[1]]; rules <- read.delim(a[[2]], colClasses = "character", quote = "", comment.char = ""); recr <- read.delim(a[[3]], colClasses = "character", quote = "", comment.char = "")
+OUT <- a[[4]]; dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+HEX <- "(?<![0-9a-fA-F])[0-9a-f]{8,64}(?![0-9a-fA-F])"
+classify <- function(p) { cls <- rep(NA_character_, length(p)); rid <- cls
+  for (i in seq_len(nrow(rules))) { m <- is.na(cls) & grepl(rules$regex[i], p, perl = TRUE); cls[m] <- rules$class[i]; rid[m] <- rules$rule[i] }
+  data.frame(class = cls, rule = rid, stringsAsFactors = FALSE) }
+rdl <- function(p) { x <- readLines(p, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2); x }
+nrm <- function(p) sub("^\\./", "", gsub("\\\\", "/", p))
+# ---- parse one hash list into (listed path, sha, bytes, prefix) ----
+parse_text <- function(x) { x <- trimws(x, which = "right"); out <- list(); bad <- 0L
+  for (ln in x) { if (!nzchar(trimws(ln)) || startsWith(trimws(ln), "#")) next
+    pre <- ""; body <- ln; if (grepl(" :: ", ln, fixed = TRUE)) { pre <- sub(" :: .*$", "", ln); body <- sub("^.*? :: ", "", ln) }
+    m <- regmatches(body, regexec("^([0-9a-f]{64})(?:\\s{2}([0-9]+))?\\s+\\*?(.+)$", body, perl = TRUE))[[1]]
+    if (length(m)) out[[length(out) + 1]] <- c(path = nrm(m[4]), sha = m[2], prefix = pre) else if (grepl("[0-9a-f]{64}", body)) bad <- bad + 1L }
+  list(rows = out, bad = bad) }
+walk_json <- function(o, acc) {
+  if (is.list(o)) { nm <- names(o)
+    if (!is.null(nm)) for (k in nm) { v <- o[[k]]
+      if (is.character(v) && length(v) == 1 && grepl("^[0-9a-f]{64}$", v) && (k == "sha256" || grepl("_sha256$", k))) {
+        pk <- if (k == "sha256") "path" else sub("_sha256$", "", k)
+        pv <- if (is.character(o[[pk]])) o[[pk]] else if (is.character(o[[paste0(pk, "_path")]])) o[[paste0(pk, "_path")]] else NA_character_
+        acc$rows[[length(acc$rows) + 1]] <- c(path = if (is.na(pv)) paste0("(unpaired:", k, ")") else nrm(pv), sha = v, prefix = "") } }
+    for (v in o) { if (is.character(v)) for (s in v) if (grepl("^[0-9a-f]{64}\\s+\\S", s)) acc$rows <- c(acc$rows, parse_text(s)$rows)
+      acc <- walk_json(v, acc) } }
+  acc }
+parse_list <- function(f, rel) {
+  if (grepl("\\.jsonl$", rel)) { acc <- list(rows = list()); bad <- 0L
+    for (ln in rdl(f)) if (nzchar(trimws(ln))) { o <- tryCatch(fromJSON(ln, simplifyVector = FALSE), error = function(e) NULL); if (is.null(o)) bad <- bad + 1L else acc <- walk_json(o, acc) }
+    return(list(rows = acc$rows, bad = bad)) }
+  if (grepl("\\.json$", rel)) { o <- tryCatch(fromJSON(paste(rdl(f), collapse = "\n"), simplifyVector = FALSE), error = function(e) NULL)
+    if (is.null(o)) return(list(rows = list(), bad = 1L)); return(list(rows = walk_json(o, list(rows = list()))$rows, bad = 0L)) }
+  parse_text(rdl(f)) }
+# ---- core audit (used by the self-test and by the real run) ----
+audit <- function(inv, lists, records) {   # inv: data.frame(path, bytes, sha256); lists / records: named character vectors path -> local file
+  invp <- inv$path; H <- list(); bad <- 0L
+  for (rel in names(lists)) { r <- parse_list(lists[[rel]], rel); bad <- bad + r$bad; ld <- dirname(rel); run <- sub("/.*$", "", rel)
+    for (z in r$rows) { p <- z[["path"]]
+      cand <- if (nzchar(z[["prefix"]])) file.path(dirname(ld), dirname(nrm(z[["prefix"]])), p) else c(file.path(ld, p), file.path(run, p))
+      cand <- nrm(gsub("/+", "/", cand)); hit <- cand[cand %in% invp]
+      H[[length(H) + 1]] <- data.frame(list = rel, listed = p, logical = if (length(hit)) hit[1] else cand[1], resolved = length(hit) > 0, sha256 = z[["sha"]], stringsAsFactors = FALSE) } }
+  H <- if (length(H)) do.call(rbind, H) else data.frame(list = character(), listed = character(), logical = character(), resolved = logical(), sha256 = character())
+  cl <- classify(H$logical); H$class <- cl$class; H$rule <- cl$rule
+  key <- paste(H$logical, H$sha256)
+  A <- H[!duplicated(key), c("logical", "sha256", "class", "rule", "resolved")]
+  A$n_records <- as.integer(table(key)[paste(A$logical, A$sha256)])
+  A$bytes <- suppressWarnings(as.numeric(inv$bytes[match(A$logical, invp)]))
+  Gsha <- unique(A$sha256[A$class == "G"]); I <- A[A$class == "I", ]
+  bn <- basename(invp); bcount <- table(bn); Gbn <- unique(basename(A$logical[A$class == "G"]))
+  idirs <- unique(unlist(regmatches(I$logical, gregexpr("(_smoke[^/]*|_preflight[^/]*|_interim[^/]*|_superseded[^/]*|evidence_first_[^/]*)(?=/)", I$logical, perl = TRUE))))
+  C <- list(); nrec <- 0L; nexcl <- 0L
+  relp <- sub("^[^/]+/", "", I$logical); b <- basename(I$logical); okb <- as.integer(bcount[b]) == 1 & nchar(b) >= 12 & !(b %in% Gbn)
+  addc <- function(j, kind, rp, x, pat) { li <- which(grepl(pat, x, fixed = TRUE)); lapply(li, function(i) data.frame(artifact = if (is.na(j)) paste0("(directory) ", pat) else I$logical[j], sha256 = if (is.na(j)) "" else I$sha256[j],
+      rule = if (is.na(j)) classify(paste0("x/", pat, "/y"))$rule else I$rule[j], kind = kind, record = rp, line = i, text = substr(trimws(x[i]), 1, 300), stringsAsFactors = FALSE)) }
+  for (rp in names(records)) { if (classify(rp)$class == "I") { nexcl <- nexcl + 1L; next }; nrec <- nrec + 1L
+    x <- rdl(records[[rp]]); whole <- paste(x, collapse = "\n")
+    for (i in seq_along(x)) { ln <- x[i]; toks <- regmatches(ln, gregexpr(HEX, ln, perl = TRUE))[[1]]
+      for (t in unique(toks)) { m <- which(startsWith(I$sha256, t)); if (length(m)) { gdup <- any(startsWith(Gsha, t))
+          for (j in m) C[[length(C) + 1]] <- data.frame(artifact = I$logical[j], sha256 = I$sha256[j], rule = I$rule[j], kind = if (gdup) "hash_but_G_copy_exists" else "hash", record = rp, line = i, text = substr(trimws(ln), 1, 300), stringsAsFactors = FALSE) } } }
+    for (j in seq_along(relp)) { bs <- gsub("/", "\\\\", relp[j], fixed = TRUE)
+      if (grepl(relp[j], whole, fixed = TRUE)) C <- c(C, addc(j, "path", rp, x, relp[j])) else if (grepl(bs, whole, fixed = TRUE)) C <- c(C, addc(j, "path", rp, x, bs))
+      else if (okb[j] && grepl(b[j], whole, fixed = TRUE)) C <- c(C, addc(j, "file_name", rp, x, b[j])) }
+    for (d in idirs) if (grepl(d, whole, fixed = TRUE)) C <- c(C, addc(NA, "directory", rp, x, d)) }
+  C <- if (length(C)) do.call(rbind, C) else data.frame(artifact = character(), sha256 = character(), rule = character(), kind = character(), record = character(), line = integer(), text = character())
+  C <- C[!duplicated(paste(C$artifact, C$kind, C$record, C$line)), ]
+  N <- C[C$kind != "hash_but_G_copy_exists", ]
+  list(H = H, A = A, C = C, N = N, bad = bad, nrec = nrec, nexcl = nexcl, idirs = idirs) }
+# ---- self-test (known answers; the real run aborts if it fails) ----
+st <- tempfile("c43st"); dir.create(st)
+s1 <- digest("intermediate", algo = "sha256", serialize = FALSE); s2 <- digest("gate", algo = "sha256", serialize = FALSE); s3 <- digest("dup", algo = "sha256", serialize = FALSE)
+writeLines(c(paste0(s1, "  _smoke_x/a_partial_capture.txt"), paste0(s2, "  C99/packets/C99_1_BUILDER_ChatGPT.txt"), paste0(s3, "  _smoke_x/copy.csv"), paste0(s3, "  C99/arms/B/copy.csv")), file.path(st, "L.sha256"))
+writeLines(c("Superseded capture ", substr(s1, 1, 16), "… was re-read for the audit."), file.path(st, "R_cite.md"))
+writeLines(c("Packet ", substr(s2, 1, 16), "… and output ", substr(s3, 1, 12), "… cited (G copy exists)."), file.path(st, "R_clean.md"))
+invst <- data.frame(path = c("T/_smoke_x/a_partial_capture.txt", "T/C99/packets/C99_1_BUILDER_ChatGPT.txt", "T/_smoke_x/copy.csv", "T/C99/arms/B/copy.csv", "T/L.sha256"), bytes = "1", sha256 = c(s1, s2, s3, s3, "x"), stringsAsFactors = FALSE)
+r1 <- audit(invst, c("T/L.sha256" = file.path(st, "L.sha256")), c("T/RESULTS_cite.md" = file.path(st, "R_cite.md")))
+r2 <- audit(invst, c("T/L.sha256" = file.path(st, "L.sha256")), c("T/RESULTS_clean.md" = file.path(st, "R_clean.md")))
+st_cite <- nrow(r1$N[r1$N$kind == "hash", ]) == 1 && r1$N$artifact[r1$N$kind == "hash"][1] == "T/_smoke_x/a_partial_capture.txt"
+st_clean <- nrow(r2$N) == 0 && any(r2$C$kind == "hash_but_G_copy_exists")
+st_class <- identical(classify(c("N15/_smoke_b3/x", "N13/C48/packets/C48_3_ADJUDICATOR_Grok.HEAD.TEMPLATE.txt", "N15/C26/C26-builder/builder_chatgpt.html", "N15/C26/C26-builder/builder_chatgpt_files/a.js", "N13/N13_runner_v1.tar", "N15/RESULTS_N15.md.pre_reaj.bak"))$class, c("I", "I", "G", "I", "I", "I"))
+selftest <- if (st_cite && st_clean && st_class) "PASS" else "FAIL"
+writeLines(sprintf("selftest=%s seed_cite_detected=%s clean_not_flagged_with_G_copy=%s class_rules=%s", selftest, st_cite, st_clean, st_class), file.path(OUT, "SELFTEST.txt"))
+if (selftest != "PASS") { cat("SELFTEST FAIL\n"); quit(status = 4) }
+# ---- real run ----
+ex <- file.path(OUT, "_trail"); if (dir.exists(ex)) stop("_trail exists; never overwritten"); untar(tarf, exdir = ex)
+inv <- read.delim(file.path(ex, "INVENTORY.tsv"), colClasses = "character", quote = "", comment.char = "")
+lf <- list.files(file.path(ex, "lists"), recursive = TRUE, all.files = TRUE); rf <- list.files(file.path(ex, "records"), recursive = TRUE, all.files = TRUE)
+lists <- setNames(file.path(ex, "lists", lf), lf); recs <- setNames(file.path(ex, "records", rf), rf)
+recs <- recs[Reduce(`|`, lapply(recr$regex, function(rx) grepl(rx, names(recs), perl = TRUE)))]
+for (p in c(names(lists), names(recs))) { h <- inv$sha256[match(p, inv$path)]; f <- if (p %in% names(lists)) lists[[p]] else recs[[p]]
+  if (is.na(h) || digest(file = f, algo = "sha256") != h) { cat("index copy does not match INVENTORY:", p, "\n"); quit(status = 5) } }
+r <- audit(inv, lists, recs)
+write.csv(r$A, file.path(OUT, "HASHED_ARTIFACTS.csv"), row.names = FALSE); write.csv(r$C, file.path(OUT, "CITATIONS.csv"), row.names = FALSE)
+ND <- r$N[!duplicated(paste(r$N$artifact, r$N$kind)), c("artifact", "sha256", "rule", "kind")]
+ND$n_citing_lines <- as.integer(table(paste(r$N$artifact, r$N$kind))[paste(ND$artifact, ND$kind)])
+ND$records <- vapply(seq_len(nrow(ND)), function(i) paste(unique(r$N$record[r$N$artifact == ND$artifact[i] & r$N$kind == ND$kind[i]]), collapse = "|"), "")
+write.csv(ND, file.path(OUT, "NEEDED.csv"), row.names = FALSE)
+byrule <- table(factor(r$A$rule, levels = rules$rule)); Ib <- sum(r$A$bytes[r$A$class == "I"], na.rm = TRUE)
+nh <- length(unique(r$N$artifact[r$N$kind == "hash"])); np <- length(unique(r$N$artifact[r$N$kind %in% c("path", "file_name")])); nd <- length(unique(r$N$artifact[r$N$kind == "directory"]))
+unl <- setdiff(inv$path, r$A$logical)
+S <- c(sprintf("trail_files=%d", nrow(inv)), sprintf("hash_list_files=%d", length(lists)), sprintf("hash_records=%d", nrow(r$H)), sprintf("unparsed_hash_lines=%d", r$bad),
+       sprintf("distinct_hashed_artifacts=%d", nrow(r$A)), sprintf("unresolved_paths=%d", sum(!r$A$resolved)), sprintf("class_G=%d", sum(r$A$class == "G")), sprintf("class_I=%d", sum(r$A$class == "I")),
+       paste0("by_rule: ", paste(sprintf("%s=%d", names(byrule), as.integer(byrule)), collapse = " ")), sprintf("class_I_bytes_known=%.0f", Ib),
+       sprintf("hash_records_class_I=%d", sum(r$H$class == "I")), sprintf("records_scanned=%d", r$nrec), sprintf("records_excluded_class_I=%d", r$nexcl),
+       sprintf("intermediate_dirs=%s", paste(r$idirs, collapse = "|")), sprintf("citations_total=%d", nrow(r$C)), sprintf("citations_hash_with_G_copy=%d", sum(r$C$kind == "hash_but_G_copy_exists")),
+       sprintf("needed_by_hash=%d", nh), sprintf("needed_by_path_or_name=%d", np), sprintf("needed_by_directory=%d", nd), sprintf("trail_files_not_in_any_hash_list=%d", length(unl)))
+writeLines(S, file.path(OUT, "SUMMARY.txt"))
+writeLines(sprintf("selftest=%s needed_by_hash=%d needed_by_path_or_name=%d needed_by_directory=%d status=%s", selftest, nh, np, nd, if (nh + np + nd == 0) "NONE_NEEDED" else "INTERMEDIATE_NEEDED"), file.path(OUT, "AUDIT_RESULT.txt"))
+writeLines(unl, file.path(OUT, "UNHASHED_TRAIL_FILES.txt"))
+cat(readLines(file.path(OUT, "AUDIT_RESULT.txt")), "\n")
+### seeds/C43/CLASS_RULES.tsv (991 bytes, sha256 f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794)
+rule	class	regex	meaning
+I1_scratch	I	(^|/)(_smoke[^/]*|_preflight[^/]*|_interim[^/]*)(/|$)|(^|/)smoke_[^/]*\.tgz$	scratch, smoke, preflight or interim runs (non-reporting)
+I2_superseded	I	(^|/)_superseded[^/]*/|\.bak$|\.HEAD\.v[0-9]+\.txt$|(^|/)evidence_first_[^/]*/|\.partial(/|$)	superseded versions, first or failed copies kept aside
+I3_bundle	I	\.(tar|tgz|zip)$|(^|/)pull_[^/]*\.lst$	transfer bundles and their listings (copies of files that are hashed in their own right)
+I4_page_asset	I	_files/	asset files (scripts, styles, images) of a saved chat page; the page itself (.html) and its extracted text stay gate-feeding
+I5_assembly	I	\.HEAD\.txt$|\.TEMPLATE\.txt$	assembly inputs (adjudicator HEAD, packet templates) whose full text is inside the assembled, hashed packet
+G0_gate	G	.*	everything else: final captures (.html page, extracted .md), deployed code and seeds, frozen pack files, arm outputs and run records, specs, constitution, packets, evidence, results, terminal states
+### seeds/C43/RECORD_RULES.tsv (518 bytes, sha256 4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220)
+rule	regex	meaning
+R1_narrative	(^|/)(RESULTS_[^/]*\.md|SUMMARY_[^/]*\.md|TOOLS_PATCH_LOG\.txt|PROGRESS_[^/]*\.md|PLAN_[^/]*\.md|SELECTION_[^/]*\.md)$	coordinator narrative records (results, summaries, patch log, progress, plans, selection)
+R2_reaj	^N15/REAJ/.*\.(md|txt)$	re-adjudication records and packets (an audit of earlier verdicts)
+R3_disclosure	(^|/)(PRECHECK_[^/]*\.json|README[^/]*\.(txt|md)|INTERIM\.txt|REAJ_RECORD\.txt)$	disclosure records (pre-execution checks, supersession notes, interim evaluations)
+### seeds/C43/ARMS.tsv (154 bytes, sha256 25d004971a97c26af0e468dc50bb45d3788a8efd9eb1692cdcd80ac938a84d67)
+arm	input	desc
+AUDIT	seeds\C43\TRAIL_INDEX.tar	freeze-scope audit of the coordinator's own N15+N13 hash trail (cut 2026-10-03 10:52:00 CT); 0 extra chats
+### seeds/C43/AUDIT (35 bytes, sha256 b0fcc932c071cf7d9a8ebe459130b898fcd94797157d76d6ad106068c7e5c1a3)
+C43 freeze-scope audit (runner v6)
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C43",
+  "frozen_at_ct": "2026-10-03 12:24:23 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C43/C43-builder/builder_report.md", "bytes": 19649, "sha256": "445f74af883d77fca26b1124db37fa460acd0fc00093f050c2046ba104b4701c", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C43/C43-validator/validator_report.md", "bytes": 11261, "sha256": "4148f956fdbc4adfa519df5d88250d61b0cba06de70a99f50aea5fb87f9b17f4", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "d304f4f9be0a8a574a1b5dc2449577f4fc31762a1543c56b90e717ceea7ee95d"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C43 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as the Builder** for **C43 — Addendum 01b, candidate #43, “Freeze scope.”** I am making an independent first pass, am blind to the Validator’s first-pass output, and am not assuming an Adjudicator role. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. C43 targets governance of the coordinator’s freeze/hash trail across all stages, using the coordinator’s N15+N13 box-side trail cut at 2026-10-03 10:52:00 CT.
+
+The control does not rerun an analytical R path, connect to MySQL, or read clock values. The disclosed OF-1 repeated-hour discrepancy in the frozen R-A/R-B pack is therefore outside C43’s measured surface and cannot change a C43 count.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+Conceptually, C43 tests narrowing the freeze/hash obligation. The standing rule freezes, hashes, and logs every intermediate capture, failed copy, and partial reply. The variant would continue hashing gate-feeding artifacts but would cease requiring hashes for artifacts mechanically classified as intermediate. It does **not** test deleting final evidence or changing analytical calculations; it tests removing five class-I categories from the mandatory hash scope while retaining class G.
+
+The five excluded classes are exactly: I1 scratch/preflight/interim material; I2 superseded or failed versions; I3 transfer bundles/listings; I4 saved-page asset folders; and I5 assembly inputs such as `.HEAD.txt` and `.TEMPLATE.txt`. G0 retains everything else, including final captures, deployed code and seeds, frozen-pack files, arm outputs, specs, packets, evidence, results, and terminal-state artifacts. The seeded `CLASS_RULES.tsv` implements those rules first-match-wins.
+
+There is one evidence-pack qualification. `runner_b6/SEED_DIFFS_b6.txt` is frozen and identified by SHA-256 `729ed8cad382ae82805499d493bf7eb8fa38687665286649bb3746330f0b1e2d`, but its verbatim body is not reproduced in this packet. Therefore I cannot truthfully claim to quote the textual contents of that diff file itself. The packet does, however, reproduce the C43 seed/harness files from which the concrete C43 implementation can be independently reconstructed.
+
+The reconstructable seeded changes are as follows. `ARMS.tsv` creates one `AUDIT` arm over `seeds\C43\TRAIL_INDEX.tar`; the `AUDIT` marker identifies it as the runner-v6 freeze-scope audit. `CLASS_RULES.tsv` adds the six first-match classifications I1–I5 and G0. `RECORD_RULES.tsv` defines three record populations: R1 coordinator narratives, R2 N15 re-adjudication material, and R3 disclosures.
+
+The new `c43_audit.R` parses textual, JSON, JSONL, and arm-manifest hash records; resolves their paths against the frozen inventory; deduplicates hashed artifacts by logical-path/SHA pair; classifies each artifact; excludes records that are themselves class I; and scans eligible records for three forms of evidence: SHA citations, path/eligible unique-filename citations, and intermediate-directory citations. A SHA citation is downgraded to `hash_but_G_copy_exists` when a class-G artifact retains matching bytes, so it does not count as an intermediate dependency.
+
+The audit also seeds known-answer tests before touching the real trail: one planted intermediate hash citation must be detected, a hash whose bytes also exist in G must not be counted, and six known paths must receive the declared classes. Failure aborts before the real audit.
+
+For the real run, the tar is unpacked under the output directory, every copied list and scanned record is re-hashed against `INVENTORY.tsv`, and an inventory mismatch causes the audit to stop. The code then writes `HASHED_ARTIFACTS.csv`, `CITATIONS.csv`, `NEEDED.csv`, `SUMMARY.txt`, `AUDIT_RESULT.txt`, `SELFTEST.txt`, and `UNHASHED_TRAIL_FILES.txt`; the three operative counts are distinct needed artifacts by hash, by path/file name, and by directory.
+
+No C43 analytical seed alters R-A, R-B, the Chicago 311 source data, portfolio outputs, or κ-grid outputs. Those files remain frozen inputs checked by the batch preflight rather than mutated C43 surfaces.
+
+## 3. Hard mechanical facts table.
+
+| ID | Hard fact | Independent calculation / observation | Status |
+| --- | --- | --- | --- |
+| HF-01 | One reporting arm exists. | `C43_arms.csv` contains only `AUDIT`. | **Recomputed from table row count.** |
+| HF-02 | AUDIT exited successfully in 35.7 s. | Raw exit row gives exit `0`, elapsed `35.7`. | **Quoted.** |
+| HF-03 | Self-test has 3/3 successful components. | `seed_cite_detected=TRUE`, `clean_not_flagged_with_G_copy=TRUE`, `class_rules=TRUE`; conjunction gives PASS. | **Recomputed; matches quoted PASS.** |
+| HF-04 | Distinct hashed artifacts = 14,095. | `8,130 G + 5,965 I = 14,095`. | **Recomputed.** |
+| HF-05 | Class-I rule counts reconcile to 5,965. | `1,650 + 62 + 3 + 4,210 + 40 = 5,965`. | **Recomputed.** |
+| HF-06 | Detailed folder counts independently reconcile to each class-I summary. | Folder table sums to I1=`1,650`, I2=`62`, I3=`3`, I4=`4,210`, I5=`40`. | **Recomputed from 102 detailed folder rows.** |
+| HF-07 | Known class-I bytes = 500,660,758. | `7,353,129 + 1,675,268 + 2,504,801 + 487,189,756 + 1,937,804 = 500,660,758`. | **Recomputed.** |
+| HF-08 | Known bytes across G+I = 567,330,051; class I is 88.25% of known bytes. | `66,669,293 + 500,660,758 = 567,330,051`; `500,660,758 / 567,330,051 = 88.25%`. | **Recomputed.** |
+| HF-09 | Class I is 42.32% of distinct hashed artifacts. | `5,965 / 14,095 = 42.32%`. | **Recomputed.** |
+| HF-10 | I4 saved-page assets dominate known class-I byte cost. | `487,189,756 / 500,660,758 = 97.31%`; the remaining I classes account for 13,471,002 known bytes. | **Recomputed.** |
+| HF-11 | Total unresolved hashed artifacts = 6,868. | `5,738 G + 1,128 I1 + 2 I2 + 0 + 0 + 0 = 6,868`. | **Recomputed.** |
+| HF-12 | Class-I unresolved artifacts = 1,130; resolved distinct artifacts overall = 7,227. | `1,128 + 2 = 1,130`; `14,095 − 6,868 = 7,227`. | **Recomputed.** |
+| HF-13 | Hash-list records exceed distinct path/SHA artifacts by 2,166. | `16,261 − 14,095 = 2,166` repeated list occurrences after path/SHA deduplication. | **Recomputed.** |
+| HF-14 | Class-I hash-list records exceed distinct class-I artifacts by 415. | `6,380 − 5,965 = 415`. Correspondingly G has `16,261−6,380=9,881` hash records, or `9,881−8,130=1,751` repeats. | **Recomputed.** |
+| HF-15 | The frozen trail contains 24 candidate record files, 21 scanned and 3 excluded as class I. | `21 + 3 = 24`, exactly matching the trail-index declaration of 24 record files. | **Recomputed cross-table identity.** |
+| HF-16 | Total citation rows reconcile exactly. | `11,198 hash_but_G_copy_exists + 16 counted rows = 11,214 total`. | **Recomputed.** |
+| HF-17 | Counted dependency identities reconcile to 15 distinct needed artifact/kind entries. | `10 hash + 2 path/file-name + 3 directory = 15`. `NEEDED.csv` has 15 data rows. | **Recomputed.** |
+| HF-18 | Those 15 distinct entries generate 16 counted citing lines. | `_interim_b4` has 2 citing lines; each of the remaining 14 entries has 1, so `2 + 14 = 16`. | **Recomputed.** |
+| HF-19 | The 10 hash-needed artifact entries contain 5 unique SHA-256 values. | C26, C31, C39, C30 and C29 each contribute a HEAD / HEAD.v1 pair sharing the same historical SHA. | **Recomputed from hashes.** |
+| HF-20 | Exactly 2 path/file-name dependencies are present, and both are path dependencies. | `pc_run_b2.tgz` and `pc_run_b3.tgz`; there is no `file_name` row among counted entries. | **Recomputed.** |
+| HF-21 | Exactly 3 distinct intermediate directories are cited. | `_interim_b4`, `_superseded_v0`, `_smoke_b3`. `_interim_b4` is cited twice but counts once as a distinct needed directory. | **Recomputed.** |
+| HF-22 | Four intermediate directory names exist in the audit’s discovered set, but only three are cited. | Discovered set is `_interim_b4`, `_superseded_v0`, `_smoke_b3`, `evidence_first_0500`; the latter is absent from `NEEDED.csv`. | **Recomputed.** |
+| HF-23 | 598 trail files are absent from every parsed hash list. | Breakdown `3 .jsonl + 449 .sha256 + 146 other = 598`. | **Recomputed.** |
+| HF-24 | Trail index contains 7,804 files and 598 hash-list files. | Direct trail-index/SUMMARY counts agree. | **Quoted and cross-checked.** |
+| HF-25 | No parsed hash lines failed. | `unparsed_hash_lines=0`. | **Quoted.** |
+| HF-26 | Trail-index SHA is consistent across the frozen reference, runner-side file listing, arm input manifest, and actual arm result prefix. | Full hash is `0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9`; arm result reports its matching `0fcc3b64ac8d464a` prefix. | **Recomputed hash equality/prefix equality.** |
+| HF-27 | C43 audit-code and rule-file hashes reconcile across frozen/preflight/arm evidence. | `c43_audit.R=4c7923…406`, `CLASS_RULES.tsv=f19694…794`, `RECORD_RULES.tsv=4a56ec…220` repeat consistently in preflight, runner-side listing, and arm manifest. | **Recomputed equality.** |
+
+The task template mentions identities such as `n_agree + n_disagree = n_inner`, portfolio deltas, D-sets, and cross-arm hash comparisons. Those data structures are not instantiated by C43: this is a single-arm hash-trail audit, not a two-analytical-arm classification ablation. I therefore do not manufacture portfolio or D-set quantities that the C43 evidence does not contain. The applicable identities are the audit-count, class-count, byte-count, citation-count, record-count, and repeated-hash equalities above.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+P1 is a three-part conjunction. Condition 1 requires **zero** class-I artifacts needed by hash. The audit reports **10**, represented by ten hash-kind entries in `NEEDED.csv`; therefore condition 1 is false.
+
+Condition 2 requires both **zero** class-I dependencies by path/eligible file name and **zero** intermediate-directory citations. The audit reports **2** path/file-name dependencies and **3** distinct directory dependencies. The two path entries are `N15/pc_run_b2.tgz` and `N15/pc_run_b3.tgz`; the three directory entries are `_interim_b4`, `_superseded_v0`, and `_smoke_b3`. Therefore condition 2 is false.
+
+Condition 3 requires the auditor self-test to pass. All three seeded self-test components are true and `selftest=PASS`; therefore condition 3 is true.
+
+Because P1 requires all three conditions simultaneously, and conditions 1 and 2 are false while condition 3 is true, **P1 is not satisfied by the frozen C43 evidence**. This is the predicate assessment only; no terminal disposition is supplied.
+
+The cost quantity attached to the predicate is also mechanically available: narrowing the hash scope would remove **5,965 distinct class-I path/SHA artifacts from the mandatory scope**, representing **500,660,758 known bytes**. Because 1,130 class-I artifacts are unresolved in the box inventory, the byte figure is explicitly a known-byte quantity rather than proof that no additional bytes exist outside the box copy.
+
+## 5. Fixture and reconciliation implications.
+
+C43’s relevant locked fixture is its internal known-answer self-test, not the frozen R-A/R-B analytical fixture suite. It checks three specific semantic properties before the real audit: a planted class-I citation by hash prefix is detected; a cited class-I hash is not counted when identical bytes remain in class G; and six representative paths receive their expected I/G classifications. All three checks passed.
+
+The real audit then performs an integrity reconciliation of its frozen evidence copies. Every hash-list file and every selected record copied into `TRAIL_INDEX.tar` is re-hashed and matched to `INVENTORY.tsv` before use. The code stops on any absent inventory hash or digest mismatch. The observed arm exited `0`, with no such mismatch reported.
+
+There is also agreement across the mechanically redundant output surfaces: `C43_RESULTS.md`, `C43_arms.csv`, `AUDIT_RESULT.txt`, and `SUMMARY.txt` all report self-test PASS and needed counts of **10 by hash, 2 by path/file name, and 3 by directory**.
+
+The usual R-A/R-B exact reconciliation is not rerun by this control. C43 reads no frozen analytical pack file during the arm; the common batch preflight merely re-hashes the frozen source, R code, classification outputs, fixture outputs, portfolio counts, and κ-grid output before allowing execution. Those preflight checks passed.
+
+Consequently, OF-1 does not become a C43 fixture failure or a C43 reconciliation delta. The three known one-hour R-A/R-B differences exist in the frozen analytical pack, but C43 does not read those clock fields or derive any result from them.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The largest semantic limitation is declared in the frozen specification itself: written citation is an **upper-bound proxy** for genuine necessity. A coordinator record may mention an intermediate artifact even if the audit did not depend on it. Conversely, silent dependency is invisible if an audit used an intermediate artifact without recording its path, file name, hash, or containing directory. The evidence universe is further restricted to the box-side trail; PC-only files may appear only as logical hash entries, and chat replies are not scanned as audit/reconstruction records.
+
+That matters when interpreting the observed 15 distinct needed entries. The evidence establishes that those intermediate artifacts/directories were **cited under the predeclared mechanical rule**. It does not independently prove that every citation was causally indispensable to the historical reconstruction. Likewise, an absence of a citation would not prove an intermediate was never silently consulted.
+
+A second coverage risk is the large unresolved population. Of 14,095 distinct hashed path/SHA artifacts, 6,868 are unresolved against the box inventory, including 1,130 class-I artifacts. They remain logically represented and may still be matched by their listed identities, but their bytes are not available for the known-byte cost calculation. Therefore 500,660,758 bytes is the exact sum of **known** class-I bytes, not a complete byte-size upper bound.
+
+A third coverage observation is that 598 files in the trail inventory appear in no parsed hash list. Their reported composition—3 JSONL, 449 SHA-list files, and 146 other files—reconciles to 598. C43’s dependency predicate is specifically defined over **class-I hashed artifacts**, so those files are not silently added to the tested population.
+
+A fourth semantic point is that the ten hash-needed artifacts reduce to five unique historical byte hashes. Each historical hash appears both for a `.HEAD.txt` path and for its preserved `.HEAD.v1.txt` counterpart. The count of ten is therefore an artifact-identity count under the declared path/SHA rule, not ten distinct byte contents. This does not change the zero-versus-nonzero predicate, but it matters when interpreting magnitude.
+
+The cost is also highly concentrated: saved-page assets account for **487,189,756 bytes, or 97.31% of the 500,660,758 known class-I bytes**, yet none of the counted dependency rows is an I4 page asset. The actual counted dependencies arise from scratch directories, a superseded directory/version set, two transfer bundles, and assembly/superseded HEAD artifacts. Thus storage/hash-volume concentration and reconstruction dependency concentration are different facts in this trail.
+
+The principal unchanged surfaces are strong and explicit. The two baseline framework hashes remain the frozen pre-hardening versions. The common preflight re-verifies the source extract, R-A runner, R-B runner/modules, classification files, fixture results, portfolio counts, and κ-grid counts. C43 itself is an R-only read-side audit with no MySQL or git activity and writes only its own audit outputs.
+
+Finally, there is an evidence-packaging limitation for this Builder task: the packet freezes the SHA of `SEED_DIFFS_b6.txt` but does not reproduce that file’s actual diff text. The new C43 seed/harness files are reproduced sufficiently to inspect the C43 audit implementation itself, but an independent line-by-line verification that those files are exactly what `SEED_DIFFS_b6.txt` described cannot be performed from this packet alone.
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence section and exact row(s) |
+| --- | --- |
+| **C1. C43 tests removing class I from the mandatory hash scope while retaining class G.** | SPEC → “Control under test” and “Exact change being tested”; `CLASS_RULES.tsv` rows I1_scratch through G0_gate. |
+| **C2. The reporting run consisted of one successful AUDIT arm.** | C43_RESULTS → Arms row `AUDIT`; raw `C43_arms.csv`; `RUN_AUDIT.exit`. |
+| **C3. The distinct-artifact inventory reconciles as 8,130 G + 5,965 I = 14,095.** | SUMMARY rows `distinct_hashed_artifacts`, `class_G`, `class_I`; Hashed artifacts by class/rule rows. |
+| **C4. The five I-rule counts reconcile exactly to 5,965.** | Hashed artifacts by class/rule rows I1–I5 and detailed “Class-I artifacts by rule and top folder” rows. |
+| **C5. Known class-I byte cost is 500,660,758 bytes.** | `HASHED_ARTIFACTS.csv` summarized rows I1–I5; arithmetic shown in HF-07. |
+| **C6. There are ten needed hash-artifact entries, representing five unique hashes.** | `NEEDED.csv` hash rows for C26, C31, C39, C30, C29 HEAD and HEAD.v1 pairs. |
+| **C7. There are two needed path entries and three needed directory identities.** | `NEEDED.csv` rows `_interim_b4`, `_superseded_v0`, `pc_run_b2.tgz`, `pc_run_b3.tgz`, `_smoke_b3`; SUMMARY needed-count rows. |
+| **C8. Citation accounting reconciles to 11,214 total rows.** | SUMMARY rows `citations_total=11214`, `citations_hash_with_G_copy=11198`; CITATIONS section states 16 counted rows. `11,198 + 16 = 11,214`. |
+| **C9. The self-test passes all three declared known-answer cases.** | `SELFTEST.txt` row; seeded self-test implementation `st_cite`, `st_clean`, `st_class`. |
+| **C10. P1 condition 1 is false, condition 2 is false, and condition 3 is true.** | SPEC → P1 conditions; C43_RESULTS → Predicate conditions; NEEDED and SELFTEST raw evidence. |
+| **C11. Twenty-one records were scanned and three excluded, reconciling to the 24 record files frozen into the trail index.** | SUMMARY rows `records_scanned=21`, `records_excluded_class_I=3`; seed description says trail index contains 24 record files. |
+| **C12. The audit re-verifies copied inputs against INVENTORY before scanning them.** | `c43_audit.R` real-run code: inventory read, lists/records selected, SHA comparison and stop-on-mismatch. |
+| **C13. The trail-index hash is consistent across frozen references and the AUDIT arm.** | Runner-side files and arm input manifest both give full SHA `0fcc3b64…c9c9`; results give matching prefix `0fcc3b64ac8d464a`. |
+| **C14. C43 does not exercise or alter the frozen analytical R paths.** | SPEC says C43 reruns no R path and reads no clock value; batch preflight separately verifies frozen R/data/output hashes. |
+| **C15. OF-1 is known but cannot change C43’s mechanical numbers.** | Coordinator Note N1 / SPEC “Known open finding N1 / OF-1.” |
+| **C16. The packet does not provide a verbatim** `SEED_DIFFS_b6.txt` **body, although its hash is frozen.** | SPEC freeze lists `runner_b6/SEED_DIFFS_b6.txt` SHA `729ed8…e2d`; packet subsequently supplies the C43 seed/harness files directly. |
+
+END C43 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+# C43 VALIDATOR REPORT
+
+## 1. Role attestation and ablation ID
+
+I am DeepSeek, acting only as Validator for this first pass. I am blind to the Builder; I have not seen and have not asked for the Builder output. I return no terminal state.
+
+Ablation ID: **C43** — Addendum 01b, candidate #43 “Freeze scope,” N13 batch b6.  
+Roles in the frozen spec: Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok.  
+Constitution version: 1.0, SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`.
+
+## 2. Independent test plan: what I checked, and how
+
+I performed a packet-only audit of the frozen C43 evidence. I did not rerun R, read MySQL, or use tools. I checked:
+
+1. Role and ablation identity against the SPEC.
+2. Frozen preflight gating against the declared frozen reference hashes and runner-side file hashes.
+3. Arm manifests against runner-side file hashes and output hashes quoted in the packet.
+4. Arithmetic identities in `SUMMARY.txt`, `NEEDED.csv`, `CITATIONS.csv`, and the summarized `HASHED_ARTIFACTS.csv`.
+5. The mechanical P1 condition mapping from `C43_RESULTS.md` against `NEEDED.csv` and `AUDIT_RESULT.txt`.
+6. Self-test evidence in `SELFTEST.txt` and `AUDIT_RESULT.txt`.
+7. Internal consistency of class totals, citation totals, needed counts, unresolved-path totals, and hash-list totals.
+8. The known N1 / OF-1 clock note, to confirm C43 does not depend on clock values or R path reruns.
+9. Cross-hash equality among preflight, frozen reference hashes, runner-side files, arm input manifests, and arm output manifests.
+
+## 3. Independently recomputed hard facts
+
+### Class and artifact identities
+
+From `SUMMARY.txt` and the summarized `HASHED_ARTIFACTS.csv`:
+
+- Class I total:  
+  `1650 + 62 + 3 + 4210 + 40 = 5965` → matches `class_I=5965`.
+- Class G total: `8130` → matches `class_G=8130`.
+- Distinct hashed artifacts:  
+  `8130 + 5965 = 14095` → matches `distinct_hashed_artifacts=14095`.
+- By-rule sum:  
+  `I1 1650 + I2 62 + I3 3 + I4 4210 + I5 40 + G0 8130 = 14095`.
+- Unresolved-path sum:  
+  `G 5738 + I1 1128 + I2 2 + I3 0 + I4 0 + I5 0 = 6868` → matches `unresolved_paths=6868`.
+- Class-I known bytes:  
+  `7,353,129 + 1,675,268 + 2,504,801 + 487,189,756 + 1,937,804 = 500,660,758` → matches `class_I_bytes_known=500660758`.
+
+### Needed and citation identities
+
+From `NEEDED.csv` and `CITATIONS.csv`:
+
+- Needed-by-directory: 3 rows:  
+  `_interim_b4`, `_superseded_v0`, `_smoke_b3` → matches `needed_by_directory=3`.
+- Needed-by-path: 2 rows:  
+  `N15/pc_run_b2.tgz`, `N15/pc_run_b3.tgz` → matches `needed_by_path_or_name=2`.
+- Needed-by-hash: 10 rows:  
+  `C26_3_ADJUDICATOR_Grok.HEAD.txt`, `C26_3_ADJUDICATOR_Grok.HEAD.v1.txt`, `C31...HEAD.txt`, `C31...HEAD.v1.txt`, `C39...HEAD.txt`, `C39...HEAD.v1.txt`, `C30...HEAD.txt`, `C30...HEAD.v1.txt`, `C29...HEAD.txt`, `C29...HEAD.v1.txt` → matches `needed_by_hash=10`.
+- `NEEDED.csv` contains 15 distinct artifact/kind rows, but the reported counts are by distinct artifact for hash and path/name and by directory name for directories.
+- Counted citation rows in `CITATIONS.csv`: 16 rows.
+- `hash_but_G_copy_exists` rows: `11198`.
+- Citation total:  
+  `16 + 11198 = 11214` → matches `citations_total=11214`.
+- Sum of `hash_but_G_copy_exists` by record:  
+  `29 + 48 + 48 + 48 + 3965 + 3 + 407 + 407 + 407 + 5229 + 414 + 193 = 11198` → matches `citations_hash_with_G_copy=11198`.
+
+### Trail and hash-list identities
+
+From `SUMMARY.txt` and `UNHASHED_TRAIL_FILES.txt`:
+
+- `trail_files=7804`.
+- `hash_list_files=598`.
+- `trail_files_not_in_any_hash_list=598`.
+- UNHASHED by kind: `.jsonl 3 + .sha256 449 + other 146 = 598` → matches the unhashed count.
+- `hash_records=16261`, `distinct_hashed_artifacts=14095`; the difference is duplicate hash records, consistent with the packet.
+- `unparsed_hash_lines=0`.
+
+### Cross-arm and cross-file hash equalities
+
+There is only one arm, `AUDIT`. No cross-arm behavioral deltas or D-sets are present in this C43 packet. I checked the hash equalities that are present:
+
+| Item | Packet hash | Check |
+| --- | --- | --- |
+| `runner_b6/seeds/C43/ARMS.tsv` | `25d004971a97c26af0e468dc50bb45d3788a8efd9eb1692cdcd80ac938a84d67` | matches preflight and frozen reference |
+| `runner_b6/seeds/C43/AUDIT` | `b0fcc932c071cf7d9a8ebe459130b898fcd94797157d76d6ad106068c7e5c1a3` | matches preflight and frozen reference |
+| `runner_b6/seeds/C43/CLASS_RULES.tsv` | `f19694e21b94dc5b02759767a5fd4eae121302c70c6f9d140ad2c3f7bbf1e794` | matches preflight and frozen reference |
+| `runner_b6/seeds/C43/RECORD_RULES.tsv` | `4a56ec8da726a0edda28d0302f8ba2f29d2490f65a50075474cab7cc40ffc220` | matches preflight and frozen reference |
+| `runner_b6/seeds/C43/TRAIL_INDEX.tar` | `0fcc3b64ac8d464abec4cdaa33315d7c3009111a9cf5c54a1967897e1fb4c9c9` | matches preflight, frozen reference, and arm input manifest |
+| `runner_b6/seeds/C43/TRAIL_INDEX_INVENTORY.tsv` | `cbe2903cbcb915f6e708efb075146a060a372a596b217af16d4b060c1957b6a9` | matches preflight and frozen reference |
+| `runner_b6/seeds/C43/c43_audit.R` | `4c792370f92be028cab6d92b585b17851a4d9689dc2ee97926e1a86e884e0406` | matches preflight, frozen reference, and arm input manifest |
+| `runner_b6/eval_b6.R` | `6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a` | matches preflight and frozen reference |
+| `runner_b6/run_batch_v6.ps1` | `5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb` | matches frozen reference |
+| Frozen key7 outputs | `c099...`, `a0e42...`, `33696...`, `0d722...`, `b588...`, `eb677...`, `7a18...` | all match preflight and `FROZEN_KEY7.sha256` lines |
+| Arm output files | `CITATIONS.csv d8039778...`, `HASHED_ARTIFACTS.csv 5f547e...`, `NEEDED.csv 229b...`, `SELFTEST.txt 121257...`, `SUMMARY.txt 6375...`, `UNHASHED_TRAIL_FILES.txt 68ebb...` | match arm manifest and quoted packet hashes |
+
+### Internal inconsistency flags
+
+- No arithmetic contradiction was found in the class totals, needed counts, citation totals, unresolved totals, or rule counts.
+- Minor reporting truncation: `trail_index_sha256` in `C43_arms.csv` and in the `C43_RESULTS.md` arm table is shown as `0fcc3b64ac8d464a` (16 hex characters), not the full 64-hex SHA-256. The full hash is present elsewhere and matches the frozen reference. This is a reporting truncation, not a hash mismatch.
+- `hash_records_class_I=6380`, `records_scanned=21`, and `records_excluded_class_I=3` cannot be independently recomputed from the summarized packet alone; I found no contradiction with the provided evidence.
+- Portfolio deltas and D-sets: not applicable to this C43 packet; no R-A/R-B portfolio delta table or D-set table is present. Cross-arm comparison is limited to the single `AUDIT` arm.
+
+## 4. Facts that cannot be recomputed from this packet
+
+The following cannot be independently recomputed from the provided evidence:
+
+1. The full 7,804-row `INVENTORY.tsv` and the full `TRAIL_INDEX.tar` contents.
+2. The full 14,095-row `HASHED_ARTIFACTS.csv`; only the summarized class/rule table is provided.
+3. The full 11,214-row `CITATIONS.csv`; only 16 counted rows and a summary of 11,198 `hash_but_G_copy_exists` rows are provided.
+4. The full 598-path `UNHASHED_TRAIL_FILES.txt`; only counts by kind are provided.
+5. The exact 21 scanned records and 3 excluded class-I records.
+6. `hash_records_class_I=6380` from raw hash-record tables.
+7. Individual `class_I_bytes_known` values for unresolved class-I artifacts.
+8. The actual preflight execution output beyond the quoted block.
+9. The self-test execution internals beyond `SELFTEST.txt`.
+10. The actual contents of the cited records beyond the quoted citation lines.
+11. The N1 / OF-1 clock values and R path behavior; C43 evidence does not include the clock rows or R reruns.
+12. The full list of 598 hash-list files and the full list of 598 unhashed trail files.
+13. Whether any audit or reconstruction depended silently on an intermediate artifact without naming or hashing it; the spec declares this limit.
+
+## 5. P1 assessment against the frozen predicate in the SPEC
+
+Frozen P1 conditions from the SPEC:
+
+1. **No class-I artifact is NEEDED by hash.**  
+   Evidence: `needed_by_hash=10`; `NEEDED.csv` lists ten class-I hash citations from `N15/TOOLS_PATCH_LOG.txt` for `C26`, `C31`, `C39`, `C30`, and `C29` `.HEAD.txt` and `.HEAD.v1.txt` files. Condition 1 is **NOT MET** by the mechanical evidence.
+2. **No class-I artifact is NEEDED by path or file name, and no intermediate folder is cited.**  
+   Evidence: `needed_by_path_or_name=2` for `N15/pc_run_b2.tgz` and `N15/pc_run_b3.tgz`, both cited in `N15/RESULTS_N15.md`; `needed_by_directory=3` for `_interim_b4`, `_superseded_v0`, and `_smoke_b3`. Condition 2 is **NOT MET** by the mechanical evidence.
+3. **Harness validity: the auditor self-test passes.**  
+   Evidence: `SELFTEST.txt` records `selftest=PASS seed_cite_detected=TRUE clean_not_flagged_with_G_copy=TRUE class_rules=TRUE`; `AUDIT_RESULT.txt` records `selftest=PASS`. Condition 3 is **MET**.
+
+Cost reported, not scored: class-I hashed artifacts = 5,965; known class-I bytes = 500,660,758; by rule I1=1650, I2=62, I3=3, I4=4210, I5=40.
+
+No terminal state is given here.
+
+## 6. Blocking objections
+
+None. I find no defect in the harness, seed, predicate application, or evidence in this packet that should block a verdict.
+
+Non-blocking observations:
+
+- The mechanical “needed” definition is an upper-bound proxy by design; it counts citations, not proven audit dependence, and cannot see silent use.
+- The I5 assembly-input hash citations follow the declared rule: they are counted because no class-G artifact has the same SHA-256, even though their full text is inside an assembled gate-feeding packet.
+- `trail_index_sha256` is truncated in the arm CSV and results table, but the full hash is present and consistent elsewhere.
+- The N1 / OF-1 clock issue is disclosed and does not enter any C43 number.
+
+## 7. Claim → evidence map
+
+| Claim | Evidence |
+| --- | --- |
+| Validator role and ablation ID C43 | SPEC header; roles section; constitution hash `e6c3b348...` |
+| Preflight gating passed | PREFLIGHT section: `preflight gating result: PASS` |
+| Runner-side C43 files match frozen reference hashes | PREFLIGHT seed OK lines; FROZEN REFERENCE HASHES; RUNNER-SIDE FILES |
+| Frozen key7 outputs match frozen pack hashes | PREFLIGHT frozen OK lines; FROZEN_KEY7.sha256 block |
+| Audit arm ran to exit 0 | RUN LOG; `C43_arms.csv`; `RUN_AUDIT.exit` |
+| Self-test passed | `SELFTEST.txt`; `AUDIT_RESULT.txt`; `C43_RESULTS.md` condition 3 |
+| Class totals are internally consistent | `SUMMARY.txt`; summarized `HASHED_ARTIFACTS.csv` |
+| Needed counts are internally consistent | `NEEDED.csv`; `AUDIT_RESULT.txt`; `C43_arms.csv` |
+| Citation totals are internally consistent | `SUMMARY.txt`; counted `CITATIONS.csv` rows; `hash_but_G_copy_exists` summary |
+| P1 condition 1 not met | `needed_by_hash=10`; `NEEDED.csv` hash rows |
+| P1 condition 2 not met | `needed_by_path_or_name=2`; `needed_by_directory=3`; `NEEDED.csv` path/directory rows |
+| P1 condition 3 met | `SELFTEST.txt`; `AUDIT_RESULT.txt` |
+| N1 / OF-1 is known and outside C43 | COORDINATOR NOTE N1 / OF-1; C43 scope says it reruns no R path and reads no clock value |
+
+END C43 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C43 ADJUDICATION'.

@@ -1,0 +1,4 @@
+"arm","model","delivery","reply_sha256","end_line","files_listed","files_opened_proven","n_files","files_said_opened","sha_match","facts_answered","facts_correct","usable","minutes","time_to_usable_min"
+"DS_ZIP","DeepSeek","ZIP","434ead16128d6b32346a6a5febc0f944477c1d8c15a5a2b6156e75fc67157ca6",TRUE,9,0,9,0,0,3,1,FALSE,0.65,Inf
+"DS_FILES","DeepSeek","FILES (PD-3 rerun: FILES_PD3, SHA256SUMS.txt)","f6e0a1f79a95ad566df9511366f5d5a021947d0e59cd11ca5218b22f663b074f",TRUE,9,9,9,9,9,5,5,TRUE,0.83,0.83
+"GPT_FILES","ChatGPT","FILES","94cab4c78cb7760d3a557179579def0409d1ef6faf0c0c45294c31dac2aff740",TRUE,9,9,9,9,9,5,5,TRUE,5,5

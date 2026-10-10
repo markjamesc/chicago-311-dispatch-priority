@@ -1,0 +1,3 @@
+sent=2026-10-09 05:46:51
+reply_complete=2026-10-09 05:54:07
+# reply_complete = first-seen (upper bound; still streaming at ~05:51:30, finish seen 05:54:07; true finish not observed)

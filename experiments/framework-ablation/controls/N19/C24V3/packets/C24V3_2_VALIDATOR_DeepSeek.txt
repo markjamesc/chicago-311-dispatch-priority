@@ -1,0 +1,744 @@
+# C24 v3 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message (this is the C24 v3 chunked re-run of the COLLAPSED arm; C24 v2 was a resource failure). There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C24 VALIDATOR REPORT
+
+---
+# COORDINATOR NOTE (written 2026-10-10 after the run; facts only, not a verdict)
+- C24 v2 (N18) COLLAPSED R-A/R-B were MEMKILLed (resource failure; evidence preserved). v3 re-ran ONLY the COLLAPSED R steps chunked (see SPEC V3). Same extracts (sha256-verified), same frozen judgment code, MEMKILL guard unchanged (2048 MB), no tolerance change.
+- The runner process was killed at ~11:19 CDT (after COLLAPSED R-A exit 0) when the PC desktop app disconnected; R-B had not started. It was resumed at 11:51 CDT with run_c24v3_resume.ps1 (same Run-R code, guard and chunk size, R-B only) and completed. Both runner logs are in the packet (resume script not in the frozen seeds list; disclosed here).
+- Mechanical result printed by the evaluator: P1 NOT MET, solely because one of the 7 key files differs: RB_portfolio_counts.csv (COLLAPSED sha 9f0f050a19c5131660bd7ae9b58b6ef6babb63cffea88577d3948851012b15ea vs B eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c). The difference is one field: n_out_of_set = 14,413,393 (COLLAPSED, full table, includes every non-Open row) vs 23,191 (B, Open-only extract). n_decision, n_ESCALATE, n_INCONCLUSIVE, n_STANDARD and kappa are identical (222002 / 131968 / 6377 / 83657 / 2). n_out_of_set counts input rows outside the decision set and depends on the number of rows in the extract: 14,635,395 - 222,002 = 14,413,393; 245,193 - 222,002 = 23,191. The other 6 key files (both classification files, both fixture files, RA portfolio counts, RB kappa grid) are byte-identical to arm B and to the frozen pack.
+- Predicate P1 was frozen before execution and is not changed here; this note does not relax it.
+
+---
+# SPEC (original, N13 C24)
+# C24 — Ablation specification (FROZEN)
+
+**Ablation ID:** C24 (owner program catalog #24 "Mechanical vs Judged Population")
+**Batch:** N13, added 2026-10-03 by owner approval (fresh LOCAL re-extract of the full table; local MySQL only, read-only, no internet)
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 source extraction / R population judgment
+**Frozen at CT:** 2026-10-03, before the runner executed (runner `run_c24.ps1`, evaluator `eval_c24.R`)
+
+## Control under test (owner program, catalog #24)
+"Separate broad SQL extraction (mechanical envelope) from the final judged universe in R" — purpose: avoid hiding judgment in query filtering. Evidence named by the program: SQL query result counts vs the final analytic set, clearly separated. Program Pass: collapsing the envelope into R causes no subtle changes. Program Fail: loss of separation yields incorrect counts (keep rule).
+In the frozen pack the SQL mechanical envelope (Envelope A of `sql/01_source_extract.sql`) is `WHERE r.STATUS = 'Open'`, and R-A/R-B then judge the population (both paths also exclude non-Open, DUPLICATE and LEGACY rows in R).
+
+## Verdict convention
+**KEEP = the ablation is adopted: the separate SQL mechanical envelope can be collapsed into R (R receives the unfiltered table and applies the population rules itself). REVERT = the separation stays.** HALT as in constitution §9.
+
+## Exact change being tested
+Two fresh local extracts, same method, same session settings, run one after the other (no other MySQL client running; the runner refuses to start otherwise):
+- **X_SEP** (arm B, separation kept) = the frozen Envelope A SELECT with `WHERE r.STATUS = 'Open'` (same text as N13 C52 `E1.sql`).
+- **X_FULL** (arm COLLAPSED) = the same SELECT with that WHERE line removed; `mechanical_envelope` is labelled `NONE (full table; envelope applied in R)` (the column is not read by either R path). Everything else is identical (diff in the packet).
+- Declared file layout for both: the frozen extract's first line, byte-for-byte (UTF-8 BOM + header + LF), followed by `mysql --login-path=chicago311 -N -B --raw` output, ORDER BY SR_NUMBER. The file is written as `data/source/src_open_candidates.csv` of the arm and left in place (not deleted).
+- Both arms use the frozen R-A and R-B code unchanged, the frozen `src_peer_stats.csv` and `src_extract_lineage.csv` (Envelope B, the peer statistics, is not collapsed; it is an aggregate, not the population envelope).
+- `Q_COUNTS.sql`: SQL counts — total rows, rows per STATUS, rows with STATUS = 'Open'.
+- CHECKSUM TABLE (raw_311_requests and the three src_ tables) before the first and after the last SQL step. SHA-256, bytes and data-row count of both extracts are recorded (`EXTRACTS.csv`).
+- R runs: arm B then COLLAPSED, R-A then R-B, `run_*.R all` (fixtures included). Cap 4 h per run. A watchdog kills an R run if free physical memory falls below 2,048 MB (to protect the PC); that is recorded as MEMKILL.
+
+## Known open finding N1 / OF-1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). C24 compares each path with itself across arms (COLLAPSED vs B), so N1 cannot cause a C24 mismatch.
+
+## Known export difference (disclosed before execution; INFO only)
+The frozen `src_open_candidates.csv` was exported through a PowerShell pipe that turned non-ASCII characters into '?': in N13 C52 the same Envelope A query via `--raw` differed from the frozen data rows on 109 of 245,193 lines, all in SR_TYPE text (e.g. "Snow – Uncleared Sidewalk Complaint" vs "Snow ? Uncleared…"). Both C24 arms use the same fresh export method, so this cannot affect the COLLAPSED vs B comparison. Arm B vs frozen outputs is reported as INFO only.
+
+## Operational benefit predicate P1 (program Pass/Fail made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. full-extract data rows = SQL total rows, and separated-extract data rows = SQL count with STATUS = 'Open' (counts clearly separated and reconciled);
+2. COLLAPSED R-A and R-B exit 0 (an error, the 4 h cap or a MEMKILL counts as failure: the collapsed design did not produce an analytic set);
+3. COLLAPSED's 7 key outputs (RA/RB classifications, RA/RB fixture results, RA/RB portfolio counts, RB kappa grid) are byte-identical to arm B's — no subtle change in the analytic set or counts;
+4. every fixture passes on both COLLAPSED paths.
+REVERT side: any of 1–4 fails. Resource use (extract size, R run time, peak memory) is reported, not gated.
+
+## Regression / HALT rules
+- HALT if the CHECKSUM bracket changes or is empty (the runner then does not run R), if a SQL step exits non-zero or writes to stderr, if arm B fails or its fixtures do not all pass, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 conditions 4–7 apply to arm B (the separated reference): condition 4 = COLLAPSED vs B byte equality per path; condition 5 = all fixtures pass in arm B (and COLLAPSED via P1).
+
+## Allowed source/data scope
+Local MySQL 8.0 `chicago311` (SELECT and CHECKSUM TABLE only, via the CLI with `--login-path=chicago311`) and the frozen PC pack. No internet, no download. The full extract (≈14.6M rows, several GB) stays on the PC disk.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, quoted in full in the packet)
+**Frozen pack files (preflight gating):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `R-A/run_RA.R` SHA-256 `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-A/outputs/RA_fixture_results.csv` SHA-256 `33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-A/outputs/RA_portfolio_counts.csv` SHA-256 `b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+- `sql/01_source_extract.sql` SHA-256 `f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5`
+- `sql/02_source_gate_checks.sql` SHA-256 `ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59`
+**Runner-side files (frozen list `runner/SEEDS_C24.sha256`; preflight gating):**
+- `runner/seeds/C24/CK.sql` SHA-256 `044252cb90036cae89d201a0456094e028df23ace88e6f8e985914b218c4a866`
+- `runner/seeds/C24/COLLAPSE` SHA-256 `7a554e73062f88dbe57998a951dff4a782215014562f9ec63d3ff3ce98854c42`
+- `runner/seeds/C24/Q_COUNTS.sql` SHA-256 `28c52916aa871354e7ce2aa0b9679dabde2cc93dd793868fba5818eac3dfa603`
+- `runner/seeds/C24/X_FULL.sql` SHA-256 `b7435bee0a124a52bf3b467bd459f3cd4ea9016434813ef64f2c329fda24467e`
+- `runner/seeds/C24/X_SEP.sql` SHA-256 `dbe3ee193abd9e66f2d9fe100a53c21b229b4847f67a7855cc08d82b00cd6896`
+- `runner/run_c24.ps1` SHA-256 `ced2eacb5b84d7a29f353c8681cb45de3af8de19dd3bf3d2f897badae2058c7c`
+- `runner/eval_c24.R` SHA-256 `a25713de587851600484b78e26745f7600f30d299dbcc0a7a1d50e06fe78048c`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above. This spec is hashed in `SPEC_FREEZE_C24.sha256` before execution.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# SPEC ADDENDUM v2 (N18)
+# C24 v2 — Ablation specification (FROZEN)
+
+**Ablation ID:** C24 v2 (catalog #24 "Mechanical vs Judged Population"), batch N18, owner-authorised rerun 2026-10-09 ("sure do it, finish 24"), owner reconfirmed 2026-10-10.
+**Supersedes nothing:** N13 C24 stays on file as terminal state HALT (owner ruling 2026-10-09 03:05 CT; harness defect). Its evidence is untouched. v2's verdict, once adjudicated, is the C24 verdict that replaces it.
+**Design: identical to N13 C24** (`runs/N13/C24/ABLATION_SPEC.md`: control, KEEP/REVERT convention, arms X_SEP/X_FULL, predicate P1, HALT rules, frozen data pack hashes, constitution and baseline hashes, SQL seeds). Read that file for the full text; only the changes below differ.
+
+## Changes in v2 (harness fixes only; the control and predicate are not changed)
+1. **Client character set:** every mysql call adds `--default-character-set=utf8mb4`, so output is UTF-8 and not the Windows OEM codepage (N13 defect: byte 0x82 in 75 lines made arm B R-B fail with invalid UTF-8).
+2. **RAM gate (wait, not kill):** before each COLLAPSED R run the runner waits until free physical memory >= 19,968 MB (19.5 GB) and logs the wait (max 12 h). The 2,048 MB MEMKILL watchdog is unchanged. N13 COLLAPSED R-A/R-B peaked at 15.3/17.2 GB and were MEMKILLed. A MEMKILL in v2 still counts as failure of P1 condition 2 / HALT per the original rules.
+3. **Names:** work dir `...\ablation-runs\N18`, output folder `C24V2`, log `RUNNER_LOG_C24V2.txt`, result files `C24V2_RESULTS.md`, `C24V2_arms.csv`, `C24V2_EVIDENCE.sha256`; runner `run_c24v2.ps1`, evaluator `eval_c24v2.R`, seeds list `SEEDS_C24V2.sha256`.
+4. R version: `C:\Program Files\R\R-4.6.1\bin\Rscript.exe` (same as N13, found installed). MySQL: `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, service MySQL80 running. Local only, no internet, no downloads.
+
+## Known disclosures carried over
+N1/OF-1 (1.000 h on three ESCALATE rows between R-A and R-B) does not affect COLLAPSED vs B comparison. Arm B vs frozen outputs is INFO only; with utf8mb4 export, arm B may now differ from the frozen extract on the 109 SR_TYPE rows (frozen file has '?' there) and arm B R-A/R-B outputs may differ from the frozen outputs accordingly (INFO, not gating).
+
+## Frozen runner-side hashes (`runner/SEEDS_C24V2.sha256`, verified by preflight)
+See that file; contents quoted in the packet. Spec hashed in `SPEC_FREEZE_C24V2.sha256`.
+
+## Roles / tasks
+Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok, same tasks as N13 C24 spec. Verdict convention unchanged: KEEP = collapse the envelope into R; REVERT = separation stays; HALT per constitution §9.
+
+---
+# SPEC ADDENDUM v3 (N19), FROZEN before launch; f37080fb4ca3945f576cd0016f7a48615d6f1aa963e6b14b04f8147b10857412  ABLATION_SPEC_V3.md
+# C24 v3 — Ablation specification addendum (FROZEN before launch)
+
+**Ablation ID:** C24 v3 (catalog #24 "Mechanical vs Judged Population"), batch N19. Owner-authorised 2026-10-10 ("okay, let us do that" = build and run the chunked collapsed arm).
+**Supersedes nothing.** N13 C24 (HALT, harness defect) and C24 v2 / N18 (resource failure) stay on file unchanged. v3 is the same ablation re-run with a different R-side reading strategy for the COLLAPSED arm only.
+**Design: identical to N13 C24 and C24 v2** (control, KEEP/REVERT convention, arms X_SEP/X_FULL, predicate P1, HALT rules, frozen data pack hashes, constitution and baseline hashes, SQL seeds). See `runs/N13/C24/ABLATION_SPEC.md` and `runs/N18/C24V2/ABLATION_SPEC_V2.md`.
+
+## Why v3 exists (disclosure)
+In C24 v2 (N18) the SQL phase and arm B completed cleanly (checksum bracket PRE = POST). The COLLAPSED arm R-A and R-B read the full 14,635,395-row extract (8,167,123,771 bytes) into memory at once and were killed by the unchanged 2,048 MB free-RAM guard (MEMKILL), twice:
+- attempt 1 (v2 main run, ~05:50 CDT 2026-10-10): R-A MEMKILL after 143 s, peak 19,346 MB; R-B MEMKILL after 130.1 s, peak 19,321 MB;
+- attempt 2 (R steps only, 10:53 CDT 2026-10-10): R-A MEMKILL after 142.4 s, peak 20,128 MB; R-B not started (runner stops after a R-A kill).
+The full-table version therefore does not fit this PC (32 GB RAM). This is a resource failure, not a finding about the correctness of collapsing. Both MEMKILL attempts, their logs, exit files and fixture outputs are preserved untouched in `N18\C24V2\` (including `attempt1_collapsed\`) and are part of the evidence for v3.
+
+## What changes in v3 (the only changes)
+1. **COLLAPSED arm R-A and R-B read the full extract in row chunks** (readr `read_tsv_chunked`, 250,000 rows per chunk, all columns read as character) and apply the unchanged frozen judgment functions to each chunk. Only the `run_production()` function differs from the frozen scripts (`run_RA_chunked.R`, `run_RB_chunked.R`). `classify_open_rows()`, `rb_normalize_open()`, `rb_judge_rows()`, `rb_portfolio_counts()`, `rb_kappa_grid_counts()`, all constants, parsing rules and the fixture code are byte-for-byte the frozen code (the four R-B module files are the frozen files, hashes verified in preflight).
+2. **Exactness argument.** Every judgment is a function of one row plus the small peer-statistics table (`src_peer_stats.csv`, 104 types, loaded once, never derived from the chunked data): population filter (STATUS/DUPLICATE/LEGACY), clock parsing, integrity clauses, peer join, dormancy/threshold decision. There is no ranking, no dedupe across rows, no group statistic computed from the extract, no row-order dependence. Therefore the whole-table output equals the concatenation of the per-chunk outputs (same row order), and every count is the sum of chunk counts. Columns are read as character in both designs for all columns the code uses (clock columns were already forced to character; the remaining used columns are converted with `as.character`/`str_trim` before use), so type guessing cannot differ between chunks.
+3. **Outputs:** same 7 key files, same names, same format. Classification files are written chunk by chunk to a `.partial` file that is renamed only on completion; counts files are written once from summed counts.
+4. **Memory:** the 2,048 MB MEMKILL watchdog is UNCHANGED. The pre-run free-RAM wait is lowered from 19,968 MB to 6,144 MB because the chunked run needs only a few GB. 4 h cap per R run unchanged. No tolerance change; predicate P1 unchanged (COLLAPSED exits 0 and its 7 key outputs are byte-identical to arm B's).
+5. **Carried unchanged from C24 v2:** SQL extracts (B and COLLAPSED, verified by sha256 against `EXTRACTS.csv` in preflight; the COLLAPSED extract is hard-linked, not copied), SQL count query results, CHECKSUM bracket (matched), arm B R-A/R-B outputs and run records. Arm B is not re-run.
+6. **Names:** work dir `...\ablation-runs\N19`, output `C24V3`, log `RUNNER_LOG_C24V3.txt`, results `C24V3_RESULTS.md`, `C24V3_arms.csv`, `C24V3_EVIDENCE.sha256`; runner `run_c24v3.ps1`, evaluator `eval_c24v3.R`, seeds list `SEEDS_C24V3.sha256`.
+
+## Equivalence proof performed before freezing (evidence in `N19\test_evidence\`)
+- **T1, arm-B extract (245,193 rows, 5 chunks of 50,000):** chunked R-A and R-B outputs vs the whole-table frozen-code outputs recorded in C24 v2 arm B: **all 7 key outputs byte-identical (sha256 equal)**.
+- **T2, 1,245,193-row sample** (first 1,000,000 data rows of the full extract + all 245,193 arm-B rows), whole-table frozen code vs chunked code with 77,777-row chunks (chunk boundaries not aligned to anything): **all 7 key outputs byte-identical (sha256 equal)**; 238,746 decision rows, kappa grid identical.
+- Hashes: `TEST_OUTPUT_HASHES.sha256`; run times: `tests_log.txt`.
+The proof covers the code path; it does not prove behaviour on the 13.4M rows not in the sample, which is what the v3 run itself tests (P1 compares against arm B).
+
+## Roles / tasks
+Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok, same tasks as N13 C24. Verdict convention unchanged: KEEP = collapse the envelope into R; REVERT = separation stays; HALT per constitution §9. Reviewers must be told the COLLAPSED arm ran chunked and why; chunking is a harness change, not a design change.
+
+## Frozen runner-side hashes
+`runner/SEEDS_C24V3.sha256` (verified by preflight). Spec hash in `SPEC_FREEZE_C24V3.sha256`.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT C24V3
+﻿frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+seed   OK   0f063bf1df546cef2dbb483fb949c321438bd2146c6ef6bf71c9086d9e1e25f7 code/run_RA_chunked.R
+seed   OK   1381b584f024df945be590604fa18ac080dc3b8d6cd03033bafa12f76a8217b8 code/run_RB_chunked.R
+seed   OK   4f69a6b16c76c343a3df730b549a71f851990db8064c183fc36ccb739bb9edec eval_c24v3.R
+seed   OK   328e72caa458a9b79551ae33c0ba87261d5bc9c1c44d77999a255564013a305a run_c24v3.ps1
+extract OK   9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2 B (EXTRACTS.csv of C24V2: 9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2)
+extract OK   8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe COLLAPSED (EXTRACTS.csv of C24V2: 8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe)
+C24V2 checksum bracket carried: MATCH
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | digest 0.6.39
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 19878 MB, C: free 634 GB
+preflight gating result: PASS
+
+---
+# FROZEN RUNNER-SIDE HASHES (SEEDS_C24V3.sha256)
+0f063bf1df546cef2dbb483fb949c321438bd2146c6ef6bf71c9086d9e1e25f7  code/run_RA_chunked.R
+1381b584f024df945be590604fa18ac080dc3b8d6cd03033bafa12f76a8217b8  code/run_RB_chunked.R
+4f69a6b16c76c343a3df730b549a71f851990db8064c183fc36ccb739bb9edec  eval_c24v3.R
+328e72caa458a9b79551ae33c0ba87261d5bc9c1c44d77999a255564013a305a  run_c24v3.ps1
+
+---
+# CODE DIFF: frozen scripts vs chunked scripts (only run_production() differs)
+497c497,499
+< # ---- Production run ---------------------------------------------------------
+---
+> # ---- Production run (C24V3 CHUNKED: row-wise exact; see ABLATION_SPEC_V3) -----
+> # Only run_production() differs from the frozen run_RA.R. classify_open_rows(), constants, parsing and fixtures are unchanged.
+> # Every judgment is row-local (peer stats are a separate small table), so chunk results concatenate to the whole-table result.
+500,504c502
+<   open_df <- if (grepl("\\.csv$", paths$open, ignore.case = TRUE)) {
+<     readr::read_tsv(paths$open, col_types = clock_col_types, show_col_types = FALSE, guess_max = 200000, progress = FALSE)
+<   } else {
+<     readr::read_tsv(paths$open, col_types = clock_col_types, show_col_types = FALSE, guess_max = 200000)
+<   }
+---
+>   chunk_rows <- as.integer(Sys.getenv("C24_CHUNK_ROWS", "250000"))
+510,516c508,509
+< 
+<   message("open_n=", nrow(open_df), " peer_types=", nrow(peer_df))
+<   judged_all <- classify_open_rows(open_df, peer_df)
+<   decision <- judged_all %>% filter(!.exclude) %>% select(-.exclude)
+< 
+<   stopifnot(nrow(decision) > 0)
+< 
+---
+>   hdr <- names(readr::read_tsv(paths$open, n_max = 0, col_types = readr::cols(.default = readr::col_character()), show_col_types = FALSE, progress = FALSE))
+>   ct <- do.call(readr::cols, stats::setNames(rep(list(readr::col_character()), length(hdr)), hdr))
+518,519c511,532
+<   readr::write_csv(decision, class_path)
+<   message("Wrote ", class_path, " n=", nrow(decision))
+---
+>   part_path <- paste0(class_path, ".partial")
+>   if (file.exists(part_path)) file.remove(part_path)
+>   st <- new.env(); st$first <- TRUE; st$n_in <- 0L; st$n_dec <- 0L; st$esc <- 0L; st$inc <- 0L; st$std <- 0L; st$chunks <- 0L
+>   cb <- readr::SideEffectChunkCallback$new(function(x, pos) {
+>     judged_all <- classify_open_rows(x, peer_df)
+>     decision <- judged_all %>% filter(!.exclude) %>% select(-.exclude)
+>     readr::write_csv(decision, part_path, append = !st$first)
+>     st$first <- FALSE
+>     st$n_in <- st$n_in + nrow(x)
+>     st$n_dec <- st$n_dec + nrow(decision)
+>     st$esc <- st$esc + sum(decision$classification == "ESCALATE", na.rm = TRUE)
+>     st$inc <- st$inc + sum(decision$classification == "INCONCLUSIVE", na.rm = TRUE)
+>     st$std <- st$std + sum(decision$classification == "STANDARD", na.rm = TRUE)
+>     st$chunks <- st$chunks + 1L
+>     message("chunk ", st$chunks, " pos=", pos, " in=", st$n_in, " decision=", st$n_dec)
+>     invisible(NULL)
+>   })
+>   readr::read_tsv_chunked(paths$open, callback = cb, chunk_size = chunk_rows, col_types = ct, progress = FALSE)
+>   message("open_n=", st$n_in, " peer_types=", nrow(peer_df), " chunks=", st$chunks, " chunk_rows=", chunk_rows)
+>   stopifnot(st$n_dec > 0)
+>   file.rename(part_path, class_path)
+>   message("Wrote ", class_path, " n=", st$n_dec)
+521,533d533
+<   portfolio <- tibble(
+<     metric = c("n_decision", "n_ESCALATE", "n_INCONCLUSIVE", "n_STANDARD", "kappa", "rule_version", "t_freeze"),
+<     value = c(
+<       as.character(nrow(decision)),
+<       as.character(sum(decision$classification == "ESCALATE", na.rm = TRUE)),
+<       as.character(sum(decision$classification == "INCONCLUSIVE", na.rm = TRUE)),
+<       as.character(sum(decision$classification == "STANDARD", na.rm = TRUE)),
+<       as.character(KAPPA),
+<       RULE_VERSION,
+<       format(T_FREEZE, "%Y-%m-%d %H:%M:%S %Z")
+<     )
+<   )
+<   # Also wide counts row for convenience
+535,538c535,538
+<     n_decision = nrow(decision),
+<     n_ESCALATE = sum(decision$classification == "ESCALATE", na.rm = TRUE),
+<     n_INCONCLUSIVE = sum(decision$classification == "INCONCLUSIVE", na.rm = TRUE),
+<     n_STANDARD = sum(decision$classification == "STANDARD", na.rm = TRUE),
+---
+>     n_decision = st$n_dec,
+>     n_ESCALATE = st$esc,
+>     n_INCONCLUSIVE = st$inc,
+>     n_STANDARD = st$std,
+547c547
+<   invisible(list(decision = decision, portfolio = portfolio_wide))
+---
+>   invisible(list(portfolio = portfolio_wide))
+======
+90a91,92
+> # C24V3 CHUNKED run_production(): the only function that differs from the frozen run_RB.R. rb_normalize_open(), rb_judge_rows(),
+> # rb_portfolio_counts(), rb_kappa_grid_counts() and all constants are the frozen functions, applied to row-chunks (all judgments are row-local).
+96,97c98,99
+<   message("[R-B] loading open candidates...")
+<   open_raw <- rb_read_csv_flex(paths$open_csv)
+---
+>   message("[R-B] loading open candidates (chunked)...")
+>   chunk_rows <- as.integer(Sys.getenv("C24_CHUNK_ROWS", "250000"))
+99d100
+<   open_df <- rb_normalize_open(open_raw)
+101c102,133
+<   message("[R-B] open n=", nrow(open_df), " peer types=", nrow(peer_df))
+---
+>   hdr <- names(readr::read_tsv(paths$open_csv, n_max = 0, col_types = readr::cols(.default = readr::col_character()), show_col_types = FALSE, progress = FALSE))
+>   ct <- do.call(readr::cols, stats::setNames(rep(list(readr::col_character()), length(hdr)), hdr))
+>   class_path <- file.path(paths$out_dir, "RB_classifications.csv")
+>   part_path <- paste0(class_path, ".partial")
+>   if (file.exists(part_path)) file.remove(part_path)
+>   st <- new.env(); st$first <- TRUE; st$n_in <- 0L; st$chunks <- 0L; st$n_lab <- 0L
+>   st$port <- NULL; st$grid <- NULL
+>   addcnt <- function(acc, df) if (is.null(acc)) df else { for (nm in setdiff(names(df), "kappa")) acc[[nm]] <- acc[[nm]] + df[[nm]]; acc }
+>   cb <- readr::SideEffectChunkCallback$new(function(x, pos) {
+>     open_df <- rb_normalize_open(as.data.frame(x, stringsAsFactors = FALSE))
+>     judged <- rb_judge_rows(open_df, peer_df, kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+>     labeled <- judged[!is.na(judged$classification), , drop = FALSE]
+>     class_out <- labeled[, c(
+>       "SR_NUMBER", "type_key", "classification", "evidence_reason",
+>       "dormant_h", "open_age_h", "peer_n", "peer_p75_h", "peer_p50_h",
+>       "kappa", "integrity_clause", "rule_version", "design_version"
+>     )]
+>     readr::write_csv(class_out, part_path, na = "", append = !st$first)
+>     st$first <- FALSE
+>     st$port <- addcnt(st$port, rb_portfolio_counts(judged, kappa = RB_KAPPA_DEFAULT))
+>     g <- rb_kappa_grid_counts(open_df, peer_df, grid = RB_KAPPA_GRID, t_freeze = RB_T_FREEZE)
+>     g <- g[, c("kappa", "n_decision", "n_ESCALATE", "n_INCONCLUSIVE", "n_STANDARD")]
+>     if (is.null(st$grid)) st$grid <- g else for (nm in setdiff(names(g), "kappa")) { stopifnot(all(st$grid$kappa == g$kappa)); st$grid[[nm]] <- st$grid[[nm]] + g[[nm]] }
+>     st$n_in <- st$n_in + nrow(open_df); st$n_lab <- st$n_lab + nrow(labeled); st$chunks <- st$chunks + 1L
+>     message("[R-B] chunk ", st$chunks, " pos=", pos, " in=", st$n_in, " labeled=", st$n_lab)
+>     invisible(NULL)
+>   })
+>   readr::read_tsv_chunked(paths$open_csv, callback = cb, chunk_size = chunk_rows, col_types = ct, progress = FALSE)
+>   message("[R-B] open n=", st$n_in, " peer types=", nrow(peer_df), " chunks=", st$chunks, " chunk_rows=", chunk_rows)
+>   if (st$n_lab < 1) stop("classification n==0 \u2014 abort", call. = FALSE)
+>   file.rename(part_path, class_path)
+>   message("[R-B] wrote ", class_path, " (n=", st$n_lab, ")")
+103,115c135
+<   judged <- rb_judge_rows(open_df, peer_df, kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+<   labeled <- judged[!is.na(judged$classification), , drop = FALSE]
+<   if (nrow(labeled) < 1) stop("classification n==0 — abort", call. = FALSE)
+< 
+<   # Critical recon columns + audit
+<   class_out <- labeled[, c(
+<     "SR_NUMBER", "type_key", "classification", "evidence_reason",
+<     "dormant_h", "open_age_h", "peer_n", "peer_p75_h", "peer_p50_h",
+<     "kappa", "integrity_clause", "rule_version", "design_version"
+<   )]
+<   write_csv_rb(class_out, file.path(paths$out_dir, "RB_classifications.csv"))
+< 
+<   port <- rb_portfolio_counts(judged, kappa = RB_KAPPA_DEFAULT)
+---
+>   port <- st$port
+121,125c141
+< 
+<   grid <- rb_kappa_grid_counts(open_df, peer_df, grid = RB_KAPPA_GRID, t_freeze = RB_T_FREEZE)
+<   # Counts-only diagnostic table
+<   grid_out <- grid[, c("kappa", "n_decision", "n_ESCALATE", "n_INCONCLUSIVE", "n_STANDARD")]
+<   write_csv_rb(grid_out, file.path(paths$out_dir, "RB_kappa_grid_counts.csv"))
+---
+>   write_csv_rb(st$grid, file.path(paths$out_dir, "RB_kappa_grid_counts.csv"))
+127,128c143
+< 
+<   invisible(list(judged = judged, portfolio = port, grid = grid_out))
+---
+>   invisible(list(portfolio = port, grid = st$grid))
+
+---
+# EQUIVALENCE TESTS before freezing (T1 arm-B extract 5 chunks; T2 1,245,193-row sample whole vs chunked)
+T1_B RA exit=0 secs=10
+T1_B RB exit=0 secs=23
+T2_sample_whole RA exit=0 secs=41
+T2_sample_whole RB exit=0 secs=117
+T2_sample_chunked RA exit=0 secs=36
+T2_sample_chunked RB exit=0 secs=105
+ALLDONE
+
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  T1_B/RA_classifications.csv
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  T1_B/RA_fixture_results.csv
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  T1_B/RA_portfolio_counts.csv
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  T1_B/RB_classifications.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  T1_B/RB_fixture_results.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  T1_B/RB_kappa_grid_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  T1_B/RB_portfolio_counts.csv
+0f02b6882d52f912306a7ce1be1f1c4281c2e5ec1b2b51b3824df6c8265543b9  24018089  T2_sample_whole/RA_classifications.csv
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  T2_sample_whole/RA_fixture_results.csv
+07aa9c9579c7de989208c3cfc1bae300cb046422cb329dcdbc9c204190421c73  140  T2_sample_whole/RA_portfolio_counts.csv
+12792d80f0238a40ac5cefc73330ed80d3c9087ccdfef56828e3f3a0ce9d3ec5  45189454  T2_sample_whole/RB_classifications.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  T2_sample_whole/RB_fixture_results.csv
+8da521f7be5ec4be9b8fb1266c160a371c7cb6f00feb38871fc44c8afd8129b1  164  T2_sample_whole/RB_kappa_grid_counts.csv
+cd3311a06c7a7bb371edc01c67acfe7157bd9fb3a7180e907447972b086d1497  102  T2_sample_whole/RB_portfolio_counts.csv
+0f02b6882d52f912306a7ce1be1f1c4281c2e5ec1b2b51b3824df6c8265543b9  24018089  T2_sample_chunked/RA_classifications.csv
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  T2_sample_chunked/RA_fixture_results.csv
+07aa9c9579c7de989208c3cfc1bae300cb046422cb329dcdbc9c204190421c73  140  T2_sample_chunked/RA_portfolio_counts.csv
+12792d80f0238a40ac5cefc73330ed80d3c9087ccdfef56828e3f3a0ce9d3ec5  45189454  T2_sample_chunked/RB_classifications.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  T2_sample_chunked/RB_fixture_results.csv
+8da521f7be5ec4be9b8fb1266c160a371c7cb6f00feb38871fc44c8afd8129b1  164  T2_sample_chunked/RB_kappa_grid_counts.csv
+cd3311a06c7a7bb371edc01c67acfe7157bd9fb3a7180e907447972b086d1497  102  T2_sample_chunked/RB_portfolio_counts.csv
+c797066feb36bbc562ee4654fb79049e0de4e25b87920f12e4c8b7ff50b6695b  T2_sample input (1,000,000 first data lines of full extract + all 245,193 B-arm rows; 1,245,193 data rows)
+
+---
+# RUN LOG (RUNNER_LOG_C24V3.txt)
+﻿2026-10-10 11:12:42 START C24V3 work=C:\Users\Mark\Documents\R Working Directory\ablation-runs\N19 v2=C:\Users\Mark\Documents\R Working Directory\ablation-runs\N18\C24V2 chunk_rows=250000
+2026-10-10 11:13:08 frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+2026-10-10 11:13:08 frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+2026-10-10 11:13:09 frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+2026-10-10 11:13:09 frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+2026-10-10 11:13:09 frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+2026-10-10 11:13:09 frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+2026-10-10 11:13:09 frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+2026-10-10 11:13:09 seed   OK   0f063bf1df546cef2dbb483fb949c321438bd2146c6ef6bf71c9086d9e1e25f7 code/run_RA_chunked.R
+2026-10-10 11:13:09 seed   OK   1381b584f024df945be590604fa18ac080dc3b8d6cd03033bafa12f76a8217b8 code/run_RB_chunked.R
+2026-10-10 11:13:09 seed   OK   4f69a6b16c76c343a3df730b549a71f851990db8064c183fc36ccb739bb9edec eval_c24v3.R
+2026-10-10 11:13:09 seed   OK   328e72caa458a9b79551ae33c0ba87261d5bc9c1c44d77999a255564013a305a run_c24v3.ps1
+2026-10-10 11:13:09 extract OK   9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2 B (EXTRACTS.csv of C24V2: 9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2)
+2026-10-10 11:13:09 extract OK   8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe COLLAPSED (EXTRACTS.csv of C24V2: 8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe)
+2026-10-10 11:13:09 C24V2 checksum bracket carried: MATCH
+2026-10-10 11:13:09 R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | digest 0.6.39
+2026-10-10 11:13:09 machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 19878 MB, C: free 634 GB
+2026-10-10 11:13:09 preflight gating result: PASS
+2026-10-10 11:13:09 R phase (COLLAPSED CHUNKED; R-A then R-B; cap 4 h each; kill if free RAM < 2048 MB - guard unchanged)
+2026-10-10 11:13:36   RAM pre-check PASS before COLLAPSED RA: free_MB=19724 waited_s=0
+2026-10-10 11:19:23   COLLAPSED RA exit=0 secs=346.9 min_free_MB=13346 peak_R_MB=6412
+2026-10-10 11:51:36 RESUME C24V3 after runner process was killed at 11:19 when the PC app disconnected (R-A had finished exit=0; R-B not started). Resuming at R-B; same code, same guard.
+2026-10-10 11:51:36   RAM pre-check PASS before COLLAPSED RB: free_MB=19520 waited_s=0
+2026-10-10 12:10:29   COLLAPSED RB exit=0 secs=1132.5 min_free_MB=13702 peak_R_MB=8346
+2026-10-10 12:10:30 summarize
+2026-10-10 12:10:34 summarize exit=0
+2026-10-10 12:10:34 DONE C24V3 elapsed_min=18.97
+
+---
+# COLLAPSED RUN EXIT FILES (code,secs,end,cap,min_free_MB,peak_R_MB)
+RA: 0,346.9,2026-10-10T11:19:23-05:00,14400,13346,6412
+
+RB: 0,1132.5,2026-10-10T12:10:29-05:00,14400,13702,8346
+
+---
+# C24V3_RESULTS.md (runner output)
+# C24 RESULTS (mechanical; generated 2026-10-10 12:10:34 CDT)
+
+**Mechanical predicate result: P1 NOT MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| SQL counts: full-extract data rows = SQL total rows, and separated-extract data rows = SQL envelope count (STATUS = 'Open') | MET |
+| COLLAPSED: R-A and R-B exit 0 (no error, timeout or memory kill) | MET |
+| COLLAPSED: all 7 key outputs byte-identical to arm B's (same analytic set and counts) | NOT MET |
+| COLLAPSED: every fixture passes on both paths | MET |
+
+## SQL query counts vs final analytic set
+| quantity | value |
+|---|---|
+| total | 14635395 |
+| status=Canceled |   212654 |
+| status=Closed |        1 |
+| status=Completed | 14177547 |
+| status=Open |   245193 |
+| envelope_open |   245193 |
+| separated extract data rows (arm B) | 245193 |
+| full extract data rows (arm COLLAPSED) | 14635395 |
+| R decision rows B RA | 222002 |
+| R decision rows B RB | 222002 |
+| R decision rows COLLAPSED RA | 222002 |
+| R decision rows COLLAPSED RB | 222002 |
+
+Note: COLLAPSED arm R-A/R-B ran CHUNKED (spec v3, run_RA_chunked.R/run_RB_chunked.R); B arm results and SQL/extract/checksum evidence are carried unchanged from C24V2 (N18).
+
+## Extracts (kept in place on the PC)
+| arm | sha256 | bytes | data_rows |
+|---|---|---|---|
+| B | 9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2 |  118672055 |   245193 |
+| COLLAPSED | 8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe | 8167123771 | 14635395 |
+
+## SQL steps
+| step | exit | secs | end | err_bytes |
+|---|---|---|---|---|
+| CK_PRE | 0 | 1001.7 | 2026-10-10T04:53:40-05:00 | 0 |
+| Q_COUNTS | 0 |  558.0 | 2026-10-10T05:03:03-05:00 | 0 |
+| X_SEP | 0 |  272.1 | 2026-10-10T05:07:36-05:00 | 0 |
+| X_FULL | 0 | 2027.0 | 2026-10-10T05:41:23-05:00 | 0 |
+| CK_POST | 0 |  272.0 | 2026-10-10T05:45:55-05:00 | 0 |
+
+## R runs
+| arm | path | exit | secs | min_free_MB | peak_R_MB | decision_rows | fixtures_pass | fixtures_n |
+|---|---|---|---|---|---|---|---|---|
+| B | RA | 0 | 19.9 | 20803 | 519 | 222002 | 14 | 14 |
+| B | RB | 0 | 24.9 | 20452 | 720 | 222002 | 14 | 14 |
+| COLLAPSED | RA | 0 | 346.9 | 13346 | 6412 | 222002 | 14 | 14 |
+| COLLAPSED | RB | 0 | 1132.5 | 13702 | 8346 | 222002 | 14 | 14 |
+
+## 7 key outputs: COLLAPSED vs B (gating) and B vs frozen pack (INFO only; the fresh export differs from the frozen export method, see SPEC)
+| file | frozen | B | COLLAPSED | COLLAPSED_eq_B | B_eq_frozen_INFO |
+|---|---|---|---|---|---|
+| R-A/outputs/RA_classifications.csv | c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 | c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 | c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 | TRUE | TRUE |
+| R-B/outputs/RB_classifications.csv | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | TRUE | TRUE |
+| R-A/outputs/RA_fixture_results.csv | 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 | 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 | 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 | TRUE | TRUE |
+| R-B/outputs/RB_fixture_results.csv | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | TRUE | TRUE |
+| R-A/outputs/RA_portfolio_counts.csv | b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 | b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 | b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 | TRUE | TRUE |
+| R-B/outputs/RB_portfolio_counts.csv | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c | 9f0f050a19c5131660bd7ae9b58b6ef6babb63cffea88577d3948851012b15ea | FALSE | TRUE |
+| R-B/outputs/RB_kappa_grid_counts.csv | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | TRUE | TRUE |
+
+CHECKSUM bracket PRE: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+CHECKSUM bracket POST: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+
+---
+# C24V3_arms.csv
+"arm","path","exit","secs","min_free_MB","peak_R_MB","decision_rows","fixtures_pass","fixtures_n"
+"B","RA","0","19.9","20803","519",222002,14,14
+"B","RB","0","24.9","20452","720",222002,14,14
+"COLLAPSED","RA","0","346.9","13346","6412",222002,14,14
+"COLLAPSED","RB","0","1132.5","13702","8346",222002,14,14
+
+---
+# COLLAPSED RB_portfolio_counts.csv (the differing file)
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,14413393
+
+---
+# ARM MANIFESTS (sha256 size path)
+﻿arms/B/MANIFEST_inputs.sha256 :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/B/MANIFEST_inputs.sha256 :: 9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2  118672055  data\source\src_open_candidates.csv
+arms/B/MANIFEST_inputs.sha256 :: 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6  118671465  data\source\src_open_candidates.csv.part.appended
+arms/B/MANIFEST_inputs.sha256 :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/B/MANIFEST_inputs.sha256 :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+arms/B/MANIFEST_inputs.sha256 :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/B/MANIFEST_inputs.sha256 :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/B/MANIFEST_inputs.sha256 :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/B/MANIFEST_inputs.sha256 :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/B/MANIFEST_inputs.sha256 :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/B/MANIFEST_outputs.sha256 :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+arms/B/MANIFEST_outputs.sha256 :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+arms/B/MANIFEST_outputs.sha256 :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+arms/B/MANIFEST_outputs.sha256 :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/B/MANIFEST_outputs.sha256 :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/B/MANIFEST_outputs.sha256 :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/B/MANIFEST_outputs.sha256 :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/B/MANIFEST_outputs.sha256 :: edd9072ed7cdad1ac8769e04ba290606960640f716352f29900da96a437d915d  50  RUN_RA.exit
+arms/B/MANIFEST_outputs.sha256 :: f201cb40fe66a5b04ab7d97a20ddea94bcbe1f5355419dff71f0bc1355f41e9e  793  RUN_RA.stderr.txt
+arms/B/MANIFEST_outputs.sha256 :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+arms/B/MANIFEST_outputs.sha256 :: cd59a8717b7d944d8438cfa96c6825dc205c8f06c662f4f61e3ae454b9a79f36  50  RUN_RB.exit
+arms/B/MANIFEST_outputs.sha256 :: bf2e457ab7c721ce63125e882415f88a37793a7627674e3b2e0cd9eb3fdd2932  1270  RUN_RB.stderr.txt
+arms/B/MANIFEST_outputs.sha256 :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe  8167123771  data\source\src_open_candidates.csv
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 0f063bf1df546cef2dbb483fb949c321438bd2146c6ef6bf71c9086d9e1e25f7  25496  R-A\run_RA_chunked.R
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/COLLAPSED/MANIFEST_inputs.sha256 :: 1381b584f024df945be590604fa18ac080dc3b8d6cd03033bafa12f76a8217b8  7563  R-B\run_RB_chunked.R
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 9f0f050a19c5131660bd7ae9b58b6ef6babb63cffea88577d3948851012b15ea  103  R-B\outputs\RB_portfolio_counts.csv
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: e7ad0b574343dd2707e7486413b2eaf69a7294f005f52d766dc5a8935fa2e277  52  RUN_RA.exit
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 5a95f0f0a6aad124887e3043366cfa57b32cdeb283980aea99e3a79f442547ce  3739  RUN_RA.stderr.txt
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: b61ff9c59070287ea6af0977f8a1ef6d4df4c216153c5742833fbf68e5afa0de  53  RUN_RB.exit
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: 88cc0055979bf536aa07a814d68f6053b11b79dca20b1cffa72134a5988df5d8  4505  RUN_RB.stderr.txt
+arms/COLLAPSED/MANIFEST_outputs.sha256 :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# EVIDENCE SHA256
+﻿4837d468f7a1a37b9ff9b4c480725fb3e48d4884e41b2501974f9bc3f3faf5a6  C24V3_ARM_MANIFESTS.txt
+612955c39c6ed3599a467329e4e01f522c80a33aa8be968800da110019965879  C24V3_arms.csv
+e38dcb3164aca3a6d46c5b28abd888d9c6e59c806cfffaf938eabca61d985304  C24V3_RESULTS.md
+13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  CK_POST.tsv
+13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  CK_PRE.tsv
+e7ad0b574343dd2707e7486413b2eaf69a7294f005f52d766dc5a8935fa2e277  COLLAPSED_RUN_RA.exit
+5a95f0f0a6aad124887e3043366cfa57b32cdeb283980aea99e3a79f442547ce  COLLAPSED_RUN_RA.stderr.txt
+d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  COLLAPSED_RUN_RA.stdout.txt
+b61ff9c59070287ea6af0977f8a1ef6d4df4c216153c5742833fbf68e5afa0de  COLLAPSED_RUN_RB.exit
+88cc0055979bf536aa07a814d68f6053b11b79dca20b1cffa72134a5988df5d8  COLLAPSED_RUN_RB.stderr.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  COLLAPSED_RUN_RB.stdout.txt
+6adab17443821bfd6fc655a19791eef89a01598fdeb35d0c23cd90d5287ea98d  EXTRACTS.csv
+9773c3159070e62b191286c021482b9268d7a63eb6a0ef5c9cfe4e0eff018561  PREFLIGHT_C24V3.txt
+6d8a8cf6259663c80bce24da2856e964f0dc333bba2aa8613a8cac3dd67b1f35  Q_COUNTS.tsv
+85404ccb7a1a2f1929660be1d3574502aea98026252d46d5b6abfe5e05426a2a  SQL_TIMES.csv
+
+---
+# PRIOR ATTEMPTS: preserved in N18\C24V2; two MEMKILL attempts at ~19.3-20.1 GB peak on the full-table scripts (see SPEC V3).

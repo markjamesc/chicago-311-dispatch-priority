@@ -1,0 +1,77 @@
+[R-B] project root: C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03→STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates (chunked)...
+[R-B] chunk 1 pos=1 in=250000 labeled=7321
+[R-B] chunk 2 pos=250001 in=500000 labeled=8757
+[R-B] chunk 3 pos=500001 in=750000 labeled=12174
+[R-B] chunk 4 pos=750001 in=1000000 labeled=16744
+[R-B] chunk 5 pos=1000001 in=1250000 labeled=24083
+[R-B] chunk 6 pos=1250001 in=1500000 labeled=26894
+[R-B] chunk 7 pos=1500001 in=1750000 labeled=28576
+[R-B] chunk 8 pos=1750001 in=2000000 labeled=29562
+[R-B] chunk 9 pos=2000001 in=2250000 labeled=30811
+[R-B] chunk 10 pos=2250001 in=2500000 labeled=31752
+[R-B] chunk 11 pos=2500001 in=2750000 labeled=33845
+[R-B] chunk 12 pos=2750001 in=3000000 labeled=37155
+[R-B] chunk 13 pos=3000001 in=3250000 labeled=37717
+[R-B] chunk 14 pos=3250001 in=3500000 labeled=38590
+[R-B] chunk 15 pos=3500001 in=3750000 labeled=39039
+[R-B] chunk 16 pos=3750001 in=4000000 labeled=39441
+[R-B] chunk 17 pos=4000001 in=4250000 labeled=40098
+[R-B] chunk 18 pos=4250001 in=4500000 labeled=40958
+[R-B] chunk 19 pos=4500001 in=4750000 labeled=41485
+[R-B] chunk 20 pos=4750001 in=5000000 labeled=45594
+[R-B] chunk 21 pos=5000001 in=5250000 labeled=46947
+[R-B] chunk 22 pos=5250001 in=5500000 labeled=47801
+[R-B] chunk 23 pos=5500001 in=5750000 labeled=48490
+[R-B] chunk 24 pos=5750001 in=6000000 labeled=49245
+[R-B] chunk 25 pos=6000001 in=6250000 labeled=49907
+[R-B] chunk 26 pos=6250001 in=6500000 labeled=50568
+[R-B] chunk 27 pos=6500001 in=6750000 labeled=51349
+[R-B] chunk 28 pos=6750001 in=7000000 labeled=52206
+[R-B] chunk 29 pos=7000001 in=7250000 labeled=53973
+[R-B] chunk 30 pos=7250001 in=7500000 labeled=56059
+[R-B] chunk 31 pos=7500001 in=7750000 labeled=56901
+[R-B] chunk 32 pos=7750001 in=8000000 labeled=58045
+[R-B] chunk 33 pos=8000001 in=8250000 labeled=59449
+[R-B] chunk 34 pos=8250001 in=8500000 labeled=61084
+[R-B] chunk 35 pos=8500001 in=8750000 labeled=62439
+[R-B] chunk 36 pos=8750001 in=9000000 labeled=64306
+[R-B] chunk 37 pos=9000001 in=9250000 labeled=66307
+[R-B] chunk 38 pos=9250001 in=9500000 labeled=68891
+[R-B] chunk 39 pos=9500001 in=9750000 labeled=72585
+[R-B] chunk 40 pos=9750001 in=10000000 labeled=75894
+[R-B] chunk 41 pos=10000001 in=10250000 labeled=79425
+[R-B] chunk 42 pos=10250001 in=10500000 labeled=82707
+[R-B] chunk 43 pos=10500001 in=10750000 labeled=85405
+[R-B] chunk 44 pos=10750001 in=11000000 labeled=88226
+[R-B] chunk 45 pos=11000001 in=11250000 labeled=92502
+[R-B] chunk 46 pos=11250001 in=11500000 labeled=95388
+[R-B] chunk 47 pos=11500001 in=11750000 labeled=99280
+[R-B] chunk 48 pos=11750001 in=12000000 labeled=103170
+[R-B] chunk 49 pos=12000001 in=12250000 labeled=107563
+[R-B] chunk 50 pos=12250001 in=12500000 labeled=112747
+[R-B] chunk 51 pos=12500001 in=12750000 labeled=116668
+[R-B] chunk 52 pos=12750001 in=13000000 labeled=119666
+[R-B] chunk 53 pos=13000001 in=13250000 labeled=125449
+[R-B] chunk 54 pos=13250001 in=13500000 labeled=130476
+[R-B] chunk 55 pos=13500001 in=13750000 labeled=139121
+[R-B] chunk 56 pos=13750001 in=14000000 labeled=150634
+[R-B] chunk 57 pos=14000001 in=14250000 labeled=168187
+[R-B] chunk 58 pos=14250001 in=14500000 labeled=195881
+[R-B] chunk 59 pos=14500001 in=14635395 labeled=222002
+[R-B] open n=14635395 peer types=104 chunks=59 chunk_rows=250000
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-B/outputs/RB_classifications.csv (n=222002)
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-B/outputs/RB_portfolio_counts.csv (n=1)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all

@@ -1,0 +1,688 @@
+# C11 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Method Constants vs Knobs (catalog #11) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C11 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+- Cross-reference: N1 is open finding **OF-1** in the coordinator's RESULTS_N15.md (DST ambiguous-hour clean-pair mismatch; coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It was disclosed to the Builder and Validator in their packets (COORDINATOR NOTE N1) and in every spec ("Known open finding N1"), all before execution.
+
+---
+# SPEC
+# C11 — Ablation specification (FROZEN)
+
+**Ablation ID:** C11 (owner Remaining Ablation Program, catalog #11 "Method Constants vs Knobs")
+**Batch:** N15 batch 2 of 3 (controls C14, C11, C34, C16, C18)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`; `R-B/R/40_fixtures.R` `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 3→4 (fixed method constants vs the single owner knob κ)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Fixed method constants (W = 365 d, n_min = 50) are distinguished from the single owner-tunable knob κ (`MEASUREMENT_DESIGN_LOCKED.md` §4, §7). Changing a constant is a design change, not tuning.
+**Caught with the control:** crash, a method constant in the run code that differs from the locked value (n_min ≠ 50 in `R-A/run_RA.R` `N_MIN` or `R-B/R/00_config.R` `RB_N_MIN`), recon key/label mismatch, or fixture failure.
+
+## Exact change being tested (ablation)
+There is no constants-vs-knobs distinction. n_min is treated as tunable and can be retuned silently, without a design change.
+**Caught without the control (D_abl):** crash, recon key/label mismatch (n_only_ra + n_only_rb + n_disagree > 0), or a fixture failure on any path.
+W is applied in the SQL peer extract and cannot be varied without a new extract, so it is not seeded.
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. As a result, arm B's full-field recon (R-A vs R-B) shows dormant_h 1 and open_age_h 2 in every control. These mismatches are present in the frozen pack itself. The HALT rule "B recon 0/0/0" uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h.
+
+## Data profile used to choose seeds (frozen source, read-only, computed before the specs were frozen)
+STATUS = "Open" on all 245,193 rows. DUPLICATE: false 222,176 / true 23,017. LEGACY_RECORD: false 245,014 / true 179. PARENT_SR_NUMBER non-blank: 23,014. CLOSED_DATE non-blank: 0. Blank type_key: 0. Unparseable created/mod: 0. mod < created: 0. created > T: 0. Open rows by peer_n: no peer stats 6,443; 1–29: 27; 30–49: 35; 50–74: 14; 75–99: 19; ≥100: 238,655.
+
+## Seeded retunes (frozen before execution)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b2.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b2.txt`. No source variants are used in batch 2.
+- **K_NMIN30_CM** (paths run: RA+RB): Method constant n_min retuned 50 -> 30 on both paths (treated as a knob).
+  - code seed `seeds/C11/RA_NMIN30__run_RA.R` → `R-A\run_RA.R`, SHA-256 `0e0ed301c76a12cace469180a780808f1b91ec0465291d91c0a407b6e67e8b50`
+  - code seed `seeds/C11/RB_NMIN30__00_config.R` → `R-B\R\00_config.R`, SHA-256 `db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae`
+- **K_NMIN75_CM** (paths run: RA+RB): Method constant n_min retuned 50 -> 75 on both paths.
+  - code seed `seeds/C11/RA_NMIN75__run_RA.R` → `R-A\run_RA.R`, SHA-256 `67d6a1fc9696c3519811f8a2199154513310281fc0dc8eace05f97011469bb03`
+  - code seed `seeds/C11/RB_NMIN75__00_config.R` → `R-B\R\00_config.R`, SHA-256 `ff8014a4d65e742379524a71ddcf1f4daaf42b158b046dfadc127981be13be9d`
+- **K_NMIN100_CM** (paths run: RA+RB): Method constant n_min retuned 50 -> 100 on both paths.
+  - code seed `seeds/C11/RA_NMIN100__run_RA.R` → `R-A\run_RA.R`, SHA-256 `3781cefc3966b2c5db66bee7e30cfe94049113f2ac0d499ed608be3e32f57caf`
+  - code seed `seeds/C11/RB_NMIN100__00_config.R` → `R-B\R\00_config.R`, SHA-256 `534696b49c777aee6840bb0ec73fcc81749adaeeb7c594c388c934e652c18c4d`
+- **K_NMIN30_RB** (paths run: RB): Method constant n_min retuned 50 -> 30 on R-B only.
+  - code seed `seeds/C11/RB_NMIN30__00_config.R` → `R-B\R\00_config.R`, SHA-256 `db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No silent tunability existed anyway. Fail: Ambiguous tuning found without rule (keep rule)."
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs (as frozen unless an arm's seed states a fixture rewrite).
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures in the pack.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon (key set + classification, the frozen definition; see N1) is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   c1fcf612b31cfb5c92ba797f2de433cb4a951f3a23c6651a39184075817a92d5 seeds/C11/ARMS.tsv
+seed   OK   3781cefc3966b2c5db66bee7e30cfe94049113f2ac0d499ed608be3e32f57caf seeds/C11/RA_NMIN100__run_RA.R
+seed   OK   0e0ed301c76a12cace469180a780808f1b91ec0465291d91c0a407b6e67e8b50 seeds/C11/RA_NMIN30__run_RA.R
+seed   OK   67d6a1fc9696c3519811f8a2199154513310281fc0dc8eace05f97011469bb03 seeds/C11/RA_NMIN75__run_RA.R
+seed   OK   534696b49c777aee6840bb0ec73fcc81749adaeeb7c594c388c934e652c18c4d seeds/C11/RB_NMIN100__00_config.R
+seed   OK   db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae seeds/C11/RB_NMIN30__00_config.R
+seed   OK   ff8014a4d65e742379524a71ddcf1f4daaf42b158b046dfadc127981be13be9d seeds/C11/RB_NMIN75__00_config.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+c1fcf612b31cfb5c92ba797f2de433cb4a951f3a23c6651a39184075817a92d5  745  runner/seeds/C11/ARMS.tsv
+3781cefc3966b2c5db66bee7e30cfe94049113f2ac0d499ed608be3e32f57caf  25010  runner/seeds/C11/RA_NMIN100__run_RA.R
+0e0ed301c76a12cace469180a780808f1b91ec0465291d91c0a407b6e67e8b50  25009  runner/seeds/C11/RA_NMIN30__run_RA.R
+67d6a1fc9696c3519811f8a2199154513310281fc0dc8eace05f97011469bb03  25009  runner/seeds/C11/RA_NMIN75__run_RA.R
+534696b49c777aee6840bb0ec73fcc81749adaeeb7c594c388c934e652c18c4d  1883  runner/seeds/C11/RB_NMIN100__00_config.R
+db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae  1882  runner/seeds/C11/RB_NMIN30__00_config.R
+ff8014a4d65e742379524a71ddcf1f4daaf42b158b046dfadc127981be13be9d  1882  runner/seeds/C11/RB_NMIN75__00_config.R
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+05:45:45 C11 arms
+05:46:00   B RA exit=0 secs=14.3
+05:46:26   B RB exit=0 secs=26.2
+05:46:40   K_NMIN30_CM RA exit=0 secs=12.2
+05:47:06   K_NMIN30_CM RB exit=0 secs=26.3
+05:47:20   K_NMIN75_CM RA exit=0 secs=13.4
+05:47:47   K_NMIN75_CM RB exit=0 secs=27.3
+05:48:02   K_NMIN100_CM RA exit=0 secs=14.3
+05:48:29   K_NMIN100_CM RB exit=0 secs=26.2
+05:48:56   K_NMIN30_RB RB exit=0 secs=26.3
+
+---
+# C11_RESULTS.md (runner output)
+# C11 RESULTS — Method Constants vs Knobs (catalog #11) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 4/4
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {K_NMIN30_CM,K_NMIN75_CM,K_NMIN100_CM,K_NMIN30_RB}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path (n_min treated as a tunable knob)]: {K_NMIN100_CM,K_NMIN30_RB}
+- H6 H minus caught-without-control: {K_NMIN30_CM,K_NMIN75_CM}
+- H7 arms with no locked-field change: {}
+- H8 caught with the control [crash, a method constant (n_min) in the run code differs from the locked value 50, recon key/label mismatch, or fixture failure]: {K_NMIN30_CM,K_NMIN75_CM,K_NMIN100_CM,K_NMIN30_RB}
+- H9 caught with the control but no locked-field change: {}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| K_NMIN30_CM | RA+RB | Method constant n_min retuned 50 -> 30 on both paths (treated as a knob) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=35 dormant=0 open_age=0 | only_x=0 only_B=0 label=35 dormant=0 open_age=0 | 70 | 70 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| K_NMIN75_CM | RA+RB | Method constant n_min retuned 50 -> 75 on both paths | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=14 dormant=0 open_age=0 | only_x=0 only_B=0 label=14 dormant=0 open_age=0 | 28 | 28 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| K_NMIN100_CM | RA+RB | Method constant n_min retuned 50 -> 100 on both paths | RA=0 RB=0 | 14/14 | 13/14 (F14) | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=33 dormant=0 open_age=0 | only_x=0 only_B=0 label=33 dormant=0 open_age=0 | 66 | 66 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | TRUE |
+| K_NMIN30_RB | RB | Method constant n_min retuned 50 -> 30 on R-B only | RB=0 | 14/14 | 14/14 | 0 | 0 | 35 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=35 dormant=0 open_age=0 | 35 | 35 | TRUE | R-B\R\00_config.R | TRUE | TRUE |
+
+
+---
+# C11_arms.csv (raw, full file)
+arm,paths_run,change,exit,fx_RA,fx_RB,recon_only_ra,recon_only_rb,recon_disagree,recon_dormant_mismatch,recon_open_age_mismatch,RA_vs_B,RB_vs_B,locked_field_changes_vs_B,decision_changes_vs_B,harm,inputs_differing_from_B,caught_with_control,caught_without_control
+K_NMIN30_CM,RA+RB,Method constant n_min retuned 50 -> 30 on both paths (treated as a knob),RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=35 dormant=0 open_age=0,only_x=0 only_B=0 label=35 dormant=0 open_age=0,70,70,TRUE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,FALSE
+K_NMIN75_CM,RA+RB,Method constant n_min retuned 50 -> 75 on both paths,RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=14 dormant=0 open_age=0,only_x=0 only_B=0 label=14 dormant=0 open_age=0,28,28,TRUE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,FALSE
+K_NMIN100_CM,RA+RB,Method constant n_min retuned 50 -> 100 on both paths,RA=0 RB=0,14/14,13/14 (F14),0,0,0,1,2,only_x=0 only_B=0 label=33 dormant=0 open_age=0,only_x=0 only_B=0 label=33 dormant=0 open_age=0,66,66,TRUE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,TRUE
+K_NMIN30_RB,RB,Method constant n_min retuned 50 -> 30 on R-B only,RB=0,14/14,14/14,0,0,35,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=0 label=35 dormant=0 open_age=0,35,35,TRUE,R-B\R\00_config.R,TRUE,TRUE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+B,RA,F01,ESCALATE,ESCALATE,TRUE
+B,RA,F02,STANDARD,STANDARD,TRUE
+B,RA,F03,STANDARD,STANDARD,TRUE
+B,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F10,STANDARD,STANDARD,TRUE
+B,RA,F11,ESCALATE,ESCALATE,TRUE
+B,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+B,RB,F01,ESCALATE,ESCALATE,TRUE
+B,RB,F02,STANDARD,STANDARD,TRUE
+B,RB,F03,STANDARD,STANDARD,TRUE
+B,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F10,STANDARD,STANDARD,TRUE
+B,RB,F11,ESCALATE,ESCALATE,TRUE
+B,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+K_NMIN30_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN30_CM,RA,F02,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RA,F03,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RA,F10,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN30_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+K_NMIN30_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN30_CM,RB,F02,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RB,F03,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RB,F10,STANDARD,STANDARD,TRUE
+K_NMIN30_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN30_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+K_NMIN75_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN75_CM,RA,F02,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RA,F03,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RA,F10,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN75_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+K_NMIN75_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN75_CM,RB,F02,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RB,F03,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RB,F10,STANDARD,STANDARD,TRUE
+K_NMIN75_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN75_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN75_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN75_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+K_NMIN100_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN100_CM,RA,F02,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RA,F03,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RA,F10,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN100_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+K_NMIN100_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN100_CM,RB,F02,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RB,F03,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RB,F10,STANDARD,STANDARD,TRUE
+K_NMIN100_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN100_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN100_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN100_CM,RB,F14,STANDARD|STANDARD,INCONCLUSIVE|INCONCLUSIVE,FALSE
+K_NMIN30_RB,RB,F01,ESCALATE,ESCALATE,TRUE
+K_NMIN30_RB,RB,F02,STANDARD,STANDARD,TRUE
+K_NMIN30_RB,RB,F03,STANDARD,STANDARD,TRUE
+K_NMIN30_RB,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_RB,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_RB,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_RB,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_RB,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_RB,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_RB,RB,F10,STANDARD,STANDARD,TRUE
+K_NMIN30_RB,RB,F11,ESCALATE,ESCALATE,TRUE
+K_NMIN30_RB,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+K_NMIN30_RB,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+K_NMIN30_RB,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+
+---
+# C11_EVIDENCE.sha256
+20af4071028aaefb44f6cf010af1b240a938c3c582f0824b679a2c20c5308199  C11_ARM_MANIFESTS.txt
+f63787b682cfb0791136806e0415858d418f3b4530bb9d66b169df231e32b74e  C11_arms.csv
+1e8e3786c171a6e4c6d0854523a08c58551036140a0e552c91d9c7ce20f12a63  C11_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+B out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+B out :: e34f81ef0bd9a3d1016240d4e5a8a31f828b40007f13c957d1ef61439c5aef0f  34  RUN_RA.exit
+B out :: b9c4c332275ad454e74f685abeb80b940ead2e05b65085d56b7efcc8ef34ba28  779  RUN_RA.stderr.txt
+B out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+B out :: d28c0eb05511636b73dd651b2aa955e31bd9e8e973ac05015cd86e36d75d1c1f  34  RUN_RB.exit
+B out :: c56a1c83d9d84821027f1c04ded0edcde4edb22da4c0b2d069b22e3b84f6ca66  1260  RUN_RB.stderr.txt
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+K_NMIN100_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+K_NMIN100_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+K_NMIN100_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+K_NMIN100_CM in  :: 3781cefc3966b2c5db66bee7e30cfe94049113f2ac0d499ed608be3e32f57caf  25010  R-A\run_RA.R
+K_NMIN100_CM in  :: 534696b49c777aee6840bb0ec73fcc81749adaeeb7c594c388c934e652c18c4d  1883  R-B\R\00_config.R
+K_NMIN100_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+K_NMIN100_CM in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+K_NMIN100_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+K_NMIN100_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+K_NMIN100_CM out :: ddf62aafb09c3d0e161a57c18fcff960a234d8b95c6e9b92e800e20025d0eae3  22271758  R-A\outputs\RA_classifications.csv
+K_NMIN100_CM out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+K_NMIN100_CM out :: 6d05d22515f3043f30f8bd984fd78ccaae44b8c5df5ff520f951909f33bb9fc8  140  R-A\outputs\RA_portfolio_counts.csv
+K_NMIN100_CM out :: bffefede26eee4616ad780986c11a76edb846473a09a2bf64583d2641b9d7a97  41962256  R-B\outputs\RB_classifications.csv
+K_NMIN100_CM out :: 31e2dec6ac3193ca561f080df62f1e21d23c6c3213c9ba3e3353e585de9e0443  1801  R-B\outputs\RB_fixture_results.csv
+K_NMIN100_CM out :: abf56e0ab4c960efe3f19687f2ce16cc6f708a11081abddbdb26748da8ec0b64  164  R-B\outputs\RB_kappa_grid_counts.csv
+K_NMIN100_CM out :: be0a9c6101db59915390a49aa01764441726eaf6119d240332a63b3a5a122802  100  R-B\outputs\RB_portfolio_counts.csv
+K_NMIN100_CM out :: 7e6ad0ea966edc07ec46f3ebe0bdf47e4989ba99064a28351746708cca5eaad6  34  RUN_RA.exit
+K_NMIN100_CM out :: 5d65417b27c0211f7cc71c3fd18b187277e8d9f6b076b9a47c2f6fd72160144e  856  RUN_RA.stderr.txt
+K_NMIN100_CM out :: 75f6a0c0577b8370c989619a43a18e244a81f62f6bed076e6ca4abf8b10f416c  1361  RUN_RA.stdout.txt
+K_NMIN100_CM out :: 80bda41b4cab72eba2014def93f12d7e9b57c1deada2378f2849fb79b6cd38e2  34  RUN_RB.exit
+K_NMIN100_CM out :: b081f082b0a3d6ff415016e2331c2b8999937fd0badccfc22344144875d51676  1315  RUN_RB.stderr.txt
+K_NMIN100_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+K_NMIN30_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+K_NMIN30_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+K_NMIN30_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+K_NMIN30_CM in  :: 0e0ed301c76a12cace469180a780808f1b91ec0465291d91c0a407b6e67e8b50  25009  R-A\run_RA.R
+K_NMIN30_CM in  :: db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae  1882  R-B\R\00_config.R
+K_NMIN30_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+K_NMIN30_CM in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+K_NMIN30_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+K_NMIN30_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+K_NMIN30_CM out :: 32fff88c2391ecfcca691c6b24dc011f9f03c1cbef01efccd20663d4d441bc7c  22271176  R-A\outputs\RA_classifications.csv
+K_NMIN30_CM out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+K_NMIN30_CM out :: 1e942e3a5ab6fb9c0e526509a1e0da21cf86eb47a13cf6bb9bd27d24d69b452a  140  R-A\outputs\RA_portfolio_counts.csv
+K_NMIN30_CM out :: 34342fd4aea95e0611674aa36558942623cf4bd8287adea176e53fd53051ec8d  41965325  R-B\outputs\RB_classifications.csv
+K_NMIN30_CM out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+K_NMIN30_CM out :: e3df7e2937bf77c6d5ed054b40572c8481200b3cb6ab78c4f72a19506a1985da  164  R-B\outputs\RB_kappa_grid_counts.csv
+K_NMIN30_CM out :: 68ed99d7abaeb26e363c7fcae331ce7992061c004c0e8366f589d2ac97a62cb6  100  R-B\outputs\RB_portfolio_counts.csv
+K_NMIN30_CM out :: 5b77a9ad5507f2b432bb8c52f2df3740ff680b730483ad79a09786a6910e0639  34  RUN_RA.exit
+K_NMIN30_CM out :: 3c00b81a7a8b4afa22433b5dfea13c5e10b702e33d741a5540a5feeae32b2587  849  RUN_RA.stderr.txt
+K_NMIN30_CM out :: 3b74ac712086bf8e3d58612c2a8f777ace6402a83d08d91002bc7dfd540b0a69  1361  RUN_RA.stdout.txt
+K_NMIN30_CM out :: c36ff41e3e5d01fb2b8bf62c70610ab1b5b83bae60cefc45829aa977c7b1c8bf  34  RUN_RB.exit
+K_NMIN30_CM out :: ca278531950a1d1bc062fa27b43e837e6397adb7d2238b959666ab236f689bc5  1310  RUN_RB.stderr.txt
+K_NMIN30_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+K_NMIN30_RB in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+K_NMIN30_RB in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+K_NMIN30_RB in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+K_NMIN30_RB in  :: db2ee5110bc4c0afb470dd00c225129a0f6822ba5bebcfb4c36c511e4391f6ae  1882  R-B\R\00_config.R
+K_NMIN30_RB in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+K_NMIN30_RB in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+K_NMIN30_RB in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+K_NMIN30_RB in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+K_NMIN30_RB out :: 34342fd4aea95e0611674aa36558942623cf4bd8287adea176e53fd53051ec8d  41965325  R-B\outputs\RB_classifications.csv
+K_NMIN30_RB out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+K_NMIN30_RB out :: e3df7e2937bf77c6d5ed054b40572c8481200b3cb6ab78c4f72a19506a1985da  164  R-B\outputs\RB_kappa_grid_counts.csv
+K_NMIN30_RB out :: 68ed99d7abaeb26e363c7fcae331ce7992061c004c0e8366f589d2ac97a62cb6  100  R-B\outputs\RB_portfolio_counts.csv
+K_NMIN30_RB out :: 96f65dda22b280d2f7ed31f91d2ff6dabfcf768157621f3ef240d53f1a2b335f  34  RUN_RB.exit
+K_NMIN30_RB out :: 666ecd54115514cd70c5c46b7ca71feea60a6cb00031732cfec34c8defd3cf52  1310  RUN_RB.stderr.txt
+K_NMIN30_RB out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+K_NMIN75_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+K_NMIN75_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+K_NMIN75_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+K_NMIN75_CM in  :: 67d6a1fc9696c3519811f8a2199154513310281fc0dc8eace05f97011469bb03  25009  R-A\run_RA.R
+K_NMIN75_CM in  :: ff8014a4d65e742379524a71ddcf1f4daaf42b158b046dfadc127981be13be9d  1882  R-B\R\00_config.R
+K_NMIN75_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+K_NMIN75_CM in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+K_NMIN75_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+K_NMIN75_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+K_NMIN75_CM out :: 96320fd4926105ed219645606b31ea03cdddf1c8396a8a74fd049d1375337bf2  22271602  R-A\outputs\RA_classifications.csv
+K_NMIN75_CM out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+K_NMIN75_CM out :: 2e69c6007319b2640f2aaef1e7894426b54a354e42e8c0c5ad20883217c85dcc  140  R-A\outputs\RA_portfolio_counts.csv
+K_NMIN75_CM out :: 6fc8930461d823ea94a3beb810986b34a7cb0c47c30852f4e7828119539da352  41963103  R-B\outputs\RB_classifications.csv
+K_NMIN75_CM out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+K_NMIN75_CM out :: a4e936aa6d33df4de1aa1306e016dfd5beaae53acf7792aaead38673aff1b5d8  164  R-B\outputs\RB_kappa_grid_counts.csv
+K_NMIN75_CM out :: 6c19fb49a9e838637d6bdb904c467b3c47f207834b4df2ac579fbbeeec6dac4d  100  R-B\outputs\RB_portfolio_counts.csv
+K_NMIN75_CM out :: 1f0642e069589a59272c13690475ad8bf26b8a477c237ed166109278a8dd18e3  34  RUN_RA.exit
+K_NMIN75_CM out :: 2642be715eb00a57bcdd8d3836436294dd5b0d455e5969859318cdbf6946e3b2  849  RUN_RA.stderr.txt
+K_NMIN75_CM out :: 7a1cb0aa99018304c4a2d0b16b4ff5f9a58f373fdb102125d9b87f129d0aa3f3  1361  RUN_RA.stdout.txt
+K_NMIN75_CM out :: 7a2907c44d712003ed69db2f7de1b0e2bb1dc6672ed86a0ef10b64b5f08fb252  34  RUN_RB.exit
+K_NMIN75_CM out :: 8dfe7cd35370635e4d7e8a4c7f8f847ab935c32dc972aa70c56cf254aea7a40f  1310  RUN_RB.stderr.txt
+K_NMIN75_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-A/run_RA.R
++++ seeds/C11/RA_NMIN30__run_RA.R
+@@ -32,7 +32,7 @@
+ # ---- Locked constants -------------------------------------------------------
+ RULE_VERSION <- "RA-tcd-ig-v1"
+ KAPPA <- 2.0
+-N_MIN <- 50L
++N_MIN <- 30L
+ T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+ # ---- Paths ------------------------------------------------------------------
+--- frozen/R-B/R/00_config.R
++++ seeds/C11/RB_NMIN30__00_config.R
+@@ -13,7 +13,7 @@
+ RB_KAPPA_DEFAULT <- 2.0
+ 
+ # Method constants (not knobs)
+-RB_N_MIN <- 50L
++RB_N_MIN <- 30L
+ RB_KAPPA_GRID <- c(1.0, 1.5, 2.0, 3.0)
+ 
+ # Path resolution: R-B lives at <project>/R-B/
+--- frozen/R-A/run_RA.R
++++ seeds/C11/RA_NMIN75__run_RA.R
+@@ -32,7 +32,7 @@
+ # ---- Locked constants -------------------------------------------------------
+ RULE_VERSION <- "RA-tcd-ig-v1"
+ KAPPA <- 2.0
+-N_MIN <- 50L
++N_MIN <- 75L
+ T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+ # ---- Paths ------------------------------------------------------------------
+--- frozen/R-B/R/00_config.R
++++ seeds/C11/RB_NMIN75__00_config.R
+@@ -13,7 +13,7 @@
+ RB_KAPPA_DEFAULT <- 2.0
+ 
+ # Method constants (not knobs)
+-RB_N_MIN <- 50L
++RB_N_MIN <- 75L
+ RB_KAPPA_GRID <- c(1.0, 1.5, 2.0, 3.0)
+ 
+ # Path resolution: R-B lives at <project>/R-B/
+--- frozen/R-A/run_RA.R
++++ seeds/C11/RA_NMIN100__run_RA.R
+@@ -32,7 +32,7 @@
+ # ---- Locked constants -------------------------------------------------------
+ RULE_VERSION <- "RA-tcd-ig-v1"
+ KAPPA <- 2.0
+-N_MIN <- 50L
++N_MIN <- 100L
+ T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+ # ---- Paths ------------------------------------------------------------------
+--- frozen/R-B/R/00_config.R
++++ seeds/C11/RB_NMIN100__00_config.R
+@@ -13,7 +13,7 @@
+ RB_KAPPA_DEFAULT <- 2.0
+ 
+ # Method constants (not knobs)
+-RB_N_MIN <- 50L
++RB_N_MIN <- 100L
+ RB_KAPPA_GRID <- c(1.0, 1.5, 2.0, 3.0)
+ 
+ # Path resolution: R-B lives at <project>/R-B/
+
+

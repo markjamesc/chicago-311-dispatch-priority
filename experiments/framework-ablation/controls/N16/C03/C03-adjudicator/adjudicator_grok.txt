@@ -1,0 +1,180 @@
+﻿Role attestation
+
+I am the Adjudicator for ablation C03 only (Batch N16, owner control #3: Design Gate after the cross-review, pre-gate replay). Role: Grok, Expert mode. Builder is ChatGPT; Validator is DeepSeek. I issue exactly one terminal state. I do not rerun the scorer, repair code, create a criterion, relax a gate, or prefer one side’s mechanical result over the other’s. Independence: this adjudication uses only the frozen packet (SPEC, constitution, preflight, scorer source, C03_RESULTS.md, C03_items.csv, verbatim Stage 3 inputs, FREEZE RECORD, Builder report, Validator report). No Validator or Builder assessment was available to the other before freeze (verdict_token_leak: false on both packs).
+KEEP would mean the Design Gate may be applied before the cross-review. REVERT means it stays after the cross-review. HALT only on a constitution §9 condition as narrowed in the adjudicator charge.
+
+Freeze check
+
+The FREEZE RECORD (EVIDENCE_FREEZE.json, frozen_at_ct 2026-10-09 03:12:50 CT, constitution 1.0) names the two packs and their hashes:
+
+Builder: C03/C03-builder/builder_report.md, 20555 bytes, SHA-256 6f4f06aae6d61b13253d7a376237ac8eeb7c3a1bb1103d35c88b0dc588bf9406, verdict_token_leak: false.
+Validator: C03/C03-validator/validator_report.md, 9950 bytes, SHA-256 eaddc17ba1d268683247163aa9458413f0b2e12b218b83f2c6347ca081fcf8f1, verdict_token_leak: false.
+
+The reports in this packet are those frozen files as supplied. I do not recompute SHA-256 (no rerun; charge forbids tools). Nothing in either report contradicts the freeze-record paths, roles, or leak flags.
+Completeness: the Builder report ends with END C03 BUILDER REPORT. The Validator report ends with END C03 VALIDATOR REPORT. Both are complete. Neither leaks a terminal-state token.
+Frozen-reference hashes cited by both reports match the SPEC and C03_EVIDENCE.sha256 for score_c03.py (9cd3dc726b2ade2bd0c7431763a0979418de5af4235fec68b131cf46c4dd4e62), C03_RESULTS.md (8cc735ffea6a3124901959656fb08f64be63fa95579186da40a3f9e1ccd4af34), and C03_items.csv (d3801c09adbf3efc608c8650d8f1fce63a96eb815b0c98e01712a4f3a61a600a). Preflight reports PASS, failures 0, and the six Stage 3 input prefixes in C03_RESULTS.md match the full hashes in preflight and C03_EVIDENCE.sha256. n16lib.py is hashed in the SPEC (4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47) but its source is not in this packet and it is omitted from C03_EVIDENCE.sha256; that is recorded under objections, not as a contradicted hash.
+
+Hard-fact agreement table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkChecklist items scored141414agreeItem 1 classSYNTHESIS-ONLYSYNTHESIS-ONLYSYNTHESIS-ONLYagreePre-review class count131313agreeNeither class count000agreeP1.1 decidable from pre-reviewNOT METNOT METNOT METagreeLocked-design tokens4747 (reported; not fully re-enumerated)47agreeTokens in Design A / Design B7 / 457 / 457 / 45agreeTokens only in CROSS_REVIEW000agreeTokens in no review document000agreeP1.2 token coverageMETMETMETagreeCROSS_REVIEW §4 disagreements777agreeP1.3 empty disagreement listNOT METNOT METNOT METagreeMechanical P1NOT METNOT METNOT METagreeSix Stage 3 input hashes vs SPEC/preflightmatchmatchprefixes matchagreeScorer / RESULTS / items hashes vs SPECmatchmatchlistedagree
+No hard number or classification that decides a P1 condition is in dispute. Builder’s semantic notes on items 4 and 9 (snapshot selection and parse/timezone rule not fully settled) are qualifications beside the scorer class, not a reclassification of the mechanical row. Validator’s token-enumeration caveat does not change the reported MET on P1.2. Extra Validator observations (n16lib omitted from C03_EVIDENCE.sha256; RESULTS timestamp 02:21:35 CT vs preflight 02:21:42 CT; shared hash of two non-C03 files) are not contradicted by Builder and do not decide a P1 condition.
+
+The nine KEEP conditions of constitution §7
+PASS. Both packs are present, frozen in the FREEZE RECORD at 2026-10-09 03:12:50 CT, and complete (END lines). Scorer results, items table, scorer source, frozen Stage 3 inputs, and hashes are in the packet. Citation: FREEZE RECORD; Builder END line; Validator END line; C03_RESULTS.md; C03_items.csv.
+PASS. Roles are distinct (Builder ChatGPT, Validator DeepSeek, Adjudicator Grok). Each first pass attests blindness; freeze record marks verdict_token_leak: false on both packs. Citation: FREEZE RECORD roles; Builder §1; Validator §1.
+PASS. Builder and Validator agree on every P1-deciding hard fact in the table in §3, and both agree with the scorer. Citation: Builder §§3–4; Validator §§3 and 5; C03_RESULTS.md condition table; C03_items.csv item 1; CROSS_REVIEW §4.
+PASS (not applicable). SPEC regression rules and the adjudicator charge state that constitution §7 conditions 4 and 5 are not applicable to this text-only control: no R-A/R-B path, no reconciliation run. Text-level equivalent is the frozen-document comparison, which both reports performed. Citation: SPEC § Regression / HALT rules; coordinator note; Builder §3.5; Validator §2.
+PASS (not applicable). No fixture execution. Seeds declared: (none). Known-answer cases are the unmodified arms and those seeds. Citation: SPEC § Frozen reference hashes, Seed files: (none); SPEC § Regression / HALT rules; coordinator note.
+PASS. No undeclared semantic change. Seeds: none. No Stage 3 document was rewritten. Frozen inputs are only read; preflight failures: 0. The order change under test is the declared ablation, not a silent code or schema change. Citation: SPEC §§ Arms, Disclosures, Frozen data; PREFLIGHT PASS; Builder §2.2.
+PASS. No locked regression is introduced. No SQL/R path ran. Coordinator note: N16 reads only frozen Stage 1–5 text, logs, and C48 outputs, so N1/OF-1 cannot enter any N16 number. Citation: coordinator note; PREFLIGHT PASS failures: 0; SPEC § Disclosures.
+FAIL. The predeclared benefit predicate P1 is the conjunction of three conditions. Condition 1 is NOT MET (item 1, lock candidate = B-leaning hybrid (TCD-IG), class SYNTHESIS-ONLY; key term hybrid is absent from the pre-review union and present in CROSS_REVIEW). Condition 2 is MET (47 locked tokens; 0 only in CROSS_REVIEW; 0 introduced only at lock). Condition 3 is NOT MET (CROSS_REVIEW §4 lists 7 material disagreements; P1 requires an empty list). Mechanical P1: NOT MET. Citation: SPEC § Operational benefit predicate P1; C03_RESULTS.md condition table and § Cross-review section 4; C03_items.csv row 1; Builder §4; Validator §5; CROSS_REVIEW §§4–5.
+FAIL. A Validator blocking objection remains supported by the frozen packet: score_c03.py imports n16lib, the SPEC declares n16lib.py SHA-256 4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47, and that source is absent from the packet and from C03_EVIDENCE.sha256. The 7-second RESULTS-before-preflight timestamp is also in the frozen texts. Neither objection overturns the agreed P1 failure, and neither is treated as a HALT (see §5). Citation: Validator §§3, 4, 6; SCORER SOURCE import line; SPEC scorer-file hashes; C03_EVIDENCE.sha256; C03_RESULTS.md generated line; PREFLIGHT timestamp line.
+
+KEEP requires all nine. Conditions 8 and 9 fail. KEEP is not available.
+
+HALT conditions of §9
+
+
+Hard mechanical results conflict: absent. Builder, Validator, and scorer agree on item-1 class, 13/0 class counts, token 47/0/0, disagreement count 7, and P1 NOT MET. Citation: §3 table; Builder §4; Validator §5; C03_RESULTS.md.
+Required raw evidence missing: absent under the charge. Scorer results, raw items table, scorer source score_c03.py, frozen inputs, and hashes are present. The charge says not to HALT only because a historical stdout is missing. The n16lib helper source is absent; P1.1 and P1.3, which decide the failure, are recomputed from verbatim CROSS_REVIEW, Design A/B, the dossier, and C03_items.csv without that helper. Citation: adjudicator charge; C03_RESULTS.md; C03_items.csv; CROSS_REVIEW §4; SCORER SOURCE.
+Hash or frozen-version mismatch against the FREEZE RECORD or FROZEN REFERENCE HASHES: absent. Pack hashes are those in the FREEZE RECORD as supplied. Input, scorer, RESULTS, and items hashes cited by both reports match the SPEC and C03_EVIDENCE.sha256. Preflight PASS. The n16lib omission is a missing manifest line, not a contradicted digest. Citation: FREEZE RECORD; SPEC frozen reference hashes; C03_EVIDENCE.sha256; PREFLIGHT.
+Baseline or constitution changed mid-run: absent. Constitution SHA-256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 and baseline framework hashes match preflight. Citation: PREFLIGHT; SPEC constitution version.
+Role separation violated: absent. Three distinct roles; no model holds two. Citation: FREEZE RECORD roles; SPEC § Roles.
+Information barrier breached before first-pass freeze: absent. Both attest blindness; verdict_token_leak: false. Citation: Builder §1; Validator §1; FREEZE RECORD.
+Benefit predicate not operationally defined before execution: absent. P1’s three conditions are in the frozen SPEC, approved as owner answer Z / form 3-A before the chats. Citation: SPEC § Operational benefit predicate P1; SPEC definitions and approval.
+Adjudicator cannot determine which frozen evidence pack is authoritative: absent. FREEZE RECORD names one Builder pack and one Validator pack. Citation: FREEZE RECORD.
+
+No HALT condition is present.
+
+Blocking objections raised by the Validator and how the evidence bears on them
+
+Objection 1 — n16lib.py source absent, and omitted from C03_EVIDENCE.sha256, though imported and hashed in the SPEC. Supported as a pack gap. It does not create a Builder/Validator conflict on a P1-deciding classification. Item 1’s SYNTHESIS-ONLY class and the seven §4 headings are visible in C03_items.csv and CROSS_REVIEW §4 without the helper. The token regex that implements P1.2 is in the supplied score_c03.py, and both sides report P1.2 MET. This objection supports KEEP condition 9 failing. It is not a HALT: the charge treats scorer results, scorer source, raw tables, frozen inputs, and hashes as present, and forbids HALT solely for a missing historical stdout.
+Objection 2 — RESULTS generated 2026-10-09 02:21:35 CT, preflight 02:21:42 CT (reporting line precedes preflight by 7 seconds). Supported as a timestamp order note. Preflight itself reports PASS, failures 0, and the compared hashes match. This is not a hash mismatch, not a mid-run constitution change, and not a conflict on a P1 number.
+Objection 3 — seeds: none. Matches SPEC Seed files: (none). No objection.
+Objection 4 — fixtures/reconciliation: not applicable. Matches the coordinator note and SPEC. No objection.
+No objection is a hard mechanical disagreement, a contradicted freeze hash, a role breach, or an undefined predicate.
+
+Verdict rationale
+
+The change under test is applying the Design Gate to the pre-review set only (Design A, Design B, AI 3 dossier), before CROSS_REVIEW. The frozen baseline gate passed after synthesis (DESIGN_GATE_RECEIPT, PASS 2026-09-19 05:23:53 CDT) on a B-leaning hybrid (TCD-IG).
+On the frozen records that move is decision-relevant. Checklist item 1, the lock candidate itself, is synthesis-only: the phrase and the hybrid recommendation appear in CROSS_REVIEW §§5–6, not as an already-reconciled candidate in Design A, Design B, or the dossier. CROSS_REVIEW §4 lists seven material disagreements (primary statistic, knob specificity, INCONCLUSIVE as residual vs integrity gate, eligibility surface, fixture depth including F03, capacity handling, peer aggregates in SQL). P1.3 requires that list to be empty, because a gate before the cross-review would approve one design without that reconciliation. P1.2 is met (no locked-design token is added only by the cross-review or only at lock), so the failure is not a missing token; it is an unreconciled construct fork and a synthesis-only approval object. SPEC disclosures already state that this replay does not show what an owner would have approved; the predicate that was frozen still fails.
+Mechanics are coherent. HALT conditions are absent. P1 is not met, and a supported non-halting objection remains. Constitution §8: coherent evidence without the predeclared benefit reverts. The Design Gate stays after the cross-review.
+TERMINAL_STATE: REVERT
+END C03 ADJUDICATION

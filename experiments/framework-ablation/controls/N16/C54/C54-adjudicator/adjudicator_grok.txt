@@ -1,0 +1,173 @@
+﻿Role attestation
+
+I am the Adjudicator only (Grok, Expert), for ablation C54, batch N16, owner control #54 (Builder file-download capture channel, capture-log replay, option 54-B). Builder is ChatGPT; Validator is DeepSeek. I did not build, validate, rerun the scorer, repair code, or create a criterion. KEEP would add the file-download channel (page capture kept as cross-check). REVERT would not add it. No terminal state is taken from either pack. Constitution 1.0.
+
+Freeze check
+
+The FREEZE RECORD (EVIDENCE_FREEZE.json, frozen_at_ct 2026-10-09 04:03:52 CT) names the two packs and records verdict_token_leak false for both:
+
+Builder: C54/C54-builder/builder_report.md, 26509 bytes, SHA-256 d2389be616a10cc6c0736653399f4eecf055c37dc887c3a58fee481938a137ac. The embedded report is presented as that frozen file. It is complete and ends with END C54 BUILDER REPORT. It returns no KEEP, REVERT, or HALT.
+Validator: C54/C54-validator/validator_report.md, 8257 bytes, SHA-256 57fd6d38f95fcfb04a7932d1efc3a4323ce583e175499dc1d35bd918bbdc481f. The embedded report is presented as that frozen file. It is complete and ends with END C54 VALIDATOR REPORT. It returns no KEEP, REVERT, or HALT.
+
+I do not rehash the embedded prose. No pack asserts a mismatch against the freeze record. Quoted hashes that a KEEP condition relies on agree across the SPEC, PREFLIGHT, FROZEN REFERENCE HASHES, and C54_EVIDENCE.sha256: constitution e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; scorer score_c54.py 59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86; n16lib.py 4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47 (source supplied in the 04:08 CT supplement); C54_RESULTS.md d7dcea67edca73804c92a50294a80fd01a8dfc84563e1e15e7e6ea15cfa0e4d4; C54_captures.csv e1c52c50e64a52139824dedcf749e647465e5f16e2d1cbb878a64fc5f180c72c; C43_TERMINAL_STATE.txt 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0, content REVERT. Baseline framework hashes match the SPEC. PREFLIGHT PASS, failures: 0. Seed files: none.
+
+Hard-fact agreement table
+
+Scorer RESULTS is the mechanical reference. P1-deciding facts agree. One auxiliary recount does not.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkLog entries414141agreeChatGPT / Grok / DeepSeek14 / 11 / 1614 / 11 / 16table implies 14 / 11 / 16agreeDownload-capable (ChatGPT+Grok)252525agreeIncident entries333agreeIncidents still in final entry for that capture333agreeC49 DeepSeek, cause established, not avoidableyesyesyesagreeC43 DeepSeek, cause established, not avoidableyesyesyesagreeC48 Grok, cause not established, not avoidableyesyesyesagreeAvoidable incidents000agreeP1.1NOT METNOT METNOT METagreeP1.2 (≥ 30 logged captures)MET (41; also 38)MET (41; also 39)METagreeP1.3 (#43 = REVERT)METMETMETagreeMechanical P1NOT METNOT METNOT METagreeC40 D-C1 / D-C2 scored as reply-capture failuresnonolisted, not scoredagreeDistinct (control, file) keys3839not reported; uses 41 log entriesdisagree
+The disagree row does not decide a P1 condition. C49/reply_deepseek.html occurs three times (CAPTURE_b6 twice, CAPTURE_b6b once) and C40/inc_r2_chatgpt.html twice, so 41 − 3 = 38 distinct keys. The Validator counted only the two CAPTURE_b6 C49 rows and reached 39. Both figures, and the scorer’s 41, are ≥ 30. No incident row is superseded. This is not a conflict on a predeclared hard result.
+
+The nine KEEP conditions (constitution §7)
+Evidence packs complete and frozen: PASS. Both packs end on their END lines; freeze record present; preflight 0 failures; results and CSV hashes match the SPEC (C54_RESULTS.md, C54_captures.csv, FREEZE RECORD).
+Role separation valid: PASS. Builder ChatGPT, Validator DeepSeek, Adjudicator Grok; each pack attests a single role and blindness; freeze record verdict_token_leak: false (constitution §1; FREEZE RECORD).
+Builder and Validator agree on hard mechanical facts: PASS. They agree on every P1-deciding number and classification in §3. The 38-versus-39 key count is not a scorer result and does not decide P1 (constitution §4; SPEC P1; both packs §3).
+Exact reconciliation where required: PASS, not applicable. SPEC withdraws clean-arm byte identity for this text-only control. Text-level equivalent: site, incident, and eligibility identities reconcile to 41, and both packs match the scorer (SPEC regression rules; both packs §5).
+Every mandatory fixture passes: PASS, not applicable. No fixture and no R run. Known-answer cases are the unmodified arms and the declared seeds, of which there are none (SPEC; coordinator note).
+No undeclared semantic change: PASS. No seed files, no capture-implementation patch, replay only. Items marked not measured (byte identity, intake minutes, downloads adding failures) are not evidence either way (SPEC disclosures; scorer source).
+No locked regression introduced: PASS. Frozen inputs read only; N1/OF-1 cannot enter N16; #43 stays REVERT (coordinator note; C43_TERMINAL_STATE.txt).
+Predeclared benefit predicate satisfied: FAIL. P1 is conjunctive. Condition 1 is NOT MET: avoidable incidents = 0. Conditions 2 and 3 are MET. P1 NOT MET (SPEC P1; C54_RESULTS.md Conditions; both packs).
+No blocking objection remains supported by the frozen evidence: PASS. Validator blocking objections: none. The non-blocking notes (text-only mode, duplicate paths, disclosed scratch-run adjustment) do not unsettle a P1 fact (Validator §6).
+
+Condition 8 fails. The nine conditions are conjunctive, so KEEP is not available.
+
+HALT conditions (constitution §9)
+
+
+Hard mechanical results conflict: absent. P1-deciding counts and classifications agree with the scorer. The 38-versus-39 recount does not decide a P1 condition (SPEC HALT rule; §3).
+Required raw evidence missing: absent. Scorer results, raw capture table, scorer source, n16lib.py supplement, frozen notes, and C43_TERMINAL_STATE.txt are in the packet. A missing historical stdout is not a HALT here (adjudicator instructions; C54_RESULTS.md).
+Hash or frozen-version mismatch: absent. Quoted hashes agree; preflight failures 0 (§2).
+Baseline or constitution changed mid-run: absent. Constitution 1.0 and both baseline hashes match the SPEC and PREFLIGHT.
+Role separation violated: absent. Freeze record roles match the SPEC (§1, §4.2).
+Information barrier breached before first-pass freeze: absent. Both packs attest blindness; no verdict-token leak recorded.
+Benefit predicate not defined before execution: absent. P1’s three conditions are in the frozen SPEC, owner answer Z, before the chats.
+Adjudicator cannot tell which pack is authoritative: absent. One freeze record, one builder path, one validator path, both complete.
+
+No §9 condition is present. Not HALT.
+
+Blocking objections and the evidence
+
+The Validator raises no blocking objection. Non-blocking notes do not move a gate: text-only capture and the unrun 54-A live test are declared; duplicate paths leave condition 2 MET; the scratch-run rule that excluded the C48 Grok row is disclosed in the SPEC and applied in the reporting scorer.
+The Builder’s residual concerns are the same exclusions the SPEC already made. C49 and C43 are DeepSeek incomplete replies (C49_NOTES.md, C43_NOTES.md); the premise says DeepSeek has no download, so they are not avoidable. C48 is Grok with ends_ok=false while the extracted reply ends on its END line, and no note establishes a page-capture cause, so the SPEC bars counting it. C40 D-C1 is input-side and D-C2 is a tool fix; both are listed, not scored. No other CSV row has an incident field. None of this is a supported blocking objection to the mechanical result.
+
+Verdict rationale
+
+The change under test was not executed as a live channel. The frozen question is whether the N13 capture logs contain at least one reply-capture failure, with an established page-capture cause, on ChatGPT or Grok, that a download would have avoided, in a sample of at least 30, with #43 still REVERT. The scorer and both packs give 41 log entries, 25 download-capable captures, 3 incidents, and 0 avoidable incidents. Two incidents are DeepSeek; the one Grok incident has no established page-capture cause. P1 is therefore not met. The replay does not show that adding the download channel would have changed the outcome on these frozen records. Unmeasured byte identity and intake minutes are not evidence for KEEP. Mechanics are coherent and no HALT condition holds, so the failed predicate reverts.
+TERMINAL_STATE: REVERT
+END C54 ADJUDICATION

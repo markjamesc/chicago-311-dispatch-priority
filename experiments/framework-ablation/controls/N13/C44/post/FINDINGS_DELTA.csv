@@ -1,0 +1,2 @@
+"arm","severity","relates_to","row"
+"DELTA","MATERIAL","V-3","| F1 | MATERIAL | V-3 | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | Replace `42.9%` with `49.2%`. The required correction and arithmetic give `64,922 / 131,968 = 0.491952595 = 49.1953% ≈ 49.2%`. |"

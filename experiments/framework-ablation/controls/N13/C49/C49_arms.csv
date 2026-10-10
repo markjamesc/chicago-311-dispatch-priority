@@ -1,0 +1,2 @@
+arm,exit,status,n_evidence_files,zip_entries,zip_bytes,files_bytes_total
+CHECK,0,PASS,9,10,9592,17323

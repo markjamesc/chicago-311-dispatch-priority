@@ -1,0 +1,30 @@
+{
+ "cid": "C49R",
+ "role": "validator",
+ "source": "C49R/C49R-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 12745,
+ "source_sha256": "4cc94b99f26c1885b5ac8f068cb566631d479d2f070a5b5b7ff23008dd2fb210",
+ "output": "C49R/C49R-validator/validator_report.md",
+ "output_bytes": 12745,
+ "output_sha256": "4cc94b99f26c1885b5ac8f068cb566631d479d2f070a5b5b7ff23008dd2fb210",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "url=https://chat.deepseek.com/a/chat/s/81aa6e7a-ceac-4d04-a464-ef733cf7ae91\nsent=2026-10-09 07:37:24 CDT\nreply_complete=by 2026-10-09 07:44:40 CDT (upper bound; still generating at ~07:39:30; UI \"Thought for 43 seconds\")\nnotes: New chat, DeepThink ON, Search OFF (verified visually before send; Search had initially shown as on and was toggled off). Packet packets/C49R_2_VALIDATOR_DeepSeek.txt (61234 B, ends \"Finish with the line: END C49R VALIDATOR REPORT\") sent as a single file attachment (chip \"TXT 59.8KB\") with no message text. Capture: select rendered reply (thoughts excluded), copy, clipget; unchanged + final newline. Ordered-list numerals are not in the copied text (rendered list markers not selectable)."
+}

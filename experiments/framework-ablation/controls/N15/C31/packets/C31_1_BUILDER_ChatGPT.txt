@@ -1,0 +1,671 @@
+# C31 Builder — ChatGPT (INDEPENDENT FIRST PASS)
+
+Role: Builder only. Use the highest reasoning setting. You are blind to the Validator. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+3. Hard mechanical facts table. Recompute every number you can from the evidence tables below: identities such as n_agree + n_disagree = n_inner, portfolio deltas, D-sets, and hash equalities across arms. Mark each number as recomputed or quoted.
+4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+5. Fixture and reconciliation implications.
+6. Semantic/regression risks and unchanged surfaces.
+7. Claim → evidence map. Cite the section and the table row for each claim.
+End your reply with this exact line on its own:
+END C31 BUILDER REPORT
+
+---
+# SPEC
+# C31 — Ablation specification (FROZEN)
+
+**Ablation ID:** C31 (owner Remaining Ablation Program, catalog #31 "Lineage Attestation")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (provenance of data and code versions)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Before outputs are trusted, the run attests explicit source/data version and snapshot identity: a manifest of the SHA-256 of every input (source files and code) is checked against the frozen record.
+
+## Exact change being tested (ablation)
+There is no lineage attestation. An undocumented change can reach both paths identically. Trust rests on exit 0, fixtures on both paths, and exact recon R-A vs R-B (key set + classification).
+**Caught without the control (D_abl):** crash, recon key/label mismatch, or a fixture failure on any path.
+**Caught with the control:** the above, or any input-file SHA-256 that differs from the frozen record.
+
+## Seeded undocumented changes (frozen before execution; applied to both paths)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **L_STALE24** (paths run: RA+RB): Both paths read the stale snapshot (undocumented snapshot change).
+  - source variant `V_STALE24/src_open_candidates.csv` SHA-256 `8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58`, 118267409 bytes
+  - source variant `V_STALE24/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+- **L_PEER10** (paths run: RA+RB): Both paths read the altered peer stats (undocumented).
+  - source variant `V_PEER10/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, 118671837 bytes (unchanged, equals the frozen file)
+  - source variant `V_PEER10/src_peer_stats.csv` SHA-256 `573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8`, 16276 bytes
+  - variant note: type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+- **L_TF24** (paths run: RA+RB): Both paths' T_freeze moved +24 h (undocumented config change).
+  - code seed `seeds/C31/RA_TF24__run_RA.R` → `R-A\run_RA.R`, SHA-256 `4694d22d2bc81220bbb0326971e12782de5a88e5a9065291062c6f492e175bcd`
+  - code seed `seeds/C31/RB_TF24__00_config.R` → `R-B\R\00_config.R`, SHA-256 `3484c86e27dbe704f8017bc76606ff7ec95dec97aa6d8768e2f485a8bfe03daf`
+- **L_K25** (paths run: RA+RB): Both paths' kappa 2.0 -> 2.5 (undocumented knob change).
+  - code seed `seeds/C31/RA_K25__run_RA.R` → `R-A\run_RA.R`, SHA-256 `7b3e23dc17b242353b552febde9c7fbd4447fd200ac5d0996e25435a18a44051`
+  - code seed `seeds/C31/RB_K25__00_config.R` → `R-B\R\00_config.R`, SHA-256 `401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90`
+- **L_COMMENT** (paths run: RA+RB): Comment-only edit in both paths (bytes differ, no semantic change).
+  - code seed `seeds/C31/RA_COMMENT__run_RA.R` → `R-A\run_RA.R`, SHA-256 `51a47bd1c613d8570f2a8f52436b5b7580a40cc924fe89ccb15a980baad80be9`
+  - code seed `seeds/C31/RB_COMMENT__00_config.R` → `R-B\R\00_config.R`, SHA-256 `bdf1f3cb821d3ed8798e6698b59be2094681f0632637f4fff68d0260a150a5e2`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No ambiguity in data/code versions. Fail: Undocumented changes found (keep rule)."
+Definitions:
+- **H:** harm set (above).
+- **D_abl:** seeded arms caught without the control (definition above).
+Outcomes:
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. L_COMMENT (comment-only) shows whether attestation alarms on a benign change.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   80682432b46ba9c6b2b561396e1a82c0b5eadfb96e4cdc3ba36826f2e9a886d4 seeds/C31/ARMS.tsv
+seed   OK   51a47bd1c613d8570f2a8f52436b5b7580a40cc924fe89ccb15a980baad80be9 seeds/C31/RA_COMMENT__run_RA.R
+seed   OK   7b3e23dc17b242353b552febde9c7fbd4447fd200ac5d0996e25435a18a44051 seeds/C31/RA_K25__run_RA.R
+seed   OK   4694d22d2bc81220bbb0326971e12782de5a88e5a9065291062c6f492e175bcd seeds/C31/RA_TF24__run_RA.R
+seed   OK   bdf1f3cb821d3ed8798e6698b59be2094681f0632637f4fff68d0260a150a5e2 seeds/C31/RB_COMMENT__00_config.R
+seed   OK   401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90 seeds/C31/RB_K25__00_config.R
+seed   OK   3484c86e27dbe704f8017bc76606ff7ec95dec97aa6d8768e2f485a8bfe03daf seeds/C31/RB_TF24__00_config.R
+seed   OK   0631458b3883141fba25f80a2e843941d82e8e1db058b1406714c7093192de5f source_variants.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+04:44:28 variant OK V_STALE24 src_open_candidates.csv 8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58 rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+04:44:28 variant OK V_STALE24 src_peer_stats.csv cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+04:44:28 variant OK V_PEER10 src_open_candidates.csv ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+04:44:28 variant OK V_PEER10 src_peer_stats.csv 573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8 type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+
+---
+# RUN LOG (this control)
+04:47:52 C31 arms
+04:48:03   B RA exit=0 secs=11.3
+04:48:29   B RB exit=0 secs=25.2
+04:48:42   L_STALE24 RA exit=0 secs=12.1
+04:49:07   L_STALE24 RB exit=0 secs=25.2
+04:49:20   L_PEER10 RA exit=0 secs=12.1
+04:49:46   L_PEER10 RB exit=0 secs=26.3
+04:49:58   L_TF24 RA exit=0 secs=11.1
+04:50:23   L_TF24 RB exit=0 secs=25.3
+04:50:36   L_K25 RA exit=0 secs=12.3
+04:51:02   L_K25 RB exit=0 secs=26.2
+04:51:14   L_COMMENT RA exit=0 secs=11.1
+04:51:40   L_COMMENT RB exit=0 secs=26.3
+
+---
+# C31_RESULTS.md (runner output)
+# C31 RESULTS — Lineage Attestation (catalog #31) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 5/5
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path (no lineage/manifest attestation)]: {}
+- H6 H minus caught-without-control: {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H7 arms with no locked-field change: {L_COMMENT}
+- H8 caught with the control [crash, any input file SHA-256 (source or code) differs from the frozen record, recon key/label mismatch, or fixture failure]: {L_STALE24,L_PEER10,L_TF24,L_K25,L_COMMENT}
+- H9 caught with the control but no locked-field change: {L_COMMENT}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| L_STALE24 | RA+RB | Both paths read the stale snapshot (undocumented snapshot change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | 1546 | 1546 | TRUE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| L_PEER10 | RA+RB | Both paths read the altered peer stats (undocumented) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | 538 | 538 | TRUE | data\source\src_peer_stats.csv | TRUE | FALSE |
+| L_TF24 | RA+RB | Both paths' T_freeze moved +24 h (undocumented config change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | 889154 | 1146 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_K25 | RA+RB | Both paths' kappa 2.0 -> 2.5 (undocumented knob change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | 13786 | 13786 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_COMMENT | RA+RB | Comment-only edit in both paths (bytes differ, no semantic change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+
+
+---
+# C31_arms.csv (raw, full file)
+arm,paths_run,change,exit,fx_RA,fx_RB,recon_only_ra,recon_only_rb,recon_disagree,recon_dormant_mismatch,recon_open_age_mismatch,RA_vs_B,RB_vs_B,locked_field_changes_vs_B,decision_changes_vs_B,harm,inputs_differing_from_B,caught_with_control,caught_without_control
+L_STALE24,RA+RB,Both paths read the stale snapshot (undocumented snapshot change),RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=773 label=0 dormant=0 open_age=0,only_x=0 only_B=773 label=0 dormant=0 open_age=0,1546,1546,TRUE,data\source\src_open_candidates.csv,TRUE,FALSE
+L_PEER10,RA+RB,Both paths read the altered peer stats (undocumented),RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=269 dormant=0 open_age=0,only_x=0 only_B=0 label=269 dormant=0 open_age=0,538,538,TRUE,data\source\src_peer_stats.csv,TRUE,FALSE
+L_TF24,RA+RB,Both paths' T_freeze moved +24 h (undocumented config change),RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=573 dormant=222002 open_age=222002,only_x=0 only_B=0 label=573 dormant=222002 open_age=222002,889154,1146,TRUE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,FALSE
+L_K25,RA+RB,Both paths' kappa 2.0 -> 2.5 (undocumented knob change),RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=6893 dormant=0 open_age=0,only_x=0 only_B=0 label=6893 dormant=0 open_age=0,13786,13786,TRUE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,FALSE
+L_COMMENT,RA+RB,"Comment-only edit in both paths (bytes differ, no semantic change)",RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=0 label=0 dormant=0 open_age=0,0,0,FALSE,R-A\run_RA.R; R-B\R\00_config.R,TRUE,FALSE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+B,RA,F01,ESCALATE,ESCALATE,TRUE
+B,RA,F02,STANDARD,STANDARD,TRUE
+B,RA,F03,STANDARD,STANDARD,TRUE
+B,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F10,STANDARD,STANDARD,TRUE
+B,RA,F11,ESCALATE,ESCALATE,TRUE
+B,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+B,RB,F01,ESCALATE,ESCALATE,TRUE
+B,RB,F02,STANDARD,STANDARD,TRUE
+B,RB,F03,STANDARD,STANDARD,TRUE
+B,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F10,STANDARD,STANDARD,TRUE
+B,RB,F11,ESCALATE,ESCALATE,TRUE
+B,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+L_STALE24,RA,F01,ESCALATE,ESCALATE,TRUE
+L_STALE24,RA,F02,STANDARD,STANDARD,TRUE
+L_STALE24,RA,F03,STANDARD,STANDARD,TRUE
+L_STALE24,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RA,F10,STANDARD,STANDARD,TRUE
+L_STALE24,RA,F11,ESCALATE,ESCALATE,TRUE
+L_STALE24,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+L_STALE24,RB,F01,ESCALATE,ESCALATE,TRUE
+L_STALE24,RB,F02,STANDARD,STANDARD,TRUE
+L_STALE24,RB,F03,STANDARD,STANDARD,TRUE
+L_STALE24,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RB,F10,STANDARD,STANDARD,TRUE
+L_STALE24,RB,F11,ESCALATE,ESCALATE,TRUE
+L_STALE24,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_STALE24,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_STALE24,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+L_PEER10,RA,F01,ESCALATE,ESCALATE,TRUE
+L_PEER10,RA,F02,STANDARD,STANDARD,TRUE
+L_PEER10,RA,F03,STANDARD,STANDARD,TRUE
+L_PEER10,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RA,F10,STANDARD,STANDARD,TRUE
+L_PEER10,RA,F11,ESCALATE,ESCALATE,TRUE
+L_PEER10,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+L_PEER10,RB,F01,ESCALATE,ESCALATE,TRUE
+L_PEER10,RB,F02,STANDARD,STANDARD,TRUE
+L_PEER10,RB,F03,STANDARD,STANDARD,TRUE
+L_PEER10,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RB,F10,STANDARD,STANDARD,TRUE
+L_PEER10,RB,F11,ESCALATE,ESCALATE,TRUE
+L_PEER10,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_PEER10,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_PEER10,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+L_TF24,RA,F01,ESCALATE,ESCALATE,TRUE
+L_TF24,RA,F02,STANDARD,STANDARD,TRUE
+L_TF24,RA,F03,STANDARD,STANDARD,TRUE
+L_TF24,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RA,F10,STANDARD,STANDARD,TRUE
+L_TF24,RA,F11,ESCALATE,ESCALATE,TRUE
+L_TF24,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+L_TF24,RB,F01,ESCALATE,ESCALATE,TRUE
+L_TF24,RB,F02,STANDARD,STANDARD,TRUE
+L_TF24,RB,F03,STANDARD,STANDARD,TRUE
+L_TF24,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RB,F10,STANDARD,STANDARD,TRUE
+L_TF24,RB,F11,ESCALATE,ESCALATE,TRUE
+L_TF24,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_TF24,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_TF24,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+L_K25,RA,F01,ESCALATE,ESCALATE,TRUE
+L_K25,RA,F02,STANDARD,STANDARD,TRUE
+L_K25,RA,F03,STANDARD,STANDARD,TRUE
+L_K25,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RA,F10,STANDARD,STANDARD,TRUE
+L_K25,RA,F11,ESCALATE,ESCALATE,TRUE
+L_K25,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+L_K25,RB,F01,ESCALATE,ESCALATE,TRUE
+L_K25,RB,F02,STANDARD,STANDARD,TRUE
+L_K25,RB,F03,STANDARD,STANDARD,TRUE
+L_K25,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RB,F10,STANDARD,STANDARD,TRUE
+L_K25,RB,F11,ESCALATE,ESCALATE,TRUE
+L_K25,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_K25,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_K25,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+L_COMMENT,RA,F01,ESCALATE,ESCALATE,TRUE
+L_COMMENT,RA,F02,STANDARD,STANDARD,TRUE
+L_COMMENT,RA,F03,STANDARD,STANDARD,TRUE
+L_COMMENT,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RA,F10,STANDARD,STANDARD,TRUE
+L_COMMENT,RA,F11,ESCALATE,ESCALATE,TRUE
+L_COMMENT,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+L_COMMENT,RB,F01,ESCALATE,ESCALATE,TRUE
+L_COMMENT,RB,F02,STANDARD,STANDARD,TRUE
+L_COMMENT,RB,F03,STANDARD,STANDARD,TRUE
+L_COMMENT,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RB,F10,STANDARD,STANDARD,TRUE
+L_COMMENT,RB,F11,ESCALATE,ESCALATE,TRUE
+L_COMMENT,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+L_COMMENT,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+L_COMMENT,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+
+---
+# C31_EVIDENCE.sha256
+d0b21c9c07eb49034afe1a9f2c4168b650dbda1c2bfd92bf02f73a4c9b61d46f  C31_ARM_MANIFESTS.txt
+3e32165c5d367b925f1a90cb3f0b179435ba457ca92fa1f9ecd633302c02d30f  C31_arms.csv
+d2ba0b1dbff37f963c29f9f8cfbef35450b95590f78e97989d77e97c64c00e5d  C31_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — key files only (full list in evidence)
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+L_COMMENT in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+L_COMMENT in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+L_COMMENT in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+L_COMMENT in  :: 51a47bd1c613d8570f2a8f52436b5b7580a40cc924fe89ccb15a980baad80be9  25063  R-A\run_RA.R
+L_COMMENT in  :: bdf1f3cb821d3ed8798e6698b59be2094681f0632637f4fff68d0260a150a5e2  1936  R-B\R\00_config.R
+L_COMMENT in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+L_COMMENT in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+L_COMMENT out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+L_COMMENT out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+L_COMMENT out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+L_COMMENT out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+L_K25 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+L_K25 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+L_K25 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+L_K25 in  :: 7b3e23dc17b242353b552febde9c7fbd4447fd200ac5d0996e25435a18a44051  25009  R-A\run_RA.R
+L_K25 in  :: 401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90  1882  R-B\R\00_config.R
+L_K25 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+L_K25 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+L_K25 out :: 4099050e2f7ec629f31a902b321ef8320181208a7bc57247eefe9f2116bc7091  22681020  R-A\outputs\RA_classifications.csv
+L_K25 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+L_K25 out :: 50f568f8472b3311fee4a45c93207f713dd0b481fdfd4bf259e67c3d4ae1c2d7  42407737  R-B\outputs\RB_classifications.csv
+L_K25 out :: f777621e1e04035e18b38f927cdf4335d113da563b675fbcf689ba7d9f4edba9  1820  R-B\outputs\RB_fixture_results.csv
+L_PEER10 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+L_PEER10 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+L_PEER10 in  :: 573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8  16276  data\source\src_peer_stats.csv
+L_PEER10 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+L_PEER10 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+L_PEER10 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+L_PEER10 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+L_PEER10 out :: 80020a2ecad58bd03a5a56e0d562db4b79789a7ee2a10f43d4e9d968c0286415  22270136  R-A\outputs\RA_classifications.csv
+L_PEER10 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+L_PEER10 out :: 0bd73e59c437506117edcfa49ba163525b868dc0694e3a5888eddb9ea9055935  41963733  R-B\outputs\RB_classifications.csv
+L_PEER10 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+L_STALE24 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+L_STALE24 in  :: 8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58  118267409  data\source\src_open_candidates.csv
+L_STALE24 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+L_STALE24 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+L_STALE24 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+L_STALE24 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+L_STALE24 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+L_STALE24 out :: 0cddde648503f823de0f225f10ebad3ef6d2fc30cee69c514bef158a3bc92c77  22200547  R-A\outputs\RA_classifications.csv
+L_STALE24 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+L_STALE24 out :: 088b4daf24e6bfec20e9373f34aab006339e910135b4b3e3aebb90fd813a9711  41819931  R-B\outputs\RB_classifications.csv
+L_STALE24 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+L_TF24 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+L_TF24 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+L_TF24 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+L_TF24 in  :: 4694d22d2bc81220bbb0326971e12782de5a88e5a9065291062c6f492e175bcd  25009  R-A\run_RA.R
+L_TF24 in  :: 3484c86e27dbe704f8017bc76606ff7ec95dec97aa6d8768e2f485a8bfe03daf  1882  R-B\R\00_config.R
+L_TF24 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+L_TF24 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+L_TF24 out :: 34f9879fc37cd4b1fe45620132d056451b0c795c4862bd7302a3f0625dc78394  22279313  R-A\outputs\RA_classifications.csv
+L_TF24 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+L_TF24 out :: 6287e97cfc3fc2642f65dc0d7cb9837acfaa454e028b49633c77aa106f7c102b  41966372  R-B\outputs\RB_classifications.csv
+L_TF24 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-A/run_RA.R
++++ seeds/C31/RA_TF24__run_RA.R
+@@ -33,7 +33,7 @@
+ RULE_VERSION <- "RA-tcd-ig-v1"
+ KAPPA <- 2.0
+ N_MIN <- 50L
+-T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")
++T_FREEZE <- lubridate::ymd_hms("2026-09-13 23:59:59", tz = "America/Chicago")
+ 
+ # ---- Paths ------------------------------------------------------------------
+ resolve_project_root <- function() {
+--- frozen/R-B/R/00_config.R
++++ seeds/C31/RB_TF24__00_config.R
+@@ -7,7 +7,7 @@
+ RB_SNAPSHOT_ID <- "chicago311-raw-frozen-2026-09-12"
+ 
+ # Locked freeze instant (America/Chicago wall clock)
+-RB_T_FREEZE <- as.POSIXct("2026-09-12 23:59:59", tz = "America/Chicago")
++RB_T_FREEZE <- as.POSIXct("2026-09-13 23:59:59", tz = "America/Chicago")
+ 
+ # Owner-tunable production knob
+ RB_KAPPA_DEFAULT <- 2.0
+--- frozen/R-A/run_RA.R
++++ seeds/C31/RA_K25__run_RA.R
+@@ -31,7 +31,7 @@
+ 
+ # ---- Locked constants -------------------------------------------------------
+ RULE_VERSION <- "RA-tcd-ig-v1"
+-KAPPA <- 2.0
++KAPPA <- 2.5
+ N_MIN <- 50L
+ T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+--- frozen/R-B/R/00_config.R
++++ seeds/C31/RB_K25__00_config.R
+@@ -10,7 +10,7 @@
+ RB_T_FREEZE <- as.POSIXct("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+ # Owner-tunable production knob
+-RB_KAPPA_DEFAULT <- 2.0
++RB_KAPPA_DEFAULT <- 2.5
+ 
+ # Method constants (not knobs)
+ RB_N_MIN <- 50L
+--- frozen/R-A/run_RA.R
++++ seeds/C31/RA_COMMENT__run_RA.R
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env Rscript
++# lineage test: comment-only edit, no semantic change
+ # =============================================================================
+ # Chicago 311 Stage 4 — R-A judged path (AI 1 / TCD-IG B-leaning hybrid)
+ # Independence: authored without reading or mirroring any R-B code.
+--- frozen/R-B/R/00_config.R
++++ seeds/C31/RB_COMMENT__00_config.R
+@@ -1,3 +1,4 @@
++# lineage test: comment-only edit, no semantic change
+ # R-B config — Stage 4 TCD-IG (independent path; no R-A imports)
+ # design_version: stage3-v1-tcd-ig | fixture_version: fixtures-v1-tcd-ig
+ 
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C31 BUILDER REPORT

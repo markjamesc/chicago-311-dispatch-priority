@@ -1,0 +1,4 @@
+sent=2026-10-09 07:15:38 CDT
+reply_complete=2026-10-09 07:17:20 CDT (approx; UI "Worked for 1m 40s")
+url=https://chatgpt.com/c/6ac8dae2-ca04-83e8-9a9b-5f69c1589c2c
+notes: ChatGPT model picker = High (3 of 3, highest available), no tools enabled. Attachment chip count before send = 10. ChatGPT itself displayed 9 chips with a "(1)" suffix (e.g. AI1_INTERPRETATION(1).md, portfolio_summary(1).csv); SHA256SUMS.txt shown unchanged. Not renamed or repaired by operator; sent as-is. Reply shows "Analyzed" x3 (model used analysis on the files). Capture: select rendered reply, copy, clipget; unchanged + final newline.

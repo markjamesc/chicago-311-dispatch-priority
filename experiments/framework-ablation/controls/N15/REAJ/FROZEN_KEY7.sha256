@@ -1,0 +1,8 @@
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43

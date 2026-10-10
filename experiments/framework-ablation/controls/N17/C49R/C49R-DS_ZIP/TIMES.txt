@@ -1,0 +1,4 @@
+sent=2026-10-09 07:11:45 CDT
+reply_complete=2026-10-09 07:12:10 CDT (observed complete at first check; approx)
+url=https://chat.deepseek.com/a/chat/s/39daee6c-84c4-4234-b83c-268958a74c5d
+notes: DeepThink ON, Search OFF (Search was ON by default; switched off, verified via toggle state). Attachment evidence_pkg.zip REJECTED by DeepSeek on upload with toast: "The uploaded file format is not supported. Supported formats include PDF, DOC, XLSX, PPT, images, text, and code." Attachment chip count at send = 0. Per frozen rules nothing renamed/retried; message sent with packet text only. Model reported all files OPENED: NO. Capture: select rendered reply, copy, clipget; unchanged + final newline.

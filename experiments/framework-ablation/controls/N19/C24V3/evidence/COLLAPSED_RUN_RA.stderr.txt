@@ -1,0 +1,68 @@
+PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-A/outputs/RA_fixture_results.csv pass=14/14
+chunk 1 pos=1 in=250000 decision=7321
+chunk 2 pos=250001 in=500000 decision=8757
+chunk 3 pos=500001 in=750000 decision=12174
+chunk 4 pos=750001 in=1000000 decision=16744
+chunk 5 pos=1000001 in=1250000 decision=24083
+chunk 6 pos=1250001 in=1500000 decision=26894
+chunk 7 pos=1500001 in=1750000 decision=28576
+chunk 8 pos=1750001 in=2000000 decision=29562
+chunk 9 pos=2000001 in=2250000 decision=30811
+chunk 10 pos=2250001 in=2500000 decision=31752
+chunk 11 pos=2500001 in=2750000 decision=33845
+chunk 12 pos=2750001 in=3000000 decision=37155
+chunk 13 pos=3000001 in=3250000 decision=37717
+chunk 14 pos=3250001 in=3500000 decision=38590
+chunk 15 pos=3500001 in=3750000 decision=39039
+chunk 16 pos=3750001 in=4000000 decision=39441
+chunk 17 pos=4000001 in=4250000 decision=40098
+chunk 18 pos=4250001 in=4500000 decision=40958
+chunk 19 pos=4500001 in=4750000 decision=41485
+chunk 20 pos=4750001 in=5000000 decision=45594
+chunk 21 pos=5000001 in=5250000 decision=46947
+chunk 22 pos=5250001 in=5500000 decision=47801
+chunk 23 pos=5500001 in=5750000 decision=48490
+chunk 24 pos=5750001 in=6000000 decision=49245
+chunk 25 pos=6000001 in=6250000 decision=49907
+chunk 26 pos=6250001 in=6500000 decision=50568
+chunk 27 pos=6500001 in=6750000 decision=51349
+chunk 28 pos=6750001 in=7000000 decision=52206
+chunk 29 pos=7000001 in=7250000 decision=53973
+chunk 30 pos=7250001 in=7500000 decision=56059
+chunk 31 pos=7500001 in=7750000 decision=56901
+chunk 32 pos=7750001 in=8000000 decision=58045
+chunk 33 pos=8000001 in=8250000 decision=59449
+chunk 34 pos=8250001 in=8500000 decision=61084
+chunk 35 pos=8500001 in=8750000 decision=62439
+chunk 36 pos=8750001 in=9000000 decision=64306
+chunk 37 pos=9000001 in=9250000 decision=66307
+chunk 38 pos=9250001 in=9500000 decision=68891
+chunk 39 pos=9500001 in=9750000 decision=72585
+chunk 40 pos=9750001 in=10000000 decision=75894
+chunk 41 pos=10000001 in=10250000 decision=79425
+chunk 42 pos=10250001 in=10500000 decision=82707
+chunk 43 pos=10500001 in=10750000 decision=85405
+chunk 44 pos=10750001 in=11000000 decision=88226
+chunk 45 pos=11000001 in=11250000 decision=92502
+chunk 46 pos=11250001 in=11500000 decision=95388
+chunk 47 pos=11500001 in=11750000 decision=99280
+chunk 48 pos=11750001 in=12000000 decision=103170
+chunk 49 pos=12000001 in=12250000 decision=107563
+chunk 50 pos=12250001 in=12500000 decision=112747
+chunk 51 pos=12500001 in=12750000 decision=116668
+chunk 52 pos=12750001 in=13000000 decision=119666
+chunk 53 pos=13000001 in=13250000 decision=125449
+chunk 54 pos=13250001 in=13500000 decision=130476
+chunk 55 pos=13500001 in=13750000 decision=139121
+chunk 56 pos=13750001 in=14000000 decision=150634
+chunk 57 pos=14000001 in=14250000 decision=168187
+chunk 58 pos=14250001 in=14500000 decision=195881
+chunk 59 pos=14500001 in=14635395 decision=222002
+open_n=14635395 peer_types=104 chunks=59 chunk_rows=250000
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N19/C24V3/arms/COLLAPSED/R-A/outputs/RA_portfolio_counts.csv
+R-A done. mode=all

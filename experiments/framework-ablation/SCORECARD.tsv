@@ -1,0 +1,46 @@
+control_id	batch	rule_under_test	mechanical_result	recorded_terminal_state	superseded_note	artifact_path
+C27	C27_C33	Fixtures on both paths		REVERT		controls/C27_C33/C27/
+C33	C27_C33	Naive clock contract		REVERT		controls/C27_C33/C33/
+C24	N13	Mechanical vs judged population (SQL envelope vs R)	HALT	HALT	superseded by N19 C24V3 (REVERT)	controls/N13/C24/
+C40	N13	Repair-round cap	PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)	NONE_RECORDED (NOT_TRIGGERED per spec)		controls/N13/C40/
+C41	N13	Fixture depth over count	P1 MET	KEEP		controls/N13/C41/
+C42	N13	Batched owner rulings	P1 NOT MET	REVERT		controls/N13/C42/
+C43	N13	Narrow freeze scope (hash gate-feeding artifacts only)	P1 NOT MET	REVERT		controls/N13/C43/
+C44	N13	Changed-files-only re-review	PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)	KEEP		controls/N13/C44/
+C46	N13	Design-time numerical determinism (proposed addition)	P1 NOT MET	REVERT		controls/N13/C46/
+C47	N13	Small-denominator / single-unit dominance check	P1 MET	KEEP		controls/N13/C47/
+C48	N13	No second final audit after verified revisions	PARTIAL: mechanical conditions evaluated; condition(s) marked PENDING are assessed from the frozen audit replies	KEEP		controls/N13/C48/
+C49	N13		PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)	HALT	superseded by N17 C49R (KEEP)	controls/N13/C49/
+C51	N13	Reduced-scale smoke run before full pipeline	P1 MET	KEEP		controls/N13/C51/
+C52	N13	Parallel extract and Source Gate queries	P1 NOT MET	REVERT		controls/N13/C52/
+C53	N13	Design-time output-field completeness (proposed addition)	P1 MET	KEEP		controls/N13/C53/
+C11	N15	Method constants vs knobs		REVERT		controls/N15/C11/
+C14	N15	Explicit semantics (Open/Eligible)		REVERT		controls/N15/C14/
+C15	N15	Ranking/Capacity Framing-only (scope set at Stage 2, enforced at 5)		REVERT		controls/N15/C15/
+C16	N15	Spec-to-Builder packet completeness		KEEP		controls/N15/C16/
+C18	N15	No fixture rewrite on fail		REVERT		controls/N15/C18/
+C26	N15	Frozen Source Package		HALT-INCOMPLETE (re-adjudicated: see controls/N15/REAJ/C26)	superseded by re-adjudication REVERT (see controls/N15/REAJ/C26)	controls/N15/C26/
+C29	N15	Recon investigation		REVERT		controls/N15/C29/
+C30	N15	Structural cross-review		KEEP		controls/N15/C30/
+C31	N15	Lineage attestation		REVERT		controls/N15/C31/
+C32	N15	Freeze before Stage 5		REVERT		controls/N15/C32/
+C34	N15	Deterministic workflow gate		REVERT		controls/N15/C34/
+C35	N15	Freeze validated pack		REVERT		controls/N15/C35/
+C36	N15	No re-judging validation labels		REVERT		controls/N15/C36/
+C39	N15	Recon scope and tolerance		REVERT		controls/N15/C39/
+C45	N15	Parallel R-A/R-B runs		REVERT	N15 REVERT superseded by re-adjudication KEEP (see controls/N15/REAJ/C45 and N13)	controls/N15/C45/
+C01	N16	Stage-3 blindness relaxed (unblinded design chat)		KEEP		controls/N16/C01/
+C02	N16	Coordinator draft given to designer		REVERT		controls/N16/C02/
+C03	N16	Design Gate after the cross-review		REVERT		controls/N16/C03/
+C04	N16	Single interpreter replaces three Stage-5 roles		REVERT		controls/N16/C04/
+C05	N16	Word-list lint replaces AI2/AI3 claim-ceiling judgement		REVERT		controls/N16/C05/
+C06	N16	Start Gate action-vocabulary lock		REVERT		controls/N16/C06/
+C07	N16	Framing gate: exactly one question		REVERT		controls/N16/C07/
+C09	N16	Ambiguity attack before lock		REVERT		controls/N16/C09/
+C37	N16	Evidence-tag table checks recommendation proportionality		KEEP		controls/N16/C37/
+C38	N16	Follow-up tag (sections 8-9) dropped		KEEP		controls/N16/C38/
+C50	N16	Consolidated revision + mechanical checklist replaces revise/re-audit loop		KEEP		controls/N16/C50/
+C54	N16	Builder file-download capture channel		REVERT		controls/N16/C54/
+C49R	N17	Individual-file evidence delivery + SHA256SUMS.txt + inventory		KEEP		controls/N17/C49R/
+C24V2	N18	Mechanical vs judged population (SQL envelope vs R)		NONE_RECORDED	attempt, no terminal state; superseded by N19 C24V3 (REVERT)	controls/N18/C24V2/
+C24V3	N19	Mechanical vs judged population (SQL envelope vs R)	P1 NOT MET	REVERT		controls/N19/C24V3/

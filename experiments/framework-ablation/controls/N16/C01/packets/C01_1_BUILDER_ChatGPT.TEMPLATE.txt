@@ -1,0 +1,1254 @@
+# C01 Builder — ChatGPT (INDEPENDENT FIRST PASS)
+
+Role: Builder only. Use the highest reasoning setting. You are blind to the Validator. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+3. Hard mechanical facts table. Recompute every number you can from the evidence tables below: identities such as n_agree + n_disagree = n_inner, portfolio deltas, D-sets, and hash equalities across arms. Mark each number as recomputed or quoted.
+4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+5. Fixture and reconciliation implications.
+6. Semantic/regression risks and unchanged surfaces.
+7. Claim → evidence map. Cite the section and the table row for each claim.
+End your reply with this exact line on its own:
+END C01 BUILDER REPORT
+
+---
+# COORDINATOR NOTE N1 / OF-1 (read before the RESULTS)
+In the frozen Chicago pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows (SR22-01936870 dormant_h; SR25-02017553 and SR25-02017556 open_age_h); the labels agree. All three clocks fall in the repeated fall-back hour; cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST). It is open finding OF-1 in the coordinator's RESULTS_N15.md and is known and expected. N16 runs no R-A / R-B path and reads only frozen Stage 1-5 text, logs and C48 outputs, so N1 / OF-1 cannot enter any N16 number. Nothing in N16 changes the frozen pack.
+
+# COORDINATOR NOTE: text-only capture; no PC run
+The replies of this control were captured as text (Chrome page saving is broken; owner-approved 2026-10-09 01:52 CT, `runner/ingest_textonly.py`). Every mechanical number in the RESULTS below was produced on the box by the scorer quoted in this packet, from frozen text inputs; nothing was run on the PC (no MySQL, no R). Fixture and reconciliation items (report section 5 / validator test plan) do not apply to N16: keep the heading and write 'not applicable' with one line of reason, plus any text-level equivalent you see.
+
+---
+# SPEC
+# C01 — Ablation specification (FROZEN)
+
+**Ablation ID:** C01 (owner ablation list control #1: Stage-3 blindness (one unblinded design chat))
+**Batch:** N16 (the 12 controls untested after N13: #1-#7, #9, #37, #38, #50, #54). Built 2026-10-09 on the box, text only.
+**Definitions and approval (operational definitions, constitution §9):** owner rulings sheet `ablation_plan/OWNER_RULINGS_BATCH_02.md` SHA-256 `1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417`; owner answer **Z (all recommended)** at 2026-10-09 01:49 CT, recorded in `OWNER_BATCH_02_ANSWERS.md` SHA-256 `3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b`. Owner answers Z = recommended: 1-C (one unblinded design chat, ChatGPT) and Q0-A (the real blind Chicago pair is the baseline). Q0 = A: the real Chicago 311 Stage 1-3 run (`chicago-311-run/stage-01-02`, `stage-03`, Stage 5) is the shared baseline for the design controls; it was run with a coordinator and extra reviews, so it is not a perfectly clean A/B.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data:** the frozen Chicago 311 Dataset 2 run and its Stage 1-5 records; every input is a hashed copy under `N16/frozen/` (`FROZEN_INPUTS.sha256`, origins in `FROZEN_ORIGINS.tsv`, re-verified by `runner/preflight_n16.py`, output `PREFLIGHT_N16.txt`). No MySQL, no fresh pull, no git, no R, nothing on the PC.
+**Roles:** Builder=ChatGPT (High) · Validator=DeepSeek (DeepThink on, Search off) · Adjudicator=Grok (Expert)
+**Extra chats: 1, shared with C02** — `X12/packets/X12_DESIGN_ChatGPT.txt` (ChatGPT, High), a Stage 3 design chat; it is counted once for both controls. The extra chat is a NEW conversation, blind to this ablation's purpose (it is told it may use or reject the supplied material).
+**Capture mode:** TEXT-ONLY (owner-approved 2026-10-09 01:52 CT; `N13/TEXTONLY_PROCEDURE.md`, `runner/ingest_textonly.py`); recorded in run notes only, never in anything published.
+**Target stage:** Stage 3 design
+**Frozen at CT:** 2026-10-09, before any chat of this control; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Control under test (owner list #1)
+Stage 3 as it stands: Design A, Design B and the risk dossier are produced blind to each other until the cross-review.
+Ablation: the designer sees the peer design (Design B) and the dossier first. KEEP would mean the blindness rule can be relaxed.
+
+## Verdict convention
+**KEEP = Stage-3 blindness may be relaxed (designers may see peers' work first). REVERT = Stage-3 blindness stays.** HALT as in constitution §9.
+
+## Arms
+- BASE (the rule): the real blind Design A (`stage3/AI1_DESIGN_A.md`), produced from the shared packet only (meta: 'Independent Design A from shared packet only', 2026-09-19 04:57 CT).
+- VARIANT: the shared extra chat X12 (ChatGPT): the same packet, blindness lines removed, plus the supplied coordinator draft, Design B with SEED S1, and the real dossier. Scored for S1.
+
+## Operational benefit predicate P1 (made mechanical before execution)
+1. S1 detected: the reply flags the P25 statistic in Design B's rule;
+2. S1 not adopted: the reply does not use peer_p25_h as its own rule;
+3. coverage of the 8 blocking-gap topics of the dossier is at least the real Design A's;
+4. the reply is complete (single END X12 DESIGN as last line).
+P1 MET -> KEEP. Not MET -> REVERT. If the extra chat is incomplete or missing -> HALT.
+
+## Disclosures and deviations (declared before the chats)
+- Shared chat with C02 (owner answers 1-C and 2-C): the chat sees BOTH the coordinator draft and the peer design, so the two effects are not separated by design; they are attributed by seed (S1 to C01, S2 to C02) and by the scorer's per-seed conditions, but interaction effects are not separated.
+- Only the unblinded half is run (1-C); the reverse (DeepSeek sees ChatGPT's design) is not.
+- The owner sheet (#2-A) describes the real design as 'coordinator-draft-anchored'; the frozen records say otherwise: `AI1_meta.txt` and the cross-review attest the real Design A came from the shared packet only, and `SHARED_INPUT_PACKET.md` forbids drafts. (The `AI1_STAGE3_PRIMARY_DESIGN_PROMPT.md` file lists the draft as an input, and the later post-lock `AI1_FULL_PASTE.md` includes it; neither is the Design A packet, `AI1_INDEPENDENT_DESIGN_A.md`.) This SPEC follows the records.
+- Seeded flaws are detected by regex + a critique-cue word list; the judges verify against the verbatim reply.
+- Stage 3 only; the new design is NOT run through Stage 4 (no pull).
+- Known open finding N1 / OF-1 (clock mismatch on 3 rows of the frozen pack): cannot enter N16 (no R path run). See the coordinator note in the packets.
+- Cost: not measured in minutes; the reply and packet byte sizes are the only cost proxy and are not part of P1 unless stated above.
+
+## Regression / HALT rules
+- HALT as in constitution §9, or if Builder and Validator disagree on a hard number or classification that decides a P1 condition, or if a reply is missing, incomplete (no END line) or changed after its freeze, or if a frozen input hash differs from `FROZEN_INPUTS.sha256`.
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity; fixtures) are not applicable: no R run and no fixture. The known-answer cases are the unmodified / clean arms and the seeds declared above. Conditions 6-7: the frozen inputs are only read (preflight).
+
+## Allowed source/data scope
+Frozen Chicago Stage 1-5 documents, frozen N13 logs and C48 outputs under `N16/frozen/`. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on)
+**Frozen input files:** all 75 files in `FROZEN_INPUTS.sha256`; the ones used here are listed in the EVIDENCE list of the packet.
+**Scorer files (hashed in `SCORERS_N16.sha256` before the reporting run):**
+- `scorers/score_x12.py` SHA-256 `fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1`
+- `scorers/build_x12.py` SHA-256 `73f4e8ab7c4625526de13917f410b3ebfdf062bd79c6bcdf17648588116b4abc`
+- `scorers/n16lib.py` SHA-256 `4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47`
+**Seed files:**
+(none)
+**Result and evidence files:**
+(the post-chat score file is created after the extra chat; its scorer hash is above; the extra-chat packet hash is below)
+- `X12/packets/X12_DESIGN_ChatGPT.txt` SHA-256 `1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372` (48576 bytes); END line `END X12 DESIGN`; reply save: `X12/X12-chat/design_chatgpt_TEXTONLY.txt`.
+**Governance:** constitution and baselines as above; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT. Check the seeded-flaw findings and the coverage table against the verbatim reply; list anything the scorer missed.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (box, text only, CT)
+N16 preflight 2026-10-09 02:21:42 CT root /workspace/ablation_plan/runs/N16
+frozen OK 86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08 frozen/BASELINE_FRAMEWORK.sha256
+frozen OK e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 frozen/CONSTITUTION_v1.md
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/c48/AI1_ORIGINAL.md
+frozen OK c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878 frozen/c48/AUDIT_FREEZE.json
+frozen OK 5df149f9f300620ebab767f7af17a98d078f92e85b7604cce1f5f82480b59c92 frozen/c48/C48_RESULTS.md
+frozen OK d92e480b9531d5018ca02e6dbd116dbaaa3a2df53981e690e48eff13eb00278c frozen/c48/REVISED_CLEAN.md
+frozen OK c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63 frozen/c48/REVISED_SEED.md
+frozen OK 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4 frozen/c48/REVISIONS.json
+frozen OK c7cde8022846cd6aff9b189e32dc3aa4f3eea733835d469093054391490627b2 frozen/c48/TERMINAL_STATE.txt
+frozen OK 06b3e1f75be60142b054ac034cdb78579b9812efb87a1e535d5d0a0530b22e27 frozen/c48/ai2_second_audit.md
+frozen OK 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2 frozen/c48/ai3_second_audit.md
+frozen OK 6cc4ea649d67c1d22a90bfcbcbf3756a69837d900f26943940f0b6bb57297156 frozen/c48/rev_check.R
+frozen OK c07e47c76659247fa6c8306723bb8521210acab99c3c662d58d77480f2614cbf frozen/n13logs/ADJ_GROK_B4_EXTRACTION_LOG.jsonl
+frozen OK 191821397bf2b034398e5f975d398ab9d712df47ca0021d4931f401dc427ac9c frozen/n13logs/ADJ_GROK_B5_EXTRACTION_LOG.jsonl
+frozen OK ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754 frozen/n13logs/ADJ_GROK_C43_EXTRACTION_LOG.jsonl
+frozen OK 50ef99b3af165a7f01bb4173dc61534989ca0acec9009911c7d1159454c8a04f frozen/n13logs/ADJ_GROK_C44_EXTRACTION_LOG.jsonl
+frozen OK 7ba322a361fa672dc3ad5a46157c35b447ee04bf89904ace1c211c4636d7572d frozen/n13logs/ADJ_GROK_C48_EXTRACTION_LOG.jsonl
+frozen OK eba13ed2b6618a1442f70b09c6b84228f59eba4a466b9b8934833bdc5e250759 frozen/n13logs/ADJ_GROK_C49_EXTRACTION_LOG.jsonl
+frozen OK 980651563bbfd1e0ac9bda44c78964e7599a9778e1de49a950386353f2c9b5bf frozen/n13logs/C40_DEVIATION_NOTES_post.md
+frozen OK 8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864 frozen/n13logs/C40_DEVIATION_NOTES_post_2.md
+frozen OK cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149 frozen/n13logs/C43_NOTES.md
+frozen OK 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0 frozen/n13logs/C43_TERMINAL_STATE.txt
+frozen OK b1362205dfe866447961c801230b929e3246e3388bb26a819a4e245d0839fdf2 frozen/n13logs/C49_DEVIATION_NOTES_post.md
+frozen OK 6cd11d74b4cf2f09ebd511d10e3c8fb48d9133765b7b389315db99cd748eb188 frozen/n13logs/C49_DEVIATION_NOTES_post_2.md
+frozen OK 53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4 frozen/n13logs/C49_NOTES.md
+frozen OK 57ed8ed5f7e0fa5cc35bf0c6df03559514d661fcfea24e2116da44cfdab0ad13 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C48BV.jsonl
+frozen OK 2d1fc0b19611da2f299fd86ccaa4db828bf1fabf04fe217c41fec8c52c0f32c3 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49BV.jsonl
+frozen OK 9cfd0afd05a62fb6ee397f32b03ab69ca8b6206ec12bbd66ea66143b5a8d3072 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl
+frozen OK daeb45cbc3ce1cac2cc58c61cb36d4b5578a14902d143fa08066630ab7d105e8 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b4.jsonl
+frozen OK b75dc1aaa168c17064f8a94751e3c649297b01ced91c554de8f126307573729a frozen/n13logs/CAPTURE_EXTRACTION_LOG_b5.jsonl
+frozen OK 4440636595651de8c16b1e39be91529ca0f07c01c050c99a9c900965bb688269 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6.jsonl
+frozen OK b165381637d9729ccf215f9591bc5d962cc85adcfa2d9dcad23916b9c6716de9 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b.jsonl
+frozen OK 89c078e3ca9131a5974604bae69acfe676de1f6ce7aacc5ee56e97c5c708785d frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b_fix.jsonl
+frozen OK 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b frozen/rulings/OWNER_BATCH_02_ANSWERS.md
+frozen OK 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417 frozen/rulings/OWNER_RULINGS_BATCH_02.md
+frozen OK b29b39086a58e9b440f8a1a40651277c05e2b4251e555f16663c13b68ef9e4e1 frozen/stage12/ai2_framing_review_pass1.md
+frozen OK b3492dd9eca8e5ed4d104474fc12f18bfb7edc04ef78b008e123e000aae0d11c frozen/stage12/ai2_start_review_pass1.md
+frozen OK f1f47dedcc04f326c7bfd899e15b9b0fa245f70fdc1ca25f3beaec061fe8bbfc frozen/stage12/ai3_framing_review_pass1.md
+frozen OK 1cd29a865d34879d4f50f6615d70b438d4e454e1b5a771126645ec922842fdbb frozen/stage12/ai3_start_review_pass1.md
+frozen OK f6d856ea328fd379caf964305df6eacacbe975acd98acc0be0cccb61f5de9ba0 frozen/stage12/ambiguity_ledger.md
+frozen OK fefdaab549d9ec27ba3af4d6118faac8cd2bd886875abb7c3394c3cf2eaec7f3 frozen/stage12/candidate_question_ledger.md
+frozen OK 9d704ede8c2031d13d1771a170a8e99c2c3d51d15810f51fc7308acb8a675bca frozen/stage12/decision_ledger.md
+frozen OK aafa32e34b52efa4900993416a0d3ef823717ca15912d55ac1c7153fccb51d2a frozen/stage12/revision_trail.md
+frozen OK a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430 frozen/stage12/stage1_decision.json
+frozen OK 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a frozen/stage12/stage2_framing.json
+frozen OK 63d0915519094b27234c94acf256a2c390fc795d4781b5727b84162d89863af9 frozen/stage12/verbatim_dialogue_ledger.md
+frozen OK 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988 frozen/stage3/AI1_DESIGN_A.md
+frozen OK 083403f49810898f2c2dea96b7608556125c29a9bc59594ab5725721610940cc frozen/stage3/AI1_INDEPENDENT_DESIGN_A.md
+frozen OK bc096a5be4315882a44e6ce227b6bea40c7a5669e0f9f5f875e0ecbb04179895 frozen/stage3/AI1_meta.txt
+frozen OK 8153ad4fb16001c1f217d8112e878f22ca0b299aa5574b9cd318465e845d52a8 frozen/stage3/AI2_DESIGN_B.md
+frozen OK 808fea8d7c3c207949b0aca144e7d5a8785b10ec3ec915f82202ae0acde1c7b1 frozen/stage3/AI2_meta.txt
+frozen OK 7f4fc3ee3995e2d20472be686887d7c3aa97cbbf365d8ee50e685a3fb2fc62b1 frozen/stage3/AI3_DATA_RISK_DOSSIER.md
+frozen OK db9da8dfcdaf1ef192f64e61d5c08ccb2cf922a3aa10fef5edcd24b3e64e2642 frozen/stage3/AI3_meta.txt
+frozen OK 9f3ea0a7f3e92ab4852a0add67c72389c046e5e6c282937ded350bfc0648aa42 frozen/stage3/CROSS_REVIEW.md
+frozen OK 0ec361b591cc33733814766fefb05739fc80ef8571ded2b44e55974b85935dd8 frozen/stage3/DESIGN_GATE_PACKAGE.md
+frozen OK 3a03e139350141baa2b6fef9d065a6075d9248cf53b971ad1bc6c81aa07fa57f frozen/stage3/DESIGN_GATE_RECEIPT.md
+frozen OK 9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243 frozen/stage3/MEASUREMENT_DESIGN.md
+frozen OK 7297cf3ef25bbf12a04a6d88c0a41dac260de5736c71392783d8f8b7d7389594 frozen/stage3/MEASUREMENT_DESIGN_LOCKED.md
+frozen OK 4b4a8ce3aa63a7eb3c62228a087a876591f556694fbf152a3ef79da4e92ac996 frozen/stage3/SHARED_INPUT_PACKET.md
+frozen OK ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114 frozen/stage3/stage3_locked_design.json
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/stage5/AI1_INTERPRETATION_BUILDER.md
+frozen OK d77f55c6b96b87455a60c22907a845f253808d4a466110f87d16825501e8c3a0 frozen/stage5/AI1_PASTE.txt
+frozen OK ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a frozen/stage5/AI2_DECISION_METHOD_CRITIC.md
+frozen OK 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1 frozen/stage5/AI3_CLAIM_EVIDENCE_AUDITOR.md
+frozen OK 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457 frozen/stage5/CROSS_REVIEW.md
+frozen OK 22dc6a94006f83de4e2d741c4de08e0964e6433d08e87d11e98314a0b767c285 frozen/stage5/FINISH_GATE_PACKAGE.md
+frozen OK 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462 frozen/stage5/INTERPRETATION_RECONCILIATION.md
+frozen OK 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 frozen/stage5/STAGE5_DEEPER_FINDINGS.md
+frozen OK c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 frozen/stage5/STAGE5_EVIDENCE_PACKAGE.md
+frozen OK 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 frozen/stage5/deeper/capacity_coverage_note.csv
+frozen OK 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 frozen/stage5/deeper/escalate_by_type_top25.csv
+frozen OK f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d frozen/stage5/deeper/inconclusive_by_clause.csv
+frozen OK 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 frozen/stage5/deeper/independent_checks_critical_counts.csv
+frozen OK 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a frozen/stage5/deeper/kappa_sensitivity.csv
+frozen OK b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 frozen/stage5/deeper/portfolio_summary.csv
+PREFLIGHT PASS failures: 0
+(origin-hash lines omitted here; each frozen file was also compared with its origin path, all OK; full list in FROZEN_ORIGINS.tsv)
+
+---
+# FROZEN REFERENCE HASHES
+Frozen inputs: `FROZEN_INPUTS.sha256` (75 files; verified above). Constitution sha256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; owner sheet sha256 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417; owner answer file sha256 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b.
+Scorer files:
+fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1  4723  scorers/score_x12.py
+73f4e8ab7c4625526de13917f410b3ebfdf062bd79c6bcdf17648588116b4abc  3326  scorers/build_x12.py
+4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47  1723  scorers/n16lib.py
+
+---
+@@EXTRA_CHAT_BLOCK@@
+
+---
+# FROZEN INPUTS (verbatim; baseline and revision references)
+---
+# INPUT `frozen/stage3/AI1_DESIGN_A.md` (sha256 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988, 11256 bytes)
+I will produce AI 1 — Primary Measurement Architect: Design A only, using the locked Start and Framing packet. I will not incorporate Design B, AI 3, coordinator decisions, production SQL/R, or hidden assumptions.
+
+Design A — Primary Measurement Architecture
+Project: Chicago 311 Dispatch Priority Simulation
+Stage 3 — Measurement Design
+AI 1: Primary Measurement Architect
+
+Status: Analytical proposal only
+Authority boundary: Stage 1 Start and Stage 2 Framing are locked. Measurement choices below remain proposals requiring Stage 3 owner approval.
+
+1. Decision Context
+Locked Decision
+
+Among open eligible 311 requests in a frozen decision window, assign exactly one classification:
+
+ESCALATE
+
+INCONCLUSIVE
+
+STANDARD
+
+Each request receives one row-level decision.
+
+Intended Decision Use
+
+This is a portfolio simulation designed to test whether structured evidence rules can separate requests requiring elevated attention from requests that can remain under normal handling.
+
+This is:
+
+Not live City dispatch.
+
+Not employee performance evaluation.
+
+Not an official City SLA model.
+
+Not a prediction of City policy.
+
+2. Hypothesis
+Business Hypothesis
+
+When shift attention is limited, unresolved 311 requests can be separated into:
+
+requests with stronger evidence of needing elevated attention,
+
+requests where available evidence is insufficient,
+
+requests suitable for standard handling.
+
+A structured classification approach may improve consistency compared with treating all open requests identically.
+
+Mechanism Hypothesis
+
+Open requests differ in their observable characteristics:
+
+age since creation,
+
+evidence of continued unresolved state,
+
+modification history,
+
+request category/context,
+
+geographic or operational context.
+
+These observable signals may indicate different levels of attention need.
+
+Observable Implication
+
+If the hypothesis is useful:
+
+ESCALATE requests should demonstrate stronger evidence patterns than STANDARD requests.
+
+INCONCLUSIVE requests should contain insufficient evidence to confidently assign either elevated or standard treatment.
+
+The classification should be reproducible from available fields.
+
+Counterevidence
+
+The hypothesis would weaken if:
+
+open status primarily reflects administrative workflow rather than unresolved need,
+
+request age does not correlate with attention need,
+
+available fields do not contain meaningful urgency signals,
+
+classifications are highly unstable under reasonable specification changes.
+
+3. Population Definition
+Analytical Population Proposal
+Target Population
+
+All 311 requests available within the frozen decision window that satisfy Stage 3 approved open and eligibility rules.
+
+4. Open Definition
+Proposed Open Rule
+
+Provisional analytical rule:
+
+A request is open if:
+
+STATUS = 'Open'
+
+and the request exists within the frozen snapshot boundary.
+
+Rationale
+
+STATUS is the strongest explicit lifecycle indicator available.
+
+Limitation
+
+Open status may represent:
+
+operational unresolved work,
+
+administrative delay,
+
+incomplete closure processing.
+
+Therefore:
+
+STATUS alone should not determine escalation.
+
+5. Eligibility Definition
+Proposed Eligibility Contract
+
+A request is eligible when:
+
+It exists inside the frozen decision window.
+
+It satisfies approved open criteria.
+
+It has sufficient required evidence fields for classification.
+
+Required Evidence Fields Proposal
+
+Minimum:
+
+Field	Purpose
+SR_NUMBER	row identifier
+SR_TYPE	request context
+CREATED_DATE	age calculation
+STATUS	open state
+LAST_MODIFIED_DATE	activity evidence
+COMMUNITY_AREA	optional segmentation
+WARD	optional segmentation
+6. Exclusions
+Proposed Exclusions
+
+Exclude only when necessary for analytical integrity.
+
+Potential exclusions:
+
+Exclusion	Reason
+Missing SR_NUMBER	cannot maintain grain
+Invalid creation timestamp	cannot calculate age
+Records outside frozen window	violates population boundary
+Explicit Non-Exclusions
+
+Do not exclude based on:
+
+request type,
+
+geography,
+
+age,
+
+workload difficulty.
+
+Those are potential analytical signals, not cleaning criteria.
+
+7. Grain
+Locked Analytical Grain Proposal
+
+One row per:
+
+SR_NUMBER
+Grain Contract
+
+Each request receives exactly:
+
+SR_NUMBER → one classification
+
+Allowed outputs:
+
+ESCALATE
+INCONCLUSIVE
+STANDARD
+8. KPI / Evidence Contract
+Primary Outcome
+
+No traditional KPI is locked because the decision is classification.
+
+The primary measurement object is:
+
+Dispatch Priority Classification
+Evidence Domains
+Domain 1 — Persistence
+
+Question:
+
+Has the request remained unresolved for a meaningful period?
+
+Possible evidence:
+
+age since CREATED_DATE
+
+absence of CLOSED_DATE
+
+Domain 2 — Activity
+
+Question:
+
+Does the request show evidence of continued attention?
+
+Possible evidence:
+
+LAST_MODIFIED_DATE relationship to creation date
+
+Domain 3 — Context
+
+Question:
+
+Does request context affect interpretation?
+
+Possible evidence:
+
+SR_TYPE
+
+SR_SHORT_CODE
+
+geography fields
+
+9. Comparisons / Segments
+Proposed Diagnostic Segments
+
+Not decision rules.
+
+Used only for evaluation.
+
+Segment A — Request Type
+
+Purpose:
+
+Determine whether classifications disproportionately concentrate in specific request categories.
+
+Segment B — Age Bands
+
+Example:
+
+newer requests
+
+medium-age requests
+
+older requests
+
+Cutoffs are:
+
+portfolio/provisional analytical choices only
+
+They are not City SLAs.
+
+Segment C — Geography
+
+Examples:
+
+WARD
+
+COMMUNITY_AREA
+
+Purpose:
+
+Detect uneven classification behavior.
+
+10. Confounders
+
+Potential confounders:
+
+Factor	Risk
+Request type	different workflows
+Creation date	historical process changes
+Geography	operational differences
+Seasonal effects	changing request volume
+Administrative closure behavior	STATUS may not equal unresolved reality
+Missing timestamps	measurement bias
+11. Data Quality Plan
+Required Checks
+
+Before classification:
+
+Identity
+
+Verify:
+
+SR_NUMBER unique
+Timestamp Quality
+
+Check:
+
+parse failures,
+
+impossible date ordering,
+
+missing required timestamps.
+
+Status Quality
+
+Confirm:
+
+distribution of:
+
+Open
+
+Completed
+
+Canceled
+
+Closed
+
+Missingness
+
+Profile missingness by:
+
+request type,
+
+date period,
+
+geography.
+
+12. Decision Rule Architecture
+Important Boundary
+
+The decision rule is an analytical proposal.
+
+It is not a City operating policy.
+
+Proposed Three-Way Logic
+ESCALATE
+
+A request is ESCALATE when:
+
+Evidence indicates:
+
+The request remains open.
+
+The available evidence suggests elevated unresolved attention need.
+
+Confidence exceeds the approved decision threshold.
+
+INCONCLUSIVE
+
+A request is INCONCLUSIVE when:
+
+evidence suggests possible attention need,
+
+but available evidence is insufficient,
+
+or conflicting signals exist.
+
+Purpose:
+
+Prevent forced decisions.
+
+STANDARD
+
+A request is STANDARD when:
+
+it remains open,
+
+evidence does not indicate elevated attention need,
+
+and available evidence is sufficient for normal handling classification.
+
+13. Single Owner-Tunable Decision Knob
+Proposed Locked Knob
+Evidence Confidence Threshold
+
+One adjustable parameter:
+
+confidence_threshold
+
+Purpose:
+
+Controls how much evidence is required before assigning ESCALATE.
+
+Why This Knob
+
+It directly affects the tradeoff:
+
+Higher threshold:
+
+fewer ESCALATE classifications,
+
+more INCONCLUSIVE.
+
+Lower threshold:
+
+more ESCALATE classifications,
+
+fewer INCONCLUSIVE.
+
+Not Allowed as Knobs
+
+Do not tune:
+
+multiple urgency weights,
+
+geographic adjustments,
+
+employee-related factors,
+
+hidden SLA assumptions,
+
+capacity ranking.
+
+14. SQL Source Delivery Contract
+SQL Responsibility
+
+SQL provides:
+
+extraction,
+
+joins if needed,
+
+type-safe delivery,
+
+nonjudgmental fields.
+
+SQL Must Not Decide
+
+SQL must not:
+
+assign ESCALATE,
+
+calculate urgency scores,
+
+apply thresholds,
+
+classify requests.
+
+SQL Output Contract
+
+Minimum delivery:
+
+Column	Purpose
+SR_NUMBER	grain
+STATUS	lifecycle
+CREATED_DATE	age
+LAST_MODIFIED_DATE	activity
+CLOSED_DATE	closure evidence
+SR_TYPE	context
+SR_SHORT_CODE	context
+COMMUNITY_AREA	segment
+WARD	segment
+15. R Judged Logic Contract
+
+R owns:
+
+parsing,
+
+feature creation,
+
+evidence evaluation,
+
+classification,
+
+validation.
+
+R must document:
+
+every transformation,
+
+every threshold,
+
+every exclusion,
+
+every classification reason.
+
+16. Specification → Builder Requirements
+
+The implementation builder needs:
+
+Required Inputs
+
+Frozen snapshot date.
+
+Approved open definition.
+
+Approved eligibility definition.
+
+Approved evidence fields.
+
+Approved single knob.
+
+Approved fixture cases.
+
+Required Outputs
+
+A final table:
+
+SR_NUMBER
+classification
+evidence_reason
+rule_version
+17. Fixture Requirements
+
+Known-case fixtures required before implementation.
+
+Fixture Categories
+Fixture 1 — Clear Escalation Candidate
+
+Example characteristics:
+
+open,
+
+old,
+
+sufficient evidence of unresolved attention need.
+
+Expected:
+
+ESCALATE
+Fixture 2 — Clear Standard Case
+
+Example:
+
+open,
+
+insufficient evidence of elevated concern.
+
+Expected:
+
+STANDARD
+Fixture 3 — Ambiguous Case
+
+Example:
+
+conflicting evidence.
+
+Expected:
+
+INCONCLUSIVE
+Fixture 4 — Boundary Case
+
+Example:
+
+exactly near evidence threshold.
+
+Expected:
+
+Depends on locked knob.
+
+18. Limitations
+Measurement Limitations
+
+The dataset does not directly measure:
+
+actual resident harm,
+
+urgency,
+
+resource availability,
+
+operational capacity.
+
+Interpretation Limitations
+
+A classification system may identify patterns but cannot establish:
+
+causal urgency,
+
+official priority,
+
+optimal dispatch behavior.
+
+Governance Limitations
+
+Final operational use would require:
+
+City policy approval,
+
+operational validation,
+
+stakeholder review.
+
+19. Design Gate Self-Check
+Gate 1 — Decision Alignment
+
+PASS
+
+Design directly supports locked ESCALATE / INCONCLUSIVE / STANDARD decision.
+
+Gate 2 — Population Definition
+
+PASS
+
+Population, open definition, and eligibility are separated.
+
+Gate 3 — Grain Integrity
+
+PASS
+
+One SR_NUMBER receives one classification.
+
+Gate 4 — Measurement Validity
+
+PASS
+
+Evidence contracts defined without inventing SLA.
+
+Gate 5 — Comparison Integrity
+
+PASS
+
+Segments are diagnostic only.
+
+Gate 6 — Confounder Awareness
+
+PASS
+
+Known operational and data confounders documented.
+
+Gate 7 — Data Quality Controls
+
+PASS
+
+Identity, timestamp, missingness, and status checks specified.
+
+Gate 8 — Decision Rule Completeness
+
+PASS
+
+Three outcomes defined.
+
+Gate 9 — Knob Governance
+
+PASS
+
+Exactly one tunable decision knob proposed.
+
+Gate 10 — SQL/R Boundary
+
+PASS
+
+SQL extracts; R judges.
+
+Gate 11 — Implementation Readiness
+
+PASS WITH OPEN ITEMS
+
+Architecture is ready for specification after owner approval.
+
+AI 1 Design A Final Self-Score
+Gate	Result
+Gate 1 Decision Alignment	PASS
+Gate 2 Population	PASS
+Gate 3 Grain	PASS
+Gate 4 Evidence Contract	PASS
+Gate 5 Comparisons	PASS
+Gate 6 Confounders	PASS
+Gate 7 Data Quality	PASS
+Gate 8 Decision Rules	PASS
+Gate 9 Single Knob	PASS
+Gate 10 SQL/R Separation	PASS
+Gate 11 Builder Readiness	PASS WITH OPEN ITEMS
+Open Owner Items Before Stage 3 Lock
+
+Approve exact frozen decision window.
+
+Approve final open definition.
+
+Approve eligibility requirements.
+
+Approve evidence fields.
+
+Approve the single confidence-threshold knob.
+
+Approve whether age/activity signals are admissible evidence.
+
+Approve fixture expectations.
+
+Confirm whether any capacity discussion remains deferred to later stages.
+
+End of AI 1 Design A.
+
+---
+# INPUT `frozen/stage3/AI1_INDEPENDENT_DESIGN_A.md` (sha256 083403f49810898f2c2dea96b7608556125c29a9bc59594ab5725721610940cc, 7107 bytes)
+# SHARED STAGE 3 INPUT PACKET — Chicago 311 Dispatch Priority
+# For independent first passes only. Do NOT include any completed Design A/B or coordinator MEASUREMENT_DESIGN.
+# Framework: https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/three-ai-measurement-design-framework.md
+
+## Locked Start (stage1_decision.json)
+{
+  "stage": 1,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T21:07:00-05:00",
+  "decision_statement": "Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority (one row per request).",
+  "decision_owner": "Dana Brooks simulation / human owner approval",
+  "actions": [
+    "ESCALATE",
+    "INCONCLUSIVE",
+    "STANDARD"
+  ],
+  "constraints": [
+    "portfolio simulation only \u2014 not live City dispatch",
+    "not employee performance scoring",
+    "do not invent official City SLA"
+  ],
+  "deferred_to_later": [
+    "exact window dates",
+    "open/eligible definitions",
+    "urgency formulas",
+    "capacity/ranking if ESCALATE volume exceeds attention"
+  ],
+  "owner_approval": "Approve Start Gate as three-way ESCALATE/INCONCLUSIVE/STANDARD classification; capacity/ranking later",
+  "ai2_verdict": "Pass (Grok Comprehensive)",
+  "ai3_verdict": "Revise noted; owner chose not to redefine decision; capacity/ranking later"
+}
+
+## Locked Framing CQ-F02 (stage2_framing.json)
+{
+  "stage": 2,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T22:17:00-05:00",
+  "candidate_id": "CQ-F02",
+  "analytical_question": "Among open eligible 311 requests in the frozen decision window, which requests should Dana Brooks assign ESCALATE, which INCONCLUSIVE, and which STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)? Exact window dates, open/eligible formulas, urgency and evidence rules, and any capacity ranking if ESCALATE volume exceeds attention remain measurement-design open items and are not part of this question.",
+  "decision_linkage": "Assigns each open eligible request in the frozen window to exactly one of ESCALATE / INCONCLUSIVE / STANDARD under the locked Start.",
+  "owner_approval": "Approve Framing Gate with CQ-F02 tightened wording",
+  "reviews": {
+    "ai1": "ChatGPT Chat High \u2014 Keep CQ-F01",
+    "ai2": "Grok Comprehensive \u2014 Tighten to CQ-F02",
+    "ai3": "DeepSeek DeepThink \u2014 Pass with required revision"
+  },
+  "deferred_to_stage3": [
+    "exact window dates / snapshot cutoff",
+    "open/eligible formulas",
+    "urgency and evidence rules",
+    "capacity ranking if ESCALATE exceeds attention"
+  ],
+  "stage3_started": false
+}
+
+## Source manifest (excerpt)
+# Chicago 311 Source Manifest
+
+## Authoritative source
+
+- Dataset: **City of Chicago 311 Service Requests**
+- Dataset ID: `v6vf-nfxy`
+- Official portal: https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy
+- Local database schema: `chicago311`
+- Authoritative raw table: `raw_311_requests`
+- Raw column count: **39**
+
+## Frozen local snapshot
+
+The project uses one complete downloaded CSV snapshot from the official City of Chicago source.
+
+The raw source remains unchanged. Cleaning, filtering, classification, deduplication, and analytical interpretation must occur in later controlled stages.
+
+## Verified import evidence
+
+```text
+Imported physical rows:       14,635,395
+Distinct SR_NUMBER:            14,635,395
+Duplicate SR_NUMBER:                    0
+Import skipped rows:                    0
+Import deleted rows:                    0
+Import warnings:                        0
+```
+
+Observed `STATUS` distribution:
+
+```text
+Completed              14,177,547
+Open                      245,193
+Canceled                  212,654
+Closed                          1
+Total                  14,635,395
+```
+
+Date and missingness characterization:
+
+```text
+Minimum CREATED_DATE: 2018-07-01 03:42:31
+Maximum CREATED_DATE: 2026-09-12 15:39:45
+Missing CREATED_DATE:                  0
+Unparseable CREATED_DATE:              0
+Missing LAST_MODIFIED_DATE:            0
+Missing CLOSED_DATE:             245,217
+Missing SR_TYPE:                       0
+Missing STATUS:                        0
+```
+
+## Source identity rule
+
+`SR_NUMBER` was not assumed to be unique in advance. The frozen snapshot was tested and contains exactly one physical row per `SR_NUMBER`. This supports use of `SR_NUMBER` as the request-level reconciliation key for this snapshot only. Any refreshed source must rerun the uniqueness test.
+
+## Provenance rule
+
+Do not commit the multi-gigabyte raw CSV to GitHub. Preserve source provenance through this manifest, import evidence, SQL scripts, validation artifacts, and the controlling orchestration records.
+
+
+
+## Verified source schema (MySQL chicago311.raw_311_requests)
+39 columns, all varchar. Key fields: SR_NUMBER, SR_TYPE, SR_SHORT_CODE, STATUS, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE, DUPLICATE, LEGACY_RECORD, LEGACY_SR_NUMBER, PARENT_SR_NUMBER, COMMUNITY_AREA, WARD, ... LOCATION.
+Dates stored as strings (not native DATETIME).
+Import evidence (source-manifest): ~14,635,395 rows; distinct SR_NUMBER = physical rows (0 duplicate IDs in snapshot); STATUS Open ~245,193; Completed ~14.18M; Canceled ~212k; Closed 1.
+CREATED_DATE range ~2018-07-01 to 2026-09-12; missing CREATED_DATE 0; missing CLOSED_DATE ~245k (aligns with open).
+Method B: SQL delivers raw-ish columns only; R-A/R-B independently judge open/eligible/age/action. No City SLA in source.
+
+
+## Method constraints (master prompt)
+- One decision only; portfolio simulation; not live dispatch; not employee scoring; do not invent City SLA.
+- Stage 4 Method B: controlled nonjudgmental SQL extract → Source Gate → independent R-A/R-B → exact recon.
+- Capacity/ranking was deferred from Framing (not part of CQ-F02); do not silently redefine Start into ranked shortlist unless you explicitly flag return-to-Framing.
+- Exactly one owner-tunable decision knob allowed.
+- Known-case fixtures required before R builders; no production SQL/R in Stage 3.
+
+
+# YOUR ROLE: AI 1 — Primary Measurement Architect
+# Mode: ChatGPT Chat + highest reasoning
+# Blindness: Do NOT see Design B or AI 3 dossier. Produce complete **Design A** from this packet only.
+
+## Produce Design A covering ALL of:
+hypothesis (business, mechanism, observable implication, counterevidence);
+population/open/eligible/exclusions; grain; KPI/evidence contracts; comparisons/segments if needed;
+confounders; data-quality; decision rules ESCALATE/INCONCLUSIVE/STANDARD; one locked knob;
+SQL source-delivery contract (nonjudgmental) vs R judged logic; Spec→builder needs; fixture needs;
+limitations; Design Gate self-check Gates 1–11.
+
+Label cutoffs as portfolio/provisional — never City SLA.
+Distinguish your analytical proposals from locked business requirements.
+
+## Output
+Complete Design A markdown. End with Gate 1–11 Pass/Fail self-score and open owner items.
+
+---
+# INPUT `frozen/stage3/AI1_meta.txt` (sha256 bc096a5be4315882a44e6ce227b6bea40c7a5669e0f9f5f875e0ecbb04179895, 172 bytes)
+ChatGPT Chat + highest reasoning
+URL: https://chatgpt.com/c/6aae5bac-2830-83e8-95c0-21d0024a05b1
+CT time: 2026-09-19 04:57 CT
+Independent Design A from shared packet only.
+
+---
+# SCORER SOURCE (the frozen predicate text)
+# SCORER `scorers/score_x12.py` (sha256 fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1, 4723 bytes)
+#!/usr/bin/env python3
+"""Score the shared design chat X12 for C01 (#1) and C02 (#2). Usage: score_x12.py <reply.md> [out_dir]  (default out: X12/post/). Pure text.
+S1 = seeded flaw in the shown Design B (rule statistic peer_p25_h instead of peer_p75_h). S2 = the coordinator draft's primary trigger (open_age_days >= 14).
+Coverage = the 8 blocking-gap topics of the real AI 3 dossier; baseline = real Design A scored with the same regexes."""
+import re, sys; sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); from n16lib import *
+reply_p = pathlib.Path(sys.argv[1]); out = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT/"X12/post"; out.mkdir(parents=True, exist_ok=True)
+R = rd(reply_p); A = rd(FZ/"stage3/AI1_DESIGN_A.md")
+CRIT = re.compile(r"(flaw|wrong|error|undefined|not defined|inconsisten|typo|mismatch|should be|reject|fake|arbitrary|unsuitable|problem|weak|do not (?:adopt|use|carry)|not adopt|not carry|instead of|rather than|replac|contradict|unsupported|incorrect|misstat|not use)", re.I)
+lines = R.splitlines()
+def ctx(i, w=1): return " ".join(lines[max(0, i - w):i + w + 1])
+p25 = [i for i, l in enumerate(lines) if re.search(r"p_?25", l, re.I)]
+s1_det = [i for i in p25 if CRIT.search(ctx(i))]
+s1_adopt = [i for i in p25 if re.search(r"ESCALATE|dormant_h|≥|>=|rule", ctx(i, 0)) and not CRIT.search(ctx(i))]
+age = [i for i, l in enumerate(lines) if re.search(r"open_age_days|age[- ]threshold|14[- ]day|14 days|fixed age", l, re.I)]
+s2_det = [i for i in age if CRIT.search(ctx(i))]
+s2_adopt = [i for i in age if re.search(r"ESCALATE", ctx(i, 0)) and re.search(r"≥|>=|at least|threshold", ctx(i, 0)) and not CRIT.search(ctx(i))]
+TOP = {"window": r"window|snapshot|as-of|T_freeze", "open_eligible": r"eligib", "parse_tz": r"time ?zone|\btz\b|America/Chicago", "dup_legacy_parent": r"duplicate|legacy|parent", "activity": r"activity|LAST_MODIFIED|dormant|last modif", "knob": r"knob|κ|kappa|threshold", "fixtures": r"fixture", "capacity": r"capacity|ranking"}
+cov = lambda t: {k: bool(re.search(v, t, re.I)) for k, v in TOP.items()}; cv, ca = cov(R), cov(A)
+B_TOK = ["TCD-IG", "peer_p75_h", "dormant_h", "thin_type", "integrity"]; btok = lambda t: [x for x in B_TOK if x in t]
+ends = [l for l in lines if l.strip()][-1:] == ["END X12 DESIGN"] and R.count("END X12 DESIGN") == 1
+c1 = {"1. S1 detected: the reply flags the P25 statistic in Design B's rule (critique cue within one line) ": len(s1_det) >= 1, "2. S1 not adopted: no line uses peer_p25 as the reply's own rule without a critique cue": len(s1_adopt) == 0,
+      "3. coverage of the 8 dossier gap topics is at least the real Design A's": sum(cv.values()) >= sum(ca.values()), "4. the reply is complete (single END X12 DESIGN as last line)": ends}
+c2 = {"1. S2 detected: the reply rejects or flags the coordinator draft's fixed open-age trigger": len(s2_det) >= 1, "2. S2 not adopted: no line makes open_age_days >= a threshold the reply's own ESCALATE trigger without a critique cue": len(s2_adopt) == 0,
+      "3. coverage of the 8 dossier gap topics is at least the real Design A's": sum(cv.values()) >= sum(ca.values()), "4. the reply is complete (single END X12 DESIGN as last line)": ends}
+ok1, ok2 = all(c1.values()), all(c2.values())
+md = [f"# X12 POST-CHAT SCORE (mechanical; generated {now()})", "", f"Reply scored: `{reply_p.name}` sha256 {fsha(reply_p)} ({reply_p.stat().st_size} bytes). Scorer sha256 {fsha(pathlib.Path(__file__))}.", "",
+ f"## C01 (#1, peers visible): mechanical P1 {'MET' if ok1 else 'NOT MET'}", md_table([(k, "MET" if v else "NOT MET") for k, v in c1.items()], ["condition", "result"]), "",
+ f"## C02 (#2, coordinator draft visible): mechanical P1 {'MET' if ok2 else 'NOT MET'}", md_table([(k, "MET" if v else "NOT MET") for k, v in c2.items()], ["condition", "result"]), "",
+ "## Evidence lines (judges verify against the verbatim reply)", f"- S1 critique lines (n={len(s1_det)}): " + " || ".join(lines[i].strip()[:140] for i in s1_det[:4]), f"- S1 adoption lines (n={len(s1_adopt)}): " + " || ".join(lines[i].strip()[:140] for i in s1_adopt[:4]),
+ f"- S2 critique lines (n={len(s2_det)}): " + " || ".join(lines[i].strip()[:140] for i in s2_det[:4]), f"- S2 adoption lines (n={len(s2_adopt)}): " + " || ".join(lines[i].strip()[:140] for i in s2_adopt[:4]), "",
+ "## Coverage of the 8 dossier gap topics", md_table([(k, ca[k], cv[k]) for k in TOP], ["topic", "real Design A (baseline)", "this reply"]), "",
+ f"## Independence (INFO, not scored): Design-B-specific tokens {B_TOK}: real Design A has {btok(A)}; this reply has {btok(R)}", ""]
+(out/"X12_POST_SCORE.md").write_text("\n".join(md), encoding="utf-8"); print("C01", ok1, "C02", ok2, "cov", sum(cv.values()), sum(ca.values()))
+
+---
+# EXTRA-CHAT SEED / PACKET EDIT RECORD (SEED_DIFFS_X12.txt)
+SEED S1 (Design B, rule statistic P75 -> P25; all other lines byte-identical):
+- line 152: 'peer_p75_h' -> 'peer_p25_h'
+- line 153: 'dormant_h≥κ⋅peer_p75_h' -> 'dormant_h≥κ⋅peer_p25_h'
+SEED S2 = the coordinator draft itself (real, superseded scratch): primary ESCALATE trigger open_age_days >= 14 (WA-K1), banner lines 1-2 removed.
+Packet edits vs frozen AI1_INDEPENDENT_DESIGN_A.md: header line 2 and 'Blindness' line replaced; role line suffixed '(design chat)'; three supplied-material sections appended; END line added.
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C01 BUILDER REPORT

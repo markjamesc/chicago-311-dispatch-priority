@@ -1,0 +1,1262 @@
+# C54 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the file-download capture channel is added.
+- REVERT: the file-download capture channel is not added.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (scorer results, raw tables, scorer source, frozen inputs, hashes). Do not HALT only because a historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default (but see the SPEC's P1 note for the control where the direction of P1 is inverted).
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity, fixtures) are not applicable to this text-only control; the known-answer cases are the unmodified / clean arms and the seeds declared in the SPEC. Conditions 6–7: the frozen inputs are only read (preflight).
+- Items the SPEC marks "not measured" or "weak test" are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs scorer RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Builder file-download capture channel (capture-log replay)) materially change the outcome on the frozen records?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C54 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen Chicago pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows (SR22-01936870 dormant_h; SR25-02017553 and SR25-02017556 open_age_h); the labels agree. All three clocks fall in the repeated fall-back hour; cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST). It is open finding OF-1 in the coordinator's RESULTS_N15.md and is known and expected. N16 runs no R-A / R-B path and reads only frozen Stage 1-5 text, logs and C48 outputs, so N1 / OF-1 cannot enter any N16 number. Nothing in N16 changes the frozen pack.
+- The replies of this control were captured as text (Chrome page saving is broken; owner-approved 2026-10-09 01:52 CT, `runner/ingest_textonly.py`). Every mechanical number in the RESULTS below was produced on the box by the scorer quoted in this packet, from frozen text inputs; nothing was run on the PC (no MySQL, no R). Fixture and reconciliation items (report section 5 / validator test plan) do not apply to N16: keep the heading and write 'not applicable' with one line of reason, plus any text-level equivalent you see.
+---
+# SPEC
+# C54 — Ablation specification (FROZEN)
+
+**Ablation ID:** C54 (owner ablation list control #54: Builder file-download capture channel (capture-log replay))
+**Batch:** N16 (the 12 controls untested after N13: #1-#7, #9, #37, #38, #50, #54). Built 2026-10-09 on the box, text only.
+**Definitions and approval (operational definitions, constitution §9):** owner rulings sheet `ablation_plan/OWNER_RULINGS_BATCH_02.md` SHA-256 `1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417`; owner answer **Z (all recommended)** at 2026-10-09 01:49 CT, recorded in `OWNER_BATCH_02_ANSWERS.md` SHA-256 `3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b`. Owner answer Z = recommended: 54-B replay now (measure from the N13 capture logs how many capture failures happened and which a download would have avoided; no new chats); 54-A (live proof) not run and blocked while Chrome saving is broken. Q0 = A: the real Chicago 311 Stage 1-3 run (`chicago-311-run/stage-01-02`, `stage-03`, Stage 5) is the shared baseline for the design controls; it was run with a coordinator and extra reviews, so it is not a perfectly clean A/B.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data:** the frozen Chicago 311 Dataset 2 run and its Stage 1-5 records; every input is a hashed copy under `N16/frozen/` (`FROZEN_INPUTS.sha256`, origins in `FROZEN_ORIGINS.tsv`, re-verified by `runner/preflight_n16.py`, output `PREFLIGHT_N16.txt`). No MySQL, no fresh pull, no git, no R, nothing on the PC.
+**Roles:** Builder=ChatGPT (High) · Validator=DeepSeek (DeepThink on, Search off) · Adjudicator=Grok (Expert)
+**Extra chats: 0.** Builder (ChatGPT, High), Validator (DeepSeek, DeepThink on / Search off) and Adjudicator (Grok, Expert) only.
+**Capture mode:** TEXT-ONLY (owner-approved 2026-10-09 01:52 CT; `N13/TEXTONLY_PROCEDURE.md`, `runner/ingest_textonly.py`); recorded in run notes only, never in anything published.
+**Target stage:** capture process (all stages)
+**Frozen at CT:** 2026-10-09, before any chat of this control; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Control under test (owner list #54)
+Capture as it stands: each chat reply is captured by saving the page (now: text-only paste) and extracted; every artefact is hashed and logged under the full freeze scope (#43 = REVERT keeps it).
+Addition: a UI file download of the reply as a second capture channel (ChatGPT, Grok). KEEP would mean the download channel is adopted (page capture kept as a cross-check).
+
+## Verdict convention
+**KEEP = the file-download capture channel is added. REVERT = the file-download capture channel is not added.** HALT as in constitution §9.
+
+## Arms
+- BASE (the rule): the 41 logged captures in `CAPTURE_EXTRACTION_LOG_*.jsonl` and `ADJ_GROK_*_EXTRACTION_LOG.jsonl` (N13 batches b4, b5, b6, b6b and Grok adjudicators).
+- VARIANT (replay): incident entries (no END at the end, END count not 1, log entry without extraction result) classified by site and cause; an incident counts as avoidable only if its cause is established as a page-capture problem in a coordinator note AND the site is download-capable (premise).
+
+## Operational benefit predicate P1 (made mechanical before execution)
+1. at least one reply-capture failure, with an established page-capture cause, on a download-capable site (ChatGPT or Grok) that a download would have avoided;
+2. at least 30 logged captures;
+3. dependency #43 = REVERT (frozen `C43/TERMINAL_STATE.txt`), so every downloaded file would be hashed and logged under the existing scope (no saving is claimed).
+P1 MET -> KEEP (adopt as an addition, page capture kept as the cross-check). Any condition not MET -> REVERT. If the log cannot be read -> HALT.
+
+## Disclosures and deviations (declared before the chats)
+- Premise, not verified: ChatGPT and Grok UIs offer a file download of a reply; DeepSeek's does not.
+- Not measured (needs the live test 54-A): byte-identity of downloaded vs saved replies, intake minutes, whether downloads add failures of their own.
+- A capture is the last entry per page path; the C48 AI 2 Grok log entry has `ends_ok=false` while its extracted reply ends at its END line, and no note establishes why, so it is NOT counted as avoidable.
+- The two C40 deviation notes (D-C1 backticks as U+001F in a SENT message; D-C2 re-extraction tool fix) are input-side or tool-side and are listed, not scored.
+- Scratch-run adjustment before the reporting run: the 'cause established' rule was added after a first run counted the C48 Grok entry as avoidable.
+- Known open finding N1 / OF-1 (clock mismatch on 3 rows of the frozen pack): cannot enter N16 (no R path run). See the coordinator note in the packets.
+- Cost: not measured in minutes; the reply and packet byte sizes are the only cost proxy and are not part of P1 unless stated above.
+
+## Regression / HALT rules
+- HALT as in constitution §9, or if Builder and Validator disagree on a hard number or classification that decides a P1 condition, or if a reply is missing, incomplete (no END line) or changed after its freeze, or if a frozen input hash differs from `FROZEN_INPUTS.sha256`.
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity; fixtures) are not applicable: no R run and no fixture. The known-answer cases are the unmodified / clean arms and the seeds declared above. Conditions 6-7: the frozen inputs are only read (preflight).
+
+## Allowed source/data scope
+Frozen Chicago Stage 1-5 documents, frozen N13 logs and C48 outputs under `N16/frozen/`. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on)
+**Frozen input files:** all 75 files in `FROZEN_INPUTS.sha256`; the ones used here are listed in the EVIDENCE list of the packet.
+**Scorer files (hashed in `SCORERS_N16.sha256` before the reporting run):**
+- `scorers/score_c54.py` SHA-256 `59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86`
+- `scorers/n16lib.py` SHA-256 `4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47`
+**Seed files:**
+(none)
+**Result and evidence files:**
+- `C54/evidence/C54_RESULTS.md` SHA-256 `d7dcea67edca73804c92a50294a80fd01a8dfc84563e1e15e7e6ea15cfa0e4d4`
+- `C54/evidence/C54_captures.csv` SHA-256 `e1c52c50e64a52139824dedcf749e647465e5f16e2d1cbb878a64fc5f180c72c`
+
+**Governance:** constitution and baselines as above; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT. Recount the incidents from the capture table and check each incident's cause against the quoted notes; say whether any other entry should count.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (box, text only, CT)
+N16 preflight 2026-10-09 02:21:42 CT root /workspace/ablation_plan/runs/N16
+frozen OK 86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08 frozen/BASELINE_FRAMEWORK.sha256
+frozen OK e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 frozen/CONSTITUTION_v1.md
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/c48/AI1_ORIGINAL.md
+frozen OK c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878 frozen/c48/AUDIT_FREEZE.json
+frozen OK 5df149f9f300620ebab767f7af17a98d078f92e85b7604cce1f5f82480b59c92 frozen/c48/C48_RESULTS.md
+frozen OK d92e480b9531d5018ca02e6dbd116dbaaa3a2df53981e690e48eff13eb00278c frozen/c48/REVISED_CLEAN.md
+frozen OK c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63 frozen/c48/REVISED_SEED.md
+frozen OK 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4 frozen/c48/REVISIONS.json
+frozen OK c7cde8022846cd6aff9b189e32dc3aa4f3eea733835d469093054391490627b2 frozen/c48/TERMINAL_STATE.txt
+frozen OK 06b3e1f75be60142b054ac034cdb78579b9812efb87a1e535d5d0a0530b22e27 frozen/c48/ai2_second_audit.md
+frozen OK 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2 frozen/c48/ai3_second_audit.md
+frozen OK 6cc4ea649d67c1d22a90bfcbcbf3756a69837d900f26943940f0b6bb57297156 frozen/c48/rev_check.R
+frozen OK c07e47c76659247fa6c8306723bb8521210acab99c3c662d58d77480f2614cbf frozen/n13logs/ADJ_GROK_B4_EXTRACTION_LOG.jsonl
+frozen OK 191821397bf2b034398e5f975d398ab9d712df47ca0021d4931f401dc427ac9c frozen/n13logs/ADJ_GROK_B5_EXTRACTION_LOG.jsonl
+frozen OK ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754 frozen/n13logs/ADJ_GROK_C43_EXTRACTION_LOG.jsonl
+frozen OK 50ef99b3af165a7f01bb4173dc61534989ca0acec9009911c7d1159454c8a04f frozen/n13logs/ADJ_GROK_C44_EXTRACTION_LOG.jsonl
+frozen OK 7ba322a361fa672dc3ad5a46157c35b447ee04bf89904ace1c211c4636d7572d frozen/n13logs/ADJ_GROK_C48_EXTRACTION_LOG.jsonl
+frozen OK eba13ed2b6618a1442f70b09c6b84228f59eba4a466b9b8934833bdc5e250759 frozen/n13logs/ADJ_GROK_C49_EXTRACTION_LOG.jsonl
+frozen OK 980651563bbfd1e0ac9bda44c78964e7599a9778e1de49a950386353f2c9b5bf frozen/n13logs/C40_DEVIATION_NOTES_post.md
+frozen OK 8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864 frozen/n13logs/C40_DEVIATION_NOTES_post_2.md
+frozen OK cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149 frozen/n13logs/C43_NOTES.md
+frozen OK 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0 frozen/n13logs/C43_TERMINAL_STATE.txt
+frozen OK b1362205dfe866447961c801230b929e3246e3388bb26a819a4e245d0839fdf2 frozen/n13logs/C49_DEVIATION_NOTES_post.md
+frozen OK 6cd11d74b4cf2f09ebd511d10e3c8fb48d9133765b7b389315db99cd748eb188 frozen/n13logs/C49_DEVIATION_NOTES_post_2.md
+frozen OK 53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4 frozen/n13logs/C49_NOTES.md
+frozen OK 57ed8ed5f7e0fa5cc35bf0c6df03559514d661fcfea24e2116da44cfdab0ad13 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C48BV.jsonl
+frozen OK 2d1fc0b19611da2f299fd86ccaa4db828bf1fabf04fe217c41fec8c52c0f32c3 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49BV.jsonl
+frozen OK 9cfd0afd05a62fb6ee397f32b03ab69ca8b6206ec12bbd66ea66143b5a8d3072 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl
+frozen OK daeb45cbc3ce1cac2cc58c61cb36d4b5578a14902d143fa08066630ab7d105e8 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b4.jsonl
+frozen OK b75dc1aaa168c17064f8a94751e3c649297b01ced91c554de8f126307573729a frozen/n13logs/CAPTURE_EXTRACTION_LOG_b5.jsonl
+frozen OK 4440636595651de8c16b1e39be91529ca0f07c01c050c99a9c900965bb688269 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6.jsonl
+frozen OK b165381637d9729ccf215f9591bc5d962cc85adcfa2d9dcad23916b9c6716de9 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b.jsonl
+frozen OK 89c078e3ca9131a5974604bae69acfe676de1f6ce7aacc5ee56e97c5c708785d frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b_fix.jsonl
+frozen OK 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b frozen/rulings/OWNER_BATCH_02_ANSWERS.md
+frozen OK 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417 frozen/rulings/OWNER_RULINGS_BATCH_02.md
+frozen OK b29b39086a58e9b440f8a1a40651277c05e2b4251e555f16663c13b68ef9e4e1 frozen/stage12/ai2_framing_review_pass1.md
+frozen OK b3492dd9eca8e5ed4d104474fc12f18bfb7edc04ef78b008e123e000aae0d11c frozen/stage12/ai2_start_review_pass1.md
+frozen OK f1f47dedcc04f326c7bfd899e15b9b0fa245f70fdc1ca25f3beaec061fe8bbfc frozen/stage12/ai3_framing_review_pass1.md
+frozen OK 1cd29a865d34879d4f50f6615d70b438d4e454e1b5a771126645ec922842fdbb frozen/stage12/ai3_start_review_pass1.md
+frozen OK f6d856ea328fd379caf964305df6eacacbe975acd98acc0be0cccb61f5de9ba0 frozen/stage12/ambiguity_ledger.md
+frozen OK fefdaab549d9ec27ba3af4d6118faac8cd2bd886875abb7c3394c3cf2eaec7f3 frozen/stage12/candidate_question_ledger.md
+frozen OK 9d704ede8c2031d13d1771a170a8e99c2c3d51d15810f51fc7308acb8a675bca frozen/stage12/decision_ledger.md
+frozen OK aafa32e34b52efa4900993416a0d3ef823717ca15912d55ac1c7153fccb51d2a frozen/stage12/revision_trail.md
+frozen OK a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430 frozen/stage12/stage1_decision.json
+frozen OK 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a frozen/stage12/stage2_framing.json
+frozen OK 63d0915519094b27234c94acf256a2c390fc795d4781b5727b84162d89863af9 frozen/stage12/verbatim_dialogue_ledger.md
+frozen OK 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988 frozen/stage3/AI1_DESIGN_A.md
+frozen OK 083403f49810898f2c2dea96b7608556125c29a9bc59594ab5725721610940cc frozen/stage3/AI1_INDEPENDENT_DESIGN_A.md
+frozen OK bc096a5be4315882a44e6ce227b6bea40c7a5669e0f9f5f875e0ecbb04179895 frozen/stage3/AI1_meta.txt
+frozen OK 8153ad4fb16001c1f217d8112e878f22ca0b299aa5574b9cd318465e845d52a8 frozen/stage3/AI2_DESIGN_B.md
+frozen OK 808fea8d7c3c207949b0aca144e7d5a8785b10ec3ec915f82202ae0acde1c7b1 frozen/stage3/AI2_meta.txt
+frozen OK 7f4fc3ee3995e2d20472be686887d7c3aa97cbbf365d8ee50e685a3fb2fc62b1 frozen/stage3/AI3_DATA_RISK_DOSSIER.md
+frozen OK db9da8dfcdaf1ef192f64e61d5c08ccb2cf922a3aa10fef5edcd24b3e64e2642 frozen/stage3/AI3_meta.txt
+frozen OK 9f3ea0a7f3e92ab4852a0add67c72389c046e5e6c282937ded350bfc0648aa42 frozen/stage3/CROSS_REVIEW.md
+frozen OK 0ec361b591cc33733814766fefb05739fc80ef8571ded2b44e55974b85935dd8 frozen/stage3/DESIGN_GATE_PACKAGE.md
+frozen OK 3a03e139350141baa2b6fef9d065a6075d9248cf53b971ad1bc6c81aa07fa57f frozen/stage3/DESIGN_GATE_RECEIPT.md
+frozen OK 9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243 frozen/stage3/MEASUREMENT_DESIGN.md
+frozen OK 7297cf3ef25bbf12a04a6d88c0a41dac260de5736c71392783d8f8b7d7389594 frozen/stage3/MEASUREMENT_DESIGN_LOCKED.md
+frozen OK 4b4a8ce3aa63a7eb3c62228a087a876591f556694fbf152a3ef79da4e92ac996 frozen/stage3/SHARED_INPUT_PACKET.md
+frozen OK ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114 frozen/stage3/stage3_locked_design.json
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/stage5/AI1_INTERPRETATION_BUILDER.md
+frozen OK d77f55c6b96b87455a60c22907a845f253808d4a466110f87d16825501e8c3a0 frozen/stage5/AI1_PASTE.txt
+frozen OK ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a frozen/stage5/AI2_DECISION_METHOD_CRITIC.md
+frozen OK 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1 frozen/stage5/AI3_CLAIM_EVIDENCE_AUDITOR.md
+frozen OK 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457 frozen/stage5/CROSS_REVIEW.md
+frozen OK 22dc6a94006f83de4e2d741c4de08e0964e6433d08e87d11e98314a0b767c285 frozen/stage5/FINISH_GATE_PACKAGE.md
+frozen OK 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462 frozen/stage5/INTERPRETATION_RECONCILIATION.md
+frozen OK 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 frozen/stage5/STAGE5_DEEPER_FINDINGS.md
+frozen OK c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 frozen/stage5/STAGE5_EVIDENCE_PACKAGE.md
+frozen OK 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 frozen/stage5/deeper/capacity_coverage_note.csv
+frozen OK 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 frozen/stage5/deeper/escalate_by_type_top25.csv
+frozen OK f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d frozen/stage5/deeper/inconclusive_by_clause.csv
+frozen OK 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 frozen/stage5/deeper/independent_checks_critical_counts.csv
+frozen OK 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a frozen/stage5/deeper/kappa_sensitivity.csv
+frozen OK b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 frozen/stage5/deeper/portfolio_summary.csv
+PREFLIGHT PASS failures: 0
+(origin-hash lines omitted here; each frozen file was also compared with its origin path, all OK; full list in FROZEN_ORIGINS.tsv)
+
+---
+# FROZEN REFERENCE HASHES
+Frozen inputs: `FROZEN_INPUTS.sha256` (75 files; verified above). Constitution sha256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; owner sheet sha256 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417; owner answer file sha256 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b.
+Scorer files:
+59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86  4938  scorers/score_c54.py
+4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47  1723  scorers/n16lib.py
+
+---
+# C54_RESULTS.md (scorer output)
+# C54 RESULTS (mechanical replay; generated 2026-10-09 02:21:36 CT)
+
+**Mechanical P1 result: NOT MET**
+Replay only: byte-identity of a downloaded file vs the saved page, and intake minutes, are NOT measured (option 54-A, a live test, is not run). Chrome page saving is broken on the box; this replay does not need it.
+
+## Conditions
+| condition | result |
+|---|---|
+| 1. at least one reply-capture failure, with an established page-capture cause, on a download-capable site (ChatGPT or Grok) that a download would have avoided | NOT MET |
+| 2. the sample is not trivial: at least 30 logged captures | MET |
+| 3. dependency #43 = REVERT (full freeze scope stays), so every downloaded file would be hashed and logged under the existing scope; no saving is claimed | MET |
+
+## Counts: 41 log entries, 3 incident entries (3 still incident in the final log entry for that capture), download-capable captures 25, avoidable incidents 0
+C43 TERMINAL_STATE (frozen, N13): REVERT
+
+## Incident entries
+| log | control | file | site | md_bytes | incident | explanation (from coordinator notes) | download premise |
+|---|---|---|---|---|---|---|---|
+| CAPTURE_C49BV | C49 | validator_deepseek.html | deepseek | 12402 | reply did not end at its END line in the capture | DeepSeek reply stopped inside section 7, no END line (C49_NOTES.md) | not avoidable (DeepSeek: no download in UI, premise) |
+| CAPTURE_b5 | C48 | ai2_grok.html | grok | 4078 | reply did not end at its END line in the capture | capture log flag ends_ok=false for the Grok page although the extracted reply's last line is its END line; the log does not record why (cause NOT established) | cause not established: not counted as avoidable |
+| CAPTURE_b6 | C43 | validator_deepseek.html | deepseek |  | log entry has no extraction result (incomplete capture / harness incident) | DeepSeek stopped in thinking; incomplete page (C43_NOTES.md) | not avoidable (DeepSeek: no download in UI, premise) |
+
+## Input-side incident (not a reply capture; listed, not scored)
+- ## D-C1 Round-2 message: backticks arrived as U+001F control characters (judged NOT material)
+- ## D-C2 r2 reply re-extracted with extract_reply_v3.py (tool fix)
+
+## All captures
+| log | control | file | site | md_bytes | incident |
+|---|---|---|---|---|---|
+| ADJ_GROK_B4 | C51 | adjudicator_grok.html | grok | 12861 |  |
+| ADJ_GROK_B4 | C46 | adjudicator_grok.html | grok | 12536 |  |
+| ADJ_GROK_B5 | C41 | adjudicator_grok.html | grok | 11291 |  |
+| ADJ_GROK_B5 | C47 | adjudicator_grok.html | grok | 12009 |  |
+| ADJ_GROK_B5 | C53 | adjudicator_grok.html | grok | 12307 |  |
+| ADJ_GROK_B5 | C42 | adjudicator_grok.html | grok | 11873 |  |
+| ADJ_GROK_C43 | C43 | adjudicator_grok.html | grok | 12372 |  |
+| ADJ_GROK_C44 | C44 | adjudicator_grok.html | grok | 11804 |  |
+| ADJ_GROK_C48 | C48 | adjudicator_grok.html | grok | 9593 |  |
+| ADJ_GROK_C49 | C49 | adjudicator_grok.html | grok | 13650 |  |
+| CAPTURE_C48BV | C48 | builder_chatgpt.html | chatgpt | 17840 |  |
+| CAPTURE_C48BV | C48 | validator_deepseek.html | deepseek | 9332 |  |
+| CAPTURE_C49BV | C49 | builder_chatgpt.html | chatgpt | 17860 |  |
+| CAPTURE_C49BV | C49 | validator_deepseek.html | deepseek | 12402 | reply did not end at its END line in the capture |
+| CAPTURE_C49V_r2 | C49 | validator_deepseek_r2.html | deepseek | 10269 |  |
+| CAPTURE_b4 | C51 | builder_chatgpt.html | chatgpt | 19925 |  |
+| CAPTURE_b4 | C51 | validator_deepseek.html | deepseek | 9966 |  |
+| CAPTURE_b4 | C46 | builder_chatgpt.html | chatgpt | 24696 |  |
+| CAPTURE_b4 | C46 | validator_deepseek.html | deepseek | 12131 |  |
+| CAPTURE_b5 | C41 | builder_chatgpt.html | chatgpt | 17713 |  |
+| CAPTURE_b5 | C41 | validator_deepseek.html | deepseek | 9611 |  |
+| CAPTURE_b5 | C47 | builder_chatgpt.html | chatgpt | 17718 |  |
+| CAPTURE_b5 | C47 | validator_deepseek.html | deepseek | 10593 |  |
+| CAPTURE_b5 | C53 | builder_chatgpt.html | chatgpt | 19154 |  |
+| CAPTURE_b5 | C53 | validator_deepseek.html | deepseek | 13725 |  |
+| CAPTURE_b5 | C42 | builder_chatgpt.html | chatgpt | 16993 |  |
+| CAPTURE_b5 | C42 | validator_deepseek.html | deepseek | 9846 |  |
+| CAPTURE_b5 | C48 | ai2_grok.html | grok | 4078 | reply did not end at its END line in the capture |
+| CAPTURE_b5 | C48 | ai3_deepseek.html | deepseek | 3053 |  |
+| CAPTURE_b6 | C44 | delta_deepseek.html | deepseek | 2834 |  |
+| CAPTURE_b6 | C49 | reply_deepseek.html | deepseek | 1842 |  |
+| CAPTURE_b6 | C49 | reply_deepseek.html | deepseek | 2371 |  |
+| CAPTURE_b6 | C49 | reply_chatgpt.html | chatgpt | 3724 |  |
+| CAPTURE_b6 | C40 | inc_r1_chatgpt.html | chatgpt | 6684 |  |
+| CAPTURE_b6 | C43 | builder_chatgpt.html | chatgpt | 19649 |  |
+| CAPTURE_b6 | C43 | validator_deepseek.html | deepseek |  | log entry has no extraction result (incomplete capture / harness incident) |
+| CAPTURE_b6b | C49 | reply_deepseek.html | deepseek | 2596 |  |
+| CAPTURE_b6b | C40 | inc_r2_chatgpt.html | chatgpt | 6962 |  |
+| CAPTURE_b6b | C44 | builder_chatgpt.html | chatgpt | 19696 |  |
+| CAPTURE_b6b | C44 | validator_deepseek.html | deepseek | 11786 |  |
+| CAPTURE_b6b_fix | C40 | inc_r2_chatgpt.html | chatgpt | 7706 |  |
+
+
+---
+# C54_captures.csv (raw, full file)
+log,control,file,site,md_bytes,incident
+ADJ_GROK_B4,C51,adjudicator_grok.html,grok,12861,
+ADJ_GROK_B4,C46,adjudicator_grok.html,grok,12536,
+ADJ_GROK_B5,C41,adjudicator_grok.html,grok,11291,
+ADJ_GROK_B5,C47,adjudicator_grok.html,grok,12009,
+ADJ_GROK_B5,C53,adjudicator_grok.html,grok,12307,
+ADJ_GROK_B5,C42,adjudicator_grok.html,grok,11873,
+ADJ_GROK_C43,C43,adjudicator_grok.html,grok,12372,
+ADJ_GROK_C44,C44,adjudicator_grok.html,grok,11804,
+ADJ_GROK_C48,C48,adjudicator_grok.html,grok,9593,
+ADJ_GROK_C49,C49,adjudicator_grok.html,grok,13650,
+CAPTURE_C48BV,C48,builder_chatgpt.html,chatgpt,17840,
+CAPTURE_C48BV,C48,validator_deepseek.html,deepseek,9332,
+CAPTURE_C49BV,C49,builder_chatgpt.html,chatgpt,17860,
+CAPTURE_C49BV,C49,validator_deepseek.html,deepseek,12402,reply did not end at its END line in the capture
+CAPTURE_C49V_r2,C49,validator_deepseek_r2.html,deepseek,10269,
+CAPTURE_b4,C51,builder_chatgpt.html,chatgpt,19925,
+CAPTURE_b4,C51,validator_deepseek.html,deepseek,9966,
+CAPTURE_b4,C46,builder_chatgpt.html,chatgpt,24696,
+CAPTURE_b4,C46,validator_deepseek.html,deepseek,12131,
+CAPTURE_b5,C41,builder_chatgpt.html,chatgpt,17713,
+CAPTURE_b5,C41,validator_deepseek.html,deepseek,9611,
+CAPTURE_b5,C47,builder_chatgpt.html,chatgpt,17718,
+CAPTURE_b5,C47,validator_deepseek.html,deepseek,10593,
+CAPTURE_b5,C53,builder_chatgpt.html,chatgpt,19154,
+CAPTURE_b5,C53,validator_deepseek.html,deepseek,13725,
+CAPTURE_b5,C42,builder_chatgpt.html,chatgpt,16993,
+CAPTURE_b5,C42,validator_deepseek.html,deepseek,9846,
+CAPTURE_b5,C48,ai2_grok.html,grok,4078,reply did not end at its END line in the capture
+CAPTURE_b5,C48,ai3_deepseek.html,deepseek,3053,
+CAPTURE_b6,C44,delta_deepseek.html,deepseek,2834,
+CAPTURE_b6,C49,reply_deepseek.html,deepseek,1842,
+CAPTURE_b6,C49,reply_deepseek.html,deepseek,2371,
+CAPTURE_b6,C49,reply_chatgpt.html,chatgpt,3724,
+CAPTURE_b6,C40,inc_r1_chatgpt.html,chatgpt,6684,
+CAPTURE_b6,C43,builder_chatgpt.html,chatgpt,19649,
+CAPTURE_b6,C43,validator_deepseek.html,deepseek,,log entry has no extraction result (incomplete capture / harness incident)
+CAPTURE_b6b,C49,reply_deepseek.html,deepseek,2596,
+CAPTURE_b6b,C40,inc_r2_chatgpt.html,chatgpt,6962,
+CAPTURE_b6b,C44,builder_chatgpt.html,chatgpt,19696,
+CAPTURE_b6b,C44,validator_deepseek.html,deepseek,11786,
+CAPTURE_b6b_fix,C40,inc_r2_chatgpt.html,chatgpt,7706,
+
+---
+# C54_EVIDENCE.sha256
+c07e47c76659247fa6c8306723bb8521210acab99c3c662d58d77480f2614cbf  1223  frozen/n13logs/ADJ_GROK_B4_EXTRACTION_LOG.jsonl
+191821397bf2b034398e5f975d398ab9d712df47ca0021d4931f401dc427ac9c  2369  frozen/n13logs/ADJ_GROK_B5_EXTRACTION_LOG.jsonl
+ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754  596  frozen/n13logs/ADJ_GROK_C43_EXTRACTION_LOG.jsonl
+50ef99b3af165a7f01bb4173dc61534989ca0acec9009911c7d1159454c8a04f  591  frozen/n13logs/ADJ_GROK_C44_EXTRACTION_LOG.jsonl
+7ba322a361fa672dc3ad5a46157c35b447ee04bf89904ace1c211c4636d7572d  589  frozen/n13logs/ADJ_GROK_C48_EXTRACTION_LOG.jsonl
+eba13ed2b6618a1442f70b09c6b84228f59eba4a466b9b8934833bdc5e250759  592  frozen/n13logs/ADJ_GROK_C49_EXTRACTION_LOG.jsonl
+57ed8ed5f7e0fa5cc35bf0c6df03559514d661fcfea24e2116da44cfdab0ad13  1836  frozen/n13logs/CAPTURE_EXTRACTION_LOG_C48BV.jsonl
+2d1fc0b19611da2f299fd86ccaa4db828bf1fabf04fe217c41fec8c52c0f32c3  2131  frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49BV.jsonl
+9cfd0afd05a62fb6ee397f32b03ab69ca8b6206ec12bbd66ea66143b5a8d3072  861  frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl
+daeb45cbc3ce1cac2cc58c61cb36d4b5578a14902d143fa08066630ab7d105e8  3551  frozen/n13logs/CAPTURE_EXTRACTION_LOG_b4.jsonl
+b75dc1aaa168c17064f8a94751e3c649297b01ced91c554de8f126307573729a  8413  frozen/n13logs/CAPTURE_EXTRACTION_LOG_b5.jsonl
+4440636595651de8c16b1e39be91529ca0f07c01c050c99a9c900965bb688269  4222  frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6.jsonl
+b165381637d9729ccf215f9591bc5d962cc85adcfa2d9dcad23916b9c6716de9  2577  frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b.jsonl
+89c078e3ca9131a5974604bae69acfe676de1f6ce7aacc5ee56e97c5c708785d  518  frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b_fix.jsonl
+0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0  8  frozen/n13logs/C43_TERMINAL_STATE.txt
+cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149  1917  frozen/n13logs/C43_NOTES.md
+53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4  1723  frozen/n13logs/C49_NOTES.md
+8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864  3483  frozen/n13logs/C40_DEVIATION_NOTES_post_2.md
+59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86  4938  scorers/score_c54.py
+d7dcea67edca73804c92a50294a80fd01a8dfc84563e1e15e7e6ea15cfa0e4d4  5143  C54/evidence/C54_RESULTS.md
+e1c52c50e64a52139824dedcf749e647465e5f16e2d1cbb878a64fc5f180c72c  2331  C54/evidence/C54_captures.csv
+
+---
+# SCORER SOURCE (the frozen predicate text) `scorers/score_c54.py` (sha256 59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86, 4938 bytes)
+#!/usr/bin/env python3
+"""C54 replay (#54-B): capture failures in the N13 capture logs and which a UI file download would have avoided.
+Declared premises (NOT verified here; stated in the SPEC): ChatGPT and Grok chat UIs offer a file download of a reply; DeepSeek's does not, so DeepSeek incidents are never counted as avoidable.
+Incident rule (declared): a capture entry is an incident if it has END_count != 1, ends_with_END false, ends_ok false, or lacks the check fields altogether (log entry without extraction result)."""
+import re, sys, glob; sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); from n16lib import *
+L = FZ/"n13logs"; ent = []
+for f in sorted(L.glob("*EXTRACTION_LOG*.jsonl")):
+    for i, l in enumerate(rd(f).splitlines()):
+        if not l.strip(): continue
+        d = json.loads(l); html = d.get("html", ""); site = d.get("site") or ("grok" if "ADJ_GROK" in f.name or "grok" in html.lower() else "?")
+        cid = html.split("/")[0]; has = any(k in d for k in ("ends_with_END", "ends_ok"))
+        end_ok = d.get("ends_with_END", d.get("ends_ok")); cnt = d.get("END_count", None)
+        inc = None
+        if not has: inc = "log entry has no extraction result (incomplete capture / harness incident)"
+        elif end_ok is False: inc = "reply did not end at its END line in the capture"
+        elif cnt not in (None, 1): inc = f"END count {cnt}"
+        ent.append((f.name.replace("_EXTRACTION_LOG", "").replace(".jsonl", ""), cid, html.split("/")[-1], site, d.get("md_bytes", ""), inc or ""))
+# the same capture re-logged after a fix is one capture: keep the LAST entry per html path
+last = {}
+for e in ent: last[(e[1], e[2])] = e
+allc = ent; inc_all = [e for e in allc if e[5]]
+inc_final = [e for e in inc_all if last[(e[1], e[2])] is e]           # incidents still present in the final log entry
+# explanatory classes (from the coordinator notes, quoted): see frozen/n13logs/C43_NOTES.md, C49_NOTES.md, C48 audit log
+cls = []
+for e in inc_all:
+    why = {"C49": "DeepSeek reply stopped inside section 7, no END line (C49_NOTES.md)", "C43": "DeepSeek stopped in thinking; incomplete page (C43_NOTES.md)",
+           "C48": "capture log flag ends_ok=false for the Grok page although the extracted reply's last line is its END line; the log does not record why (cause NOT established)"}.get(e[1], "")
+    est = e[1] in ("C49", "C43")   # cause established in a coordinator note
+    avoid = e[3] in ("chatgpt", "grok") and est
+    cls.append(e[:5] + (e[5], why, "avoidable by a download (premise)" if avoid else ("not avoidable (DeepSeek: no download in UI, premise)" if e[3] == "deepseek" else "cause not established: not counted as avoidable")))
+dl_caps = [e for e in allc if e[3] in ("chatgpt", "grok")]; dl_inc = [c for c in cls if c[7].startswith("avoidable")]
+t43 = rd(L/"C43_TERMINAL_STATE.txt").strip()
+notes_c40 = rd(L/"C40_DEVIATION_NOTES_post_2.md")
+inp = [l for l in notes_c40.splitlines() if l.startswith("## D-C")]
+cond = {"1. at least one reply-capture failure, with an established page-capture cause, on a download-capable site (ChatGPT or Grok) that a download would have avoided": len(dl_inc) >= 1,
+        "2. the sample is not trivial: at least 30 logged captures": len(allc) >= 30,
+        "3. dependency #43 = REVERT (full freeze scope stays), so every downloaded file would be hashed and logged under the existing scope; no saving is claimed": t43 == "REVERT"}
+ok = all(cond.values())
+md = [f"# C54 RESULTS (mechanical replay; generated {now()})", "", f"**Mechanical P1 result: {'MET (all 3)' if ok else 'NOT MET'}**",
+ "Replay only: byte-identity of a downloaded file vs the saved page, and intake minutes, are NOT measured (option 54-A, a live test, is not run). Chrome page saving is broken on the box; this replay does not need it.", "",
+ "## Conditions", md_table([(k, "MET" if v else "NOT MET") for k, v in cond.items()], ["condition", "result"]), "",
+ f"## Counts: {len(allc)} log entries, {len(inc_all)} incident entries ({len(inc_final)} still incident in the final log entry for that capture), download-capable captures {len(dl_caps)}, avoidable incidents {len(dl_inc)}",
+ f"C43 TERMINAL_STATE (frozen, N13): {t43}", "",
+ "## Incident entries", md_table(cls, ["log", "control", "file", "site", "md_bytes", "incident", "explanation (from coordinator notes)", "download premise"]), "",
+ "## Input-side incident (not a reply capture; listed, not scored)", "\n".join("- " + x for x in inp), "",
+ "## All captures", md_table(allc, ["log", "control", "file", "site", "md_bytes", "incident"]), ""]
+finish("C54", "\n".join(md), sorted(L.glob("*EXTRACTION_LOG*.jsonl")) + [L/"C43_TERMINAL_STATE.txt", L/"C43_NOTES.md", L/"C49_NOTES.md", L/"C40_DEVIATION_NOTES_post_2.md", pathlib.Path(__file__)])
+write_csv(ROOT/"C54/evidence/C54_captures.csv", allc, ["log", "control", "file", "site", "md_bytes", "incident"])
+print("C54", ok, len(allc), len(inc_all), len(dl_inc))
+
+---
+# FROZEN INPUTS (verbatim)
+---
+# INPUT `frozen/n13logs/C43_NOTES.md` (sha256 cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149, 1917 bytes)
+# C43 notes (N13 b6)
+
+## 2026-10-03 12:25 CT — Validator harness incident and r2 rerun
+- **Harness incident (r1):** `C43-validator/validator_deepseek.html` (saved 12:06 CDT; sha256 a5900b53… in `../CAPTURE_FREEZE_b6.sha256`) is INCOMPLETE. DeepSeek stopped in thinking; the operator sent 'continue'; the second attempt was still thinking, and the page ends at DeepSeek's 'One more step before you proceed…' screen. It has no answer, no END line and no `validator_report.md`. It stays frozen and read-only as failed evidence. Nothing was deleted, and it is not used for any verdict.
+- **Rerun r2 (authoritative Validator capture):** `C43-validator/validator_deepseek_r2.html`, 223,486 B, sha256 5890ed33b7dbf8d529d10d2b0f1904833c644553fccf0b6dd2ea80269abb8f41.
+  - New DeepSeek chat https://chat.deepseek.com/a/chat/s/6fcaf0b8-0fdb-4c72-bd42-7bb0d199dda0, same packet (`packets/C43_2_VALIDATOR_DeepSeek.txt`, c3204d5f…).
+  - Sent 12:20:54 CDT. Reply complete ~12:22:23 CDT (computerUse estimate); the page mtime 12:22:16 CDT is the upper bound. See `C43-validator/TIMES.txt`.
+- **Extraction:** `extract_reply_v2.py` (249053a4…) → `C43-validator/validator_report.md` (11,261 B, sha256 4148f956…).
+  - 1 assistant message; ends with `END C43 VALIDATOR REPORT` (count 1); all 7 required sections; no verdict line; no chips.
+  - Log: `C43-validator/EXTRACTION_LOG_r2.jsonl`.
+- **Hash manifest:** `C43_CAPTURES.sha256` lists the Builder, the r1 failed page, the r2 page and report, and TIMES.txt. `C43_CAPTURE_ASSETS_r2.sha256` lists the r2 `_files` folder.
+
+## 2026-10-03 12:32 CT — Grok Adjudicator: REVERT
+- `C43-adjudicator/adjudicator_grok.html` (d1c60a50…). Exactly one TERMINAL_STATE line: REVERT. `record_terminal.R` → `TERMINAL_STATE.txt` = REVERT. See `../RESULTS_N13.md`.
+- `C43_CAPTURES.sha256` was appended with the adjudicator entries (before the append: c6c3d8b1…; after: 0d7d2f70…).
+
+---
+# INPUT `frozen/n13logs/C49_NOTES.md` (sha256 53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4, 1723 bytes)
+# C49 notes (N13 b6)
+
+## 2026-10-03 13:28 CT — Validator harness incident (r1) and r2 rerun
+- **Harness incident (r1):** `C49-validator/validator_deepseek.html` (sent 13:19:30, saved 13:20 CT; sha256 241ddcf5…) is INCOMPLETE. The DeepSeek reply stops inside §7 (claim → evidence map), with no `END C49 VALIDATOR REPORT` line. The extracted text is kept as `validator_report.INCOMPLETE.md` (renamed so the assembler cannot use it). Both are frozen in `../CAPTURE_FREEZE_C49BV.sha256` as failed evidence; nothing was deleted and they are not used for any verdict.
+- **Correction:** the ~13:23 records (the `CAPTURE_FREEZE_C49BV.sha256` header and FLOW row 13) say the r1 page "ends at DeepSeek's 'One more step before you proceed…' screen". That was inferred from the string in the page. On re-check, the string belongs to a hidden overlay element (`display: none`) present in both the r1 and r2 pages. r1 is simply a truncated reply; whether a verification screen appeared is not shown by the page.
+- **Rerun r2 (authoritative Validator capture):** `C49-validator/validator_deepseek_r2.html` (252,656 B, sha256 f83dfeda36cb01a7b6468e4a03b9d969c484622028c76a3b2aa2ce2740f9caf4).
+  - New chat https://chat.deepseek.com/a/chat/s/99e79f0d-649e-4c8b-b199-438243c1a7d7, same packet `packets/C49_2_VALIDATOR_DeepSeek.txt` (3f10c479…).
+  - Sent 13:24:17, done 13:26:11 CT (`C49-validator/TIMES_r2.txt`). No verification screen (operator).
+- **Extraction:** `validator_report.md` (10,269 B, f7f285be…). 1 assistant message; END once and last; all 7 sections; no verdict line; no chips. Freeze: `../CAPTURE_FREEZE_C49V_r2.sha256`, assets `../CAPTURE_ASSETS_C49V_r2.sha256`, log `../CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl`.
+
+---
+# INPUT `frozen/n13logs/C40_DEVIATION_NOTES_post_2.md` (sha256 8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864, 3483 bytes)
+# C40 post-freeze deviation notes, part 2 (b6, 2026-10-03 ~12:50 CT). Continues DEVIATION_NOTES_post.md (frozen, unchanged)
+
+## D-C1 Round-2 message: backticks arrived as U+001F control characters (judged NOT material)
+- Operator note: when `C40/C40-INC/r2/MESSAGE.txt` (202e6170…) was pasted, the ChatGPT composer showed the inline-code backticks as control placeholders.
+- Check of the sent user turn in the saved page (`C40/C40-INC/r2/inc_r2_chatgpt.html`, 9e73d9fb…; the `whitespace-pre-wrap` user-message div):
+  - Every backtick of MESSAGE.txt (19) arrived as the control character U+001F; the page holds 17 of them.
+  - The one triple-backtick inside the instruction sentence (```` ```r ````) arrived as a single U+001F followed by `r`.
+  - The two ``` fence lines around the stderr excerpt arrived as three U+001F each.
+  - One blank line before "Fix the file." is absent.
+  - With U+001F mapped back to a backtick, every other line equals MESSAGE.txt exactly: the gate result table, all 15 stderr lines including "Error: Open source missing required column(s): …", the instructions and the END line.
+- Judgment: **not material**.
+  - All information content reached the builder: the failure, the error text, the output table and the instructions.
+  - Only markdown delimiters were garbled. The builder's r2 reply names the exact r1 cause ("The frozen `.csv` exports are tab-delimited; r1 incorrectly forced `read_csv()` comma parsing"), returns one code block, and ends with `END C40 BUILD INC r2`.
+  - r2 PASSED the gate and the hidden depth check.
+  - The garbling cannot have helped the builder. Any harm it did would have shown as a failed r2, which did not happen.
+- Prevention for later rounds: attach MESSAGE.txt as a file, or check the composer before sending.
+
+## D-C2 r2 reply re-extracted with extract_reply_v3.py (tool fix)
+- `extract_reply_v2.py` rendered ChatGPT's code block, which this page draws as `<code class="… block CodeContent-…">` with no `<pre>`, as inline code. Indentation was lost and there was no fence, so `c40_extract.R` REFUSED ("no fenced code block") at 12:43:39. That attempt wrote nothing (no candidate, no arm); its logs are kept as `C40/round_INC_r2_attempt1_REFUSED.{out,err}.txt`.
+- `runner_b6/tools/extract_reply_v3.py` (046f202d…) is v2 plus that one case. Its output is byte-identical to v2 on the other six b6 pages tested (C40 r1, C49 GPT_FILES, C43 Builder, C44 Builder, C49 DS_FILES_PD3, C44 Validator).
+- The v2 output is kept, moved not deleted, as `C40/C40-INC/r2/reply.v2extract_superseded.md` (cfebf566…). `reply.md` is now the v3 output (eb0cd252…). The html is unchanged.
+- The extracted module (`10_io_parse.R`, 72d49def…) equals the page's code text except that 9 doubled blank lines are collapsed to single ones. This is the same normalization as every v2 extraction, including r1.
+- Freeze: `CAPTURE_FREEZE_b6b_fix.sha256`.
+
+## Outcome
+- INC r1 FAIL; INC r2 PASS at 12:46:31 CDT (gate 14/14 and 4/4 outputs byte-identical; hidden depth check PASS 14/14). `c40_next.R`: NOT_TRIGGERED.
+- `c40_eval.R`: "NOT TRIGGERED (cap never reached; no verdict; no Builder/Validator/Adjudicator chats)".
+- `assemble_b6_bv.R C40` refused with exit 4 by design. No ROUNDS_FREEZE.json and no B/V/G packets were written. Per the SPEC there are no C40 verdict, B, V or G chats.
+- Times: r2 is operator-logged (0.73 min). r1 is the ruling's upper bound (7.12 min). Neither enters a predicate, because nothing diverged.
+
+---
+# INPUT `frozen/n13logs/C43_TERMINAL_STATE.txt` (sha256 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0, 8 bytes)
+REVERT
+
+---
+# FROZEN INPUTS (hash only; see FROZEN_INPUTS.sha256 and the RESULTS tables)
+- the 14 extraction-log .jsonl files (full table of captures is in C54_captures.csv, verbatim in this packet)
+---
+# SUPPLEMENT (added 2026-10-09 04:08 CT by assemble_adjudicator.py; see NOTE_2026-10-09_0408_n16lib_and_ingest.md)
+scorers/n16lib.py is imported by every N16 scorer and is quoted in the SPEC hash list, but was missing from the Builder/Validator evidence lists. Its SHA-256 is 4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47 (1723 bytes); verbatim source:
+```python
+#!/usr/bin/env python3
+"""N16 shared helpers (box only; pure text; no R, no MySQL, no PC). Every scorer writes <CID>/evidence/<CID>_RESULTS.md plus raw CSVs and <CID>_EVIDENCE.sha256."""
+import hashlib, pathlib, re, csv, io, json, datetime
+ROOT = pathlib.Path(__file__).resolve().parent.parent; FZ = ROOT/"frozen"
+sha = lambda b: hashlib.sha256(b).hexdigest()
+def rd(p): return pathlib.Path(p).read_text(encoding="utf-8-sig", errors="replace")
+def fsha(p): return sha(pathlib.Path(p).read_bytes())
+def now(): return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S CT")
+def sentences(t):
+    t = re.sub(r"\s+", " ", t); return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“(])", t) if s.strip()]
+def md_table(rows, head):
+    return "\n".join(["| " + " | ".join(head) + " |", "|" + "---|" * len(head)] + ["| " + " | ".join(str(x).replace("|", "/").replace("\n", " ") for x in r) + " |" for r in rows])
+def write_csv(path, rows, head):
+    b = io.StringIO(); w = csv.writer(b, lineterminator="\n"); w.writerow(head); w.writerows(rows); pathlib.Path(path).write_text(b.getvalue(), encoding="utf-8")
+def finish(cid, result_md, inputs):
+    """Write RESULTS + EVIDENCE.sha256 (inputs: list of paths hashed)."""
+    ev = ROOT/cid/"evidence"; ev.mkdir(parents=True, exist_ok=True)
+    (ev/f"{cid}_RESULTS.md").write_text(result_md, encoding="utf-8")
+    lines = [f"{fsha(p)}  {pathlib.Path(p).stat().st_size}  {pathlib.Path(p).relative_to(ROOT).as_posix()}" for p in inputs]
+    lines += [f"{fsha(f)}  {f.stat().st_size}  {f.relative_to(ROOT).as_posix()}" for f in sorted(ev.iterdir()) if f.name != f"{cid}_EVIDENCE.sha256"]
+    (ev/f"{cid}_EVIDENCE.sha256").write_text("\n".join(lines) + "\n", encoding="utf-8")
+```
+Timestamp note: the reporting scorer run (02:21:35 CT) preceded PREFLIGHT_N16.txt (02:21:42 CT) by 7 s; the preflight checks frozen inputs only, which the scorers read unchanged (hashes identical in both).
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C54",
+  "frozen_at_ct": "2026-10-09 04:03:52 CT",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [
+    {
+      "path": "C54/C54-builder/builder_report.md",
+      "bytes": 26509,
+      "sha256": "d2389be616a10cc6c0736653399f4eecf055c37dc887c3a58fee481938a137ac",
+      "verdict_token_leak": false
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "C54/C54-validator/validator_report.md",
+      "bytes": 8257,
+      "sha256": "57fd6d38f95fcfb04a7932d1efc3a4323ce583e175499dc1d35bd918bbdc481f",
+      "verdict_token_leak": false
+    }
+  ],
+  "runner_evidence_sha256_file": "88a2278c31b0fd66ab350868b2c5ec5a9eeabe0f853d65b44a4aa5fd9c21e829",
+  "capture_mode": "text-only (run note; do not publish)"
+}
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+C54 BUILDER REPORT
+1. Role attestation and ablation ID
+Field	Attestation
+Ablation ID	C54
+Owner control	#54 — Builder file-download capture channel (capture-log replay)
+Batch	N16
+Role	Builder — ChatGPT
+Analysis mode	Independent first pass
+Validator	DeepSeek, DeepThink on, Search off
+Adjudicator	Grok, Expert
+Independence	No Validator or Adjudicator assessment consulted
+Constitution	Version 1.0
+Frozen specification	C54 — Ablation specification (FROZEN)
+Test selected	54-B — retrospective capture-log replay
+Live test	54-A — not executed
+Execution environment	Frozen text evidence; no PC execution
+Terminal decision	Not supplied; reserved for Adjudicator
+Attestation: This report independently evaluates the frozen C54 specification, the complete 41-row capture table, the reported scoring results, the supplied scorer source, the quoted coordinator notes, and the preflight evidence.
+The assessment distinguishes independently recomputed quantities from reported quantities and assumptions. It does not treat the scorer's conclusions as proof without examining the underlying capture rows and classification rules.
+The role separation follows Constitution §1. No terminal decision is returned.
+Scope limitation: The original JSONL capture logs and downloaded reply files are not independently available as executable artifacts in this packet. Numerical recomputation therefore uses the complete CSV evidence embedded in the packet, while hash verification and coordinator observations are evaluated as quoted evidence.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS
+2.1 Baseline behavior
+Under the existing capture process:
+1. A chat reply is captured by saving its page, or using the owner-approved text-only capture procedure while Chrome saving is broken.
+2. The reply is extracted.
+3. Extraction completeness is checked using END-line information.
+4. Capture artifacts are hashed and logged under the existing freeze scope.
+5. Incomplete or failed captures remain preserved as evidence.
+The frozen baseline is the N13 capture history comprising 41 extraction-log entries.
+The dependency on control #43 preserves the existing full artifact-freezing and logging requirements.
+2.2 Proposed variant
+C54 proposes adding a UI file download of the reply as a second capture channel on download-capable sites.
+Conceptually:
+Dimension	BASE	VARIANT
+Primary capture	Saved page / currently approved text-only procedure	Existing capture retained
+Additional capture	None	UI-downloaded reply file
+Applicable sites	Existing capture sites	ChatGPT and Grok, by declared premise
+DeepSeek	Existing capture	No additional download, by declared premise
+Extraction verification	END-line and completeness checks	Existing checks retained
+Artifact hashing	Full existing freeze scope	Same scope, including any new file
+Evaluation	Historical capture evidence	Counterfactual replay of failures
+New live chats	None	None
+Actual downloadable files produced	None	None
+The proposed change does not remove a governance safeguard. It adds a second capture channel while retaining the existing capture as a cross-check.
+The proposed mechanism is redundancy: where page capture fails, a file download might preserve an otherwise lost or damaged reply.
+That potential benefit is not equivalent to evidence that a download actually succeeds.
+2.3 Exact seeded code changes
+No seeded code changes exist for C54.
+The SPEC, under FROZEN REFERENCE HASHES → Seed files, explicitly states:
+(none)
+The supplied packet contains no C54 SEED DIFFS section, no patch, and no modified framework files for comparison.
+Therefore:
+Change category	Finding
+Seed files	0 — quoted
+Seeded source-code modifications	0 — quoted from absence of seed files
+Actual replacement of capture implementation	Not performed
+Added production download implementation	Not performed
+Changed governance requirements	None declared
+New fixtures	None
+New analytical data	None
+Counterfactual classification	Performed through the frozen scorer
+The scoring implementation is identified as:
+scorers/score_c54.py
+SHA-256:
+59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86
+The shared library is:
+scorers/n16lib.py
+SHA-256:
+4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47
+These are scoring artifacts, not a seeded implementation of a new download channel.
+2.4 What the replay actually tests
+The replay tests whether the historical logs contain at least one incident satisfying all of the following:
+- A reply-capture failure occurred.
+- Its cause was established as a page-capture problem.
+- It occurred on a site assumed to support downloading.
+- A download would have avoided the failure.
+The replay cannot directly establish that the download mechanism works, that downloaded content is byte-identical to another capture, or that downloads improve capture time.
+Sources: SPEC §§Control under test, Arms, Operational benefit predicate P1, Disclosures and deviations, and FROZEN REFERENCE HASHES. C54_1_BUILDER_ChatGPT.txt
+
+3. Hard mechanical facts table
+3.1 Capture population and arithmetic identities
+The following counts were independently recomputed from the 41 data rows in C54_captures.csv, not accepted solely from the scorer summary.
+Mechanical fact	Value	Status
+Total logged entries	41	Recomputed
+ChatGPT entries	14	Recomputed
+Grok entries	11	Recomputed
+DeepSeek entries	16	Recomputed
+Site-count identity	14 + 11 + 16 = 41	Recomputed
+Download-capable entries, by premise	25	Recomputed
+Not download-capable, by premise	16	Recomputed
+Eligibility identity	25 + 16 = 41	Recomputed
+Incident entries	3	Recomputed
+Entries without incidents	38	Recomputed
+Incident identity	3 + 38 = 41	Recomputed
+Incident rate	7.32%	Recomputed
+Distinct control/file capture keys	38	Recomputed
+Additional log entries for repeated keys	3	Recomputed
+Incidents surviving last-entry selection	3	Recomputed
+Download-capable incident entries	1	Recomputed
+Established avoidable download incidents	0	Recomputed from classification evidence
+Unscored C40 deviations	2	Quoted
+Minimum required logged entries	30	Quoted, frozen SPEC
+Margin over minimum	11 entries	Recomputed
+The capture population is consistent with the scorer's reported totals. C54_1_BUILDER_ChatGPT.txt
+
+The 38 distinct capture keys arise from two repeated keys: C49/reply_deepseek.html appears three times and C40/inc_r2_chatgpt.html appears twice. Removing the three additional entries leaves 38 distinct keys. The scorer's final-entry rule retains the last entry for each key.
+Robustness check: The sample-size requirement remains satisfied using either 41 logged entries or 38 distinct capture keys.
+3.2 Distribution by capture site
+Site	Captures	Incident entries	Nonincident entries	Extracted bytes recorded
+ChatGPT	14	0	14	216,320
+Grok	11	1	10	124,374
+DeepSeek	16	2	14	122,357
+Total	41	3	38	463,051
+All counts and byte sums are recomputed from the CSV.
+The byte total is the sum of available md_bytes fields, not a measure of bytes in actual downloadable files. One DeepSeek incident lacks an md_bytes value. Repeated capture entries also contribute to the total.
+Arithmetic checks:
+- Capture counts: 14 + 11 + 16 = 41.
+- Incidents: 0 + 1 + 2 = 3.
+- Nonincidents: 14 + 10 + 14 = 38.
+- Bytes: 216,320 + 124,374 + 122,357 = 463,051.
+- Download-capable entries: 14 + 11 = 25.
+- Eligible incidents: 0 + 1 = 1.
+These identities reconcile.
+3.3 Incident-by-incident reconstruction
+Incident	Frozen evidence	Cause classification	Eligible for P1?
+C49 / CAPTURE_C49BV / DeepSeek Validator	Reply truncated inside §7; no END line; 12,402 extracted bytes	Incomplete reply established; no demonstrated page-saving failure	No
+C48 / CAPTURE_b5 / Grok AI2	ends_ok=false; extracted reply nevertheless ends at its END line; 4,078 bytes	Contradictory completeness indications; underlying cause not established	No
+C43 / CAPTURE_b6 / DeepSeek Validator	No extraction result; no recorded extracted-byte value	DeepSeek stopped in thinking; incomplete page	No
+Recomputed incident set:
+\[
+I=\{\mathrm{C49/DeepSeek},\ \mathrm{C48/Grok},\ \mathrm{C43/DeepSeek}\}
+\]
+
+\[
+|I|=3
+\]
+
+Download-capable incident set:
+\[
+D=\{\mathrm{C48/Grok}\}
+\]
+
+\[
+|D|=1
+\]
+
+Established avoidable incident set:
+\[
+A=\varnothing
+\]
+
+\[
+|A|=0
+\]
+
+The distinction between \(D\) and \(A\) is decisive. A capture occurring on an eligible site is not automatically an avoidable page-capture failure.
+3.4 Detailed classification
+C49 — DeepSeek Validator
+The coordinator's C49 note establishes that the original Validator reply terminated inside section 7 and lacked the required END line.
+The original capture was frozen as failed evidence; a separate r2 chat produced a complete authoritative reply.
+This supports an incomplete first reply. It does not establish that downloading the original reply would have recovered its missing content.
+Additionally, DeepSeek is declared download-ineligible.
+Classification: Excluded from the avoidable set.
+Evidence: INPUT C49_NOTES.md, Validator harness incident (r1) and r2 rerun; CSV CAPTURE_C49BV / C49 / validator_deepseek.html. C54_1_BUILDER_ChatGPT.txt
+
+C48 — Grok AI2
+The capture table records an incident because the log has ends_ok=false.
+However, the frozen SPEC expressly states that the extracted reply's last line is its END line.
+The packet contains no coordinator explanation establishing whether the incident resulted from the page-saving mechanism, extraction logic, logging, or another cause.
+Grok is assumed download-capable, but that premise alone does not establish that a download would have prevented the problem.
+Classification: Eligible site, unestablished cause; excluded from the avoidable set.
+Evidence: SPEC §Disclosures and deviations, item concerning C48; C54_RESULTS.md Incident entries, row CAPTURE_b5 / C48 / ai2_grok.html; CSV corresponding row. C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+
+C43 — DeepSeek Validator
+The coordinator note establishes that DeepSeek stopped in thinking, the page did not contain a completed answer, and no extraction result was obtained.
+An independent rerun later produced a complete Validator report.
+The failed first attempt does not establish that a download would have recovered the missing reply.
+DeepSeek is also declared download-ineligible.
+Classification: Excluded from the avoidable set.
+Evidence: INPUT C43_NOTES.md, Validator harness incident and r2 rerun; CSV CAPTURE_b6 / C43 / validator_deepseek.html. C54_1_BUILDER_ChatGPT.txt
+
+3.5 Could another entry count?
+No additional entry in the supplied CSV satisfies the frozen incident rule.
+The remaining 38 rows have an empty incident field. The two C40 deviations do not establish a new qualifying reply-capture failure:
+Deviation	Observed issue	P1 treatment
+D-C1	Input backticks became U+001F control characters in a sent message	Input-side issue; not a reply-capture failure
+D-C2	Extraction rendered a ChatGPT code block incorrectly; re-extraction required a tool fix	Extraction-tool issue; not established as avoidable through UI downloading
+The C40 note further reports that the corrected extraction passed its relevant checks. Neither deviation supplies evidence that a downloaded reply would have prevented an established page-capture failure.
+Independent recount conclusion: Exactly three logged incident entries exist; none qualifies as a proven download-avoidable incident under the frozen predicate.
+Evidence: C40_DEVIATION_NOTES_post_2.md, rows D-C1 and D-C2. C54_1_BUILDER_ChatGPT.txt
+
+3.6 Hashes, frozen state, and reproducibility
+Mechanical check	Observed result	Status
+Frozen input files declared	75	Quoted
+Preflight failures	0	Quoted
+Preflight result	PASS	Quoted
+Constitution SHA-256 matches between SPEC, PREFLIGHT, and reference list	Yes	Recomputed by comparing quoted strings
+Scorer SHA-256 matches between SPEC and evidence manifest	Yes	Recomputed by comparing quoted strings
+C43 terminal-state SHA-256 matches between PREFLIGHT and evidence manifest	Yes	Recomputed by comparing quoted strings
+C43 terminal-state content	REVERT	Quoted
+Baseline framework SHA-256 values match between SPEC and baseline hash section	Yes	Recomputed by comparing quoted strings
+Independently calculated hashes of the 75 underlying artifacts	Not available	Not verified
+Actual downloaded-file hash	Not available	Not measured
+Download-versus-page hash equality	Not available	Not measured
+Clean/variant output hash equality	Not applicable	No produced download arm
+The repeated digest values are internally consistent within the packet.
+Important reference hashes:
+Artifact	SHA-256
+Constitution v1.0	e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9
+C43 terminal-state file	0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0
+C54 scorer	59ce70c16eee8b8d3583caf374f894924a73b4cd67800f599eb9cb214db3dd86
+C54 results	d7dcea67edca73804c92a50294a80fd01a8dfc84563e1e15e7e6ea15cfa0e4d4
+C54 capture CSV	e1c52c50e64a52139824dedcf749e647465e5f16e2d1cbb878a64fc5f180c72c
+These are quoted reference hashes, not newly computed digests of accessible underlying files.
+Evidence: FROZEN REFERENCE HASHES, PREFLIGHT, C54_EVIDENCE.sha256, and INPUT C43_TERMINAL_STATE.txt. C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+
+3.7 Nonapplicable analytical identities
+The generic ablation-report instructions mention n_agree + n_disagree = n_inner, portfolio deltas, D-sets, and hash equalities across arms.
+For C54:
+Analytical item	Applicability
+n_agree + n_disagree = n_inner	Not applicable; no R-A/R-B comparison
+Portfolio deltas	Not applicable; no analytical portfolio rerun
+Decision-changing R-field D-set	Not applicable
+Capture-incident D-set	Applicable; computed above
+Baseline versus candidate analytical output hashes	Not applicable
+Frozen input hash comparison	Applicable; reported preflight and reference consistency
+No missing numerical value is replaced with zero.
+
+4. P1 assessment against the frozen predicate in the SPEC
+4.1 Frozen operational predicate
+The SPEC defines three conjunctive conditions.
+Condition	Required evidence	Observed evidence	Assessment
+P1.1	At least one established page-capture failure, on a download-capable site, avoidable through download	0 qualifying incidents	NOT MET
+P1.2	At least 30 logged captures	41 logged entries; 38 distinct capture keys	MET
+P1.3	Dependency #43 terminal state is REVERT, retaining full artifact freeze scope	Frozen file contains REVERT	MET
+Evidence: SPEC §Operational benefit predicate P1 and C54_RESULTS.md Conditions. C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+
+4.2 Condition P1.1
+This condition requires more than a malformed or incomplete capture.
+It requires an established page-capture cause and a justified conclusion that downloading would have prevented it.
+The three incidents separate as follows:
+- Two incidents occurred on DeepSeek, which is download-ineligible by the frozen premise.
+- One incident occurred on Grok, but its underlying cause is unestablished.
+- No ChatGPT capture is marked as an incident.
+Therefore the required qualifying incident is absent.
+P1.1 = NOT MET.
+4.3 Condition P1.2
+The CSV contains 41 logged entries.
+\[
+41\geq30
+\]
+
+Even when repeated control/file entries are collapsed:
+\[
+38\geq30
+\]
+
+The condition does not depend on counting repeated log entries as distinct captures.
+P1.2 = MET.
+4.4 Condition P1.3
+The frozen C43_TERMINAL_STATE.txt contains:
+REVERT
+Under the C54 SPEC, this is the required dependency state for preserving the full freeze scope.
+This condition establishes the intended governance dependency; it does not demonstrate successful hashing of files from a new download channel, since none were produced.
+P1.3 = MET.
+4.5 Predicate-level finding
+With the conditions evaluated conjunctively:
+\[
+P1=P1.1\land P1.2\land P1.3
+\]
+
+\[
+P1=\text{false}\land\text{true}\land\text{true}
+\]
+
+Mechanical benefit predicate P1: NOT MET.
+This is a predicate finding only, not a terminal adjudication state.
+The absence of qualifying historical evidence is not proof that a download channel could never be useful. It means the frozen retrospective evidence does not demonstrate the specifically required benefit.
+
+5. Fixture and reconciliation implications
+Not applicable. N16 performs a text-only capture-log replay and does not execute R, SQL, the Chicago analytical engine, or a behavioral fixture suite.
+5.1 Text-level equivalents
+The relevant deterministic checks are:
+Check	Finding
+Capture CSV fully enumerated	41 rows
+Per-site counts reconciled	14 + 11 + 16 = 41
+Incident counts reconciled	3 incidents + 38 nonincidents = 41
+Download eligibility reconciled	25 eligible + 16 ineligible = 41
+Duplicate capture-key behavior reviewed	41 rows reduce to 38 keys
+Incident last-entry rule checked	All 3 incidents survive
+Cause-classification check	No qualifying avoidable incident
+C43 dependency checked	Frozen state is REVERT
+Frozen hash preflight	Reported PASS, 0 failures
+Download-file byte equality	Not measured
+5.2 Reconciliation boundaries
+No comparison can be made between an actual downloaded reply and its page-captured equivalent because the replay did not create a downloaded reply.
+Similarly, there are no R-A/R-B results, intermediate analytical states, denominators, numerators, portfolio metrics, or source-row transformations to reconcile.
+The frozen Chicago analytical material is evidence provenance, not material recomputed by C54.
+5.3 Constitution §7 implications
+Conditions concerning exact analytical reconciliation and mandatory analytical fixtures are expressly excluded by the frozen SPEC for this text-only control.
+The remaining relevant protections include evidence completeness, role separation, predeclared predicate application, frozen-input integrity, and absence of undeclared semantic changes.
+The packet provides a quoted preflight success, a frozen scorer, a complete capture table, and coordinator-note explanations. Independent reproduction from the underlying original JSONL files is outside the provided executable evidence.
+
+6. Semantic/regression risks and unchanged surfaces
+6.1 Semantic risks
+Risk	Evidence or mechanism	Assessment
+Unverified download availability	ChatGPT and Grok download capabilities are premises	Empirical uncertainty
+Unverified prevention of failure	No actual download channel exercised	Benefit not independently demonstrated
+Grok END-flag inconsistency	C48 has ends_ok=false despite an END-terminated extracted reply	Unresolved classification cause
+Incomplete reply confused with page-capture failure	C43 and C49 concern DeepSeek outputs that were not completed	Must not assume download recoverability
+Potential capture-key collision	Last-entry selection uses control and basename	No observed predicate change; future naming changes could affect deduplication
+Extraction-tool behavior	C40 D-C2 required a tool correction	Preserve distinction between page and parser failures
+Sample composition	Historical N13 captures, not a randomized live comparison	Limits generalization
+Unmeasured operational cost	Download time and additional failure modes not observed	No supported efficiency claim
+6.2 Frozen scorer inspection
+The supplied scorer source performs the principal mechanical operations transparently:
+1. Reads extraction-log entries.
+2. Classifies incidents using missing extraction results or END-check failures.
+3. Retains the final entry per capture key for determining whether incidents persist.
+4. Assigns known coordinator-note classifications.
+5. Restricts potential download avoidance to ChatGPT and Grok.
+6. Evaluates the three frozen predicate conditions.
+The scorer's est classification is keyed to the control identifiers C43 and C49.
+Those controls are both associated with DeepSeek incidents. Consequently, the classification cannot generate a qualifying download-capable incident in the observed dataset.
+The scorer excludes C48 because its cause is not established.
+That treatment agrees with the stated frozen rule.
+Residual implementation concern: The scorer's cause classification is control-specific rather than a general inference from each raw incident and its individual note. This is adequate for the enumerated historical entries, but extending the scorer to new captures without revising that mapping could misclassify future evidence.
+Evidence: SCORER SOURCE score_c54.py, especially incident detection, last-entry selection, and classification logic. C54_1_BUILDER_ChatGPT.txt
+
+6.3 Freeze chronology observation
+The packet gives:
+- Scorer results generation: 2026-10-09 02:21:36 CT.
+- N16 preflight report: 2026-10-09 02:21:42 CT.
+The quoted preflight timestamp is six seconds after the scorer result timestamp.
+This establishes that the displayed preflight record was produced after the displayed scoring result. It does not establish that the inputs changed, and the subsequent preflight reports zero failures.
+The exact ordering of any other pre-execution verification is not demonstrated by these timestamps. This should remain an audit-trail observation rather than an invented input-integrity failure.
+6.4 Regression and unchanged surfaces
+Surface	Expected	Evidence-supported finding
+Three-AI measurement framework	Unchanged	Frozen hash reference retained
+Three-AI validation framework	Unchanged	Frozen hash reference retained
+Constitution v1.0	Unchanged	Matching quoted reference hashes
+Stage 1 Start	Unchanged	No execution or modification
+Stage 2 Framing	Unchanged	No execution or modification
+Stage 3 Design	Unchanged	No execution or modification
+Stage 4 analytical execution	Unchanged	No execution or modification
+Stage 5 Finish	Unchanged	No execution or modification
+SQL Source/Query Gates	Unchanged	Not executed
+Independent R-A/R-B paths	Unchanged	Not executed
+Existing capture freeze scope	Retained	C43 dependency state established
+Frozen N13 capture evidence	Read-only	Preflight reports hash integrity
+N16 variant implementation	None	Replay only
+No analytical-output regression is demonstrated, but neither is a fresh analytical regression test performed.
+6.5 Coordinator finding N1 / OF-1
+The coordinator note identifies three frozen Chicago ESCALATE records where clean R-A and R-B clock values differ by exactly 1.000 hour during the daylight-saving fall-back interval.
+The note identifies the differing repeated-hour interpretation in base R and lubridate.
+C54 does not run either path, does not modify the frozen Chicago dataset, and derives its results from capture logs and coordinator notes.
+Therefore N1 / OF-1 does not enter the C54 counts or P1 computation.
+This is a scope exclusion, not a claim that the original clock discrepancy has been resolved.
+
+7. Claim → evidence map
+Claim	Evidence section and exact row or location	Evidence type
+C54 is owner control #54 in batch N16	SPEC Ablation ID and Batch	Quoted
+Owner authorized 54-B replay and deferred live 54-A	SPEC Definitions and approval	Quoted
+Capture change adds a download channel without removing existing capture	SPEC Control under test	Quoted
+No seed files exist	SPEC FROZEN REFERENCE HASHES → Seed files, (none)	Quoted
+There are 41 logged entries	C54_captures.csv, all rows from ADJ_GROK_B4 / C51 through CAPTURE_b6b_fix / C40	Recomputed
+There are 14 ChatGPT captures	CSV, all rows with site=chatgpt	Recomputed
+There are 11 Grok captures	CSV, all rows with site=grok	Recomputed
+There are 16 DeepSeek captures	CSV, all rows with site=deepseek	Recomputed
+Site totals reconcile to 41	CSV, all 41 data rows	Recomputed
+Download-capable captures number 25	CSV, all ChatGPT and Grok rows; SPEC download-site premise	Recomputed against premise
+Incident count is 3	CSV rows CAPTURE_C49BV/C49, CAPTURE_b5/C48, and CAPTURE_b6/C43	Recomputed
+All three incidents survive final-entry selection	Same three CSV rows; SCORER SOURCE last-entry key logic	Recomputed
+C49 original Validator capture is incomplete	INPUT C49_NOTES.md, r1 harness incident; CSV CAPTURE_C49BV / C49 / validator_deepseek.html	Quoted and cross-checked
+C43 original Validator capture is incomplete	INPUT C43_NOTES.md, r1 harness incident; CSV CAPTURE_b6 / C43 / validator_deepseek.html	Quoted and cross-checked
+C48 Grok cause is unestablished	SPEC Disclosures and deviations; C54_RESULTS.md Incident entries, CAPTURE_b5 / C48 / ai2_grok.html	Quoted and assessed
+No other capture row is marked incident	CSV, all remaining 38 rows	Recomputed
+C40 deviations are not scored as reply-capture failures	INPUT C40_DEVIATION_NOTES_post_2.md, D-C1 and D-C2	Quoted and classified
+No qualifying avoidable incident exists	All three incident rows; coordinator notes; frozen download premise	Independently assessed
+Logged sample threshold is satisfied	CSV total 41; SPEC P1 condition 2 requiring 30	Recomputed
+C43 dependency is satisfied	INPUT C43_TERMINAL_STATE.txt, sole content REVERT; SPEC P1 condition 3	Quoted
+Preflight reports no failures	PREFLIGHT, final row PREFLIGHT PASS failures: 0	Quoted
+Constitution and scorer hashes are internally consistent	SPEC hashes, PREFLIGHT, FROZEN REFERENCE HASHES, C54_EVIDENCE.sha256	String comparison
+Live download byte identity is unknown	SPEC Disclosures and deviations; C54_RESULTS.md replay limitation	Quoted
+Predicate P1 is not met	SPEC P1 conditions; reconstructed incident and eligibility sets	Derived
+N1 / OF-1 cannot affect C54 calculations	COORDINATOR NOTE N1 / OF-1; SPEC frozen data scope	Scope assessment
+Principal supporting evidence spans the CSV, SPEC, coordinator notes, and scorer source. C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+ C54_1_BUILDER_ChatGPT.txt
+
+Final Builder findings
+The independent reconstruction agrees with the central numerical results in C54_RESULTS.md:
+- 41 logged captures.
+- 25 captures on sites assumed to support downloading.
+- 3 logged capture incidents.
+- 3 incidents remaining after last-entry selection.
+- 1 incident on a download-capable site.
+- 0 incidents with both an established qualifying cause and supported download avoidability.
+- 2 of the 3 P1 conditions satisfied.
+There is no evidence-supported basis to promote the C48 Grok incident into the avoidable set. Nor can the two DeepSeek incidents be treated as avoidable under the declared download-availability premise.
+The frozen evidence therefore supports P1 NOT MET, while leaving actual download effectiveness, byte identity, operational cost, and new failure modes unmeasured.
+No terminal adjudication state is provided. The independent Validator and Adjudicator must apply their assigned responsibilities under the frozen constitution.
+END C54 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID
+Role: Validator only (DeepSeek, DeepThink on, Search off). I am blind to the Builder; I have not seen and must not ask for its output.
+Ablation ID: C54. Batch: N16.
+I do not return KEEP, REVERT or HALT. No terminal state is issued here.
+
+2. Independent test plan: what I checked, and how
+I checked the frozen packet as follows:
+
+Counted every row in C54_captures.csv and grouped by log, control, file, site, md_bytes, and incident text.
+
+Recomputed the number of log entries, incident entries, incidents still present in the final entry for the same capture path, download-capable captures, and avoidable incidents.
+
+Inspected scorers/score_c54.py to see the declared incident rule and the exact mechanical form of P1 conditions 1–3.
+
+Compared the scorer’s counts and condition table against the raw C54_captures.csv table.
+
+Checked each incident against the quoted coordinator notes: C43_NOTES.md, C49_NOTES.md, and the C48 disclosure in the SPEC.
+
+Checked site classification: ChatGPT, Grok, or DeepSeek.
+
+Checked the frozen dependency C43_TERMINAL_STATE.txt.
+
+Compared the listed SHA-256 values across the SPEC, preflight, and evidence list for all files cited in this packet.
+
+Checked for duplicate capture paths and how the scorer handles them.
+
+Fixture and reconciliation items: not applicable to N16. Reason: no R run, no fixture, no MySQL, no fresh pull. Text-level equivalent: all mechanical numbers in this packet were produced from frozen text inputs by the quoted scorer, with no PC execution.
+
+3. Independently recomputed hard facts
+3.1 Counts from C54_captures.csv
+Fact	Recomputed value	Basis
+Total log entries	41	Row count of C54_captures.csv
+ChatGPT captures	14	Rows with site chatgpt
+Grok captures	11	Rows with site grok
+DeepSeek captures	16	Rows with site deepseek
+Download-capable captures (ChatGPT + Grok)	25	14 + 11
+Incident entries	3	Rows with non-empty incident field
+Incidents still in final entry for that capture	3	No incident row is superseded by a later non-incident row for the same (control, file) path
+Avoidable incidents	0	No incident has both an established page-capture cause and a download-capable site
+3.2 Incident classification
+Log	Control	File	Site	Incident	Cause established?	Download-capable?	Avoidable?
+CAPTURE_C49BV	C49	validator_deepseek.html	deepseek	reply did not end at END line	Yes, per C49_NOTES.md	No	No
+CAPTURE_b5	C48	ai2_grok.html	grok	reply did not end at END line	No, per SPEC disclosure	Yes	No
+CAPTURE_b6	C43	validator_deepseek.html	deepseek	no extraction result	Yes, per C43_NOTES.md	No	No
+Avoidable incident count is therefore 0.
+
+3.3 P1 condition recomputation
+P1 condition	Scorer result	My recomputation	Basis
+1. At least one reply-capture failure, established page-capture cause, download-capable site, avoidable by download	NOT MET	NOT MET	0 avoidable incidents
+2. At least 30 logged captures	MET	MET	41 log entries ≥ 30
+3. Dependency #43 terminal-state value is the required one	MET	MET	C43_TERMINAL_STATE.txt content matches the required value
+Overall mechanical P1	NOT MET	NOT MET	Condition 1 not met
+3.4 Hash and identity checks
+I compared the hashes available in this packet:
+
+C54_RESULTS.md: SPEC value d7dcea67… matches the evidence-list value d7dcea67….
+
+C54_captures.csv: SPEC value e1c52c50… matches the evidence-list value e1c52c50….
+
+scorers/score_c54.py: SPEC value 59ce70c1… matches the evidence-list value 59ce70c1….
+
+scorers/n16lib.py: listed in the SPEC as 4a6675fa…; no source content is included in this packet.
+
+All 14 extraction-log hashes listed in C54_EVIDENCE.sha256 match the corresponding preflight hashes.
+
+C43_TERMINAL_STATE.txt: preflight hash 0bce0104… matches the evidence-list hash 0bce0104….
+
+C43_NOTES.md: preflight hash cc63489f… matches the evidence-list hash cc63489f….
+
+C49_NOTES.md: preflight hash 53acc338… matches the evidence-list hash 53acc338….
+
+C40_DEVIATION_NOTES_post_2.md: preflight hash 8bea7195… matches the evidence-list hash 8bea7195….
+
+No hash mismatch was found among the values that appear in more than one place in this packet.
+
+3.5 Internal consistency of runner output
+No contradiction was found between C54_RESULTS.md, C54_captures.csv, and the scorer source.
+
+One definitional note: C54_captures.csv has 41 log entries, but two (control, file) paths appear more than once:
+
+C49 reply_deepseek.html under CAPTURE_b6 appears twice.
+
+C40 inc_r2_chatgpt.html appears under CAPTURE_b6b and CAPTURE_b6b_fix.
+
+The number of distinct (control, file) pairs is therefore 39. The scorer labels the count as “41 log entries,” not “41 distinct captures.” Even using the deduplicated count, condition 2 would still be MET because 39 ≥ 30. No incident is affected by the duplicate paths. This is a non-blocking definitional note, not an internal contradiction.
+
+3.6 Portfolio deltas, D-sets, cross-arm equalities
+No portfolio deltas or D-sets are present in this C54 packet. The only dependency-set item used by P1 is dependency #43, and its frozen terminal-state file is present and matches the required value. Cross-arm hash equalities available in the packet were checked as above; all matched.
+
+4. Facts that cannot be recomputed from this packet
+The exact raw JSONL contents of the 14 extraction logs.
+
+The source content of scorers/n16lib.py.
+
+The omitted origin-hash lines from preflight.
+
+SPEC_FREEZE_N16.sha256 itself.
+
+Byte-identity of a downloaded reply versus the saved page capture.
+
+Intake minutes for any capture.
+
+Whether the ChatGPT and Grok UIs actually offer a file download of a reply; this is a declared premise.
+
+Whether a UI file download would in fact have avoided the C48 Grok incident.
+
+The exact cause of the C48 Grok ends_ok=false entry.
+
+Whether any entry other than the three listed would count as an incident under a different cause interpretation.
+
+Actual SHA-256 values for files not listed in the packet.
+
+5. P1 assessment against the frozen predicate in the SPEC
+Facts only:
+
+Condition 1: NOT MET. No incident has both an established page-capture cause and a download-capable site. The C49 and C43 incidents are on DeepSeek; the C48 incident is on Grok but its cause is not established.
+
+Condition 2: MET. There are 41 log entries, which is ≥ 30.
+
+Condition 3: MET. The frozen dependency #43 terminal-state file contains the required value.
+
+Mechanical P1 result in C54_RESULTS.md: NOT MET.
+
+I issue no terminal state.
+
+6. Blocking objections
+None.
+
+Non-blocking observations:
+
+The text-only capture mode and absence of a live 54-A download test are declared in the SPEC. They limit what can be measured but do not invalidate the replay conditions as written.
+
+The duplicate (control, file) paths in C54_captures.csv do not change any condition because the deduplicated count is still ≥ 30 and no duplicate path is an incident.
+
+The scratch-run adjustment declared in the SPEC is disclosed; it does not create a hidden predicate change in the reporting run.
+
+7. Claim → evidence map
+Claim	Evidence
+Total log entries = 41	C54_captures.csv row count
+Incident entries = 3	C54_captures.csv non-empty incident rows
+Incidents still in final entry for that capture = 3	No incident row is superseded by a later non-incident row for the same (control, file) path
+Download-capable captures = 25	14 ChatGPT rows + 11 Grok rows in C54_captures.csv
+Avoidable incidents = 0	Incident table; C49/C43 are DeepSeek; C48 cause not established
+Condition 1 NOT MET	0 avoidable incidents
+Condition 2 MET	41 ≥ 30
+Condition 3 MET	C43_TERMINAL_STATE.txt content matches the required value
+Mechanical P1 NOT MET	C54_RESULTS.md; independently recomputed condition table
+C43 dependency state present	C43_TERMINAL_STATE.txt, preflight hash 0bce0104…, evidence hash 0bce0104…
+C49 cause established	C49_NOTES.md; preflight hash 53acc338…; evidence hash 53acc338…
+C43 cause established	C43_NOTES.md; preflight hash cc63489f…; evidence hash cc63489f…
+C48 cause not established	SPEC disclosure; C54_RESULTS.md incident explanation
+Hash consistency	SPEC, preflight, and C54_EVIDENCE.sha256 values compared; no mismatch found
+Fixture/reconciliation not applicable	N16 text-only, no R run, no fixture, no MySQL, no fresh pull
+END C54 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C54 ADJUDICATION'.

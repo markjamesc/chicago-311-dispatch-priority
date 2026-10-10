@@ -1,0 +1,2 @@
+arm,exit,status,full_packet_bytes,delta_packet_bytes,delta_over_full,unchanged_inputs,unchanged_listed_by_hash,revised_text_verbatim
+STATIC,0,PASS,58214,18691,0.3211,13,13,TRUE

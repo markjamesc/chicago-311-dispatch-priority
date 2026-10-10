@@ -1,0 +1,8 @@
+# C26 re-adjudication record (N15 REAJ). Written 2026-10-03 10:12 CDT by the coordinator; the state line is in TERMINAL_STATE.txt (written by runner/record_terminal.R on PC DESKTOP-RPECRM9, 10:09 CDT, exit 0).
+re-adjudication terminal state : REVERT  (on-screen verdict REVERT; match)
+supersedes                     : HALT-INCOMPLETE (N15 b1, packet defect PD-1; ../../C26/TERMINAL_STATE_NOTE.txt, kept unchanged)
+packet                         : C26_3_ADJUDICATOR_Grok_REAJ.txt sha256 3803bf200f22c9da012af84d5c5cbb63152ecf0e0c4022662002e32306d2aab0 (REAJ_FREEZE.sha256)
+saved page                     : C26-adjudicator-reaj/adjudicator_grok.html sha256 a0e17a6dd87e512001be7424ab7a7a0760ec3af2f856ea41a2f765042901a160 (1 Grok turn)
+raw (turn 1)                   : C26-adjudicator-reaj/adjudicator_raw.md sha256 756b25c9bd66cd2e129c2a407bbd607a4351040f21f40593364cba5dd56368cc
+record_terminal.R input copy   : C26-adjudicator/adjudicator_raw.md (byte-identical copy of the raw; the tool only reads <CID>-adjudicator/adjudicator_raw.md)
+Grok one-line reason           : "The frozen source checksum is not removable on this pack, because a one-row timestamp edit changes a locked duration field and still clears exit, fixtures, and frozen key/label recon." (P1 fails: H \ D_abl = {S_ONEROW})

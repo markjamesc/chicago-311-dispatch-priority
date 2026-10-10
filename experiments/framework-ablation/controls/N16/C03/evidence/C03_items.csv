@@ -1,0 +1,15 @@
+item,checklist,found_in,union,in_cross_review,class
+1,lock candidate = B-leaning hybrid (TCD-IG),-,NO,yes,SYNTHESIS-ONLY
+2,"single knob kappa, default 2.0, grid 1/1.5/2/3",B,yes,yes,pre-review
+3,"method constants W=365d, n_min=50",B,yes,yes,pre-review
+4,first-pass window = snapshot as-of T,ABD,yes,yes,pre-review
+5,Open = locked Open-token list,ABD,yes,yes,pre-review
+6,Open + parseable CLOSED_DATE -> INCONCLUSIVE,ABD,yes,yes,pre-review
+7,exclude DUPLICATE / LEGACY_RECORD true-like; type_key; CREATED_DATE <= T,BD,yes,yes,pre-review
+8,unresolved PARENT_SR_NUMBER -> INCONCLUSIVE,BD,yes,yes,pre-review
+9,lock date-parse + timezone rule,D,yes,yes,pre-review
+10,open_age_h diagnostic only,B,yes,yes,pre-review
+11,"peer P75 labelled empirical, not City SLA",B,yes,yes,pre-review
+12,fixture outline F01-F14 (esp. F03),B,yes,yes,pre-review
+13,capacity/ranking out of Stage 3; excess ESCALATE returns to Framing,ABD,yes,yes,pre-review
+14,SQL may emit peer aggregates; SQL must not emit labels,B,yes,yes,pre-review

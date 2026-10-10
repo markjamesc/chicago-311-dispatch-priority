@@ -1,0 +1,16 @@
+{
+  "ablation_id": "C49",
+  "frozen_at_ct": "2026-10-03 12:47:03 CDT",
+  "records": [
+    {"id": "DS_ZIP_reply", "path": "C49/C49-DS_ZIP/reply.md", "bytes": 1842, "sha256": "434ead16128d6b32346a6a5febc0f944477c1d8c15a5a2b6156e75fc67157ca6"},
+    {"id": "DS_ZIP_times", "path": "C49/C49-DS_ZIP/TIMES.txt", "bytes": 841, "sha256": "8b2b645eab7818ee25cfb3827c2d1061bc2265c37651c3aeb11b7844c607e7d5"},
+    {"id": "DS_ZIP_packet", "path": "C49/packets/C49_R_DS_ZIP.txt", "bytes": 2843, "sha256": "158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1"},
+    {"id": "DS_FILES_reply", "path": "C49/C49-DS_FILES/reply.md", "bytes": 2596, "sha256": "f6e0a1f79a95ad566df9511366f5d5a021947d0e59cd11ca5218b22f663b074f"},
+    {"id": "DS_FILES_times", "path": "C49/C49-DS_FILES/TIMES.txt", "bytes": 60, "sha256": "689612cf41574f755342ab8c2bd3a91f5d0997263b49c00bd6f9bca457c7ef58"},
+    {"id": "DS_FILES_packet", "path": "C49/packets/C49_R_DS_FILES_PD3.txt", "bytes": 2816, "sha256": "89ac5ab586f1daab8d4cbfa8c4819ebb1f2bf764d232773f769cc3c6afed0aba"},
+    {"id": "GPT_FILES_reply", "path": "C49/C49-GPT_FILES/reply.md", "bytes": 3724, "sha256": "94cab4c78cb7760d3a557179579def0409d1ef6faf0c0c45294c31dac2aff740"},
+    {"id": "GPT_FILES_times", "path": "C49/C49-GPT_FILES/TIMES.txt", "bytes": 871, "sha256": "927e813d535df3bfd7ccbdcd302addf2b494584b011bbc3f8da428a399ea2dcf"},
+    {"id": "GPT_FILES_packet", "path": "C49/packets/C49_R_GPT_FILES.txt", "bytes": 2821, "sha256": "bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2"}
+  ]
+}
+

@@ -1,0 +1,5 @@
+label,attention_slots,escalate_n,coverage,note
+illustrative_shift_50,50,131968,0.00037887972841901065,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+illustrative_shift_200,200,131968,0.0015155189136760426,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+illustrative_shift_1000,1000,131968,0.0075775945683802136,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap

@@ -1,0 +1,9 @@
+# N13 b5 + C42 Grok adjudicator packets, assembled on PC DESKTOP-RPECRM9 with runner/assemble_adjudicator.R (sha 1327ff98…) 11:21 CDT from HEADs (PACKETS_b5.sha256 / PACKETS_C42.sha256) + frozen reports (CAPTURE_FREEZE_b5.sha256); box copies byte-identical; each = HEAD + FREEZE RECORD + both reports verbatim (checked)
+2e1c87f3b20fbd38fdc9782e73a51c870f4f9b6556395c85dcf55ca94d6777b6  C41/packets/C41_3_ADJUDICATOR_Grok.txt
+2e75711aeb8d18c7e290fe9d4e4b8fa3befe7129e37dfb73f9f1fa371dbb7b12  C41/EVIDENCE_FREEZE.json
+671aaa12072a2ae576c3f0e338c56dcb14a14a3d0121fad042783cd2fbb07bb9  C47/packets/C47_3_ADJUDICATOR_Grok.txt
+6f5ddba7c7ca406b6f9fd0280df5bc60a64acdeb31ed50fa1ed4559cb8f31a7a  C47/EVIDENCE_FREEZE.json
+4bcfd8372d879ef5c91110d7b521b0f50a526421f061b2fa95f394914e85856f  C53/packets/C53_3_ADJUDICATOR_Grok.txt
+b7adb56e04e46dffebd41cd70fedff7f88bc2025f1ed6f845f870df4f9123da5  C53/EVIDENCE_FREEZE.json
+555bb43651cbb0f46b5e69d6bd2eb93e4bcd968369b6d0fba6abd5e418b6cb85  C42/packets/C42_3_ADJUDICATOR_Grok.txt
+c2068118f0a8f9edd0de2623292bb81cddec9b35d0b414bc17c217fd111792ae  C42/EVIDENCE_FREEZE.json

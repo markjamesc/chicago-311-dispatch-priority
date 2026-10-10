@@ -1,0 +1,4 @@
+PD-3 rerun record (2026-10-03). reply.md and TIMES.txt are byte-identical copies of C49/C49-DS_FILES_PD3/reply.md and TIMES.txt
+(capture C49/C49-DS_FILES_PD3/reply_deepseek.html, frozen in CAPTURE_FREEZE_b6b.sha256; chat https://chat.deepseek.com/a/chat/s/2bfdcf06-8c20-4656-abbd-e89c99776213; 11/11 chips before send).
+The original DS_FILES record (SHA256SUMS not delivered) was moved, not deleted, to C49/_superseded_PD3/C49-DS_FILES/ (hashes in CAPTURE_FREEZE_b6.sha256).
+They are copied here because c49_score.R and assemble_b6_bv.R read C49/C49-<arm>/. See C49/DEVIATION_NOTES_post.md (PD-3).

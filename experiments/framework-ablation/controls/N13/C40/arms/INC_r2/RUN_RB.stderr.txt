@@ -1,0 +1,16 @@
+[R-B] project root: C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/INC_r2
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/INC_r2/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03→STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+[R-B] open n=245193 peer types=104
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/INC_r2/R-B/outputs/RB_classifications.csv (n=222002)
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/INC_r2/R-B/outputs/RB_portfolio_counts.csv (n=1)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/INC_r2/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+[R-B] done mode=all

@@ -1,0 +1,713 @@
+# C27 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Fixtures on Both Paths (catalog #27) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C27 ADJUDICATION
+
+---
+# SPEC
+# C27 — Ablation specification (FROZEN)
+
+**Ablation ID:** C27 (owner Remaining Ablation Program, catalog #27 "Fixtures on Both Paths")
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 03:32 CT)
+**Target stage:** Stage 4 (fixture execution before production is trusted)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Both R-A and R-B must pass all 14 locked fixtures before their production outputs are trusted.
+
+## Exact change being tested (ablation)
+Only R-A must pass fixtures. R-B's fixture result is ignored, and R-B production is trusted if exact recon against R-A is clean (n_only_ra = n_only_rb = n_disagree = 0) and the run exits 0.
+
+## Seeded defects (frozen before execution)
+There are 9 single-rule deletions in R-B `20_integrity_and_classify.R`, one per fixture-protected rule. They were chosen by rule coverage, not by production impact:
+- M01 κ rule uses p50 instead of p75
+- M02 I01 deleted
+- M03 I02 mod<created deleted
+- M04 I04 thin peer deleted
+- M05 DUPLICATE exclusion deleted
+- M06 LEGACY exclusion deleted
+- M07 I05 parent deleted
+- M08 not-Open exclusion deleted
+- M09 I02 missing-CREATED deleted
+Files and SHA-256 are in `runner/SEEDS.sha256`; diffs are in `runner/SEED_DIFFS.txt`. A clean arm B (frozen R-A + frozen R-B) is the reference. Each mutant R-B is run in full: fixtures plus production.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14.
+
+## Critical reconciliation fields (hard mechanical)
+SR_NUMBER key set; n_ra, n_rb, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree; row-level classification; per-mutant R-B fixture pass count and failed IDs; exit codes.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the new work folder `...\ablation-runs\C27_C33`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures.
+
+## Expected unchanged surfaces
+SQL/Source Gate; TCD-IG rules; fixture expecteds; R-A code; SR_NUMBER grain; the frozen Chicago 311 pack.
+
+## Operational benefit predicate P1 (owner doc #27 thresholds, operationalized)
+Owner doc thresholds: "Pass: All fixtures passed on both. Fail: A disparity or single-sided fix occurs (keep rule)."
+Definitions:
+- **D_fix:** mutants detected under the baseline regime (R-B fixtures < 14/14, or a crash).
+- **D_abl:** mutants detected under the ablated regime (recon only/disagree > 0, or a crash).
+Outcomes:
+- **P1 satisfied:** D_fix ⊆ D_abl. Skipping the second path's fixtures loses no detection on this pack.
+- **P1 failed:** D_fix \ D_abl is non-empty. At least one defect is visible only to the second path's fixtures, a single-sided disparity that the ablated regime would trust.
+Mutants caught by neither regime are reported. They do not count for or against P1.
+
+## Regression / HALT rules
+- HALT if clean arm B does not reproduce the frozen pack: label diffs or only-rows ≠ 0 vs the frozen RA/RB classifications, recon not 0/0/0, or fixtures not 14/14 on both paths.
+- HALT if any mutant run is missing, or if Builder and Validator disagree on a hard number in `C27_RESULTS.md`.
+- Byte-hash equality with the 2026-09-19 outputs is INFO only (R 4.6.1 vs 4.5.1).
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C27_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C27 RESULTS — Fixtures on Both Paths ablation (runner output, mechanical facts only)
+
+Baseline regime: both R-A and R-B must pass the 14 fixtures before production is trusted. Ablated regime: only R-A's fixtures run; R-B is trusted if exact recon vs R-A is clean.
+Seeds: 9 single-rule deletions in R-B 20_integrity_and_classify.R, one per fixture-protected rule (frozen before the run; see seed diffs).
+
+## Mechanical facts
+- H1 clean arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 clean arm reproduces frozen labels and recon 0/0/0: TRUE
+- H3 all 9 mutant runs present (exit recorded): TRUE
+- H4 D_fix (caught by R-B's own fixtures = baseline regime): {M01,M02,M04,M05,M06,M07,M08}
+- H5 D_abl (caught with R-B fixtures skipped: R-A fixtures + exact recon vs R-A, or crash): {M01,M04,M05,M06}
+- H6 D_fix minus D_abl (defects only the second-path fixture run catches): {M02,M07,M08}
+- H7 caught by neither regime: {M03,M09}
+
+## Clean arm repro vs frozen pack
+| cmp | n_x | n_truth | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | max_abs_d_dormant_h | max_abs_d_open_age_h |
+|---|---|---|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+## Clean arm recon
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_agree | n_disagree |
+|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+
+## Mutants
+| mutant | rule_removed | exit | rb_fixtures | rb_fixtures_failed | recon_n_rb | recon_only_ra | recon_only_rb | recon_disagree | prod_rows_changed_vs_clean_RB | detected_baseline_regime | detected_ablated_regime |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| M01 | kappa rule uses peer p50 instead of p75 (F01-F03,F10,F11) | 0 | 12/14 | F03;F10 | 222002 | 0 | 0 | 16973 | 16973 | TRUE | TRUE |
+| M02 | I01 Open+CLOSED_DATE contradiction deleted (F04) | 0 | 13/14 | F04 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M03 | I02 mod<created sub-clause deleted (F05) | 0 | 14/14 |  | 222002 | 0 | 0 | 0 | 0 | FALSE | FALSE |
+| M04 | I04 thin peer_n<n_min deleted (F06) | 0 | 13/14 | F06 | 222002 | 0 | 0 | 6377 | 6377 | TRUE | TRUE |
+| M05 | DUPLICATE exclusion deleted (F07) | 0 | 13/14 | F07 | 245014 | 0 | 23012 | 0 | 23012 | TRUE | TRUE |
+| M06 | LEGACY_RECORD exclusion deleted (F08) | 0 | 13/14 | F08 | 222176 | 0 | 174 | 0 | 174 | TRUE | TRUE |
+| M07 | I05 PARENT_SR_NUMBER clause deleted (F09) | 0 | 13/14 | F09 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M08 | not-Open exclusion deleted (F12) | 0 | 13/14 | F12 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M09 | I02 unparseable/missing CREATED sub-clause deleted (F13) | 0 | 14/14 |  | 222002 | 0 | 0 | 0 | 0 | FALSE | FALSE |
+
+
+---
+# C27_EVIDENCE.sha256
+0f442c32ccfbb0419cf6981786db85d00bfe646d0ea46e049ec9009177225547  C27_ARM_MANIFESTS.txt
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  C27_baseline_recon.csv
+954bc0059e9e2a40ba00e0ae6548389036ce96e4ea2661a925b3038073553f71  C27_mutants.csv
+457cf6a573674c40ab47d01081b51627854934aabbec7fee986025bae40c5f93  C27_repro.csv
+122196bf5859163ebc9f1a8fd687d26db6fafb4295a7ed31ae9f798b1687c676  C27_RESULTS.md
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C27",
+  "frozen_at_ct": "2026-10-03 04:18:01 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C27/C27-builder/builder_report.md", "bytes": 17478, "sha256": "040e6c2e035f6b3eed8a5ae1bfe355af860021a49871122a6b899c82be8bfd53", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C27/C27-validator/validator_report.md", "bytes": 11517, "sha256": "084f9c762f341be0d3f5030aff01bc356adf7853864c52215eb08aafe1eafccd", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "6141017d4f093701a212cf1c871a6615f9452c5cad579576394c5348855c7cad"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+## 1. Role attestation and ablation ID.
+
+I am acting as **Builder only** for **C27, catalog #27 “Fixtures on Both Paths.”** This is an independent first pass, blind to the Validator. I am not acting as Validator or Adjudicator and provide no adjudication state. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; Constitution version 1.0; target stage is Stage 4.  [source: C27_1_BUILDER_ChatGPT]
+
+The frozen baseline framework hashes are:
+
+| Artifact | SHA-256 | Status |
+| --- | --- | --- |
+| `three-ai-measurement-design-framework.md` | `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c` | Quoted |
+| `three-ai-validation-and-analysis-framework.md` | `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e` | Quoted |
+
+The frozen data pack is Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.  [source: C27_1_BUILDER_ChatGPT]
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The baseline control requires **both R-A and R-B to pass all 14 locked fixtures before production is trusted**. C27 removes the R-B fixture result from the trust gate: R-A still must pass its fixtures, but R-B production is trusted when the run exits 0 and exact reconciliation against R-A has `n_only_ra = n_only_rb = n_disagree = 0`. Thus the ablation tests whether second-path fixtures supply detection that exact production reconciliation does not.  [source: C27_1_BUILDER_ChatGPT]
+
+The nine seeded R-B mutations are exactly:
+
+| Mutant | Exact seeded code change from `SEED_DIFFS` |
+| --- | --- |
+| M01 | `thresh <- kappa * peer_p75` → `thresh <- kappa * joined$peer_p50_h` |
+| M02 | `p_closed_contra <- is_open & (closed_str_set | !is.na(closed_ts))` → `p_closed_contra <- rep(FALSE, n)` |
+| M03 | Removes `(!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts)` from `p_bad_clock`; missing-created, missing-modified, and future-created checks remain. |
+| M04 | `p_thin <- peer_n < RB_N_MIN` → `p_thin <- rep(FALSE, n)` |
+| M05 | `in_decision <- is_open & !dup_flag & !leg_flag` → `in_decision <- is_open & !leg_flag`, deleting the DUPLICATE exclusion. |
+| M06 | `in_decision <- is_open & !dup_flag & !leg_flag` → `in_decision <- is_open & !dup_flag`, deleting the LEGACY_RECORD exclusion. |
+| M07 | `p_parent <- parent_nonblank` → `p_parent <- rep(FALSE, n)` |
+| M08 | `is_open <- tolower(status_norm) == "open"` → `is_open <- rep(TRUE, n)` |
+| M09 | Removes `is.na(created_ts)` from `p_bad_clock`; missing-modified, mod-before-created, and future-created checks remain. |
+
+These are the only changes represented by the frozen seed diffs.  [source: C27_1_BUILDER_ChatGPT]
+
+## 3. Hard mechanical facts table.
+
+Notation: **Q = quoted directly from the frozen evidence; R = independently recomputed from quoted values.**
+
+### Clean arm and portfolio-level facts
+
+| Fact | Result |
+| --- | --- |
+| `src_open_candidates.csv` frozen rows | 245,193 (Q) |
+| MySQL COUNT for `src_open_candidates` | 245,193 (Q) |
+| Source-row count delta | 0 (R: 245,193 − 245,193) |
+| `src_peer_stats.csv` expected rows | 104 (Q) |
+| MySQL COUNT for `src_peer_stats` | 104 (Q) |
+| Peer-row count delta | 0 (R: 104 − 104) |
+| Clean R-A exit | 0 (Q) |
+| Clean R-B exit | 0 (Q) |
+| Clean R-A fixtures | 14/14 (Q) |
+| Clean R-B fixtures | 14/14 (Q) |
+| Clean R-A reproduction: `n_x`, `n_truth` | 222,002 / 222,002 (Q) |
+| Clean R-A reproduction row delta | 0 (R) |
+| Clean R-B reproduction: `n_x`, `n_truth` | 222,002 / 222,002 (Q) |
+| Clean R-B reproduction row delta | 0 (R) |
+| Clean R-A label/only-row/dormant/open-age differences | all 0 (Q) |
+| Clean R-B label/only-row/dormant/open-age differences | all 0 (Q) |
+| Clean recon `n_ra` | 222,002 (Q) |
+| Clean recon `n_rb` | 222,002 (Q) |
+| Clean recon `n_inner` | 222,002 (Q) |
+| Clean `n_only_ra`, `n_only_rb` | 0 / 0 (Q) |
+| Clean `n_agree`, `n_disagree` | 222,002 / 0 (Q) |
+| Identity `n_agree + n_disagree = n_inner` | 222,002 + 0 = 222,002 (R) |
+| Identity `n_inner + n_only_ra = n_ra` | 222,002 + 0 = 222,002 (R) |
+| Identity `n_inner + n_only_rb = n_rb` | 222,002 + 0 = 222,002 (R) |
+| Mutant runs present | 9/9 (Q) |
+| Mutant runs with exit 0 | 9/9 (R from all nine rows) |
+| Mutant fixture passes summed | 118/126 (R) |
+| Mutant fixture failures summed | 8 (R: 126 − 118) |
+| Production changed-row events summed across mutant runs | 46,536 (R) |
+| Reconciliation disagreements summed across mutant runs | 23,350 (R) |
+| `only_rb` rows summed across mutant runs | 23,186 (R) |
+| `only_ra` rows summed across mutant runs | 0 (R) |
+| Recon anomaly events | 46,536 (R: 23,350 + 23,186 + 0) |
+| Changed-row events − recon anomaly events | 0 (R) |
+
+Clean reproduction and reconciliation values come directly from the runner output.  [source: C27_1_BUILDER_ChatGPT]
+
+### Per-mutant recomputation
+
+For every mutant, `n_inner` is independently recoverable as `recon_n_rb − recon_only_rb`; since `recon_only_ra = 0` throughout, implied R-A cardinality is also 222,002. `n_agree` is recomputed as `n_inner − recon_disagree`.
+
+| Mutant | Exit | Fixtures | Failed count | `n_rb` | `only_ra` | `only_rb` | `disagree` | `n_inner` | `n_agree` | Δ `n_rb` vs clean | Production rows changed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M01 | 0 Q | 12/14 Q | 2 R | 222,002 Q | 0 Q | 0 Q | 16,973 Q | 222,002 R | 205,029 R | 0 R | 16,973 Q |
+| M02 | 0 Q | 13/14 Q | 1 R | 222,002 Q | 0 Q | 0 Q | 0 Q | 222,002 R | 222,002 R | 0 R | 0 Q |
+| M03 | 0 Q | 14/14 Q | 0 R | 222,002 Q | 0 Q | 0 Q | 0 Q | 222,002 R | 222,002 R | 0 R | 0 Q |
+| M04 | 0 Q | 13/14 Q | 1 R | 222,002 Q | 0 Q | 0 Q | 6,377 Q | 222,002 R | 215,625 R | 0 R | 6,377 Q |
+| M05 | 0 Q | 13/14 Q | 1 R | 245,014 Q | 0 Q | 23,012 Q | 0 Q | 222,002 R | 222,002 R | +23,012 R | 23,012 Q |
+| M06 | 0 Q | 13/14 Q | 1 R | 222,176 Q | 0 Q | 174 Q | 0 Q | 222,002 R | 222,002 R | +174 R | 174 Q |
+| M07 | 0 Q | 13/14 Q | 1 R | 222,002 Q | 0 Q | 0 Q | 0 Q | 222,002 R | 222,002 R | 0 R | 0 Q |
+| M08 | 0 Q | 13/14 Q | 1 R | 222,002 Q | 0 Q | 0 Q | 0 Q | 222,002 R | 222,002 R | 0 R | 0 Q |
+| M09 | 0 Q | 14/14 Q | 0 R | 222,002 Q | 0 Q | 0 Q | 0 Q | 222,002 R | 222,002 R | 0 R | 0 Q |
+
+The underlying mutant rows are frozen in the runner table.  [source: C27_1_BUILDER_ChatGPT]
+
+The row-level equalities also recompute exactly: M01 has 16,973 changed production rows and 16,973 disagreements; M04 has 6,377 and 6,377; M05 has 23,012 changed rows and 23,012 `only_rb`; M06 has 174 and 174. M02, M03, M07, M08, and M09 each have zero production-row changes and zero reconciliation anomalies.
+
+### Detection sets and portfolio deltas
+
+From the frozen definitions, because every mutant exits 0:
+
+`D_fix = {mutants with R-B fixtures <14/14}`
+
+= **{M01, M02, M04, M05, M06, M07, M08} (R)**.
+
+`D_abl = {mutants with only-row/disagreement recon anomaly}`
+
+= **{M01, M04, M05, M06} (R)**.
+
+Therefore:
+
+| Derived portfolio fact | Result |
+| --- | --- |
+| ` | D_fix |
+| ` | D_abl |
+| `D_fix ∩ D_abl` | {M01,M04,M05,M06} (R) |
+| `D_fix \ D_abl` | {M02,M07,M08} (R) |
+| ` | D_fix \ D_abl |
+| `D_abl \ D_fix` | ∅ (R) |
+| Caught by neither | {M03,M09} (R) |
+| Baseline detection rate over nine seeds | 7/9 = 77.78% (R) |
+| Ablated detection rate over nine seeds | 4/9 = 44.44% (R) |
+| Detection-rate delta | −3/9 = −33.33 percentage points (R) |
+| Baseline-detected defects retained by ablated regime | 4/7 = 57.14% (R) |
+| Baseline-detected defects lost | 3/7 = 42.86% (R) |
+
+These independently reproduce H4–H7 in the runner summary.  [source: C27_1_BUILDER_ChatGPT]
+
+### Hash equalities across arms
+
+The clean B R-A classification hash is `c099e092...d63ae0d9`, identical to the frozen preflight R-A classification hash; the clean B R-B classification hash is `a0e42b86...fe6fe193`, identical to the frozen preflight R-B hash. Both equalities are recomputed by literal hash comparison.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT]
+
+| R-B arm | Output hash relation to clean B | Status |
+| --- | --- | --- |
+| M01 | unequal | R |
+| M02 | equal | R |
+| M03 | equal | R |
+| M04 | unequal | R |
+| M05 | unequal | R |
+| M06 | unequal | R |
+| M07 | equal | R |
+| M08 | equal | R |
+| M09 | equal | R |
+
+Thus **5/9 mutant R-B outputs are byte-identical to clean R-B and 4/9 differ (R)**. The equality set is `{M02,M03,M07,M08,M09}`; the inequality set is `{M01,M04,M05,M06}`. That partition exactly matches `prod_rows_changed_vs_clean_RB = 0` versus `>0`.  [source: C27_1_BUILDER_ChatGPT]
+
+The manifest also shows the same `src_open_candidates.csv` hash `ba089f...d81b9` and the same `10_io_parse.R` hash `40e67d...2154a` for B and all nine mutant arms: **10/10 shown arms equal for each of those two artifacts (R)**. Each mutant instead has its own seeded `20_integrity_and_classify.R` hash.  [source: C27_1_BUILDER_ChatGPT]
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen predicate defines P1 as satisfied exactly when `D_fix ⊆ D_abl`; it defines P1 as failed when `D_fix \ D_abl` is non-empty.  [source: C27_1_BUILDER_ChatGPT]
+
+The independently recomputed sets are:
+
+`D_fix = {M01,M02,M04,M05,M06,M07,M08}`
+
+`D_abl = {M01,M04,M05,M06}`
+
+`D_fix \ D_abl = {M02,M07,M08}`
+
+The difference contains **3 mutants**, so `D_fix ⊄ D_abl`. Accordingly, the frozen **P1-failed condition is met**. M02, M07, and M08 are defects detected by R-B's fixtures but not by the ablated regime's production reconciliation. M03 and M09 are caught by neither regime and, per the frozen definition, do not count for or against P1.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT]
+
+## 5. Fixture and reconciliation implications.
+
+The evidence separates the nine mutants into three mechanically distinct groups.
+
+**M01, M04, M05, and M06 are detectable by both mechanisms.** M01 and M04 preserve the production key set but generate 16,973 and 6,377 classification disagreements respectively. M05 and M06 generate 23,012 and 174 R-B-only rows respectively. Their own R-B fixture runs also fail. Thus exact production reconciliation independently exposes these four defects.  [source: C27_1_BUILDER_ChatGPT]
+
+**M02, M07, and M08 are detectable by fixtures but invisible to production reconciliation on the frozen pack.** Each exits 0, fails exactly one R-B fixture—F04, F09, and F12 respectively—and nevertheless has `only_ra=0`, `only_rb=0`, `disagree=0`, and `prod_rows_changed_vs_clean_RB=0`. Their R-B classification files are additionally byte-identical to clean R-B. These are direct examples in which behavioral fixture execution detects a seeded semantic defect that exact reconciliation on the observed production population does not.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT]
+
+**M03 and M09 are detected by neither mechanism.** Both run 14/14 R-B fixtures, have zero reconciliation anomalies, zero production rows changed, and produce the same R-B output hash as the clean arm. The run therefore demonstrates that the existing locked fixture suite itself does not expose these two seeded deletions on the supplied fixture cases. No stronger causal explanation for why they escape detection is established by the packet.  [source: C27_1_BUILDER_ChatGPT]
+
+Consequently, exact R-A/R-B production reconciliation and second-path behavioral fixtures are not mechanically interchangeable on this frozen experiment. Reconciliation detects realized differences on the frozen production population; the R-B fixture suite additionally exercises at least three seeded semantics that are dormant with respect to that population's final output.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal semantic risk is **dormant-rule equivalence**: two implementations can reconcile exactly over the current production population while implementing different rules. M02, M07, and M08 establish this concretely because their production classifications are byte-identical to clean R-B while their targeted fixture cases fail. This is precisely the kind of semantic difference that schema equality or a clean production comparison alone cannot establish away. The Constitution separately states that schema equality alone does not prove semantic equality and requires deterministic diffing plus locked behavioral fixtures.  [source: C27_1_BUILDER_ChatGPT]
+
+A second risk is **fixture incompleteness already present in the baseline suite**. M03 and M09 alter integrity logic but remain 14/14 and production-identical. The evidence establishes the detection gap, although it does not establish whether the appropriate remedy would be a stronger fixture, a different seed, or another control.
+
+The frozen expected unchanged surfaces are the SQL/Source Gate, TCD-IG rules, fixture expecteds, R-A code, SR_NUMBER grain, and frozen Chicago 311 pack.  [source: C27_1_BUILDER_ChatGPT] The provided mechanical evidence supports important portions of that freeze: source hashes pass preflight; clean R-A/R-B reproduce 222,002 frozen classifications with zero label or only-row differences; the source file and R-B parsing module retain identical hashes across every shown arm; and the declared mutations are confined to R-B `20_integrity_and_classify.R`.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT]
+
+No clean-arm production regression is exposed by the supplied evidence: clean fixtures are 14/14 on both paths, both processes exit 0, reproduction against the frozen labels is exact on the reported fields, and clean reconciliation is 0/0/0. All nine mutant runs are present with recorded exits. Builder/Validator hard-number agreement is not assessable in this independent Builder first pass because the Validator output is intentionally outside the Builder's information barrier.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT]
+
+## 7. Claim → evidence map. Cite the section and the table row for each claim.
+
+| Claim | Frozen evidence location |
+| --- | --- |
+| Clean B passed 14/14 fixtures on R-A and R-B and both exited 0. | `C27_RESULTS.md` §Mechanical facts, row H1; run log B rows.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| Clean B exactly reproduces the frozen 222,002-row classifications with zero reported label/only-row differences and clean recon 0/0/0. | `C27_RESULTS.md` §Clean arm repro rows “B R-A vs frozen…” and “B R-B vs frozen…”; §Clean arm recon row.  [source: C27_1_BUILDER_ChatGPT] |
+| All nine mutant runs are present and exit 0. | `C27_RESULTS.md` §Mechanical facts H3 plus §Mutants rows M01–M09; run log M01–M09.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| `D_fix={M01,M02,M04,M05,M06,M07,M08}`. | `C27_RESULTS.md` §Mechanical facts H4; independently reproduced from §Mutants `rb_fixtures` rows M01–M09.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| `D_abl={M01,M04,M05,M06}`. | `C27_RESULTS.md` §Mechanical facts H5; independently reproduced from §Mutants reconciliation columns.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| `D_fix \ D_abl={M02,M07,M08}`, containing three second-path-fixture-only detections. | `C27_RESULTS.md` §Mechanical facts H6; §Mutants rows M02, M07, M08.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| M02, M07, and M08 each fail one fixture but have zero production changes and 0/0/0 recon. | `C27_RESULTS.md` §Mutants rows M02, M07, M08.  [source: C27_1_BUILDER_ChatGPT] |
+| M02, M07, and M08 produce the same R-B output SHA-256 as clean B. | §ARM MANIFESTS rows B R-B output, M02 output, M07 output, M08 output.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| M03 and M09 are caught by neither regime. | `C27_RESULTS.md` §Mechanical facts H7 and §Mutants rows M03/M09.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| M01 and M04 are reconciliatory classification disagreements totaling 23,350 rows. | `C27_RESULTS.md` §Mutants rows M01/M04: 16,973 + 6,377 = 23,350 recomputed.  [source: C27_1_BUILDER_ChatGPT] |
+| M05 and M06 add 23,186 R-B-only rows in aggregate. | `C27_RESULTS.md` §Mutants rows M05/M06: 23,012 + 174 = 23,186 recomputed.  [source: C27_1_BUILDER_ChatGPT] |
+| Total changed-row events across the nine mutant runs are 46,536, exactly equal to total reconciliation anomaly events. | `C27_RESULTS.md` §Mutants rows M01–M09: 16,973 + 6,377 + 23,012 + 174 = 46,536; disagreements 23,350 + `only_rb` 23,186 = 46,536.  [source: C27_1_BUILDER_ChatGPT] |
+| Frozen P1 requires `D_fix ⊆ D_abl`; its failure condition is non-empty `D_fix \ D_abl`. | SPEC §Operational benefit predicate P1, outcome definitions.  [source: C27_1_BUILDER_ChatGPT] |
+| The P1-failed condition is met because the recomputed difference is `{M02,M07,M08}`. | SPEC §P1 outcome rule plus `C27_RESULTS.md` H4–H6.  [source: C27_1_BUILDER_ChatGPT]  [source: C27_1_BUILDER_ChatGPT] |
+| Source and parsing inputs are hash-stable across the ten shown B/M01–M09 arms, while each mutant substitutes the seeded integrity/classification file. | §ARM MANIFESTS B and M01–M09 rows.  [source: C27_1_BUILDER_ChatGPT] |
+| The nine described mutations correspond to the frozen seeded edits. | §SEED DIFFS, M01–M09 diff blocks.  [source: C27_1_BUILDER_ChatGPT] |
+
+END C27 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+# C27 VALIDATOR REPORT
+
+## 1. Role attestation and ablation ID
+
+I am DeepSeek, acting as Validator only for ablation **C27**. I have not seen the Builder output and have not asked for it. I do not return a terminal disposition in this report. Role assignment matches the frozen SPEC: Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok. Constitution version = 1.0. Ablation frozen at CT 2026-10-03 before runner execution.
+
+## 2. Independent test plan: what I checked, and how
+
+I checked the packet by:
+
+- Verifying the frozen SPEC identifiers, role assignments, source hashes, framework hashes, and preflight gating result.
+- Recomputing clean-arm reconciliation identities from `C27_RESULTS.md`.
+- Recomputing clean-arm reproduction counts from `C27_RESULTS.md`.
+- Recomputing `D_fix`, `D_abl`, `D_fix \ D_abl`, and the caught-by-neither set from the mutant table.
+- Checking per-mutant reconciliation identities: `n_rb`, `n_only_ra`, `n_only_rb`, `n_disagree`, and `prod_rows_changed_vs_clean_RB`.
+- Checking cross-arm SHA-256 equalities between clean R-B output, mutant R-B outputs, and frozen preflight outputs.
+- Checking mutant seed input hashes against `runner/SEEDS.sha256` values shown in preflight and `C27_ARM_MANIFESTS.txt`.
+- Checking seed diffs against the declared rule deletions.
+- Checking the run log for completeness of all arms and mutants.
+- Flagging internal inconsistencies in the runner output and missing raw evidence.
+
+## 3. Independently recomputed hard facts
+
+### Frozen/preflight facts
+
+- `src_open_candidates.csv` SHA-256 = `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`; row count from read-only MySQL preflight = **245,193**.
+- `src_peer_stats.csv` SHA-256 = `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`; row count = **104**.
+- Framework hashes match the two frozen baseline framework hashes in the packet.
+- Preflight gating result = **PASS**.
+- R version = **4.6.1**; package versions are as listed in preflight.
+
+### Clean arm facts
+
+- R-A exit = **0**; R-B exit = **0**.
+- R-A fixtures = **14/14**; R-B fixtures = **14/14**.
+- Clean R-A vs frozen `RA_classifications`: `n_x = 222002`, `n_truth = 222002`, `n_only_x = 0`, `n_only_truth = 0`, `n_label_diff = 0`, `n_dormant_diff = 0`, max abs deltas = **0**.
+- Clean R-B vs frozen `RB_classifications`: `n_x = 222002`, `n_truth = 222002`, `n_only_x = 0`, `n_only_truth = 0`, `n_label_diff = 0`, `n_dormant_diff = 0`, max abs deltas = **0**.
+- Clean recon: `n_ra = 222002`, `n_rb = 222002`, `n_inner = 222002`, `n_only_ra = 0`, `n_only_rb = 0`, `n_agree = 222002`, `n_disagree = 0`.
+- Identity check: `n_ra - n_only_ra = 222002 = n_inner`; `n_rb - n_only_rb = 222002 = n_inner`; `n_agree + n_disagree = 222002`. Consistent.
+- Clean R-A output hash `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9` equals frozen `R-A\outputs\RA_classifications.csv`.
+- Clean R-B output hash `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193` equals frozen `R-B\outputs\RB_classifications.csv`.
+
+### D-set recomputation
+
+From the mutant table:
+
+- `D_fix` = mutants with `rb_fixtures < 14/14` or crash = **{M01, M02, M04, M05, M06, M07, M08}**. Size = **7**.
+- `D_abl` = mutants with recon not clean (`n_only_ra > 0` or `n_only_rb > 0` or `n_disagree > 0`) or crash = **{M01, M04, M05, M06}**. Size = **4**.
+- `D_fix \ D_abl` = **{M02, M07, M08}**. Size = **3**.
+- Caught by neither regime = **{M03, M09}**. Size = **2**.
+- `D_abl` is a subset of `D_fix`: all of M01, M04, M05, M06 are also in `D_fix`.
+- Therefore `D_fix ⊆ D_abl` is **false**.
+
+These match runner H4, H5, H6, and H7.
+
+### Per-mutant hard identities
+
+| Mutant | n_rb | only_ra | only_rb | disagree | prod_rows_changed | identity check | RB output hash vs clean |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| M01 | 222002 | 0 | 0 | 16973 | 16973 | `222002 + 0 = 222002`; prod delta = disagree | differs |
+| M02 | 222002 | 0 | 0 | 0 | 0 | `222002 + 0 = 222002` | equals clean |
+| M03 | 222002 | 0 | 0 | 0 | 0 | `222002 + 0 = 222002` | equals clean |
+| M04 | 222002 | 0 | 0 | 6377 | 6377 | `222002 + 0 = 222002`; prod delta = disagree | differs |
+| M05 | 245014 | 0 | 23012 | 0 | 23012 | `222002 + 23012 = 245014`; prod delta = only_rb | differs |
+| M06 | 222176 | 0 | 174 | 0 | 174 | `222002 + 174 = 222176`; prod delta = only_rb | differs |
+| M07 | 222002 | 0 | 0 | 0 | 0 | `222002 + 0 = 222002` | equals clean |
+| M08 | 222002 | 0 | 0 | 0 | 0 | `222002 + 0 = 222002` | equals clean |
+| M09 | 222002 | 0 | 0 | 0 | 0 | `222002 + 0 = 222002` | equals clean |
+
+### Fixture failure facts
+
+- M01: 12/14; failed F03; F10.
+- M02: 13/14; failed F04.
+- M03: 14/14; no failed IDs.
+- M04: 13/14; failed F06.
+- M05: 13/14; failed F07.
+- M06: 13/14; failed F08.
+- M07: 13/14; failed F09.
+- M08: 13/14; failed F12.
+- M09: 14/14; no failed IDs.
+
+### Cross-arm hash equalities and seed hashes
+
+- All mutant `20_integrity_and_classify.R` input hashes match the corresponding `seeds/C27/Mxx_20_integrity_and_classify.R` hashes shown in preflight and `C27_ARM_MANIFESTS.txt`.
+- Mutant R-B output hashes equal clean R-B output hash for **M02, M03, M07, M08, M09**.
+- Mutant R-B output hashes differ from clean R-B output hash for **M01, M04, M05, M06**.
+- Run log records exits for B RA, B RB, and M01–M09. All recorded exits are **0**. No missing mutant run is evident from the run log.
+
+### Internal inconsistencies flagged in runner output
+
+1. **M03 and M09 fixture-protection inconsistency.**  
+   M03 is described as “I02 mod<created sub-clause deleted (F05)” but reports `rb_fixtures = 14/14`, no failed fixture IDs, clean recon, and zero production-row change.  
+   M09 is described as “I02 missing-CREATED deleted (F13)” but reports `rb_fixtures = 14/14`, no failed fixture IDs, clean recon, and zero production-row change.  
+   If the parenthetical fixture IDs denote the fixtures intended to protect those rules, then either the seeds are not actually exercised by those fixtures or the fixtures do not protect those sub-clauses as claimed. This does not alter the recomputed D-sets, but it is a seed/fixture-coverage inconsistency.
+2. **M01 coverage-vs-failure set.**  
+   M01 is labeled with coverage `(F01-F03,F10,F11)` but only F03 and F10 are listed as failed. This is not necessarily inconsistent if the parenthetical is a coverage list rather than a predicted failure list, but the runner output does not distinguish those meanings.
+3. **Manifest categorization defect.**  
+   `C27_ARM_MANIFESTS.txt` notes that `run_RA.R` / `run_RB.R` are listed under `MANIFEST_outputs` instead of `MANIFEST_inputs` because the runner’s `RUN_*` file filter is case-insensitive. The hashes for `run_RA.R` match the frozen preflight input hash, so this is a manifest categorization defect rather than an observed code mutation.
+
+## 4. Facts that cannot be recomputed from this packet
+
+The following cannot be independently recomputed from the packet as provided:
+
+- Row-level classifications for clean or mutant arms.
+- Per-fixture actual versus expected outputs.
+- The full contents of `C27_baseline_recon.csv`, `C27_mutants.csv`, `C27_repro.csv`, and the full arm manifests.
+- Exact `n_inner` and `n_agree` per mutant from raw recon output. These can be partly inferred from the summary table and clean R-A count, but not verified from raw rows.
+- R-A fixture results for each mutant run. The packet does not show per-mutant R-A fixture counts; I can only infer that R-A is unchanged and that the ablated regime would run R-A fixtures.
+- stdout/stderr logs for each run. Only the run log summary is present.
+- The exact rows changed by M01, M04, M05, and M06.
+- Independent verification that M03 and M09 truly leave all fixture expecteds unchanged, versus a fixture harness defect.
+
+## 5. P1 assessment against the frozen predicate
+
+The frozen predicate states:
+
+- **P1 satisfied:** `D_fix ⊆ D_abl`.
+- **P1 failed:** `D_fix \ D_abl` is non-empty.
+
+Independently recomputed from the mutant table:
+
+- `D_fix = {M01, M02, M04, M05, M06, M07, M08}`
+- `D_abl = {M01, M04, M05, M06}`
+- `D_fix \ D_abl = {M02, M07, M08}`
+
+`D_fix \ D_abl` is non-empty. Therefore the frozen predicate’s **P1-failed condition is met** on this pack. The mutants M02, M07, and M08 are detected by R-B fixtures but are not detected by the ablated regime’s R-A fixtures plus exact recon against R-A. M03 and M09 are caught by neither regime and do not count for or against P1 under the frozen predicate.
+
+## 6. Blocking objections
+
+1. **Missing raw evidence for required mechanical facts.**  
+   The packet provides summary tables and hashes, but not the raw per-fixture actuals/expecteds, full recon CSVs, row-level classifications, or stdout/stderr. Under the frozen constitution’s evidence requirement, a claim that fixtures passed or that recon was clean must be backed by raw execution evidence. The summary tables are internally consistent, but the raw artifacts are not present in this packet for independent row-level verification. This should block a verdict unless the adjudicator has access to the raw files whose hashes are listed in `C27_EVIDENCE.sha256`.
+2. **Seed/fixture coverage inconsistency for M03 and M09.**  
+   M03 and M09 are described as fixture-protected rule deletions with associated fixture IDs F05 and F13, but both pass 14/14, show clean recon, and produce zero production-row change. This indicates the frozen seed set or fixture suite does not actually exercise those deletions as claimed. This is a defect in the ablation design evidence, though it does not change the recomputed P1 D-sets.
+3. **Manifest categorization defect.**  
+   The arm manifests place `run_RA.R` / `run_RB.R` under output manifests because of a case-insensitive `RUN_*` filter. The hashes match frozen inputs, so this is not an observed mutation, but it means the manifest’s input/output categorization is not reliable as a changed-file-set proof without manual correction.
+
+## 7. Claim → evidence map
+
+| Claim | Evidence in packet |
+| --- | --- |
+| C27 role assignment is Validator = DeepSeek | SPEC “Roles” line |
+| Preflight source hashes and row counts match SPEC | PREFLIGHT block |
+| Clean R-A and R-B reproduce frozen labels | `C27_RESULTS.md` clean arm repro table |
+| Clean recon is 0/0/0 | `C27_RESULTS.md` clean arm recon table |
+| Clean R-A output hash equals frozen R-A output | PREFLIGHT + `C27_ARM_MANIFESTS.txt` B out |
+| Clean R-B output hash equals frozen R-B output | PREFLIGHT + `C27_ARM_MANIFESTS.txt` B out |
+| `D_fix = {M01,M02,M04,M05,M06,M07,M08}` | `C27_RESULTS.md` H4 + mutant `rb_fixtures` column |
+| `D_abl = {M01,M04,M05,M06}` | `C27_RESULTS.md` H5 + mutant recon columns |
+| `D_fix \ D_abl = {M02,M07,M08}` | `C27_RESULTS.md` H6 + recomputation |
+| Caught by neither = `{M03,M09}` | `C27_RESULTS.md` H7 + recomputation |
+| All mutant runs present | RUN LOG + `C27_RESULTS.md` H3 |
+| Seed input hashes match declared seeds | PREFLIGHT seed OK lines + `C27_ARM_MANIFESTS.txt` M01–M09 input hashes |
+| M02, M03, M07, M08, M09 R-B outputs equal clean R-B output | `C27_ARM_MANIFESTS.txt` output hashes vs clean B out |
+| M01, M04, M05, M06 R-B outputs differ from clean R-B output | `C27_ARM_MANIFESTS.txt` output hashes vs clean B out |
+| P1-failed condition is met | Recomputed `D_fix \ D_abl = {M02,M07,M08}` non-empty |
+| Raw per-fixture/recon artifacts are not in packet | `C27_EVIDENCE.sha256` lists files, but their contents are not included |
+
+END C27 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C27 ADJUDICATION'.

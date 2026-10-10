@@ -1,0 +1,6 @@
+arm,rb_exit,rb_s,table_exit,recon_exit,labels_equal_frozen,portfolio_grid_fixtures_equal_frozen,classifications_equal_frozen,table_violations,cells_violated,new_recon_mismatches_vs_clean,new_mismatch_fields,clean_mismatches_removed,baseline_outcome,variant_outcome
+B,0,27.2,0,0,TRUE,TRUE,TRUE,0,,FALSE,,,-,-
+U_DORMINC,0,25.5,0,0,TRUE,TRUE,FALSE,6377,T1a,TRUE,dormant_h:+6377,,surfaces as a new R-A/R-B mismatch with no table to say which path is right: needs an owner ruling,table check flags an R-B defect: no ruling needed
+U_P75THIN,0,25.3,0,0,TRUE,TRUE,FALSE,62,T4,TRUE,peer_p75_h:+62,,surfaces as a new R-A/R-B mismatch with no table to say which path is right: needs an owner ruling,table check flags an R-B defect: no ruling needed
+U_PEERNBLANK,0,25.4,0,0,TRUE,TRUE,FALSE,6315,T3,TRUE,peer_n:+6315,,surfaces as a new R-A/R-B mismatch with no table to say which path is right: needs an owner ruling,table check flags an R-B defect: no ruling needed
+U_CLOCKLATE,0,32.7,0,0,TRUE,TRUE,FALSE,3,T1c|T2c,FALSE,,dormant_h:-1|open_age_h:-2,"escapes: no new recon mismatch, labels and fixtures unchanged",table check flags an R-B defect: no ruling needed

@@ -1,0 +1,1293 @@
+# C41 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the depth rule (owner ruling 41A) is adopted for the fixture gate: every fixture must enter through the real file-reading step (the same 14 rows written as production-layout text and read back through 10_io_parse), and stub fixtures fail.
+- REVERT: the depth rule is not adopted; the gate stays N/N fixtures passing.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4 for clean arm B = byte equality of its 4 R-B key outputs with the FROZEN REFERENCE HASHES; condition 5 = its count-gate result (14/14) and the frozen RB_fixture_results.csv hash. Seeded arms are assessed through P1 (conditions 8–9).
+- Items the SPEC marks "not measured" (e.g. design minutes for C53, PricePoint-scale costs, the C48 audit wall-clock) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Fixture depth over count (Addendum 01 #41)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C41 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C41 does not reconcile R-A vs R-B; clean arm B's R-B outputs are compared byte-for-byte with the frozen R-B outputs, which already contain these rows, so N1 cannot cause a C41 mismatch.
+---
+# SPEC
+# C41 — Ablation specification (FROZEN)
+
+**Ablation ID:** C41 (Addendum 01, candidate #41 "Fixture depth over count")
+**Batch:** N13 batch 5 (controls C41, C47, C53, C48; the four of the owner's batch-01 rulings that run on the frozen pack without a design chat; #42 waits for the owner's answer sheet `OWNER_42_SHEET.md`)
+**Owner rulings (operational definitions, constitution §9):** Owner rulings batch 01: `ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba` (questions file `OWNER_RULINGS_BATCH_01.md` SHA-256 `bcd23877be27e047c49bb0fbd0e4bda15031dad9e85b1df3b523badf0ee1b6dc`, not edited). Ruled 2026-10-03 09:58 CT: `41A 42A 47A 48A 53A`.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 fixture gate (hardening)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b5/run_batch_v5.ps1`, evaluator `runner_b5/eval_b5.R`; R only, no MySQL)
+
+## Control under test (hardening)
+Rule as it stands: the fixture gate passes when N/N locked fixtures pass (`rb_score_fixtures`, 14 rows F01–F13 + F14 rollup). All 14 fixtures are synthetic data frames with pre-parsed timestamps that go straight to the judge (`rb_judge_rows`), so a defect in file reading or parsing (`10_io_parse`: `rb_read_csv_flex`, `rb_normalize_open`, `rb_normalize_peers`) can never fail them. PricePoint evidence: R-B r3–r5 integer trust flag and 4 no-op stub fixtures passed the count gate (Addendum 01 #41).
+
+## Verdict convention (hardening, Addendum 01)
+**KEEP = the depth rule (ruling 41A) is adopted for the fixture gate. REVERT = the depth rule is not adopted (it misses a defect the count rule caught, or costs more than allowed).** HALT as in constitution §9.
+
+## Exact change being tested (ruling 41A)
+- **Count gate (baseline):** `fixdepth.R count` = the frozen `rb_score_fixtures()`; PASS iff 14/14 rows pass.
+- **Depth gate (variant):** `fixdepth.R depth` = the SAME 14 rows of `rb_build_fixture_pack()` written as text in the production source layout (tab-separated; the frozen `src_open_candidates.csv` and `src_peer_stats.csv` header lines; MySQL-style `created_ts`/`mod_ts`/`closed_ts` = `YYYY-mm-dd HH:MM:SS.000000` or `NULL`; raw-style `*_DATE` = `mm/dd/YYYY hh:mm:ss AM`; DUPLICATE/LEGACY as `true`/`false`), read back through `rb_read_csv_flex` → `rb_normalize_open` / `rb_normalize_peers`, then `rb_judge_rows`, scored against the locked expectations (unchanged). PASS iff 14/14 pass, no read/parse error, and no stub: a stub probe replaces `rb_judge_rows` with a poison judge (every label `POISON`) and reruns `rb_score_fixtures()`; any fixture that still passes is a stub and fails the gate.
+- Each arm also runs the production `run_RB.R all` on the frozen extract, to show the real effect of each planted defect (reported; clean B's 4 R-B outputs must equal the frozen hashes).
+- Cost = gate wall time (runner-measured seconds) plus extra chats (none: both gates are mechanical).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, now confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C41 does not reconcile R-A vs R-B; clean arm B's R-B outputs are compared byte-for-byte with the frozen R-B outputs, which already embed N1, so N1 cannot cause a C41 mismatch.
+
+## Arms (runner v5, `seeds/C41/FIXDEPTH`; ARMS.tsv and diffs in the packet)
+- **B**: frozen R-B code.
+- **P_DUPINT** (`10_io_parse.R`): the DUPLICATE yes/no flag is read as a number (`true`/`false` → NA). Ruled target "a yes/no flag read as a number".
+- **P_DATESWAP** (`10_io_parse.R`): the first timestamp format has day and month swapped (`%Y-%d-%m`). Ruled target "a date-parse error".
+- **STUB_F11** (`40_fixtures.R`): F11's observed label is hard-coded. Ruled target "a test case that always passes".
+- **JUDGE_P50** (`20_integrity_and_classify.R`): κ threshold uses peer P50 instead of P75. A judge defect the count rule catches (superset control).
+- **P_TZUTC** (`10_io_parse.R`): wall clocks read as UTC. INFO probe only (not in P1).
+
+## Operational benefit predicate P1 (ruling 41A, made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. superset: every seeded arm the count gate catches is also caught by the depth gate;
+2. ruled targets: the depth gate catches P_DUPINT, P_DATESWAP and STUB_F11;
+3. clean arm B: count gate PASS and depth gate PASS (no false flag), and B's 4 R-B key outputs (classifications, fixture results, portfolio counts, κ grid) equal the frozen hashes;
+4. cost: clean arm B depth-gate wall time ≤ count-gate wall time + 60 s; no extra chats (by construction).
+REVERT side: any of 1–4 fails. P_TZUTC is reported, not scored. "Caught" = gate FAIL (including a crash of the gate script).
+
+## Regression / HALT rules
+- HALT if a run exit record is missing, if clean arm B's production run fails, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4 (exact reconciliation) for clean arm B = byte equality of its 4 R-B key outputs with the frozen R-B outputs; condition 5 (mandatory fixtures) = its count-gate result (all 14 must pass) and the frozen `RB_fixture_results.csv` hash; conditions 6–7: the frozen pack is only read (preflight hashes).
+- Timing is measured while another worker's MySQL batch (b4 C52, then C24) runs on the same PC; both gates of an arm run back to back, so contention affects both similarly. Disclosed.
+
+## Allowed source/data scope
+Frozen PC pack, read only, copied into the work folder. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+**Runner-side files for this control (frozen list `runner_b5/SEEDS_b5.sha256`; preflight gating):**
+- `runner_b5/seeds/C41/ARMS.tsv` SHA-256 `f4b056059bf732dba1f355261abcccf83a54c92b2983c092f107a7122028e344`
+- `runner_b5/seeds/C41/FIXDEPTH` SHA-256 `95a108c0c1890a0b22b538a5af927679ef001291e637ea8f24c226082e7394ac`
+- `runner_b5/seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R` SHA-256 `d11c2d2c146c240bbc8eeaf56b85fecfaa57673b932894d0c0628db110dbbabc`
+- `runner_b5/seeds/C41/RB_P_DATESWAP__10_io_parse.R` SHA-256 `87513149cc081c2c433a90aacafda727277270c7177a00260023a25e636c0af6`
+- `runner_b5/seeds/C41/RB_P_DUPINT__10_io_parse.R` SHA-256 `e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3`
+- `runner_b5/seeds/C41/RB_P_TZUTC__10_io_parse.R` SHA-256 `33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c`
+- `runner_b5/seeds/C41/RB_STUB_F11__40_fixtures.R` SHA-256 `0961a79bf1b451b72450aac141290444514248e59abd88d9e5a6b699f968bca3`
+- `runner_b5/seeds/C41/fixdepth.R` SHA-256 `5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd`
+- `runner_b5/run_batch_v5.ps1` SHA-256 `e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810`
+- `runner_b5/eval_b5.R` SHA-256 `49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; owner rulings file as above. This spec is hashed in `SPEC_FREEZE_b5.sha256` before the reporting run.
+**Condition 4 for arm B = the 4 frozen R-B key outputs listed above under `RB_`.**
+## Pre-execution check (disclosed)
+The predicate text (`eval_b5.R`, SHA-256 in `SEEDS_b5.sha256`) was hashed before any execution. The complete runner was then exercised once on the PC in a scratch folder (`N13\_preflight_b5`, non-reporting, `NON_REPORTING.txt`): 2026-10-03 10:17–10:27 CT, runner tar `N13_runner_b5_v1.tar` SHA-256 0add2b9b37fc0d7af48c20eb2c5ebda550b3f0e2d2b5904fa82be3970e3d6e6e; preflight PASS; every run exit 0; summarize exit 0. Scratch outcome: count gate caught JUDGE_P50 only; depth gate caught P_DUPINT (F07), P_DATESWAP (F03/F05/F10/F14), STUB_F11 (stub probe: F11) and JUDGE_P50; clean B PASS on both gates (count 0.7 s, depth 1.7 s) and 4/4 R-B outputs equal frozen; mechanical result P1 MET. The scratch result was therefore known before this spec was frozen; the reporting run repeats every arm from scratch. No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   f4b056059bf732dba1f355261abcccf83a54c92b2983c092f107a7122028e344 seeds/C41/ARMS.tsv
+seed   OK   95a108c0c1890a0b22b538a5af927679ef001291e637ea8f24c226082e7394ac seeds/C41/FIXDEPTH
+seed   OK   d11c2d2c146c240bbc8eeaf56b85fecfaa57673b932894d0c0628db110dbbabc seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R
+seed   OK   87513149cc081c2c433a90aacafda727277270c7177a00260023a25e636c0af6 seeds/C41/RB_P_DATESWAP__10_io_parse.R
+seed   OK   e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3 seeds/C41/RB_P_DUPINT__10_io_parse.R
+seed   OK   33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c seeds/C41/RB_P_TZUTC__10_io_parse.R
+seed   OK   0961a79bf1b451b72450aac141290444514248e59abd88d9e5a6b699f968bca3 seeds/C41/RB_STUB_F11__40_fixtures.R
+seed   OK   5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd seeds/C41/fixdepth.R
+seed   OK   e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810 run_batch_v5.ps1
+seed   OK   49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966 eval_b5.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b5 (R-only; another batch holds the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 15541 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+f4b056059bf732dba1f355261abcccf83a54c92b2983c092f107a7122028e344  1190  runner_b5/seeds/C41/ARMS.tsv
+95a108c0c1890a0b22b538a5af927679ef001291e637ea8f24c226082e7394ac  81  runner_b5/seeds/C41/FIXDEPTH
+d11c2d2c146c240bbc8eeaf56b85fecfaa57673b932894d0c0628db110dbbabc  6027  runner_b5/seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R
+87513149cc081c2c433a90aacafda727277270c7177a00260023a25e636c0af6  6683  runner_b5/seeds/C41/RB_P_DATESWAP__10_io_parse.R
+e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3  6748  runner_b5/seeds/C41/RB_P_DUPINT__10_io_parse.R
+33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c  6645  runner_b5/seeds/C41/RB_P_TZUTC__10_io_parse.R
+0961a79bf1b451b72450aac141290444514248e59abd88d9e5a6b699f968bca3  7408  runner_b5/seeds/C41/RB_STUB_F11__40_fixtures.R
+5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  runner_b5/seeds/C41/fixdepth.R
+e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810  13838  runner_b5/run_batch_v5.ps1
+49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966  17686  runner_b5/eval_b5.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b5.sha256` (written before the reporting run):
+# N13 batch b5 spec freeze, written 2026-10-03 10:28 CDT before the reporting run (scratch check in N13/_preflight_b5 disclosed in each spec)
+037865587d9d8c6de369c230486c99bfcf6e8ba6f9f1198756ed5ced4def368d  C41/ABLATION_SPEC.md
+d1582be670cf3d4721b7f0f710a00b5bc090bed6a2d0a62cc507dce2c1901aa8  C47/ABLATION_SPEC.md
+ad4a904625793fc093d127eac6ffc4796059ae98ad0e43a961237870e96819e7  C53/ABLATION_SPEC.md
+5f0cd243cbf0a8093eb119ea4f4d97464c36064f4d15f437bb2501ff91499e18  C48/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C41/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C47/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C53/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C48/CONSTITUTION_v1.md
+7998d8f4d182936100d26d2c1465ea46637b63a377d1329f9e12f4664bbdd5b2  runner_b5/SEEDS_b5.sha256
+1a84dd5f586e36f28caa0244dca54f8682d8c5d59944a13db1d3a40c10386916  runner_b5/SEED_DIFFS_b5.txt
+d502a0e642b596e9cb4db1ebfa07c3718198fe6d91fd3f6a76e6f2a7cbb10e66  runner_b5/PRECHECK_b5.json
+e8854242ec1b7e8d6ac7e81550fb8b68dbdb00e514db70db3cdf6a0774624fc0  runner_b5/assemble_c48_bv.R
+9b21f81cfc99c4cc391a362d841b83d48a1dfe8a9463598f59cc3f3b2a868e1e  C48/packets/C48_A2_SECOND_AUDIT_Grok.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+bcd23877be27e047c49bb0fbd0e4bda15031dad9e85b1df3b523badf0ee1b6dc  ablation_plan/OWNER_RULINGS_BATCH_01.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+37acd34e2a76793bb5942c100f703b2a4045b6161c5ba4f76295b4322bd642c9  ablation_plan/OWNER_42_SHEET.md
+
+---
+# RUN LOG (this control)
+10:29:11 C41 arms
+10:29:12   B FIX_count exit=0 secs=0.5 timeout=0
+10:29:13   B FIX_depth exit=0 secs=1.2 timeout=0
+10:29:38   B RB exit=0 secs=25.2 timeout=0
+10:29:41   P_DUPINT FIX_count exit=0 secs=0.8 timeout=0
+10:29:42   P_DUPINT FIX_depth exit=0 secs=1.4 timeout=0
+10:30:08   P_DUPINT RB exit=0 secs=25.2 timeout=0
+10:30:11   P_DATESWAP FIX_count exit=0 secs=0.6 timeout=0
+10:30:12   P_DATESWAP FIX_depth exit=0 secs=1.6 timeout=0
+10:30:37   P_DATESWAP RB exit=0 secs=24.9 timeout=0
+10:30:39   STUB_F11 FIX_count exit=0 secs=0.4 timeout=0
+10:30:40   STUB_F11 FIX_depth exit=0 secs=1.3 timeout=0
+10:31:07   STUB_F11 RB exit=0 secs=26.3 timeout=0
+10:31:10   JUDGE_P50 FIX_count exit=0 secs=0.8 timeout=0
+10:31:11   JUDGE_P50 FIX_depth exit=0 secs=1.5 timeout=0
+10:31:38   JUDGE_P50 RB exit=0 secs=26.4 timeout=0
+10:31:44   P_TZUTC FIX_count exit=0 secs=1.2 timeout=0
+10:31:47   P_TZUTC FIX_depth exit=0 secs=2.2 timeout=0
+10:32:15   P_TZUTC RB exit=0 secs=27.4 timeout=0
+
+---
+# C41_RESULTS.md (runner output)
+# C41 RESULTS (mechanical; generated 2026-10-03 10:39:08 CDT)
+
+**Mechanical predicate result: P1 MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. superset: every seeded arm the count gate catches is also caught by the depth gate | MET |
+| 2. ruled targets: the depth gate catches P_DUPINT (flag read as a number), P_DATESWAP (date-parse error) and STUB_F11 (always-pass test case) | MET |
+| 3. clean arm B: count gate PASS, depth gate PASS (no false flag), and B's 4 R-B key outputs equal the frozen hashes | MET |
+| 4. cost: clean arm B depth-gate wall time <= count-gate wall time + 60 s (no extra chats by construction) | MET |
+
+## Arms
+| arm | count_exit | count_s | count_gate | count_n_pass | depth_exit | depth_s | depth_gate | depth_n_pass | depth_stubs | depth_error | rb_all_exit | rb_all_s | rb_outputs_equal_frozen | caught_count | caught_depth | real_effect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| B | 0 | 0.5 | PASS | 14 | 0 | 1.2 | PASS | 14 | none |  | 0 | 25.2 | 4/4 | FALSE | FALSE | - |
+| P_DUPINT | 0 | 0.8 | PASS | 14 | 0 | 1.4 | FAIL | 13 | none |  | 0 | 25.2 | 1/4 | FALSE | TRUE | production outputs differ from frozen |
+| P_DATESWAP | 0 | 0.6 | PASS | 14 | 0 | 1.6 | FAIL | 10 | none |  | 0 | 24.9 | 1/4 | FALSE | TRUE | production outputs differ from frozen |
+| STUB_F11 | 0 | 0.4 | PASS | 14 | 0 | 1.3 | FAIL | 14 | F11 |  | 0 | 26.3 | 4/4 | FALSE | TRUE | none (production outputs = frozen) |
+| JUDGE_P50 | 0 | 0.8 | FAIL | 12 | 0 | 1.5 | FAIL | 12 | none |  | 0 | 26.4 | 0/4 | TRUE | TRUE | production outputs differ from frozen |
+| P_TZUTC | 0 | 1.2 | PASS | 14 | 0 | 2.2 | PASS | 14 | none |  | 0 | 27.4 | 1/4 | FALSE | FALSE | production outputs differ from frozen |
+
+## Failing fixtures per arm and gate
+| arm | count_failing | depth_failing |
+|---|---|---|
+| B |  |  |
+| P_DUPINT |  | F07 |
+| P_DATESWAP |  | F03/F05/F10/F14 |
+| STUB_F11 |  |  |
+| JUDGE_P50 | F03/F10 | F03/F10 |
+| P_TZUTC |  |  |
+
+## Counts
+- seeded arms caught by the count gate: JUDGE_P50
+- seeded arms caught by the depth gate: P_DUPINT, P_DATESWAP, STUB_F11, JUDGE_P50
+- INFO probe P_TZUTC: count gate PASS, depth gate PASS, real effect: production outputs differ from frozen
+
+## Arm B R-B outputs vs frozen
+| file | frozen | arm_B |
+|---|---|---|
+| R-B/outputs/RB_classifications.csv | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 |
+| R-B/outputs/RB_fixture_results.csv | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 |
+| R-B/outputs/RB_portfolio_counts.csv | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c |
+| R-B/outputs/RB_kappa_grid_counts.csv | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a |
+
+---
+# C41_arms.csv (raw, full file)
+arm,count_exit,count_s,count_gate,count_n_pass,depth_exit,depth_s,depth_gate,depth_n_pass,depth_stubs,depth_error,rb_all_exit,rb_all_s,rb_outputs_equal_frozen,caught_count,caught_depth,real_effect
+B,0,0.5,PASS,14,0,1.2,PASS,14,none,,0,25.2,4/4,FALSE,FALSE,-
+P_DUPINT,0,0.8,PASS,14,0,1.4,FAIL,13,none,,0,25.2,1/4,FALSE,TRUE,production outputs differ from frozen
+P_DATESWAP,0,0.6,PASS,14,0,1.6,FAIL,10,none,,0,24.9,1/4,FALSE,TRUE,production outputs differ from frozen
+STUB_F11,0,0.4,PASS,14,0,1.3,FAIL,14,F11,,0,26.3,4/4,FALSE,TRUE,none (production outputs = frozen)
+JUDGE_P50,0,0.8,FAIL,12,0,1.5,FAIL,12,none,,0,26.4,0/4,TRUE,TRUE,production outputs differ from frozen
+P_TZUTC,0,1.2,PASS,14,0,2.2,PASS,14,none,,0,27.4,1/4,FALSE,FALSE,production outputs differ from frozen
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/B/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/B/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+## arms/B/RUN_FIX_count.exit
+0,0.5,2026-10-03T10:29:12-05:00,0,600
+
+## arms/B/RUN_FIX_depth.exit
+0,1.2,2026-10-03T10:29:13-05:00,0,600
+
+## arms/B/RUN_RB.exit
+0,25.2,2026-10-03T10:29:38-05:00,0,1800
+
+## arms/B/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","STANDARD",TRUE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","STANDARD",TRUE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/B/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","STANDARD",TRUE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","STANDARD",TRUE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/B/outputs/GATE_count.txt
+gate=PASS n_pass=14 n=14 stubs=NA error=
+
+## arms/B/outputs/GATE_depth.txt
+gate=PASS n_pass=14 n=14 stubs=none poison_probe=ran error=
+
+## arms/JUDGE_P50/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,ESCALATE,2400,2160,200,,"E_dormant_ge_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",FALSE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,ESCALATE,96,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",FALSE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/JUDGE_P50/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,148941,6377,66684,23191
+
+## arms/JUDGE_P50/RUN_FIX_count.exit
+0,0.8,2026-10-03T10:31:10-05:00,0,600
+
+## arms/JUDGE_P50/RUN_FIX_depth.exit
+0,1.5,2026-10-03T10:31:11-05:00,0,600
+
+## arms/JUDGE_P50/RUN_RB.exit
+0,26.4,2026-10-03T10:31:38-05:00,0,1800
+
+## arms/JUDGE_P50/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","ESCALATE",FALSE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","ESCALATE",FALSE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/JUDGE_P50/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","ESCALATE",FALSE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","ESCALATE",FALSE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/JUDGE_P50/outputs/GATE_count.txt
+gate=FAIL n_pass=12 n=14 stubs=NA error=
+
+## arms/JUDGE_P50/outputs/GATE_depth.txt
+gate=FAIL n_pass=12 n=14 stubs=none poison_probe=ran error=
+
+## arms/P_DATESWAP/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/P_DATESWAP/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,120630,38605,62767,23191
+
+## arms/P_DATESWAP/RUN_FIX_count.exit
+0,0.6,2026-10-03T10:30:10-05:00,0,600
+
+## arms/P_DATESWAP/RUN_FIX_depth.exit
+0,1.6,2026-10-03T10:30:12-05:00,0,600
+
+## arms/P_DATESWAP/RUN_RB.exit
+0,24.9,2026-10-03T10:30:37-05:00,0,1800
+
+## arms/P_DATESWAP/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","STANDARD",TRUE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","STANDARD",TRUE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/P_DATESWAP/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","INCONCLUSIVE",FALSE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","ESCALATE",FALSE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","ESCALATE",FALSE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","INCONCLUSIVE|STANDARD",FALSE,FALSE
+
+## arms/P_DATESWAP/outputs/GATE_count.txt
+gate=PASS n_pass=14 n=14 stubs=NA error=
+
+## arms/P_DATESWAP/outputs/GATE_depth.txt
+gate=FAIL n_pass=10 n=14 stubs=none poison_probe=ran error=
+
+## arms/P_DUPINT/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/P_DUPINT/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,245014,131968,29389,83657,179
+
+## arms/P_DUPINT/RUN_FIX_count.exit
+0,0.8,2026-10-03T10:29:41-05:00,0,600
+
+## arms/P_DUPINT/RUN_FIX_depth.exit
+0,1.4,2026-10-03T10:29:42-05:00,0,600
+
+## arms/P_DUPINT/RUN_RB.exit
+0,25.2,2026-10-03T10:30:08-05:00,0,1800
+
+## arms/P_DUPINT/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","STANDARD",TRUE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","STANDARD",TRUE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/P_DUPINT/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","STANDARD",TRUE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","ESCALATE",FALSE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","STANDARD",TRUE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/P_DUPINT/outputs/GATE_count.txt
+gate=PASS n_pass=14 n=14 stubs=NA error=
+
+## arms/P_DUPINT/outputs/GATE_depth.txt
+gate=FAIL n_pass=13 n=14 stubs=none poison_probe=ran error=
+
+## arms/P_TZUTC/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/P_TZUTC/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,132072,6377,83553,23191
+
+## arms/P_TZUTC/RUN_FIX_count.exit
+0,1.2,2026-10-03T10:31:44-05:00,0,600
+
+## arms/P_TZUTC/RUN_FIX_depth.exit
+0,2.2,2026-10-03T10:31:47-05:00,0,600
+
+## arms/P_TZUTC/RUN_RB.exit
+0,27.4,2026-10-03T10:32:15-05:00,0,1800
+
+## arms/P_TZUTC/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","STANDARD",TRUE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","STANDARD",TRUE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/P_TZUTC/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","STANDARD",TRUE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","STANDARD",TRUE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/P_TZUTC/outputs/GATE_count.txt
+gate=PASS n_pass=14 n=14 stubs=NA error=
+
+## arms/P_TZUTC/outputs/GATE_depth.txt
+gate=PASS n_pass=14 n=14 stubs=none poison_probe=ran error=
+
+## arms/STUB_F11/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/STUB_F11/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+## arms/STUB_F11/RUN_FIX_count.exit
+0,0.4,2026-10-03T10:30:39-05:00,0,600
+
+## arms/STUB_F11/RUN_FIX_depth.exit
+0,1.3,2026-10-03T10:30:40-05:00,0,600
+
+## arms/STUB_F11/RUN_RB.exit
+0,26.3,2026-10-03T10:31:07-05:00,0,1800
+
+## arms/STUB_F11/outputs/FIX_count.csv
+"fixture_id","expected","observed","pass"
+"F01","ESCALATE","ESCALATE",TRUE
+"F02","STANDARD","STANDARD",TRUE
+"F03","STANDARD","STANDARD",TRUE
+"F04","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F05","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F06","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F07","OUT_OF_SET","OUT_OF_SET",TRUE
+"F08","OUT_OF_SET","OUT_OF_SET",TRUE
+"F09","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F10","STANDARD","STANDARD",TRUE
+"F11","ESCALATE","ESCALATE",TRUE
+"F12","OUT_OF_SET","OUT_OF_SET",TRUE
+"F13","INCONCLUSIVE","INCONCLUSIVE",TRUE
+"F14","STANDARD|STANDARD","STANDARD|STANDARD",TRUE
+
+## arms/STUB_F11/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","STANDARD",TRUE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","STANDARD",TRUE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,TRUE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/STUB_F11/outputs/GATE_count.txt
+gate=PASS n_pass=14 n=14 stubs=NA error=
+
+## arms/STUB_F11/outputs/GATE_depth.txt
+gate=FAIL n_pass=14 n=14 stubs=F11 poison_probe=ran error=
+
+## arms/B/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/B/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/B/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/JUDGE_P50/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/JUDGE_P50/RUN_RB.stderr.txt (last 6 non-empty lines of 19)
+[R-B] portfolio: decision=222002 ESCALATE=148941 INCONCLUSIVE=6377 STANDARD=66684
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/JUDGE_P50/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/P_DATESWAP/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/P_DATESWAP/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=120630 INCONCLUSIVE=38605 STANDARD=62767
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/P_DATESWAP/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/P_DUPINT/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/P_DUPINT/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=245014 ESCALATE=131968 INCONCLUSIVE=29389 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/P_DUPINT/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/P_TZUTC/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/P_TZUTC/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=132072 INCONCLUSIVE=6377 STANDARD=83553
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/P_TZUTC/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/STUB_F11/RUN_FIX_depth.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/STUB_F11/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C41/arms/STUB_F11/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+
+---
+# C41_EVIDENCE.sha256
+5f599977fb7a75605eba7faf549c9d5cac04e9ff4a5c1ade63d766d5afe47d96  C41_ARM_MANIFESTS.txt
+312066794180ae6f1c904c970e5598df250f71393bc15d737ab8a05b8b8a0cd1  C41_arms.csv
+526c255d4888c395a35bb242f94f7413a8f8c309e376f89ddd0b75e028862d42  C41_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files) are listed by hash and size only.
+arms/B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/B in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/B out :: d3997d15f23be33f26e11b1542a767864f27a87ca0b62a498634777c8e395d86  589  outputs\FIX_count.csv
+arms/B out :: 721067c0d3baeb5332b03b15230ed6776944d4c3976b863f5172831e0298c016  842  outputs\FIX_depth.csv
+arms/B out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/B out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/B out :: b554bfdf95110d5080b9146330fb90d8f864d88b197c4e2e5416a845cc995251  42  outputs\GATE_count.txt
+arms/B out :: e3464b6b1f88fd874dfbbf7bb159fe15ed229f70fa6cd21497d7c5ad239131ec  61  outputs\GATE_depth.txt
+arms/B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/B out :: 6800589ec9ffd1963c9c82c4c133622fff46d1c1d603b41083033846f47a2493  39  RUN_FIX_count.exit
+arms/B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/B out :: 7980511e08f9b0bbb7e492fd5fe6229ca0ec1a4e378071b150741df63614472e  39  RUN_FIX_depth.exit
+arms/B out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/B out :: 2ccb19e403f62c150d25a15eb68a8375365d13ccf2b58ec516ac2adf5581488b  41  RUN_RB.exit
+arms/B out :: 2e8660ce4b777397259288940f9cf491a108b524720f854530483e0efdea2ff4  1260  RUN_RB.stderr.txt
+arms/B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/JUDGE_P50 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/JUDGE_P50 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/JUDGE_P50 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/JUDGE_P50 in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/JUDGE_P50 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/JUDGE_P50 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/JUDGE_P50 in  :: d11c2d2c146c240bbc8eeaf56b85fecfaa57673b932894d0c0628db110dbbabc  6027  R-B\R\20_integrity_and_classify.R
+arms/JUDGE_P50 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/JUDGE_P50 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/JUDGE_P50 out :: f80baac3bca45aedfe8dc833c04d429b915fedfaba54f460dfb4dafee67c4c7d  591  outputs\FIX_count.csv
+arms/JUDGE_P50 out :: c616812201e1004f878ae7f093bd0e1d9c9d710a05416905f63bfbb63b7dea4d  844  outputs\FIX_depth.csv
+arms/JUDGE_P50 out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/JUDGE_P50 out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/JUDGE_P50 out :: b36b5fe4bccc9f8a940168269389d0b75d6cdbc6f590272cd26e02840cc14e36  42  outputs\GATE_count.txt
+arms/JUDGE_P50 out :: 741e5da1f8a028f9102cff1e8f0dfa71db27fdf01d5d577f535973c15ef4f368  61  outputs\GATE_depth.txt
+arms/JUDGE_P50 out :: cbd59de16b7b49d472a8bf3d830dec7005365838852fc023ebde13d5299be399  41963733  R-B\outputs\RB_classifications.csv
+arms/JUDGE_P50 out :: 6c4a4af1b69371269aa09bee90ff2f50762e885a30e46ff9310fe719098db5eb  1794  R-B\outputs\RB_fixture_results.csv
+arms/JUDGE_P50 out :: 0140e5831e54608cb62375a3c10d596249d36eaa04b0103ef27ffcf99519bde2  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/JUDGE_P50 out :: facc3ee15c07cbcdba3ff682100ba96753cf0addb9b0963d3223a502d29399f7  100  R-B\outputs\RB_portfolio_counts.csv
+arms/JUDGE_P50 out :: d20003d10cec14cfdf8ccb41f360e72116ea3306ac6b7c83e6a52d9fdb73ce21  39  RUN_FIX_count.exit
+arms/JUDGE_P50 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/JUDGE_P50 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/JUDGE_P50 out :: 3b4c6e54c22032f9254e47516a9e656006212d09376b4452ae57c29d7693ff3f  39  RUN_FIX_depth.exit
+arms/JUDGE_P50 out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/JUDGE_P50 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/JUDGE_P50 out :: 1b10f447606a45e2af45129b538ff2ca00c9275f95763cc0a40dd03ee2688d85  41  RUN_RB.exit
+arms/JUDGE_P50 out :: beb01fed421494504d7e763e772333a8363f725e99b5276b85ce35ad529e6c2d  1327  RUN_RB.stderr.txt
+arms/JUDGE_P50 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/P_DATESWAP in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/P_DATESWAP in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/P_DATESWAP in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/P_DATESWAP in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/P_DATESWAP in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/P_DATESWAP in  :: 87513149cc081c2c433a90aacafda727277270c7177a00260023a25e636c0af6  6683  R-B\R\10_io_parse.R
+arms/P_DATESWAP in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/P_DATESWAP in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/P_DATESWAP in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/P_DATESWAP out :: d3997d15f23be33f26e11b1542a767864f27a87ca0b62a498634777c8e395d86  589  outputs\FIX_count.csv
+arms/P_DATESWAP out :: aeba7b97a0fa4311d99e6e8cd5e1de3c556887cf712b43638d307c4329562df6  850  outputs\FIX_depth.csv
+arms/P_DATESWAP out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/P_DATESWAP out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/P_DATESWAP out :: b554bfdf95110d5080b9146330fb90d8f864d88b197c4e2e5416a845cc995251  42  outputs\GATE_count.txt
+arms/P_DATESWAP out :: bd450fa73152546f48dd49e87f313235234d4eadac49dffc251de6e7c12bbd45  61  outputs\GATE_depth.txt
+arms/P_DATESWAP out :: 681fd21ff204bdf40e026cb928cfeff32352cd308b88db9db5efdf098a3e8663  40127189  R-B\outputs\RB_classifications.csv
+arms/P_DATESWAP out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/P_DATESWAP out :: b71292e53d1014ac886a12b33ace2511c3f14f64d4ca15f15a3304ab056bd086  168  R-B\outputs\RB_kappa_grid_counts.csv
+arms/P_DATESWAP out :: 7937503fd05c589934c728097c006c7a3b6ffc84c92c1587f891a35a1db84b9e  101  R-B\outputs\RB_portfolio_counts.csv
+arms/P_DATESWAP out :: 6a54c4a869bcf5e104ac577ab24e92deb1dad5e5c2c0f9f508b8fd97f62e9807  39  RUN_FIX_count.exit
+arms/P_DATESWAP out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/P_DATESWAP out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/P_DATESWAP out :: 62388d2a5abdb278196b37ed1063eda450c9e47946451c02aea304e4bc99ab3a  39  RUN_FIX_depth.exit
+arms/P_DATESWAP out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/P_DATESWAP out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/P_DATESWAP out :: 7ce54772a00063b9338fb6b87ea978d0b1c4f10ec031c661b4ab65aa3950b3cb  41  RUN_RB.exit
+arms/P_DATESWAP out :: 86a91e6a4f14a3625b8d8303be8f66c2a6a8c9c3766ecddf5667150f15bf6dd6  1306  RUN_RB.stderr.txt
+arms/P_DATESWAP out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/P_DUPINT in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/P_DUPINT in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/P_DUPINT in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/P_DUPINT in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/P_DUPINT in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/P_DUPINT in  :: e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3  6748  R-B\R\10_io_parse.R
+arms/P_DUPINT in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/P_DUPINT in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/P_DUPINT in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/P_DUPINT out :: d3997d15f23be33f26e11b1542a767864f27a87ca0b62a498634777c8e395d86  589  outputs\FIX_count.csv
+arms/P_DUPINT out :: 1cc1af4eeb1a04e136d392594d57de468d199bfdb00b3147d72be8fa55ba0915  841  outputs\FIX_depth.csv
+arms/P_DUPINT out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/P_DUPINT out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/P_DUPINT out :: b554bfdf95110d5080b9146330fb90d8f864d88b197c4e2e5416a845cc995251  42  outputs\GATE_count.txt
+arms/P_DUPINT out :: 423e02559e4b593aa7da6a7eadc3f7422a0f3332ed876bff0657e02d43164a0b  61  outputs\GATE_depth.txt
+arms/P_DUPINT out :: ca411fca7a509c468b4d2854e8002adeeb6a9127a008012ea03a8599ffbb8fab  45552786  R-B\outputs\RB_classifications.csv
+arms/P_DUPINT out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/P_DUPINT out :: 1214c489a21fa3b7d16c88637a84c2af5387327d46a373203205cc4997efa80e  168  R-B\outputs\RB_kappa_grid_counts.csv
+arms/P_DUPINT out :: af0711a26f1a460b5f271fa0842bb1fd2f9f2c90d46e8d45da54bce4c18c6ddb  99  R-B\outputs\RB_portfolio_counts.csv
+arms/P_DUPINT out :: e7f8a06d596e60457d47395d1b61e07f9bcc093fbab75c66fce42fa6de5a3fa1  39  RUN_FIX_count.exit
+arms/P_DUPINT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/P_DUPINT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/P_DUPINT out :: 81c340d853e431d2493ee6535f9c0cef965e1a71713d17c38fae0698bef392c0  39  RUN_FIX_depth.exit
+arms/P_DUPINT out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/P_DUPINT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/P_DUPINT out :: 13713d86bd056e212b5a3d3b09e50887923af7c684c09efa3229ac85c7222a59  41  RUN_RB.exit
+arms/P_DUPINT out :: 9291bf6c2590b6706a643cbd4e2121ce27dd4917a411ba9902852e2885b43f34  1296  RUN_RB.stderr.txt
+arms/P_DUPINT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/P_TZUTC in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/P_TZUTC in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/P_TZUTC in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/P_TZUTC in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/P_TZUTC in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/P_TZUTC in  :: 33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c  6645  R-B\R\10_io_parse.R
+arms/P_TZUTC in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/P_TZUTC in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/P_TZUTC in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/P_TZUTC out :: d3997d15f23be33f26e11b1542a767864f27a87ca0b62a498634777c8e395d86  589  outputs\FIX_count.csv
+arms/P_TZUTC out :: 721067c0d3baeb5332b03b15230ed6776944d4c3976b863f5172831e0298c016  842  outputs\FIX_depth.csv
+arms/P_TZUTC out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/P_TZUTC out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/P_TZUTC out :: b554bfdf95110d5080b9146330fb90d8f864d88b197c4e2e5416a845cc995251  42  outputs\GATE_count.txt
+arms/P_TZUTC out :: e3464b6b1f88fd874dfbbf7bb159fe15ed229f70fa6cd21497d7c5ad239131ec  61  outputs\GATE_depth.txt
+arms/P_TZUTC out :: 87c15c8815935166f55a53417461e7e9eb34f2caa39c502b150b2ea80074f00e  41963341  R-B\outputs\RB_classifications.csv
+arms/P_TZUTC out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/P_TZUTC out :: a19f4bedf3367ff9928849fa5146c93a4283528a5390b6e4b6b949027b4d4139  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/P_TZUTC out :: 0f796663eee07d82dd45e907224d36e4358ee38fdcce76951fcdd4a3a08f4ef4  100  R-B\outputs\RB_portfolio_counts.csv
+arms/P_TZUTC out :: eaa286ea11653a23a407e5bfdecf322df1f8585fa516fc8b350f6082f197946b  39  RUN_FIX_count.exit
+arms/P_TZUTC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/P_TZUTC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/P_TZUTC out :: e69b72592a8648ac5a922935c5130515d7dfe6aa2c72d5353cd027e24a445b92  39  RUN_FIX_depth.exit
+arms/P_TZUTC out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/P_TZUTC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/P_TZUTC out :: 3a301f3f8c8992b954ff073e77d3d54734ba2d915be57ba45d061b9ab8712e15  41  RUN_RB.exit
+arms/P_TZUTC out :: 3fe5df0eb554243174c86bcfb1ec32a51b45e052bbd667b6bbe4eae1474cc933  1290  RUN_RB.stderr.txt
+arms/P_TZUTC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/STUB_F11 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/STUB_F11 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/STUB_F11 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/STUB_F11 in  :: 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  fixdepth.R
+arms/STUB_F11 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/STUB_F11 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/STUB_F11 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/STUB_F11 in  :: 0961a79bf1b451b72450aac141290444514248e59abd88d9e5a6b699f968bca3  7408  R-B\R\40_fixtures.R
+arms/STUB_F11 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/STUB_F11 out :: d3997d15f23be33f26e11b1542a767864f27a87ca0b62a498634777c8e395d86  589  outputs\FIX_count.csv
+arms/STUB_F11 out :: 0954e7fecc3b402bd1a325c1318be4178dd81fb181a33b76cd058f2bb7d76da3  841  outputs\FIX_depth.csv
+arms/STUB_F11 out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/STUB_F11 out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/STUB_F11 out :: b554bfdf95110d5080b9146330fb90d8f864d88b197c4e2e5416a845cc995251  42  outputs\GATE_count.txt
+arms/STUB_F11 out :: 8c9912f7d214feeccf7f382ad42cd7068c90816d01627babc029b689d6eb4424  60  outputs\GATE_depth.txt
+arms/STUB_F11 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/STUB_F11 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/STUB_F11 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/STUB_F11 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/STUB_F11 out :: ea1a375faa65ed4b478de88cb59320c7e523ba03b9d8500dde9016d9803b935a  39  RUN_FIX_count.exit
+arms/STUB_F11 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stderr.txt
+arms/STUB_F11 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_count.stdout.txt
+arms/STUB_F11 out :: 6cd76d6d4e0283088bf65ad635a54795a0fe686a9df270d1c7185a8dec948b97  39  RUN_FIX_depth.exit
+arms/STUB_F11 out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_FIX_depth.stderr.txt
+arms/STUB_F11 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIX_depth.stdout.txt
+arms/STUB_F11 out :: 071159cf7111c778fe4581e47468250bd5d151033a0d4ec04a47b9ee0e0106cd  41  RUN_RB.exit
+arms/STUB_F11 out :: 4e80a3c5a255897e6c7bd203fa47f0b932dd3af68796f7e5c837aacc1f9295ce  1295  RUN_RB.stderr.txt
+arms/STUB_F11 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C41/RB_P_DUPINT__10_io_parse.R
+@@ -149,7 +149,7 @@
+     created_ts = created_ts,
+     mod_ts = mod_ts,
+     closed_ts = closed_ts,
+-    DUPLICATE = getc(col_dup),
++    DUPLICATE = suppressWarnings(as.character(as.integer(getc(col_dup)))),  # [seed C41 P_DUPINT] yes/no flag read as a number (PricePoint integer trust-flag pattern)
+     LEGACY_RECORD = getc(col_leg),
+     PARENT_SR_NUMBER = getc(col_parent),
+     stringsAsFactors = FALSE,
+
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C41/RB_P_DATESWAP__10_io_parse.R
+@@ -33,7 +33,7 @@
+ 
+   # Try several formats without lubridate dependency for core path
+   formats <- c(
+-    "%Y-%m-%d %H:%M:%S",
++    "%Y-%d-%m %H:%M:%S",  # [seed C41 P_DATESWAP] day and month swapped in the first ISO format
+     "%Y-%m-%d %H:%M",
+     "%m/%d/%Y %I:%M:%S %p",
+     "%m/%d/%Y %H:%M:%S",
+
+--- frozen/R-B/R/40_fixtures.R
++++ seeds/C41/RB_STUB_F11__40_fixtures.R
+@@ -144,6 +144,7 @@
+ 
+   # Restore fixture order
+   m <- m[match(exp$SR_NUMBER, m$SR_NUMBER), ]
++  m$observed_classification[m$fixture_id == "F11"] <- "ESCALATE"  # [seed C41 STUB_F11] stub: observed value hard-coded, the judge is not consulted
+   m$pass <- m$expected_classification == m$observed_classification
+   m$kappa <- kappa
+   m$fixture_version <- RB_FIXTURE_VERSION
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R
+@@ -89,7 +89,7 @@
+ 
+   # κ rule among coherent decision rows
+   eligible_coherent <- in_decision & !integrity_fail
+-  thresh <- kappa * peer_p75
++  thresh <- kappa * joined$peer_p50_h  # [seed C41 JUDGE_P50] threshold uses peer P50 instead of P75
+   escalate <- eligible_coherent & !is.na(dormant_h) & !is.na(thresh) & (dormant_h >= thresh)
+   standard <- eligible_coherent & !escalate
+ 
+
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C41/RB_P_TZUTC__10_io_parse.R
+@@ -42,7 +42,7 @@
+   for (fmt in formats) {
+     still <- ok & is.na(out)
+     if (!any(still)) break
+-    parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "America/Chicago"))
++    parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "UTC"))  # [seed C41 P_TZUTC] wall clock read as UTC
+     out[still] <- parsed
+   }
+   out
+
+### seeds/C41/ARMS.tsv (new file, 1190 bytes)
+arm	code_seeds	desc
+B	-	clean: frozen R-B code
+P_DUPINT	seeds/C41/RB_P_DUPINT__10_io_parse.R>R-B\R\10_io_parse.R	loader defect: R-B reads the DUPLICATE yes/no flag as a number, so 'true'/'false' become NA and duplicates enter the decision set (ruled target: a yes/no flag read as a number)
+P_DATESWAP	seeds/C41/RB_P_DATESWAP__10_io_parse.R>R-B\R\10_io_parse.R	loader defect: R-B's first timestamp format has day and month swapped, so ISO dates with day <= 12 are misread (ruled target: a date-parse error)
+STUB_F11	seeds/C41/RB_STUB_F11__40_fixtures.R>R-B\R\40_fixtures.R	fixture defect: F11's observed label is hard-coded, so it always passes (ruled target: a test case that always passes; PricePoint's 4 no-op stubs)
+JUDGE_P50	seeds/C41/RB_JUDGE_P50__20_integrity_and_classify.R>R-B\R\20_integrity_and_classify.R	judge defect the count rule catches (control for 'catches everything the old rule catches'): the kappa threshold uses peer P50 instead of P75
+P_TZUTC	seeds/C41/RB_P_TZUTC__10_io_parse.R>R-B\R\10_io_parse.R	INFO probe (not a ruled target): R-B reads wall clocks as UTC (the Chicago pack's own first-run 104-row defect); shifts dormant_h by 5-6 h, which moves no fixture label
+
+### seeds/C41/FIXDEPTH (new file, 81 bytes)
+C41 fixture-gate arms (runner v5): count gate, depth gate, R-B 'all' run per arm
+
+### seeds/C41/fixdepth.R (new file, 6775 bytes)
+#!/usr/bin/env Rscript
+# N13 b5 C41 fixture-gate harness (owner ruling 41A, 2026-10-03 09:58 CT).
+# Usage: Rscript fixdepth.R <ARM_ROOT> <count|depth> <FROZEN_SOURCE_DIR>
+#   count = the frozen gate: rb_score_fixtures() on the locked synthetic pack; gate PASS iff every row passes (N/N).
+#   depth = ruling 41A: the SAME rows of rb_build_fixture_pack() are written as text in the production source layout
+#           (tab-separated, the frozen src_open_candidates.csv / src_peer_stats.csv header lines, MySQL-style *_ts columns,
+#           raw-style *_DATE columns) and read back through 10_io_parse (rb_read_csv_flex -> rb_normalize_open /
+#           rb_normalize_peers) before rb_judge_rows; expectations are the locked ones, unchanged.
+#           Plus a stub probe: rb_score_fixtures() is re-run with rb_judge_rows replaced by a poison judge
+#           (every label 'POISON', every row in the decision set); any fixture that still passes is a stub.
+#           Depth gate PASS iff every row passes through the loader AND no stub AND no error.
+# Writes <ARM_ROOT>/outputs/FIX_<mode>.csv and <ARM_ROOT>/outputs/GATE_<mode>.txt. Reads the frozen source dir only for header lines.
+a <- commandArgs(trailingOnly = TRUE); root <- a[[1]]; mode <- a[[2]]; src <- a[[3]]
+stopifnot(mode %in% c("count", "depth"))
+for (f in c("00_config.R", "10_io_parse.R", "20_integrity_and_classify.R", "40_fixtures.R")) source(file.path(root, "R-B", "R", f))
+od <- file.path(root, "outputs"); dir.create(od, showWarnings = FALSE, recursive = TRUE)
+gate_line <- function(...) writeLines(paste0(...), file.path(od, paste0("GATE_", mode, ".txt")))
+score <- function(j, pack) {
+  got <- j$classification; got[!j$in_decision_set] <- "OUT_OF_SET"
+  e <- pack$expected
+  d <- data.frame(fixture_id = e$fixture_id, SR_NUMBER = e$SR_NUMBER, expected = e$expected_classification,
+                  observed = got[match(e$SR_NUMBER, j$SR_NUMBER)], stringsAsFactors = FALSE)
+  d$pass <- !is.na(d$observed) & d$expected == d$observed
+  f14 <- d[d$fixture_id %in% c("F14A", "F14B"), ]
+  rbind(d[!d$fixture_id %in% c("F14A", "F14B"), ],
+        data.frame(fixture_id = "F14", SR_NUMBER = "SYN-F14A|SYN-F14B", expected = "STANDARD|STANDARD",
+                   observed = paste(f14$observed, collapse = "|"), pass = all(f14$pass), stringsAsFactors = FALSE))
+}
+if (mode == "count") {
+  res <- tryCatch({ fx <- rb_score_fixtures(kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+    data.frame(fixture_id = fx$fixture_id, expected = fx$expected_classification, observed = fx$observed_classification, pass = fx$pass %in% TRUE, stringsAsFactors = FALSE) },
+    error = function(e) structure(list(msg = conditionMessage(e)), class = "err"))
+  if (inherits(res, "err")) { gate_line("gate=FAIL n_pass=0 n=0 stubs=NA error=", gsub("[\r\n]+", " ", res$msg)); quit(status = 0) }
+  write.csv(res, file.path(od, "FIX_count.csv"), row.names = FALSE)
+  gate_line("gate=", if (nrow(res) == 14 && all(res$pass)) "PASS" else "FAIL", " n_pass=", sum(res$pass), " n=", nrow(res), " stubs=NA error=")
+  quit(status = 0)
+}
+# ---------------- depth ----------------
+harness_ts <- function(x) suppressWarnings(as.POSIXct(x, format = "%Y-%m-%d %H:%M:%S", tz = "America/Chicago"))  # harness-own parse of the pack's ISO strings
+mdy <- function(ts) ifelse(is.na(ts), NA_character_, format(ts, "%m/%d/%Y %I:%M:%S %p"))
+iso <- function(ts) ifelse(is.na(ts), "NULL", paste0(format(ts, "%Y-%m-%d %H:%M:%S"), ".000000"))
+err <- ""; res <- NULL
+pack <- rb_build_fixture_pack(t_freeze = RB_T_FREEZE)
+res <- tryCatch({
+  hdr_o <- strsplit(readLines(file.path(src, "src_open_candidates.csv"), n = 1, warn = FALSE), "\t")[[1]]
+  hdr_p <- strsplit(readLines(file.path(src, "src_peer_stats.csv"), n = 1, warn = FALSE), "\t")[[1]]
+  o <- pack$open; n <- nrow(o)
+  O <- as.data.frame(matrix("", nrow = n, ncol = length(hdr_o), dimnames = list(NULL, hdr_o)), stringsAsFactors = FALSE)
+  rawdate <- function(s) { t <- harness_ts(s); ifelse(is.na(t), ifelse(is.na(s), "", s), mdy(t)) }
+  O$SR_NUMBER <- o$SR_NUMBER; O$SR_TYPE <- o$SR_TYPE; O$SR_SHORT_CODE <- o$SR_SHORT_CODE; O$STATUS <- o$STATUS
+  O$CREATED_DATE <- rawdate(o$CREATED_DATE); O$LAST_MODIFIED_DATE <- rawdate(o$LAST_MODIFIED_DATE)
+  O$CLOSED_DATE <- ifelse(nzchar(o$CLOSED_DATE), rawdate(o$CLOSED_DATE), "")
+  O$created_ts <- iso(harness_ts(o$CREATED_DATE)); O$mod_ts <- iso(harness_ts(o$LAST_MODIFIED_DATE))
+  O$closed_ts <- ifelse(nzchar(o$CLOSED_DATE), iso(harness_ts(o$CLOSED_DATE)), "NULL")
+  O$DUPLICATE <- o$DUPLICATE; O$LEGACY_RECORD <- o$LEGACY_RECORD; O$PARENT_SR_NUMBER <- o$PARENT_SR_NUMBER
+  O$type_key <- o$type_key; O$t_freeze <- "2026-09-12 23:59:59"; O$mechanical_envelope <- "fixture"; O$snapshot_id <- RB_FIXTURE_VERSION
+  P <- as.data.frame(matrix("", nrow = nrow(pack$peers), ncol = length(hdr_p), dimnames = list(NULL, hdr_p)), stringsAsFactors = FALSE)
+  P$type_key <- pack$peers$type_key; P$peer_n <- as.character(pack$peers$peer_n)
+  P$peer_p50_h <- format(pack$peers$peer_p50_h, scientific = FALSE, trim = TRUE); P$peer_p75_h <- format(pack$peers$peer_p75_h, scientific = FALSE, trim = TRUE)
+  P$t_freeze <- "2026-09-12 23:59:59"; P$lookback_w_days <- "365"; P$peer_def <- "fixture"; P$peer_label_note <- "fixture"
+  fo <- file.path(od, "FIXTURE_src_open_candidates.tsv"); fp <- file.path(od, "FIXTURE_src_peer_stats.tsv")
+  write.table(O, fo, sep = "\t", quote = FALSE, row.names = FALSE, na = ""); write.table(P, fp, sep = "\t", quote = FALSE, row.names = FALSE, na = "")
+  j <- rb_judge_rows(rb_normalize_open(rb_read_csv_flex(fo)), rb_normalize_peers(rb_read_csv_flex(fp)), kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+  score(j, pack) }, error = function(e) { err <<- gsub("[\r\n]+", " ", conditionMessage(e)); NULL })
+real <- rb_judge_rows
+assign("rb_judge_rows", function(open_df, peer_df, kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE) {
+  r <- real(open_df, peer_df, kappa = kappa, t_freeze = t_freeze); r$classification <- "POISON"; r$in_decision_set <- TRUE; r }, envir = globalenv())
+fxp <- tryCatch(rb_score_fixtures(kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE), error = function(e) NULL)
+assign("rb_judge_rows", real, envir = globalenv())
+stubs <- if (is.null(fxp)) character(0) else fxp$fixture_id[fxp$pass %in% TRUE]
+if (!is.null(res)) { res$stub <- res$fixture_id %in% stubs; write.csv(res, file.path(od, "FIX_depth.csv"), row.names = FALSE) }
+ok <- !is.null(res) && nrow(res) == 14 && all(res$pass) && !length(stubs) && !nzchar(err)
+gate_line("gate=", if (ok) "PASS" else "FAIL", " n_pass=", if (is.null(res)) 0 else sum(res$pass), " n=", if (is.null(res)) 0 else nrow(res),
+          " stubs=", if (length(stubs)) paste(stubs, collapse = "|") else "none", " poison_probe=", if (is.null(fxp)) "error" else "ran", " error=", err)
+
+
+

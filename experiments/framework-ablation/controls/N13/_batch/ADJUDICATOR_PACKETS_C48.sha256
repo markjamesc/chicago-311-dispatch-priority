@@ -1,0 +1,3 @@
+# N13 b5 C48 Grok adjudicator packet, assembled on PC DESKTOP-RPECRM9 with runner/assemble_adjudicator.R (sha 1327ff98…) 11:41 CDT from the HEAD (PACKETS_C48_BV.sha256, 36f4f77c…; CRLF read, LF written) + frozen reports (CAPTURE_FREEZE_C48BV.sha256); box copy byte-identical; = HEAD + FREEZE RECORD + both reports verbatim (checked)
+726da96fba5f7e555278e95f3d605b0b6f461bc115768b5840a9088112e47f8a  C48/packets/C48_3_ADJUDICATOR_Grok.txt
+3db6164d62413a0bc506db6a94e7414da55ef0f25f7dc854fa727b858567805c  C48/EVIDENCE_FREEZE.json

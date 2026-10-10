@@ -1,0 +1,6 @@
+sent=2026-10-03 12:26:23
+reply_complete=2026-10-03 12:28:52
+# Grok Adjudicator capture adjudicator_grok.html; CT wall clock (CDT, UTC-5).
+# Source: coordinator message 2026-10-03 12:29 CT: sent 2026-10-03T17:26:23Z; reply complete ~17:28:52Z (computerUse estimate, not an operator stopwatch).
+# Upper bound for reply_complete: page save mtime 2026-10-03 12:28:39.48 CDT (box). The estimate is 13 s later than the save mtime, so the save mtime is the binding upper bound: reply_complete <= 12:28:39.
+# Grok chat: https://grok.com/c/b0b43d47-27fa-4254-8576-b16628f500ba (packet C43_3_ADJUDICATOR_Grok.txt b26b417f…; 1 user message "Follow the attached packet exactly; reply in full.").

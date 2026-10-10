@@ -1,0 +1,1 @@
+Superseded for scoring by the PD-3 rerun (2026-10-03 ~12:45 CT). Kept unchanged as evidence: SHA256SUMS (no extension) never reached DeepSeek in this arm. Hashes: CAPTURE_FREEZE_b6.sha256. Nothing deleted.

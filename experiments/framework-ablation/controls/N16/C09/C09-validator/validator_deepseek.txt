@@ -1,0 +1,157 @@
+﻿1. Role attestation and ablation ID
+Role: Validator only, DeepSeek DeepThink on, Search off. I have not seen and did not ask for the Builder output. Ablation ID: C09 — owner list control #9, “Ambiguity attack before lock (ledger replay)”, batch N16, target stage Stage 1-2 framing. Capture mode: text-only; no PC run; no MySQL/R/fixtures for N16. I do not return KEEP, REVERT or HALT.
+
+2. Independent test plan: what I checked, and how
+I checked the frozen SPEC, constitution, preflight, C09_RESULTS.md, C09_ledger.csv, the scorer source, and the verbatim frozen inputs. I re-implemented the scorer’s declared mechanical logic from scorers/score_c09.py:
+
+parsed the ambiguity ledger table and recomputed substantive, later_ruling_needed, and the needed-count;
+
+parsed the 16 Design Gate checklist items and re-applied the scorer’s declared topic regexes to ambiguity_ledger.md + stage1_decision.json;
+
+recounted the four review-file word matches under the scorer’s regex (?i)\b(blocking|material|revise|tighten|required revision);
+
+compared every hash equality I could see across SPEC, PREFLIGHT, C09_EVIDENCE.sha256, and the scorer header;
+
+checked for internal runner-output inconsistencies.
+
+Fixture and reconciliation items: not applicable for N16. Reason: no R run, no MySQL, no fixture suite, and no R-A/R-B path. Text-level equivalent checked: frozen input hashes in PREFLIGHT and the text-only capture note.
+
+3. Independently recomputed hard facts
+Ledger identities. The frozen ledger has 13 contiguous rows: A001–A013.
+
+Scorer substantive classification. Using the scorer’s exact code sub = not re.search(r"Process|governance", sev):
+
+classification	rows
+substantive = yes	A001, A002, A003, A004, A005, A006, A007, A008, A011, A012 = 10
+substantive = no	A009, A010, A013 = 3
+Caveat: A012 has severity Blocking (process). The scorer’s regex is case-sensitive and excludes Process and governance, but not lowercase process. Therefore A012 is mechanically marked substantive yes, but if the intended exclusion is any process item, A012 should be no; corrected substantive count would be 9.
+
+Needed-later count. Using later = bool(re.search(r"OPEN|Stage 3|later|Deferred", res + sev)) and requiring substantive == yes, the needed rows are:
+
+id	reason matched
+A003	OPEN, Stage 3
+A006	later
+A007	OPEN, Stage 3
+A008	Stage 3
+A011	OPEN, later, Stage 3
+Recomputed count: 5. This matches C09_RESULTS.md. If A012 is corrected to process/no, the needed count remains 5. If A012 were also treated as semantically open/later, it would become 6; either way, the zero-count condition is not met.
+
+Design Gate checklist mapping. The scorer extracted 16 items. Under the declared topic regexes, the yes items are:
+
+item	regex hit
+4	window|snapshot|frozen
+5	[Oo]pen
+6	[Cc]annot|INCONCLUSIVE
+7	[Ee]ligible|duplicate|legacy
+10	age|lateness|urgenc
+11	SLA
+13	[Cc]apacity|ranking
+16	Grok
+Mechanical count: 8 / 16, matching C09_RESULTS.md. Semantic caveat: item 16 concerns accepting AI2 produced under Grok Auto, but the ledger/Start text say Grok Comprehensive. The regex hits Grok, so the mechanical count is 8, but a semantic mapping would likely mark item 16 no, giving 7 / 16.
+
+Attack-record word counts. Recomputing the scorer’s regex over the four frozen reviews:
+
+review	recomputed count
+ai2_start	2
+ai3_start	1
+ai2_framing	7
+ai3_framing	4
+These match C09_RESULTS.md.
+
+Hash equalities checked.
+
+artifact	equality
+constitution	SPEC e6c3b348… = PREFLIGHT e6c3b348…
+owner rulings sheet	SPEC 1214c896… = PREFLIGHT 1214c896…
+owner answer file	SPEC 3a7a87ca… = PREFLIGHT 3a7a87ca…
+score_c09.py	SPEC 8b3da05e… = C09_EVIDENCE 8b3da05e… = scorer header 8b3da05e…
+ambiguity_ledger.md	PREFLIGHT f6d856ea… = C09_EVIDENCE f6d856ea…
+stage1_decision.json	PREFLIGHT a74389af… = C09_EVIDENCE a74389af…
+ai2_start_review_pass1.md	PREFLIGHT b3492dd9… = C09_EVIDENCE b3492dd9…
+ai3_start_review_pass1.md	PREFLIGHT 1cd29a86… = C09_EVIDENCE 1cd29a86…
+ai2_framing_review_pass1.md	PREFLIGHT b29b3908… = C09_EVIDENCE b29b3908…
+ai3_framing_review_pass1.md	PREFLIGHT f1f47ded… = C09_EVIDENCE f1f47ded…
+DESIGN_GATE_PACKAGE.md	PREFLIGHT 0ec361b5… = C09_EVIDENCE 0ec361b5…
+C09_RESULTS.md	SPEC 490ce631… = C09_EVIDENCE 490ce631…
+C09_ledger.csv	SPEC 220fa278… = C09_EVIDENCE 220fa278…
+PREFLIGHT reports failures: 0.
+
+Portfolio deltas / D-sets / cross-arm hash equalities. Not present in this packet. N16 runs no R-A/R-B path and no portfolio/R output, so portfolio deltas, D-sets, and cross-arm R-A/R-B hash equalities are not applicable here.
+
+Internal inconsistencies flagged in runner output.
+
+C09_RESULTS.md is generated 2026-10-09 02:21:35 CT; PREFLIGHT is 2026-10-09 02:21:42 CT. The results file timestamp precedes the preflight timestamp by 7 seconds.
+
+A012 is marked substantive yes in C09_ledger.csv despite severity Blocking (process); the scorer’s process exclusion misses lowercase process.
+
+Item 16 mechanical yes is a regex hit on Grok, but the item text is about Grok Auto while the ledger/Start say Grok Comprehensive.
+
+C09_ledger.csv is described as “raw, full file”, but its resolution values are truncated by the scorer (res[:70]), e.g. A003 ends …→ Sta.
+
+The scorer source reads DESIGN_GATE_RECEIPT.md into RCPT, but never uses it, and it is not listed in C09_EVIDENCE.sha256.
+
+4. Facts that cannot be recomputed from this packet
+SHA-256 values cannot be recomputed from raw bytes here; I can only compare the hashes as listed.
+
+scorers/n16lib.py source and hash cannot be independently recomputed; only its SPEC hash/size are shown.
+
+Individual baseline framework file hashes 70a14831… and 24aec49c… are listed in SPEC, but the individual baseline files are not shown; PREFLIGHT only shows frozen/BASELINE_FRAMEWORK.sha256.
+
+The full contents and origin paths of all 75 frozen files are not shown; only the preflight summary and selected inputs are present.
+
+DESIGN_GATE_RECEIPT.md content is not shown, and the scorer does not use it.
+
+The semantic intent of the owner rulings beyond the quoted text cannot be independently tested here.
+
+The N1/OF-1 clock-cause claim about R-B as.POSIXct vs R-A lubridate cannot be tested in this packet; N16 has no R path.
+
+Whether A012 should be treated as substantive or process is a semantic application question; the scorer mechanically marks it substantive.
+
+Whether item 16 should semantically count as named is not mechanically decidable from the regex alone.
+
+Portfolio deltas, D-sets, MySQL/R outputs, and R-A/R-B cross-arm equalities are not applicable to this N16 text-only C09 packet.
+
+5. P1 assessment against the frozen predicate in SPEC
+The frozen P1 predicate is: the zero-count condition is satisfied iff 0 substantive ledger ambiguities needed a later ruling; otherwise the non-zero side applies. The reported checklist count is not scored.
+
+Recomputed facts:
+
+substantive ledger ambiguities needing a later ruling: 5 (A003, A006, A007, A008, A011);
+
+zero-count condition: false, because 5 ≠ 0;
+
+if A012 is corrected to process/non-substantive, count remains 5;
+
+if A012 were also treated as semantically later, count would be 6;
+
+Design Gate checklist items mechanically named: 8 / 16; semantic caveat on item 16 gives 7 / 16 if corrected;
+
+attack-record counts: ai2_start 2, ai3_start 1, ai2_framing 7, ai3_framing 4.
+
+Fixture/reconciliation: not applicable — no R run, no MySQL, no fixture suite in N16. Text-level equivalent: frozen input hash verification in PREFLIGHT and text-only capture per coordinator note.
+
+No terminal state is stated here.
+
+6. Blocking objections
+Blocking objection 1 — preflight/order inconsistency. PREFLIGHT is timestamped 2026-10-09 02:21:42 CT, but C09_RESULTS.md is generated 2026-10-09 02:21:35 CT. If preflight is required before the reporting run, the harness order is defective and should block a verdict until explained.
+
+Blocking objection 2 — A012 substantive misclassification. The scorer’s Process|governance exclusion is case-sensitive and misses lowercase process in A012 severity Blocking (process). C09_ledger.csv therefore marks A012 substantive yes. This is a hard-fact table inconsistency under the declared process-exclusion intent. It does not change the P1 needed-count, but it should block hard-fact agreement until corrected.
+
+Non-blocking defects noted. Item 16 is a regex false positive relative to its semantic text; C09_ledger.csv resolutions are truncated despite being labelled raw/full; DESIGN_GATE_RECEIPT.md is read but unused and absent from C09_EVIDENCE.sha256.
+
+7. Claim → evidence map
+claim	evidence
+Ablation C09 / N16 / Stage 1-2 framing	SPEC header; coordinator note
+Text-only, no PC/MySQL/R	coordinator note; SPEC capture mode; PREFLIGHT
+Frozen input preflight passed	PREFLIGHT PREFLIGHT PASS failures: 0
+Ledger has 13 rows A001–A013	frozen/stage12/ambiguity_ledger.md; C09_ledger.csv
+5 substantive ambiguities needed later ruling	recomputation from ambiguity_ledger.md; C09_RESULTS.md counts
+Checklist mechanical count 8/16	scorer TOP regexes; DESIGN_GATE_PACKAGE.md; stage1_decision.json
+Item 16 semantic caveat	DESIGN_GATE_PACKAGE item 16; ambiguity_ledger A009; stage1_decision.json
+Attack counts 2/1/7/4	four frozen review files; scorer regex; C09_RESULTS.md
+Hash equalities	SPEC, PREFLIGHT, C09_EVIDENCE.sha256, scorer header
+Timestamp order inconsistency	C09_RESULTS.md header; PREFLIGHT header
+A012 process misclassification	ambiguity_ledger A012; scorer source Process|governance; C09_ledger.csv A012
+C09_ledger.csv truncation	scorer source res[:70]; C09_ledger.csv resolution fields
+RCPT unused / not in evidence	scorer source RCPT = rd(...); C09_EVIDENCE.sha256
+END C09 VALIDATOR REPORT

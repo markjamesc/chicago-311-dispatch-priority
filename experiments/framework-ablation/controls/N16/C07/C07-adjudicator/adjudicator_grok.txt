@@ -1,0 +1,156 @@
+﻿Role attestation
+
+I am Grok, acting only as Adjudicator (Expert) for ablation C07, batch N16, owner control #7 (Framing gate: exactly one question, ledger replay). Builder is ChatGPT; Validator is DeepSeek. I did not build, validate, rerun the scorer, repair code, create a criterion, or relax a gate. This reply issues one terminal state under constitution v1.0 (e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9). KEEP would allow the Framing gate to lock more than one question. REVERT keeps exactly one locked question.
+
+Freeze check
+
+The FREEZE RECORD (2026-10-09 03:12:50 CT) names the two packs and records verdict_token_leak: false for both:
+
+Builder: C07/C07-builder/builder_report.md, 23659 bytes, SHA-256 4a3bea7b0bda814f95d47999f2406d627d1b6bae5fbec8f0938d4a70043f8cd7
+Validator: C07/C07-validator/validator_report.md, 13278 bytes, SHA-256 64176f6eabaf31a63cff33d5ef9082e22817a40a13a27b866d73c15670bfaf28
+
+The reports embedded in this packet are those freeze-record packs. Each is complete and ends with its required line: END C07 BUILDER REPORT and END C07 VALIDATOR REPORT. Neither pack contains a KEEP, REVERT, or HALT token. I did not recompute those two digests; the packet forbids reruns and tools, and no separate byte image was supplied beyond the freeze record and the verbatim reports.
+Frozen-input and scorer hashes cited by both packs match the strings in PREFLIGHT (failures: 0), C07_EVIDENCE.sha256, and the FROZEN REFERENCE HASHES: constitution e6c3b348…, owner sheet 1214c896…, owner answer 3a7a87ca…, score_c07.py 8c26588039f75016340ada7835931c65c7ffc05a721b05451785724857dc62a3, n16lib.py 4a6675fa… (SPEC / reference list; absent from C07_EVIDENCE.sha256), C07_RESULTS.md ab49fcea…, C07_extra_questions.csv abfd4ad3…, and the seven ledger/design/Stage 5 files listed in C07_EVIDENCE.sha256. No hash string in the packet contradicts the FREEZE RECORD or the FROZEN REFERENCE HASHES.
+
+Hard-fact agreement table
+
+Scorer RESULTS (C07_RESULTS.md, generated 2026-10-09 02:21:35 CT): extra deferred = 5; lost = 0; mechanical branch = REVERT side. CSV rows A003, A006, A007, A008, A011, all outcome=carried.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactScorer RESULTSBuilderValidatorMarkCandidate-question rows2 (1 not superseded: CQ-F01)2; CQ-DRAFT-01 superseded; CQ-F01 live2; same statuses; CQ-F02 absent from Stage 1–2 ledgeragreeExtra deferred count as emitted55 (A003, A006, A007, A008, A011)Runner = 5; manual re-read = 4 if A006 excludeddisagree on A006 membership; agree the runner emitted 5Lost count000 on both the 5-row set and the 4-row setagreeA003, A007, A008, A011 class and carriageextra, in Stage 3 yes, in Stage 5 yes, carriedcarriedcarriedagreeA006 classextra deferred; carriedcarried (semantic trace as well as keyword)keyword-carried; disputes deferred class (“Resolved (T008)”; residual urgency already A008)disagree on class; agree on keyword carriageDecision-ledger “open later” rows2 (Time scope; Capacity / ranking)22agreeINFO CQ-F01/CQ-F02 mentions in revision trail11 (R011, CQ-F01)1agreeP1 KEEP-side (extra==0) OR (lost>=1)false (REVERT side)falsefalse on both 5 and 4agreeStage 5 decision-set identity131968+6377+83657=222002samesame; κ grid monotonicagreeSeed files / extra chatsnone / 00 / 0not contradictedagreeListed input and result hashesmatch reference stringsstring-equalstring-equal; n16lib missing from C07_EVIDENCE.sha256 onlyagree (no mismatch)PreflightPASS, failures 0quotedquoted; notes results timestamp 7 s before preflightagree on PASS
+The only hard-number dispute is A006’s membership (5 vs 4). It does not decide P1: both counts are greater than 0, and lost = 0 on both. I do not adopt either cardinality as a new criterion.
+
+The nine KEEP conditions (constitution §7)
+PASS. Both packs are present, frozen in the FREEZE RECORD, complete, and closed by their END lines; scorer RESULTS, CSV, scorer source, and the verbatim Stage 1–5 inputs used by the scorer are in the packet; PREFLIGHT failures = 0.
+PASS. Roles are Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Each pack attests a blind first pass and issues no terminal state. Freeze record: verdict_token_leak: false.
+PASS on the P1-deciding mechanical facts. Both packs and the scorer agree the runner emitted extra = 5 and lost = 0, and both packs agree lost = 0 and extra ≥ 1, so the KEEP-side disjuncts are false either way (SPEC regression rule: HALT only if a hard-number dispute decides a P1 condition). The A006 class dispute is recorded in §3 and §6; it is not a conflicting execution result.
+PASS (not applicable). SPEC: no R run and no reconciliation arm. Text-level equivalent, reproduced by both packs: 5 scorer rows, 0 lost, portfolio identity 222002 = 131968+6377+83657. N1/OF-1 cannot enter (no R path).
+PASS (not applicable). SPEC: no fixture. Known-answer case is the unmodified ledger replay. Both packs quote Stage 4’s 14/14 only as background, not as a C07 execution.
+PASS. Seed files: none. No framework file was patched. Stage 3 lock and Stage 5 package are read-only. No undeclared semantic change in the frozen artifacts.
+PASS. No locked regression introduced. Unchanged surfaces include the one-question rule as actually operated, TCD-IG, κ, and the Stage 5 counts. Coordinator note: OF-1 is outside N16.
+FAIL. Predeclared P1 (SPEC; score_c07.py keep = (len(extra)==0) or (len(lost)>=1)): KEEP side only if no extra question arose or at least one was lost. Observed: extra = 5 (scorer and Builder) or 4 (Validator manual), lost = 0 on both readings. Both disjuncts false. SPEC: this replay is a weak test; absence of documentary loss is not evidence that locking more than one question would be safe.
+FAIL for KEEP. Validator objections on A006’s “Resolved (T008)” wording and on CQ-F01 vs CQ-F02 / Framing Gate not owner-locked in the Stage 1–2 ledger are supported by those verbatim documents. They do not establish the KEEP side. They are addressed in §6 and do not meet a §9 HALT trigger.
+
+KEEP requires all nine. Conditions 8 and 9 fail. KEEP is not available.
+
+HALT conditions (constitution §9)
+
+
+Hard mechanical results conflict: absent as a §9 halt. Both packs reproduce the scorer outputs (extra emitted = 5, lost = 0, five keyword-carried rows) and agree the P1 branch is the non-KEEP side on both 5 and 4. The A006 membership dispute does not decide P1 (SPEC regression rule) and is not resolved by picking a side (§10).
+Required raw evidence missing: absent. Scorer RESULTS, CSV, scorer source, and the verbatim ledgers, locked design, Finish Gate, and Stage 5 evidence package are in the packet. PREFLIGHT PASS. No HALT for missing historical stdout.
+Hash or frozen-version mismatch: absent. Cited strings match the FREEZE RECORD and FROZEN REFERENCE HASHES. n16lib.py omitted from C07_EVIDENCE.sha256 is a traceability gap the Validator already distinguished from a mismatch; its hash is in the SPEC reference list.
+Baseline or constitution changed mid-run: absent. Constitution e6c3b348…; baselines 70a14831… and 24aec49c….
+Role separation violated: absent.
+Information barrier breached before first-pass freeze: absent. Both attest blindness; no Builder text in the Validator pack.
+Benefit predicate not defined before execution: absent. P1 is in the frozen SPEC and in score_c07.py (hash frozen in SCORERS_N16.sha256 before the reporting run). A006’s topic key was added in the declared scratch adjustment before that run.
+Adjudicator cannot tell which pack is authoritative: absent. Freeze record names one Builder pack and one Validator pack; both are the reports in this packet.
+
+Results timestamp 02:21:35 CT versus preflight 02:21:42 CT is unexplained but is not a hash mismatch or a missing artifact. Not a HALT.
+
+Blocking objections and the evidence
+
+A006 predicate-application objection. Supported as a semantic caveat: ambiguity ledger A006 says “Resolved (T008): no invented City SLA; portfolio urgency later,” and A008 already carries urgency. Also bounded: the frozen scorer’s declared rule counts a TOPIC row whose resolution matches OPEN|Stage 3|later, and the SPEC predeclared the SLA key. Both packs agree the keyword hits in MEASUREMENT_DESIGN_LOCKED.md and the Stage 5 package. Excluding A006 still leaves extra ≥ 4 and lost = 0. The objection does not flip P1 and is not a license to replace the predeclared rule.
+CQ-F01 vs CQ-F02 and Framing Gate lock status. Supported as a chronology gap: Stage 1–2 candidate ledger has CQ-F01 “awaiting … owner Framing Gate” and says the gate is not owner-locked; SPEC and Stage 3/5 authority lines name CQ-F02. Builder risk S5 treats this as a later point in the same workflow, not a sixth deferred topic. The packet has no Framing Gate lock receipt. That gap does not change the carriage table for A003–A011 and is not missing evidence on the SPEC’s evidence list (preflight already hashed stage2_framing.json). It blocks KEEP; it does not make the packs unauthoritative.
+Non-blocking notes (timestamp order; n16lib absent from C07_EVIDENCE.sha256; keyword carriage is a disclosed weak test) do not decide P1.
+
+Verdict rationale
+
+The change under test was not executed. No multi-question Framing run was locked, and no Stage 3 or Stage 5 artifact was regenerated. The measured question is only whether deferred substantive topics were lost under the one-question rule.
+On the frozen records they were not. Scorer and Builder: 5 arose, 0 lost, all carried (window/as-of, no invented SLA, open/eligible, κ/dormancy urgency, capacity/ranking held as RANKING_NOT_IN_SCOPE with an explicit return-to-Framing). Validator: 0 lost even if A006 is dropped. Stage 5 still shows the capacity limit (ESCALATE 131968 of 222002) as a caveat and a recommended new Framing question, not as a silent drop. That is preservation, not harm from the one-question rule.
+P1’s KEEP side is the only declared evidence of harm. It is false on every count the two packs actually produced. The SPEC states that absence of loss is not evidence that locking more than one question would be safe. Conditions 8 and 9 therefore fail, HALT conditions are absent, and the conservative default applies.
+TERMINAL_STATE: REVERT
+END C07 ADJUDICATION

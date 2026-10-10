@@ -1,0 +1,6 @@
+arm,rulings,regime,rb_exit,rb_s,classifications_sha,outputs_equal_frozen,fixtures_equal_frozen,portfolio,dom_exit,dom_status,dom_flagged
+R0,-,both,0,26.5,a0e42b8667b38baf,4/4,TRUE,"2,222002,131968,6377,83657,23191",0,FLAG,WCA2
+PM_1,Q1B,piecemeal,0,27.1,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+PM_12,"Q1B,Q2A",piecemeal,0,26.9,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+PM_123,"Q1B,Q2A,Q3A",piecemeal,0,26.4,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+BATCH,"Q1B,Q2A,Q3A",batched,0,26.7,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2

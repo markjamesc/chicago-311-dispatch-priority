@@ -1,0 +1,6 @@
+q,answer,source
+Q1,131968,portfolio_summary.csv ESCALATE at kappa=2
+Q2,64922,escalate_by_type_top25.csv WCA2
+Q3,49.2,64922/131968 in percent (1 decimal)
+Q4,25,escalate_by_type_top25.csv data rows
+Q5,118246,kappa_sensitivity.csv ESCALATE at kappa=3

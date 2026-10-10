@@ -1,0 +1,3 @@
+sent=2026-10-09 06:53:51
+reply_complete=2026-10-09 06:55:24
+# reply_complete = first-seen (upper bound; generating at 06:54:55 poll, done at 06:55:24 poll; UI "Worked for 41s"). Mode Expert (default, no custom mode). Packet sent as file attachment (C37_3_ADJUDICATOR_Grok.txt), no extra text. Captured via select+copy of rendered reply. URL https://grok.com/c/f1b365d6-b8c8-49f0-994a-636dad00e303

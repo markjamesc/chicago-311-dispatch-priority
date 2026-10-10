@@ -1,0 +1,181 @@
+Role attestation.
+
+I am Adjudicator only (Grok, Expert), ablation C50, batch N16. Builder is ChatGPT; Validator is DeepSeek. I did not rerun the scorer, repair code, create a criterion, or relax a gate. I did not consult anything outside this packet.
+Dependency applied as instructed: the C04 terminal state recorded when this packet was assembled is REVERT. The single-interpreter replacement is not in force, the three Stage 5 roles exist, and C50 is not moot. C48’s frozen terminal state is KEEP (frozen/c48/TERMINAL_STATE.txt, 5 bytes, preflight hash c7cde802…). The SPEC’s second HALT trigger (“HALT if C48’s terminal state is not KEEP”) is therefore absent. This control is judged on P1.
+
+Freeze check.
+
+The FREEZE RECORD (EVIDENCE_FREEZE.json, frozen_at_ct 2026-10-09 06:53:03 CT) names the two packs that this message quotes verbatim:
+
+Builder: C50/C50-builder/builder_report.md, 15683 bytes, SHA-256 3f2897fce005147a4d329e69e9e5d08c4197dd84f2b67bb02eed7da92d0d7984, verdict_token_leak: false. Ends with END C50 BUILDER REPORT. Complete.
+Validator: C50/C50-validator/validator_report.md, 10197 bytes, SHA-256 20bfc4327313c86b3e015383e087f0c7c36aaf020f00eb770abf8a01129b2ed2, verdict_token_leak: false. Ends with END C50 VALIDATOR REPORT. Complete.
+
+I did not recompute those two pack hashes (Adjudicator may not rerun). The packet presents these texts as the hashed freeze-record files, and both are complete through their END lines. Scorer result hash cited in the SPEC and in C50_EVIDENCE.sha256 is fb85b8abb71294f0f529eea864ee4ca721ed917573d2c50f3224f02473c085b7 for C50/evidence/C50_RESULTS.md (2419 bytes). Scorer source hash 0c26a39c… (5128 bytes) matches the SPEC and the quoted score_c50.py. Constitution e6c3b348…, owner sheet 1214c896…, and owner answer 3a7a87ca… match SPEC and preflight. PREFLIGHT_N16 reports failures: 0. The supplement supplies n16lib.py at the SPEC hash 4a6675fa… (1723 bytes); the Validator packet lacked that source, the Adjudicator packet does not. No freeze-record mismatch is shown.
+
+Hard-fact agreement table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSAgreementC48 terminal stateKEEP (predecessor accepted)KEEP, hash-consistentKEEPagreeC04 at their write timeunknown in snapshotabsent from their packet“not yet known”agree (both unknown); Adjudicator fill is REVERTCLEAN status / flagsPASS, exit 0, 0 flagsPASS, exit 0, V-1..V-6 FALSEnone flaggedagreeSEED status / flagsFLAG, exit 0, only V-3FLAG, only V-3 TRUESEED flagged V-3agreeSEED number diff42.9 expected 0 found 1; 49.2 expected 1 found 0samesame (via C48 NUMDIFF)agreePer-revision verdictsV-3 PARTIAL/PARTIAL; V-1, V-2, V-4, V-5, V-6 YES/YESsamesameagreeBLOCKING/MATERIAL inventoryAI2 F-1 MATERIAL V-3 and AI3 F-1 BLOCKING V-3; none NEWsametable lists only AI3 F-1 BLOCKING V-3agree on the raw replies; agree that the scorer under-counts AI2Why the under-countfindings() requires a leading |; AI2 has nonesameregex as quotedagreeEffect on P1.2still MET (both findings are V-3)still METMET on the one row it parsed; uncaught emptyagree on the predicate resultV-6checklist FALSE; both audits YESsameMETagreeRoundsloop 3 (1 projected) vs one-pass 1; drop 2sameMETagreeReply hashes vs AUDIT_FREEZEAI2 06b3e1f7…, AI3 8b473adf… matchsamehash_ok true, condition 5 METagreeWCA2 share64922/131968 = 49.195…% → 49.2%samenot a separate scorer row; consistent with seedagreeP1 (all 5)METMETMET (all 5)agreePortfolio deltas / D-setsnot measured / not applicablenot recomputable (CSV bodies absent)not in P1agree; SPEC marks these not measured
+No row that decides a P1 condition is a disagreement. The only mechanical defect both sides name is the scorer’s findings-table omission, and both classify it the same way.
+
+The nine KEEP conditions of constitution §7.
+PASS. Evidence packs are complete and frozen: FREEZE RECORD hashes and END lines above; PREFLIGHT failures 0; C50_RESULTS, C48_RESULTS, both second-audit replies, AUDIT_FREEZE.json, REVISIONS.json, and rev_check.R are hashed and quoted. SPEC § Regression/HALT; FREEZE RECORD.
+PASS. Role separation holds: Builder ChatGPT, Validator DeepSeek, Adjudicator Grok; each pack attests blindness; verdict_token_leak: false on both packs. Constitution §1; FREEZE RECORD roles.
+PASS. Builder and Validator agree on the predeclared hard facts, including the scorer under-count and its non-effect on P1.2. Section 3 table. Constitution §4.
+PASS (not applicable, as declared). SPEC § Regression/HALT: constitution §7 conditions 4 and 5 are not applicable to this text-only control; no R run and no fixture. Text-level equivalent: CLEAN/SEED CHECK.csv and reply-hash identity, both reproduced by both packs.
+PASS (not applicable, as declared). Same SPEC waiver. Known-answer cases are the clean arm (PASS, no flags) and the declared seed (SEED flags V-3 only). Both packs recompute those.
+PASS. No undeclared semantic change on the frozen records. The only change under test is the declared procedure (one consolidated revision plus rev_check, versus the revise/re-audit loop). Both second audits’ only BLOCKING/MATERIAL finding is the planted V-3 mis-application (42.9% for 49.2%). SPEC § Disclosures states that this re-reads C48 and adds no new evidence about errors the checklist might miss; that limit is declared, not an undeclared change.
+PASS. No locked regression. CLEAN passes with no flags; V-6 is not flagged and is graded YES/YES; no NEW finding. C48 dependency is KEEP. N1/OF-1 cannot enter N16 (coordinator note; no R path).
+PASS. Predeclared P1 is satisfied on all five clauses. Scorer: MET (all 5). Builder: all five MET. Validator: all five MET. Detail: (1) SEED flags V-3, CLEAN flags none; (2) AI2 F-1 MATERIAL and AI3 F-1 BLOCKING both relate to V-3, none NEW; (3) V-6 checklist FALSE and both audits YES; (4) loop 3 including one projected round versus one pass 1, drop of 2 ≥ 1, projection declared in SPEC § Arms and § Disclosures; (5) both reply SHA-256 values match AUDIT_FREEZE.json.
+PASS. No blocking objection remains supported. Validator: “No blocking objections that change the P1 result.” The findings-regex defect does not flip P1.2. The C04 dependency the Validator left open is filled here as REVERT, so the mootness HALT does not fire.
+
+All nine are conjunctive and all hold.
+
+HALT conditions of §9.
+
+
+Hard mechanical results conflict: absent. Section 3; both packs agree on every P1-deciding fact. Constitution §4, §9.
+Required raw evidence missing: absent. Scorer results, raw C48 CHECK/NUMDIFF tables, scorer source, frozen replies, hashes, and (in this packet) n16lib.py are present. Instruction: do not HALT only because a historical stdout is missing. SPEC text-only capture.
+Hashes or frozen versions mismatch: absent. Cited hashes for constitution, owner sheet, owner answer, scorer, C48 inputs, and C50_RESULTS agree across SPEC, preflight, and C50_EVIDENCE.sha256. No mid-run constitution or baseline change is shown.
+Baseline or constitution changed mid-run: absent. Constitution 1.0 e6c3b348…; baselines 70a14831… and 24aec49c… as frozen.
+Role separation violated: absent. FREEZE RECORD roles; both packs attest a single role and blindness.
+Information barrier breached before first-pass freeze: absent. Both packs state they did not see the other; verdict_token_leak: false.
+Benefit predicate not operationally defined before execution: absent. P1’s five clauses are in the frozen SPEC, owner answer Z / 50-B, before the chats.
+Adjudicator cannot tell which pack is authoritative: absent. FREEZE RECORD names one Builder file and one Validator file; both are complete.
+Extra SPEC HALT (C04 KEEP, question moot): absent. Recorded C04 state is REVERT.
+Extra SPEC HALT (C48 terminal state not KEEP): absent. C48 is KEEP.
+
+
+Blocking objections raised by the Validator and how the evidence bears on them.
+
+Validator’s blocking list is empty of anything that changes P1. Three items were raised as non-blocking or as dependencies:
+
+Scorer findings regex omits AI2’s F-1 | MATERIAL | V-3 because findings() requires a leading pipe, and AI2’s finding line has none (ai2_second_audit.md §2 versus ai3_second_audit.md §2 table). Builder independently reports the same defect. The raw replies contain exactly two BLOCKING/MATERIAL findings, both on V-3, none marked NEW, none on V-1, V-2, V-4, V-5, or V-6. P1.2 is “every BLOCKING / MATERIAL finding … relates to V-3 … none is NEW or on another revision,” not “the scorer table row count equals 2.” The omission makes C50_RESULTS.md’s findings table incomplete. It does not falsify the condition. Not a blocking objection, and not a Builder/Validator disagreement.
+C04 terminal state was absent from the Validator packet. Filled in this adjudication packet as REVERT. Mootness HALT does not apply.
+Round 3 is projected, not run. Declared in SPEC § Arms and § Disclosures, and written into P1 clause 4 (“loop 3 incl. 1 projected”). Both packs treat the projection as part of the frozen predicate, not as a defect. Not blocking.
+
+
+Verdict rationale.
+
+The change under test is procedural: replace the revise/re-audit loop with one consolidated revision checked by the C48 mechanical checklist. On the frozen records it does change the review path and does not change the defect found.
+LOOP, as specified: round 1 is the frozen first audit that produced V-1..V-6; round 2 is the frozen second audit of the SEED text (AI2 PASS WITH REQUIRED REVISIONS, AI3 FAIL), both isolating the planted V-3 share 42.9% instead of 49.2% (64922/131968 = 0.491952595…, one decimal 49.2%); round 3 is the declared projected audit after that fix. ONE PASS: first audit, one consolidated revision, frozen rev_check (CLEAN PASS, no flags; SEED FLAG on V-3 only, with the 42.9/49.2 number swap). V-6, the presentational seed, is not flagged and is graded YES by both audits. Reply bytes match AUDIT_FREEZE.json. Modeled audit rounds fall from 3 to 1.
+That is exactly P1. The owner sheet’s own note that #48’s KEEP covers most of #50 is a disclosure, not a failed clause: this control still had to show the checklist catches the planted material seed, does not false-flag CLEAN or V-6, and that the second-audit BLOCKING/MATERIAL set is only that seed. Those are shown. The checklist is narrower than a fresh semantic audit; the SPEC says this replay adds no evidence about errors a checklist might miss. That limit is recorded. It is not a failed predeclared condition, and items marked not measured (cost in minutes, portfolio deltas, D-sets) are not evidence either way.
+P1 is MET. No HALT condition is present. C04 REVERT leaves the question live. The revise/re-audit loop may be replaced, on this frozen control, by one consolidated pass checked by the mechanical checklist.
+TERMINAL_STATE: KEEP
+END C50 ADJUDICATION

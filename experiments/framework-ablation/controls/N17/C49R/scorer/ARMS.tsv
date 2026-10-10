@@ -1,0 +1,4 @@
+arm	model	delivery	end_line	packet
+DS_ZIP	DeepSeek	ZIP	END C49R FIRST PASS	packets/C49R_R_DS_ZIP.txt
+DS_FILES	DeepSeek	FILES (SHA256SUMS.txt)	END C49R FIRST PASS	packets/C49R_R_DS_FILES.txt
+GPT_FILES	ChatGPT	FILES (SHA256SUMS.txt)	END C49R FIRST PASS	packets/C49R_R_GPT_FILES.txt

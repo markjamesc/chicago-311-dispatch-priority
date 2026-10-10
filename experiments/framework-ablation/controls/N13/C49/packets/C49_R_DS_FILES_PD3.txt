@@ -1,0 +1,44 @@
+# Chicago 311 Dataset 2 — Stage 5 — AI 3 — Claim-to-Evidence and Numerical Auditor (FIRST PASS)
+
+You are AI 3 in the Three-AI Interpretation and Recommendation Framework for Chicago 311 Dataset 2. You audit AI 1's interpretation against the Stage 5 evidence.
+
+**Mode:** DeepThink on.
+
+## Your inputs (attached)
+The inputs are attached as 10 individual files: the 9 files listed below and `SHA256SUMS.txt` (the SHA-256 of each of the 9).
+
+- `STAGE5_EVIDENCE_PACKAGE.md`
+- `STAGE5_DEEPER_FINDINGS.md`
+- `capacity_coverage_note.csv`
+- `escalate_by_type_top25.csv`
+- `inconclusive_by_clause.csv`
+- `independent_checks_critical_counts.csv`
+- `kappa_sensitivity.csv`
+- `portfolio_summary.csv`
+- `AI1_INTERPRETATION.md`
+
+Use only the attached files. If you cannot open a file, say so in the inventory (OPENED: NO) and do not reconstruct or guess its content.
+
+## Reply format (all three parts, in this order)
+1. **FILE INVENTORY (mandatory first section).** For EACH of the 9 files above, one block exactly like this, plain text, one field per line, no table:
+```
+FILE: <file name>
+SHA256: <the SHA-256 listed for this file in SHA256SUMS.txt>
+OPENED: YES or NO
+LINES: <number of lines in the file>
+FIRST: <the first line of the file, verbatim>
+LAST: <the last non-empty line of the file, verbatim>
+```
+2. **HARD FACTS**, recomputed from the files, one line each, written as `Qn: <number>`:
+   - Q1: number of ESCALATE rows at kappa = 2 (portfolio_summary.csv)
+   - Q2: number of ESCALATE rows of type WCA2 (escalate_by_type_top25.csv)
+   - Q3: WCA2 share of all ESCALATE rows, in percent, 1 decimal
+   - Q4: number of data rows (excluding the header) in escalate_by_type_top25.csv
+   - Q5: number of ESCALATE rows at kappa = 3 (kappa_sensitivity.csv)
+3. **FINDINGS** on `AI1_INTERPRETATION.md`, one row each: `id | severity BLOCKING / MATERIAL / MINOR | quote from AI1_INTERPRETATION.md | evidence file and value | correction`. If none, write `none`.
+
+Reply in full, in one message. End your reply with exactly this line:
+END C49 FIRST PASS
+
+---
+COORDINATOR NOTE N1 / OF-1 (disclosure; not part of your task): in the frozen Chicago pack, the two independent R paths (R-A and R-B) differ by exactly 1.000 h on three ESCALATE rows (SR22-01936870 dormant_h; SR25-02017553 and SR25-02017556 open_age_h); their labels agree. All three clocks fall in the repeated fall-back hour of the DST change. Cause, confirmed on the PC (R 4.6.1, 2026-10-03): R-B's base as.POSIXct(..., tz = "America/Chicago") reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate parse reads it as the second occurrence (CST). Owner ruling 53A (2026-10-03): repeated hour = first occurrence (daylight time) on both paths, so R-B's reading conforms. The frozen pack was not changed (coordinator decision 2026-10-03 05:08 CT).

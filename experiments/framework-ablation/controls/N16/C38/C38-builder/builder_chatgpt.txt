@@ -1,0 +1,280 @@
+﻿1. Role attestation and ablation ID.
+Role: Builder — ChatGPT, independent first pass.
+Ablation ID: C38 — Monitoring / next-question tag: follow-up deletion checklist.
+Batch: N16.
+Target stage: Stage 5 interpretation.
+Constitution: Version 1.0.
+Owner-approved variant: 38-A.
+Evidence scope: Frozen Chicago 311 Stage 1–5 text, N13 logs, C48 outputs, the C38 specification, seed diffs, scorer source, preflight records, and mechanical results supplied in the packet.
+I attest that this assessment is conducted as the Builder only. I have not received or consulted a Validator first-pass response or an Adjudicator assessment.
+This report independently examines the supplied frozen evidence, reconstructs the C38 text arms, recomputes the mechanical results, and assesses the predefined operational predicate P1.
+No new Chicago 311 data, MySQL execution, R-A/R-B execution, or PC run was used. Local recomputation was restricted to the text contained in the packet.
+No terminal adjudication is issued.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+Control being ablated
+The existing Stage 5 rule requires an interpretation with incomplete evidence to retain a follow-up, expressed as a monitoring metric or next analytical question.
+C38 tests whether that requirement can be removed without introducing an unsupported finality claim.
+The adverse condition is explicitly conjunctive:
+\[
+A=F_0\land C_1\land L_1
+\]
+
+Where:
+- \(F_0\): both designated follow-up sections are absent.
+- \(C_1\): at least one non-negated finality sentence is detected.
+- \(L_1\): the limitations list is non-empty.
+The proposed simplification removes the explicit follow-up requirement. It does not remove the evidence limitations, Stage 5 recommendation, or existing decision boundaries elsewhere in the document.
+Arm definitions and exact modifications
+ORIG — unchanged baseline
+The original frozen AI1 interpretation contains Section 8, Monitoring Plan, and Section 9, Next Analytical Question.
+Section 8 specifies monitoring of ESCALATE share under κ variations, INCONCLUSIVE proportion, type concentration shifts, capacity-related framing needs, ranking logic, additional decision options, and preservation of lineage, reconciliation, and independent execution controls.
+Section 9 states the next unresolved analytical question:
+Given that the frozen TCD-IG portfolio assignment identifies a large ESCALATE population, what additional decision framing is required to evaluate capacity-aware prioritization without altering the validated Stage 3/4 assignment?
+
+FOLLOWUP_DELETED — actual ablation arm
+The SEED DIFFS remove Sections 8 and 9 completely.
+The exact diff hunk is:
+@@ -186,47 +186,2 @@
+-8. Monitoring Plan
+-...
+-9. Next Analytical Question
+-...
+ 10. Weakest Bridge in My Own Reasoning
+
+
+The 45 removed lines comprise 38 lines from Section 8 and 7 lines from Section 9.
+The frozen Python implementation is:
+dele = drop(    ORIG,    [        r"8\.\s+Monitoring Plan",        r"9\.\s+Next Analytical Question"    ])assert dele != ORIG
+
+
+
+The rest of the text remains unchanged.
+SEED_FINALITY — seeded adverse-control arm
+This arm begins with FOLLOWUP_DELETED and appends an explicit unsupported finality sentence to the Section 7 recommendation.
+The exact seeded recommendation becomes:
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation. This settles the question, and no further work is needed.
+
+The frozen implementation is:
+FS = "This settles the question, and no further work is needed."seedf = dele.replace(o7, o7 + " " + FS)assert seedf != dele
+
+
+
+Both follow-up sections remain absent.
+This arm tests whether the checklist can recognize a deliberately introduced finality claim despite the unchanged, non-empty limitations section.
+Mechanism
+The scorer detects finality through a predefined expression matching terms such as settled, settles, no further work, final answer, conclusive, definitive, beyond doubt, and closes the question.
+Its finality negation expression recognizes not, cannot, never, without, and contracted n't.
+Importantly, no is not a negation exemption for this check. Otherwise the seeded phrase no further work could exempt itself.
+This exclusion was disclosed as a scratch-run adjustment before the reporting run.
+Conceptual effect: C38 tests removal of the explicit Stage 5 follow-up sections while preserving the remaining interpretation and applying a lexical safeguard against unsupported finality.
+Evidence: SPEC → Control under test, Arms, Operational benefit predicate P1, Disclosures; SCORER SOURCE → C38 block; SEED DIFFS → FOLLOWUP_DELETED and SEED_FINALITY hunks.
+3. Hard mechanical facts table.
+3.1 Independent arm reconstruction
+I reconstructed the three arms from the verbatim original and the declared deletion and insertion rules. The resulting complete SHA-256 hashes match the packet's reference hashes.
+Arm	Bytes	Follow-up sections	Section 4 non-empty lines	Finality sentences	Adverse flag
+ORIG	7,929	2	10	0	No
+FOLLOWUP_DELETED	6,989	0	10	0	No
+SEED_FINALITY	7,047	0	10	1	Yes
+All numerical cells and flags in this table were independently recomputed from the packet's embedded original text and declared transformations. They agree with C38_RESULTS.md → Checklist, all three rows. 
+
+
+3.2 SHA-256 equality checks
+Arm	Recomputed full SHA-256	Equality to frozen reference
+ORIG	73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932	Exact
+FOLLOWUP_DELETED	8c2587125cf01601916853b5795b16f5f02c45116e65b671ef469817aa7b0ad6	Exact
+SEED_FINALITY	bf09d37b7ae4ca39df2d19548ba799e371bc71dfe0c8751c5a841f7945c5cf86	Exact
+The ORIG seed also equals the frozen c48/AI1_ORIGINAL.md reference hash.
+All three SHA-256 equality checks were independently reproduced. The scorer, constitution, owner-ruling, and evidence-file hashes are quoted from the packet rather than independently verified against separately supplied files.
+3.3 Byte deltas and modification sets
+Comparison	Calculation	Result	Status
+Deleted versus original	6,989 − 7,929	−940 bytes	Recomputed
+Seeded versus deleted	7,047 − 6,989	+58 bytes	Recomputed
+Seeded versus original	7,047 − 7,929	−882 bytes	Recomputed
+Removed sections	89	2 sections	Recomputed
+Removed text lines	38 + 7	45 lines	Recomputed
+Seeded additions	One finality sentence	1	Recomputed
+Changes to Section 4	None	0	Recomputed
+Changes to portfolio figures	None	0	Recomputed
+The removal totals 940 bytes: Section 8 contributes 546 bytes and Section 9 contributes 394 bytes.
+The only additional change in SEED_FINALITY is the appended sentence in Section 7.
+The resulting changed-text sets are:
+\[
+D_{\text{deleted}}=\{8,9\}
+\]
+
+\[
+D_{\text{seed}}=\{7,8,9\}
+\]
+
+These denote changed document sections, not SQL/R reconciliation difference sets.
+3.4 Section 4 limitations recount
+The limitations count of 10 is a count of non-empty lines after the Section 4 heading, not a count of 10 distinct substantive prohibitions.
+It consists of the introductory line, seven statements beginning with “That,” and two concluding ceiling lines.
+All 10 remain in each arm. 
+
+
+Thus the limitations-presence component of the adverse predicate is true in all three arms.
+3.5 Frozen portfolio arithmetic
+The underlying Stage 5 numerical content is untouched by C38.
+Nevertheless, the frozen original provides portfolio values that can be arithmetically cross-checked.
+Measure	Frozen value	Independent check
+ESCALATE	131,968	59.4% rounded
+INCONCLUSIVE	6,377	2.9% rounded
+STANDARD	83,657	37.7% rounded
+Total	222,002	Exact sum
+Total rounded share	100.0%	Exact sum of displayed shares
+\[
+131,968+6,377+83,657=222,002
+\]
+
+The κ sensitivity values are also arithmetically consistent:
+κ transition	ESCALATE change	Status
+1.0 → 1.5	−11,952	Recomputed
+1.5 → 2.0	−8,372	Recomputed
+2.0 → 3.0	−13,722	Recomputed
+1.0 → 3.0	−34,046	Recomputed
+The decreases are monotonic. These figures are preserved across all three text arms and are background evidence rather than C38 predicate inputs. 
+
+
+3.6 Other frozen mechanical facts
+Fact	Value	Status
+Frozen input manifest	75 files	Quoted
+N16 preflight failures	0	Quoted
+Specified P1 conditions	3	Quoted
+Conditions satisfied	3	Recomputed
+Additional chats	0	Quoted
+C38 new R runs	0	Quoted
+C38 new MySQL runs	0	Quoted
+Historical Stage 4 fixtures	14/14 in both paths	Quoted, not rerun
+Historical reconciliation	0 disagreements over 222,002 rows	Quoted, not rerun
+No n_inner, n_agree, or n_disagree values are supplied for a C38 reconciliation. Their identity cannot be independently computed and does not apply to this text-only control.
+The provided preflight reports no frozen-input failures. This is evidence of preflight consistency, not evidence of an independently rerun preflight.
+4. P1 assessment against the frozen predicate in the SPEC.
+The frozen operational benefit predicate contains three conjunctive conditions.
+Condition 1 — FOLLOWUP_DELETED raises no adverse flag
+Result: MET.
+The independently reconstructed text contains no non-empty Section 8 or Section 9.
+Section 4 still contains 10 non-empty limitation lines.
+No sentence matches the scorer's non-negated finality rule.
+Therefore:
+\[
+A=1\land0\land1=0
+\]
+
+The adverse flag is absent.
+Evidence: C38_RESULTS.md → Conditions, row 1; Checklist, FOLLOWUP_DELETED row; reconstructed text and hash.
+Condition 2 — SEED_FINALITY triggers the checklist
+Result: MET.
+The independently reconstructed seed contains neither designated follow-up section.
+Its Section 4 retains 10 non-empty limitation lines.
+The appended sentence contains the finality terms settles and no further work.
+The sentence is not exempted by the frozen negation rule.
+Therefore:
+\[
+A=1\land1\land1=1
+\]
+
+The adverse flag is present.
+Evidence: C38_RESULTS.md → Conditions, row 2; Checklist, SEED_FINALITY row; SEED DIFFS → recommendation-line addition.
+Condition 3 — ORIG raises no adverse flag
+Result: MET.
+The original contains both designated follow-up sections.
+The limitations list has 10 non-empty lines.
+No non-negated finality sentence is detected.
+Therefore:
+\[
+A=0\land0\land1=0
+\]
+
+The adverse flag is absent.
+Evidence: C38_RESULTS.md → Conditions, row 3; Checklist, ORIG row; FROZEN INPUTS → Sections 4, 8 and 9.
+Combined frozen predicate assessment
+P1 condition	Independently assessed result
+Deleted-follow-up arm unflagged	MET
+Seeded finality detected	MET
+Original arm unflagged	MET
+Conjunction	MET — 3/3
+This agrees with the mechanical P1 result quoted in C38_RESULTS.md.
+The result establishes the stipulated behavior of the frozen checklist on the three declared arms. It does not establish universal detection of unsupported finality, nor does it establish that removing follow-up content has no semantic cost.
+This is the complete P1 assessment. No terminal state is assigned.
+5. Fixture and reconciliation implications.
+Not applicable. C38 is a text-only Stage 5 ablation, with no R-A/R-B execution, SQL run, new dataset, or operational fixture suite.
+The historical Stage 4 references to 14/14 fixtures and zero reconciliation disagreements are retained from the frozen Stage 5 document; they are not newly generated C38 results.
+The applicable text-level equivalents are the three known-answer arms, their deterministic transformations, exact hash matching, section-presence checks, limitation-line counts, and finality detection.
+The reconstructed arms agree with the supplied reference hashes, and the corresponding checklist values agree with all three C38_RESULTS.md arm rows.
+Constitution §7 conditions concerning clean-arm reconciliation and mandatory execution fixtures are explicitly marked inapplicable by the SPEC. Frozen-file read-only integrity remains relevant.
+The known N1 / OF-1 discrepancy concerns three historical ESCALATE clocks with a 1.000-hour difference between R-A and R-B. The coordinator documents this separately and specifies that no R path contributes to N16. Consequently, the discrepancy does not affect any C38 text count or predicate value.
+6. Semantic/regression risks and unchanged surfaces.
+6.1 Explicit monitoring obligations are deleted
+The mechanical checklist confirms the absence of unsupported finality language under its lexicon.
+However, deleting Section 8 also removes explicit instructions to monitor:
+- κ sensitivity and ESCALATE share;
+- INCONCLUSIVE proportions and type concentrations;
+- unresolved capacity and ranking questions;
+- lineage, reconciliation, and independent execution controls.
+The removal does not necessarily eliminate these safeguards elsewhere in the workflow, but it removes their explicit presentation from this Stage 5 interpretation.
+This is a substantive document-level change that the checklist does not measure directly.
+6.2 The next analytical decision boundary loses its dedicated section
+Section 9 made capacity-aware prioritization the explicit next analytical question while preserving the Stage 3/4 assignment.
+Its deletion reduces the prominence of that unresolved decision boundary.
+The remaining document still identifies capacity limitations and the need for additional operational evidence, notably in Sections 5, 6, and 10.
+Thus, the distinction between validated simulation and unresolved operational prioritization survives, but the designated next-question mechanism is removed.
+6.3 The detector has limited lexical coverage
+The finality detector uses a declared word list rather than a general semantic analysis of overconfidence.
+Consequently, unsupported closure statements expressed without the recognized finality terms may evade detection.
+The single seeded finality sentence establishes that the specified positive control is caught. It does not establish recall across alternative phrasings.
+This limitation does not change the frozen P1 calculation.
+6.4 The clean arm has pre-existing cautionary language
+The scorer reports residual follow-up expressions in FOLLOWUP_DELETED.
+Examples include the Section 6 option to return to framing, Section 10's additional-operational-evidence requirement, and the statement that operational priority meaning is not established.
+These expressions are classified as INFO and excluded from scoring under the SPEC.
+Their survival helps explain why removing Sections 8 and 9 does not generate a finality flag in this particular frozen text.
+The SPEC explicitly discloses that the original contains no declared finality terms. Accordingly, the no-adverse result is partly text-specific rather than a demonstrated general property of follow-up deletion.
+6.5 Frozen baseline is not a perfectly isolated A/B
+The shared Chicago 311 baseline was originally produced with coordinator participation and extra reviews.
+The SPEC identifies this limitation in its Q0 ruling.
+The C38 transformation is mechanically isolated at the text level, but the historical baseline cannot be characterized as a perfectly clean independent workflow experiment.
+6.6 Unchanged surfaces
+Surface	Assessment
+Sections 1–6	Text unchanged
+Section 7	Unchanged in deletion arm; one sentence appended in seeded arm
+Sections 8–9	Removed in both modified arms
+Section 10	Text unchanged
+Section 4 limitations	All 10 counted lines preserved
+Frozen portfolio classification	Unchanged
+κ sensitivity values	Unchanged
+Evidence status labels outside deleted sections	Unchanged
+Frozen Stage 3/4 assignment	Not re-executed or modified
+Baseline framework files	No edits declared
+R/SQL source and fixtures	No execution or modification in C38
+Input hashes	Preflight reported consistent
+The primary residual risk is therefore semantic rather than arithmetic: the explicit follow-up requirement disappears, while the fixed lexical test detects only a particular class of unsupported finality statements.
+7. Claim → evidence map.
+Claim	Supporting section and exact evidence
+C38 concerns follow-up deletion in Stage 5.	SPEC → Ablation ID; Target stage; Control under test
+Owner approved 38-A, deleting the actual follow-up and checking finality against limitations.	SPEC → Definitions and approval; owner answer Z and Q0
+The frozen test has three arms.	SPEC → Arms; SCORER SOURCE → arms38 construction
+Sections 8 and 9 are deleted.	SEED DIFFS → FOLLOWUP_DELETED, hunk @@ -186,47 +186,2 @@
+The deleted content includes monitoring controls and an explicit next question.	FROZEN INPUTS → Sections 8 and 9; SEED DIFFS → removed lines
+The seed appends the specified finality sentence.	SEED DIFFS → SEED_FINALITY, hunk @@ -170,3 +170,3 @@; SCORER SOURCE → FS and seedf
+The original contains two non-empty designated follow-up sections.	C38_RESULTS.md → Checklist, ORIG row; FROZEN INPUTS → Sections 8 and 9
+The deleted arm has zero designated follow-up sections.	C38_RESULTS.md → Checklist, FOLLOWUP_DELETED row; reconstructed deletion
+Section 4 has 10 non-empty lines in every arm.	FROZEN INPUTS → Section 4; C38_RESULTS.md → Checklist, all three rows
+ORIG contains zero detected finality sentences.	C38_RESULTS.md → Checklist, ORIG row; recomputed scan
+FOLLOWUP_DELETED contains zero detected finality sentences.	C38_RESULTS.md → Checklist, FOLLOWUP_DELETED row; recomputed scan
+SEED_FINALITY contains one detected finality sentence.	C38_RESULTS.md → Checklist, SEED_FINALITY row; SCORER SOURCE → FIN and NEGF
+Only the seeded arm raises an adverse flag.	C38_RESULTS.md → Checklist, three arm rows; SCORER SOURCE → checklist()
+The reconstructed arm hashes exactly match their frozen references.	SPEC → Frozen reference hashes; C38_EVIDENCE.sha256 → three seed-file rows; independent reconstruction
+Removing the two follow-up sections reduces text size by 940 bytes.	C38_EVIDENCE.sha256 → ORIG and FOLLOWUP_DELETED byte counts; SEED DIFFS → deleted sections
+The injected sentence adds 58 bytes.	C38_EVIDENCE.sha256 → FOLLOWUP_DELETED and SEED_FINALITY byte counts; SEED DIFFS → Section 7 insertion
+Frozen portfolio counts total 222,002.	FROZEN INPUTS → Section 2B, three action rows; independently recomputed sum
+The κ grid decreases monotonically.	FROZEN INPUTS → Section 2D, four κ rows; independently computed successive deltas
+All three frozen P1 conditions are met.	C38_RESULTS.md → Conditions, rows 1–3; independent recomputation in report Section 4
+Residual follow-up language is present but unscored.	C38_RESULTS.md → Residual follow-up language; SPEC → Disclosures and deviations
+N16 did not execute R or MySQL.	COORDINATOR NOTE → text-only capture; SPEC → Frozen data; Regression/HALT rules
+Preflight reported zero frozen-input failures.	PREFLIGHT → concluding PREFLIGHT PASS failures: 0 row
+N1 / OF-1 cannot affect C38 text metrics.	COORDINATOR NOTE N1 / OF-1; SPEC → Disclosures
+The checklist does not test arbitrary semantic overconfidence.	SCORER SOURCE → declared FIN, NEGF and checklist() expressions; SPEC → Disclosures
+The test result is specific to the frozen evidence and operational P1.	SPEC → Operational benefit predicate; C38_RESULTS.md → Conditions and Checklist
+Builder finding: The independently reconstructed arm hashes and hard mechanical counts agree with the supplied C38 evidence. All three operational P1 conditions are satisfied. The remaining identified limitations concern the semantic loss of explicit follow-up instructions, the bounded finality lexicon, residual cautionary language, and the historical baseline's imperfect A/B isolation. These limitations are recorded without altering the frozen predicate or assigning a terminal state.
+END C38 BUILDER REPORT

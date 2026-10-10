@@ -1,0 +1,3 @@
+"arm","round","gate","rb_exit","fixtures","classifications_equal","hidden_depth_gate","reply_min","gate_min","round_active_min","code_sha256"
+"INC",1,"FAIL","1","14/14","FALSE","not run (gate FAIL)",7.12,0.05,7.17,"0cd186b31311d1b9"
+"INC",2,"PASS","0","14/14","TRUE","PASS",0.73,0.46,1.19,"72d49def1fbd7043"

@@ -1,0 +1,7 @@
+arm,path,k16_exit,k16_s,k4_exit,k4_s,ratio_k4_k16,full_exit,full_s,full_timeout,smoke_detects,baseline_s,variant_s
+B,RA,0,2.4,0,4.4,1.83,0,11,FALSE,none,11,17.8
+B,RB,0,3.1,0,7.8,2.52,0,25,FALSE,none,25,35.9
+SM_QUADLOOP,RB,0,19.4,0,357.7,18.44,TIMEOUT,1800.4,TRUE,k4,1825.4,412.99999999999994
+SM_MIDCRASH,RB,1,2.4,1,6.4,NA,1,18.5,FALSE,k16,43.5,38.3
+SM_OUTCRASH,RB,1,3.4,1,8.2,NA,1,25.6,FALSE,k16,50.6,39.3
+SM_RARECRASH,RB,0,2.9,0,7.9,2.72,1,5.8,FALSE,none,30.8,52.5

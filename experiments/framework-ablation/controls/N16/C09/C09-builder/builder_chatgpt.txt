@@ -1,0 +1,338 @@
+﻿1. Role attestation and ablation ID
+Ablation ID: C09 — Ambiguity attack before lock (ledger replay)
+Batch: N16
+Owner control: #9
+Role: ChatGPT — Builder, independent first pass
+Target: Stage 1–2, Start and Framing
+Execution: Frozen-text retrospective replay
+Information barrier: No Validator first-pass conclusions or Adjudicator findings used.
+This report independently examines the supplied specification, scorer, ambiguity ledger, Stage 1 lock, four historical independent reviews, Design Gate checklist, and mechanical results.
+The assessment is limited to frozen packet evidence. No MySQL, R, PC execution, live data retrieval, or external information was used.
+The report makes no terminal adjudication.
+2. Conceptual diff: ablation removal and seeded changes
+2.1 Baseline safeguard
+The baseline safeguard is a pre-lock ambiguity challenge designed to expose unresolved decision ambiguities before Stage 1–2 are finalized.
+Its historical evidence consists of:
+- The Chicago 311 ambiguity ledger, A001–A013.
+- AI 2 and AI 3 independent Start reviews.
+- AI 2 and AI 3 independent Framing reviews.
+- The resulting owner decisions, deferrals, and downstream Design Gate requirements.
+The safeguard addresses decision grain, action options, time scope, eligibility, urgency, simulation boundaries, and capacity/ranking.
+2.2 Proposed removal
+The conceptual ablation removes the requirement to perform the ambiguity challenge before locking the decision.
+The underlying hypothesis is that the challenge might be unnecessary if it discovered no substantive ambiguity subsequently requiring resolution.
+The alternative hypothesis is that the challenge identified consequential unresolved matters and therefore contributed a meaningful safeguard.
+2.3 Actual C09 implementation
+C09 does not execute a new workflow without the ambiguity challenge.
+Instead, owner-approved option 9-C replays the actual historical ledger against later rulings.
+Dimension	BASE	VARIANT / C09 replay
+Historical ambiguity challenge	Present	Historical record retained for scoring
+Ledger	A001–A013	Same frozen ledger
+Independent Start/Framing reviews	Four reviews	Same frozen reviews
+Stage 1 decision	Existing locked decision	Unmodified
+Stage 3 Design Gate	Existing checklist	Read for retrospective topic matching
+New execution without challenge	None	None
+Mechanical evaluation	Historical record	Count unresolved substantive ambiguities and checklist topic matches
+Consequently, this is an observational replay of safeguard relevance, not a clean intervention measuring the effects of removing the safeguard.
+2.4 Exact seeded code changes
+The SPEC declares:
+Seed files: (none)
+No SEED DIFFS containing executable modifications are supplied. Therefore:
+- Seeded changes: none.
+- Framework modifications: none.
+- SQL/R modifications: none.
+- Fixture modifications: none.
+- Frozen input modifications: none.
+The relevant existing scorer is scorers/score_c09.py, SHA-256:
+8b3da05ebec56f322d1bf8ca1e24bd98399a19d1ed6adea6aa0af2347997a430
+Its classification logic is:
+sub = not re.search(r"Process|governance", sev)later = bool(re.search(r"OPEN|Stage 3|later|Deferred", res + sev))
+
+
+
+The substantive-later count determines P1. The separate checklist matching uses item-specific topic regular expressions against the ambiguity ledger and Stage 1 decision.
+Evidence: SPEC → Arms; Operational benefit predicate P1; Disclosures and deviations; Frozen reference hashes. SCORER SOURCE → classification and checklist matching.
+3. Hard mechanical facts table
+3.1 Recomputed summary
+Mechanical fact	Value	Evidence status
+Ledger rows A001–A013	13	Recomputed
+Substantive rows under frozen scorer	10	Recomputed
+Non-substantive process/governance rows	3	Recomputed
+Substantive rows needing later rulings	5	Recomputed
+Substantive rows without later-ruling flag	5	Recomputed
+Total rows with later-ruling flag	5	Recomputed
+Total rows without later-ruling flag	8	Recomputed
+Design Gate checklist entries	16	Recomputed
+Checklist entries with topic-regex matches	8	Recomputed
+Checklist entries without topic-regex matches	8	Recomputed
+Historical independent review files	4	Recomputed
+Historical review keyword occurrences	14	Recomputed
+Frozen preflight entries displayed	75	Recomputed from manifest text
+Preflight reported failures	0	Quoted
+Seed files	0	Quoted
+Evidence/preflight matching hashes for seven directly overlapping inputs	7/7	Recomputed textual equality
+New PC/R/MySQL runs	0	Quoted execution scope
+The ledger, checklist, and scorer-derived counts reproduce the supplied mechanical results. 
+
+ The review keyword total and overlapping hash comparisons were also checked independently against the packet text. 
+
+
+
+
+3.2 Ledger row-by-row recomputation
+ID	Substantive under scorer	Later ruling	Basis
+A001	Yes	No	Request grain resolved T002
+A002	Yes	No	Action menu resolved T004/T010
+A003	Yes	Yes	Exact window dates deferred
+A004	Yes	No	INCONCLUSIVE path resolved
+A005	Yes	No	Portfolio-only simulation resolved
+A006	Yes	Yes	Portfolio urgency remained later
+A007	Yes	Yes	Exact eligibility formulas deferred
+A008	Yes	Yes	Urgency/lateness rules open to Stage 3
+A009	No	No	Process review
+A010	No	No	Start approval process
+A011	Yes	Yes	Capacity/ranking remained later
+A012	Yes	No	Lowercase process classification defect
+A013	No	No	Governance classification
+The five later-ruling rows are exactly:
+A003, A006, A007, A008, A011.
+Reconciliation:
+\[
+10+3=13
+\]
+
+\[
+5+5=10
+\]
+
+\[
+5+8=13
+\]
+
+All three identities hold. 
+
+
+Classification defect: A012 has severity Blocking (process). The scorer's case-sensitive exclusion matches Process, but not lowercase process. Consequently, A012 is mechanically classified as substantive.
+A case-insensitive process/governance exclusion produces 9 substantive and 4 process/governance rows rather than 10 and 3. The five later-ruling rows remain unchanged. 
+
+
+This distinction must be preserved: the frozen scorer's output is reproducible, but its substantive classification of A012 is semantically questionable.
+3.3 Recomputed Design Gate checklist mapping
+The scorer matches broad topic expressions against the historical ledger plus stage1_decision.json.
+Item	Topic	Frozen regex result	Independent semantic assessment
+1	B-leaning hybrid	No	Not named
+2	κ knob	No	Not named
+3	W and n_min constants	No	Not named
+4	Snapshot as-of T	Yes	Frozen-window concept named; exact as-of rule not established
+5	Locked Open-token list	Yes	Open population named; exact token-list rule absent
+6	Open plus CLOSED_DATE → INCONCLUSIVE	Yes	General INCONCLUSIVE named; specific status/date contradiction absent
+7	Duplicate/legacy exclusions and type eligibility	Yes	Eligibility named; exact exclusions absent
+8	Unresolved parent → INCONCLUSIVE	No	Not named
+9	Date parsing and timezone	No	Not named
+10	open_age_h diagnostic only	Yes	Urgency/lateness named; diagnostic-only restriction absent
+11	Empirical peer P75, not City SLA	Yes	No-invented-SLA constraint named; P75 rule absent
+12	Fixture F01–F14	No	Not named
+13	Capacity/ranking deferral	Yes	Deferral named; exact return-to-Framing rule absent
+14	SQL aggregates without SQL labels	No	Not named
+15	Superseded coordinator scratch	No	Not named
+16	Accept Grok Auto	Yes	Grok Comprehensive named; acceptance of Grok Auto absent
+The frozen binary result is:
+Matched: 4, 5, 6, 7, 10, 11, 13, 16.
+Unmatched: 1, 2, 3, 8, 9, 12, 14, 15.
+Thus:
+\[
+8+8=16
+\]
+
+The frozen matching implementation reproduces the reported result. 
+
+
+3.4 Mapping rows I would change
+The eight positive matches do not establish that eight complete Design Gate decisions had already been specified.
+For a semantic mapping, I would change the classification of all eight positive rows to distinguish partial topic anticipation from complete requirement anticipation.
+In particular:
+- Item 6: General recognition of INCONCLUSIVE does not anticipate the specific Open/CLOSED_DATE conflict.
+- Item 16: The historical reference to Grok Comprehensive does not anticipate approval of a Grok Auto-produced design. This is a particularly clear false-positive match.
+- Item 10: The urgency/lateness topic is genuinely present in A008, but the specific assertion that open_age_h is diagnostic only is absent. Additionally, the regex fragment age can match inside Stage, creating a mechanical false-positive risk.
+- Items 4, 5, 7, 11, 13: The earlier documents anticipate the general problem, but not the complete downstream rule.
+A more accurate semantic representation would be:
+Classification	Items
+No earlier topic match	1, 2, 3, 8, 9, 12, 14, 15
+Earlier topic present, exact downstream requirement incomplete	4, 5, 6, 7, 10, 11, 13
+Mechanically matched but different substantive decision	16
+This is an audit annotation, not a replacement of the frozen scorer or a new P1 criterion.
+The checklist count remains 8/16 under the predeclared regexes.
+3.5 Independent review keyword counts
+Historical review	Count	Status
+AI 2 Start	2	Recomputed
+AI 3 Start	1	Recomputed
+AI 2 Framing	7	Recomputed
+AI 3 Framing	4	Recomputed
+Total	14	Recomputed
+The occurrences match the scorer's specified case-insensitive pattern. 
+
+
+These are keyword occurrences, not counts of unique defects, resolved ambiguities, or successful interventions.
+3.6 Hash and reconciliation identities
+The seven overlapping frozen source hashes in C09_EVIDENCE.sha256 agree with their corresponding entries in PREFLIGHT.
+They cover the ambiguity ledger, Stage 1 lock, four independent review files, and Design Gate package. 
+
+
+The scorer, result file, CSV, constitution, and owner-approval hash strings are also consistently reported across their applicable packet sections.
+Verification boundary: These are textual comparisons of supplied hash records and a quoted successful preflight. They do not independently establish the contents of the original frozen files on the coordinator's machine.
+There are no separate generated BASE/VARIANT data-arm artifacts to hash-compare.
+The packet does not contain applicable n_agree, n_disagree, n_inner, portfolio deltas, or D-set measures for C09. No values for those quantities can be recomputed.
+4. P1 assessment against the frozen predicate
+4.1 Frozen predicate
+The SPEC defines P1 mechanically:
+The pre-lock ambiguity challenge qualifies for removal only if zero substantive ledger ambiguities needed a later ruling.
+The checklist-topic count is descriptive and is expressly excluded from P1.
+4.2 Observed facts
+The scorer identifies five substantive ledger ambiguities with deferred or later-resolution markers.
+Ambiguity	Later matter
+A003	Exact frozen-window dates
+A006	Portfolio-specific urgency definition
+A007	Exact open/eligible population rules
+A008	Urgency/lateness evidence requirements
+A011	Capacity/ranking treatment
+These matters concern population definition, time boundaries, classification evidence, and operational capacity.
+Several were not incidental wording issues. They affected what could be measured, which requests could be classified, and how classification would be interpreted.
+The historical reviews further substantiate the existence of consequential uncertainty.
+AI 2's Start review identifies eligibility as a significant unresolved boundary. AI 3's Start review identifies capacity and ranking as a potential mismatch between the stakeholder's objective and the proposed classification.
+Both Framing reviews require additional clarity about the capacity/ranking deferral. The AI 2 Framing review additionally raises owner visibility and criterion-smuggling concerns.
+4.3 Predicate evaluation
+Observed later-ruling count:
+\[
+N_{\text{later}}=5
+\]
+
+Required count for removal:
+\[
+N_{\text{later}}=0
+\]
+
+Therefore:
+\[
+5\neq0
+\]
+
+The zero-ambiguity condition is not satisfied by the supplied ledger evidence.
+This is a P1 measurement, not a terminal adjudication.
+4.4 Evidentiary limits
+The replay establishes that the historical process recorded five substantive ambiguities with later-resolution needs under the frozen classification rule.
+It does not directly establish that:
+1. Every later ruling was caused by the adversarial challenge.
+2. Every such ambiguity would have gone undetected without that challenge.
+3. An otherwise identical no-attack workflow would have produced different final decisions.
+4. Five deferrals represent five independently demonstrated failure-prevention events.
+The observed condition is sufficient to evaluate the frozen numerical predicate, but not to establish a causal effect size for the safeguard.
+5. Fixture and reconciliation implications
+Not applicable — N16 is a text-only retrospective replay without R execution, SQL extraction, Stage 4 reconciliation, or executable fixtures.
+The applicable text-level equivalents are:
+Text-level check	Observation
+Ledger completeness	A001–A013 represented
+Scorer reproduction	Five later-ruling rows reproduced
+Substantive classification	Reproduced, with A012 caveat
+Design checklist completeness	All 16 items represented
+Regex mapping reproduction	8 matches reproduced
+Independent review keyword extraction	All four reproduced
+Evidence-to-preflight hashes	Seven overlapping source hash strings agree
+Frozen input preflight	Reports zero failures
+Unchanged source artifacts	No changes declared
+No fixture claims can be made about hypothetical no-attack behavior.
+Likewise, no reconciliation test can demonstrate that Stage 3 or Stage 4 results remain semantically equivalent after removing the pre-lock challenge.
+The previously documented N1/OF-1 fall-back-hour discrepancy is outside this experiment. C09 neither executes the R-A/R-B paths nor uses the disputed clock values in its scoring.
+6. Semantic/regression risks and unchanged surfaces
+6.1 Substantive versus process classification
+A012 is a process review, but the frozen scorer treats it as substantive because the severity text contains lowercase process.
+The immediate P1 count is unaffected because A012 has no later-ruling marker.
+However, this exposes a fragile classification mechanism. A future record with different capitalization or wording could change the reported substantive population without a corresponding change in underlying ambiguity.
+This report preserves the frozen calculation and separately discloses the issue.
+6.2 Topic matching versus actual requirement anticipation
+The 8/16 checklist statistic is susceptible to overinterpretation.
+The matching expressions operate on short topic tokens rather than complete propositions.
+Examples include:
+- INCONCLUSIVE standing in for a specific status/date integrity rule.
+- Eligible standing in for duplicate and legacy exclusions.
+- SLA standing in for empirical peer-P75 labeling.
+- Grok standing in for acceptance of a different model execution mode.
+Consequently, the statistic measures broad lexical overlap, not complete pre-identification of eight later design requirements.
+The frozen predicate correctly excludes this statistic from its success condition.
+6.3 Retrospective classification of later rulings
+The scorer identifies later-ruling requirements from Resolution and Severity text using terms including OPEN, Stage 3, later, and Deferred.
+This provides reproducibility but does not distinguish between:
+- An ambiguity requiring a stakeholder ruling.
+- A technical detail intentionally delegated to measurement design.
+- A documented follow-up.
+- An unresolved governance or execution process item.
+A003, A007, and A008 clearly identify meaningful downstream definition work.
+A006 and A011 also refer to matters left for later consideration, but their presence does not independently prove a particular causal contribution from the pre-lock attack.
+The distinction matters when interpreting the ablation beyond its frozen mechanical predicate.
+6.4 Historical evidence is not a clean no-attack control
+The SPEC discloses that the historical Chicago baseline involved coordinator intervention and additional reviews.
+Therefore, the historical ledger reflects a combined decision-development process.
+It is impossible from this replay alone to isolate precisely what would have happened had the ambiguity attack been removed while every other component remained unchanged.
+This is a design limitation of the selected retrospective experiment, not evidence of a new execution failure.
+6.5 Review keyword counts have limited semantic value
+The four historical independent reviews supply meaningful written criticism.
+However, counting occurrences of Blocking, Material, Revise, Tighten, or required revision does not measure the quantity, severity, independence, or successful resolution of substantive objections.
+The review texts support qualitative analysis; the keyword count is only a mechanical descriptive statistic.
+6.6 Governance and freezing boundaries
+The packet reports:
+- A frozen constitution and baseline framework versions.
+- Owner approval of the 9-C replay.
+- Text-only capture approved before execution.
+- Frozen Stage 1–5 records and specified supporting evidence.
+- No new MySQL/R/PC execution.
+- No seeded code or framework modifications.
+No deviation from these boundaries is demonstrated by the supplied packet.
+Actual Builder/Validator mechanical agreement, the independent Validator's objections, and the Adjudicator's constitutional determination cannot be established from this Builder-only record.
+6.7 Unchanged surfaces
+The following surfaces remain unchanged by the C09 replay:
+Surface	Observed treatment
+Stage 1 locked decision	Read-only
+Stage 2 framing records	Read-only
+Stage 3 locked measurement design	Read-only
+Design Gate checklist/receipt	Read-only
+Baseline frameworks	Frozen
+Stage 4 data/analysis components	Not executed or modified
+Stage 5 interpretation records	Frozen
+SQL Query/Source Gates	Not executed
+R-A/R-B implementations	Not executed
+Fixture suite	Not executed or modified
+Workflow and Procedure Gates	Not modified
+N1/OF-1 clock finding	Unchanged
+N13 logs and C48 outputs	Frozen supporting scope
+The replay does not introduce an observed data or execution regression. It also cannot establish behavioral equivalence for a hypothetical workflow in which the ambiguity safeguard is absent.
+7. Claim → evidence map
+Claim	Source section and precise evidence
+C09 tests pre-lock ambiguity challenge removal	SPEC → Control under test, owner list #9
+Actual implementation is a retrospective ledger replay	SPEC → Arms; Disclosures and deviations; owner answer 9-C
+No seeded modifications exist	SPEC → Seed files (none); SCORER SOURCE
+Ledger contains 13 rows	FROZEN INPUTS → ambiguity_ledger.md, A001–A013; C09_ledger.csv rows A001–A013
+Frozen scorer marks 10 rows substantive	SCORER SOURCE → sub expression; C09_RESULTS.md → Ambiguity ledger rows A001–A013
+Five substantive ambiguities have later-ruling markers	C09_RESULTS.md → Counts row 1; Ambiguity ledger rows A003, A006, A007, A008, A011
+Exact window dates remained unresolved	FROZEN INPUTS → ambiguity_ledger.md, A003; stage1_decision.json, deferred_to_later
+Portfolio urgency remained a later definition	FROZEN INPUTS → ambiguity_ledger.md, A006 and A008
+Eligibility required further definition	FROZEN INPUTS → ambiguity_ledger.md, A007; AI 2 Start review, item 8
+Capacity/ranking remained an open consideration	FROZEN INPUTS → ambiguity_ledger.md, A011; AI 3 Start review, items 1, 6 and 9
+A012 is mechanically misclassified as substantive	FROZEN INPUTS → ambiguity_ledger.md, A012 severity Blocking (process); SCORER SOURCE → case-sensitive Process\|governance expression
+Checklist reports 8/16 topic matches	C09_RESULTS.md → Counts row 2; Design Gate checklist items 1–16; SCORER SOURCE → TOP regex mapping
+Item 6 match does not anticipate the specific CLOSED_DATE rule	C09_RESULTS.md → checklist item 6; FROZEN INPUTS → ambiguity ledger A004 and Stage 1 decision
+Item 10 match does not anticipate diagnostic-only open_age_h	C09_RESULTS.md → checklist item 10; FROZEN INPUTS → ambiguity ledger A008; SCORER SOURCE → TOP[10]
+Item 16 match does not anticipate Grok Auto acceptance	C09_RESULTS.md → checklist item 16; FROZEN INPUTS → ambiguity ledger A009; Design Gate package item 16
+Review keyword counts total 14	C09_RESULTS.md → Independent attack record, four review rows; SCORER SOURCE → sevtext
+P1 requires zero later-ruling ambiguities	SPEC → Operational benefit predicate P1, conditions 1–2
+C09's observed P1 count is nonzero	C09_RESULTS.md → Counts row 1; FROZEN INPUTS → ambiguity ledger A003, A006, A007, A008, A011
+Replay does not demonstrate no-attack counterfactual behavior	SPEC → Disclosures and deviations; Q0 baseline disclosure
+Frozen source evidence passes reported preflight	PREFLIGHT → 75 frozen-OK entries and final failures: 0
+Fixture and R reconciliation tests are inapplicable	Coordinator note → text-only capture/no PC run; SPEC → Regression/HALT rules
+OF-1 is excluded from N16 measurements	Coordinator note N1/OF-1; SPEC → Disclosures and deviations
+Final governance outcome is outside Builder authority	CONSTITUTION → §§1, 4, 7–10; SPEC → Builder task
+Builder conclusion
+The frozen scorer is reproducible on the evidence supplied: five substantive ambiguities are flagged as requiring later rulings, and eight of sixteen Design Gate checklist items have earlier topic-regex matches.
+The five-row P1 count is stable even after correcting the identified A012 process-classification defect.
+The principal evidentiary limitation is the retrospective design: the replay documents meaningful unresolved questions during the historical workflow, but it does not independently measure the behavior of a workflow conducted without the ambiguity challenge.
+The 8/16 mapping should remain a descriptive lexical statistic. It must not be represented as proof that eight complete Design Gate requirements were already determined before Stage 3.
+These findings complete the independent Builder assessment without substituting a new predicate, modifying frozen evidence, or making a terminal decision.
+END C09 BUILDER REPORT

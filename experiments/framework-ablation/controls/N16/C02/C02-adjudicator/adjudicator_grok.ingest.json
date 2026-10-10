@@ -1,0 +1,31 @@
+{
+ "cid": "C02",
+ "role": "adjudicator",
+ "source": "C02/C02-adjudicator/adjudicator_grok_TEXTONLY.txt",
+ "source_bytes": 8373,
+ "source_sha256": "a0a18efb3f0383f98f2676afb0ef7079c08e32a48d5f39583a5f5f700328fcce",
+ "output": "C02/C02-adjudicator/adjudicator_raw.md",
+ "output_bytes": 8374,
+ "output_sha256": "bc689eb59e09e9f89c4749a16cd875fef02dd5ff2ff0aeb0803dc08597b88be3",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "terminal_state_lines": 1,
+  "second_last_is_terminal": true,
+  "leak": false,
+  "sections_found_in_order": [],
+  "sections_by_title": [
+   "Role attestation",
+   "Freeze check",
+   "Hard-fact agreement",
+   "KEEP conditions",
+   "HALT conditions",
+   "Blocking objections",
+   "Verdict rationale"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 07:02:57\nreply_complete=2026-10-09 07:04:26\n# reply_complete = first-seen (upper bound; generating at 07:03:56 poll, done at 07:04:26 poll; UI \"Worked for 41s\"). Mode Expert (default, no custom mode). Packet sent as file attachment (C02_3_ADJUDICATOR_Grok.txt), no extra text. Captured via select+copy of rendered reply. URL https://grok.com/c/edddb3f1-34c1-4ca2-8ca7-55eb781e6946"
+}

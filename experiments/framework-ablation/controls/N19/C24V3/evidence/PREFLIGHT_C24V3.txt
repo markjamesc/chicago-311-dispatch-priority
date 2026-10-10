@@ -1,0 +1,17 @@
+﻿frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+seed   OK   0f063bf1df546cef2dbb483fb949c321438bd2146c6ef6bf71c9086d9e1e25f7 code/run_RA_chunked.R
+seed   OK   1381b584f024df945be590604fa18ac080dc3b8d6cd03033bafa12f76a8217b8 code/run_RB_chunked.R
+seed   OK   4f69a6b16c76c343a3df730b549a71f851990db8064c183fc36ccb739bb9edec eval_c24v3.R
+seed   OK   328e72caa458a9b79551ae33c0ba87261d5bc9c1c44d77999a255564013a305a run_c24v3.ps1
+extract OK   9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2 B (EXTRACTS.csv of C24V2: 9dabac4fae30f2db386ec23703a2a48f3e31c9cd9fed3261590c85b2f7c17fa2)
+extract OK   8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe COLLAPSED (EXTRACTS.csv of C24V2: 8ef6df6f0694696122d92bc36410fcf2bee1b198d2221c4562bc5bb59b557ebe)
+C24V2 checksum bracket carried: MATCH
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | digest 0.6.39
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 19878 MB, C: free 634 GB
+preflight gating result: PASS

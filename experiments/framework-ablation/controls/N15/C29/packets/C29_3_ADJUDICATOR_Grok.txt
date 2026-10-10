@@ -1,0 +1,718 @@
+# C29 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Reconciliation Investigation (catalog #29) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C29 ADJUDICATION
+
+---
+# COORDINATOR NOTES (added 2026-10-03 after the run, before any Grok chat; nothing in the spec, predicate or numbers changed)
+- N1 (open finding): in clean arm B, R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the two paths; this is not confirmed. The finding is latent in the frozen pack, which is not changed. Consequence: any regime that gates on full-field recon (dormant_h/open_age_h, |d| > 1e-6) raises an alarm on the clean pair. The H2 line of the RESULTS shows these baseline mismatches ("B full-field recon mismatches: dormant_h 1, open_age_h 2").
+
+---
+# SPEC
+# C29 — Ablation specification (FROZEN)
+
+**Ablation ID:** C29 (owner Remaining Ablation Program, catalog #29 "Reconciliation Investigation")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (handling of R-A/R-B mismatches)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+If R-A and R-B mismatch, the mismatch must be investigated and the path rerun with the defect removed. No averaging and no copying of IDs or labels from one side.
+
+## Exact change being tested (ablation)
+A mismatch is auto-resolved by a shortcut rule, with no investigation and no rerun. The owner doc names no specific shortcut, so three rules are frozen here:
+- **copy_RA:** take R-A's key set and labels.
+- **copy_RB:** take R-B's key set and labels.
+- **max_severity:** union of keys. On shared keys take the more severe label (ESCALATE > INCONCLUSIVE > STANDARD), the conservative ordinal stand-in for averaging.
+**With the control:** investigation and rerun on frozen code reproduces arm B, by construction. The seeded defect is the only difference from arm B.
+
+## Seeded mismatch scenarios (frozen before execution; one defective path, the other = arm B)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **X_RB_NODUP** (paths run: RB): Mismatch from an R-B defect: DUPLICATE exclusion dropped (extra R-B keys).
+  - code seed `seeds/C29/RB_NODUP__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `4f1d8422f4dbe7fad83c5ad737a5bd36f4f50494dc6453f00e8761870f73ec69`
+- **X_RA_NODUP** (paths run: RA): Mismatch from an R-A defect: DUPLICATE exclusion dropped (extra R-A keys).
+  - code seed `seeds/C29/RA_NODUP__run_RA.R` → `R-A\run_RA.R`, SHA-256 `94aef54437d5be9536da5ee608e6ef24ba7b2c2f861b036afd652fdd1a0e1421`
+- **X_RB_NOTHIN** (paths run: RB): Mismatch from an R-B defect: I04 thin-peer clause dropped (label disagreements).
+  - code seed `seeds/C29/RB_NOTHIN__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff`
+- **X_RA_NOTHIN** (paths run: RA): Mismatch from an R-A defect: I04 thin-peer clause dropped (label disagreements).
+  - code seed `seeds/C29/RA_NOTHIN__run_RA.R` → `R-A\run_RA.R`, SHA-256 `65e90bf81cb2f573f744636947175fb3531b9053d76ee90fed1b003212c1f98b`
+
+## Operational benefit predicate P1
+Owner threshold: "Pass: Automatically resolving mismatch yields no difference. Fail: Unresolved mismatch or improper shortcut (keep rule)."
+Outcomes:
+- **P1 satisfied:** every scenario × rule resolution (4 × 3 = 12) equals arm B (R-A labels; key set and classification).
+- **P1 failed:** at least one resolution differs from arm B.
+The harm set H and the arms caught without the control are also reported, for context.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C29_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C29 RESULTS — Reconciliation Investigation (catalog #29) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 4/4
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {X_RB_NODUP,X_RA_NODUP,X_RB_NOTHIN,X_RA_NOTHIN}
+- H5 mismatch visible to the remaining checks (the ablated regime then auto-resolves it instead of rerunning) [crash, recon key/label mismatch, or fixture failure on any path]: {X_RB_NODUP,X_RA_NODUP,X_RB_NOTHIN,X_RA_NOTHIN}
+- H6 H minus mismatch-visible: {}
+- H7 arms with no locked-field change: {}
+- H8 auto-resolution results equal to arm B (key set and classification): 4/12
+- H9 scenario x rule pairs whose resolution differs from arm B: {X_RB_NODUP:copy_RB,X_RB_NODUP:max_severity,X_RA_NODUP:copy_RA,X_RA_NODUP:max_severity,X_RB_NOTHIN:copy_RB,X_RB_NOTHIN:max_severity,X_RA_NOTHIN:copy_RA,X_RA_NOTHIN:max_severity}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| X_RB_NODUP | RB | Mismatch from an R-B defect: DUPLICATE exclusion dropped (extra R-B keys) | RB=0 | 14/14 | 13/14 (F07) | 0 | 23012 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=23012 only_B=0 label=0 dormant=0 open_age=0 | 23012 | 23012 | TRUE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| X_RA_NODUP | RA | Mismatch from an R-A defect: DUPLICATE exclusion dropped (extra R-A keys) | RA=0 | 13/14 (F07) | 14/14 | 23012 | 0 | 0 | 1 | 2 | only_x=23012 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 23012 | 23012 | TRUE | R-A\run_RA.R | NA | TRUE |
+| X_RB_NOTHIN | RB | Mismatch from an R-B defect: I04 thin-peer clause dropped (label disagreements) | RB=0 | 14/14 | 13/14 (F06) | 0 | 0 | 6377 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=6377 dormant=0 open_age=0 | 6377 | 6377 | TRUE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| X_RA_NOTHIN | RA | Mismatch from an R-A defect: I04 thin-peer clause dropped (label disagreements) | RA=0 | 13/14 (F06) | 14/14 | 0 | 0 | 6377 | 1 | 2 | only_x=0 only_B=0 label=6377 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 6377 | 6377 | TRUE | R-A\run_RA.R | NA | TRUE |
+
+## Auto-resolution (rules frozen in the SPEC; truth = arm B R-A labels)
+| scenario | rule | n_only_resolved | n_only_truth | n_label_diff | equals_truth |
+|---|---|---|---|---|---|
+| X_RB_NODUP | copy_RA | 0 | 0 | 0 | TRUE |
+| X_RB_NODUP | copy_RB | 23012 | 0 | 0 | FALSE |
+| X_RB_NODUP | max_severity | 23012 | 0 | 0 | FALSE |
+| X_RA_NODUP | copy_RA | 23012 | 0 | 0 | FALSE |
+| X_RA_NODUP | copy_RB | 0 | 0 | 0 | TRUE |
+| X_RA_NODUP | max_severity | 23012 | 0 | 0 | FALSE |
+| X_RB_NOTHIN | copy_RA | 0 | 0 | 0 | TRUE |
+| X_RB_NOTHIN | copy_RB | 0 | 0 | 6377 | FALSE |
+| X_RB_NOTHIN | max_severity | 0 | 0 | 24 | FALSE |
+| X_RA_NOTHIN | copy_RA | 0 | 0 | 6377 | FALSE |
+| X_RA_NOTHIN | copy_RB | 0 | 0 | 0 | TRUE |
+| X_RA_NOTHIN | max_severity | 0 | 0 | 24 | FALSE |
+
+
+---
+# C29_EVIDENCE.sha256
+00eb01b4262c405b3162129fe125c4ef2a3b7d04ddf1c4e882db0033ce1fb92d  C29_ARM_MANIFESTS.txt
+84b72a42e5b880ae210c7b90f46328567d0aab90db4ec84af68449502229f3a7  C29_arms.csv
+2e093ad0062a9cd6d5fc362a27f9afdacbbb3055f2891c9752864925968e5d70  C29_resolution.csv
+42a152c0d099eccef53e2553ad0a7e0ead6da2ef07f8b5ddda26c006d0638d5e  C29_RESULTS.md
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C29",
+  "frozen_at_ct": "2026-10-03 05:33:53 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C29/C29-builder/builder_report.md", "bytes": 15738, "sha256": "758ba55dea01af2e2500089a3a808c547cec857b85477e308b27c67de57f7165", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C29/C29-validator/validator_report.md", "bytes": 13564, "sha256": "e687b9917e83e700170ac6479bb87a36e86b42b2b517a47baa2465ad7daf92bd", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "f655dc91fcf421d64e5b981e61cf877b986b4a00afe1c150d19d6a0e906fc41b"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C29 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting as **Builder only**, making an **independent first pass** without access to any Validator first-pass output. The ablation is **C29**, owner Remaining Ablation Program catalog **#29, “Reconciliation Investigation,”** N15 batch 1 of 3, Constitution version 1.0, targeting **Stage 4 handling of R-A/R-B mismatches**. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok.
+
+The frozen control requires that an R-A/R-B mismatch be **investigated and the affected path rerun with the defect removed**, with no averaging and no copying of IDs or labels from one side. C29 tests removing that behavior and replacing it with automatic shortcut resolution.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The ablation removes two linked safeguards: **investigation of why R-A and R-B disagree**, and **rerunning the defective path after correcting the defect**. In their place it freezes three automatic rules: `copy_RA`, `copy_RB`, and `max_severity`. `copy_RA` takes R-A's keys and labels; `copy_RB` takes R-B's; `max_severity` unions the keys and, for shared keys, chooses `ESCALATE > INCONCLUSIVE > STANDARD`.
+
+The four seeded changes are exact one-line semantic mutations:
+
+| Seed | Frozen code | Seeded code | Semantic effect |
+| --- | --- | --- | --- |
+| `X_RB_NODUP` | `in_decision <- is_open & !dup_flag & !leg_flag` | `in_decision <- is_open & !leg_flag` | R-B stops excluding DUPLICATE rows. |
+| `X_RA_NODUP` | `exclude <- is_true_like(dup) | is_true_like(leg) | !in_envelope_open` | `exclude <- is_true_like(leg) | !in_envelope_open` | R-A stops excluding DUPLICATE rows. |
+| `X_RB_NOTHIN` | `p_thin <- peer_n < RB_N_MIN` | `p_thin <- rep(FALSE, n)` | R-B disables the thin-peer condition. |
+| `X_RA_NOTHIN` | `check(base$peer_missing | base$peer_n < n_min, "thin_type_or_missing_peer")` | `check(rep(FALSE, nrow(base)), "thin_type_or_missing_peer")` | R-A disables the thin/missing-peer check. |
+
+These are the complete seeded code diffs shown in the packet.
+
+Their frozen seed hashes are respectively `4f1d8422...f73ec69`, `94aef544...0e1421`, `487b769c...639ff`, and `65e90bf8...0f98b`, each distinct from its corresponding frozen path code hash.
+
+## 3. Hard mechanical facts table.
+
+For this table, define **D** as the set of frozen scenario×rule resolutions whose resulting **key set or classification differs from arm B truth**. Record-level SR_NUMBER memberships of the difference sets cannot be reconstructed from the packet because only counts, not differing IDs, are supplied.
+
+| Mechanical fact | Recomputed result | Status / derivation |
+| --- | --- | --- |
+| Baseline framework hash comparisons | **2/2 equal** | **Recomputed** by string equality between the two SPEC hashes and the two baseline-hash rows. |
+| Explicit frozen source/code hashes from SPEC reproduced in preflight | **5/5 equal** | **Recomputed** for `src_open_candidates`, `src_peer_stats`, R-A `run_RA.R`, R-B `00_config.R`, and R-B `20_integrity_and_classify.R`. |
+| Arm B sizes | R-A **222,002**; R-B **222,002**; inner **222,002** | **Quoted** from B reconciliation. |
+| Arm B agreement identity | `n_agree = 222,002 − 0 = 222,002`; `222,002 + 0 = 222,002` | **Recomputed** from `n_inner=222002`, `n_disagree=0`. |
+| Arm B key union | **222,002** | **Recomputed:** `222002 + 0 + 0`. |
+| Arm B fixtures | **28/28** combined | **Recomputed:** R-A 14/14 + R-B 14/14. Raw fixture rows independently contain 28 passing B rows. |
+| Arm B reproduction vs frozen classifications | **10/10 comparison cells are zero** | **Recomputed:** two paths × five diff columns; every entry is 0. |
+| Arm B key/label reconciliation | only-R-A **0**, only-R-B **0**, label-disagree **0** | **Quoted**. |
+| Arm B full-field cross-path numeric reconciliation | dormant **1**, open-age **2**, total **3** | First two **quoted**; total **recomputed** as `1+2`. |
+| Recorded path executions | **6/6 exit 0** total; **4/4 seeded runs recorded** | **Recomputed** from two B runs plus four seeded runs in the run log. |
+| `X_RB_NODUP` path sizes | R-A **222,002**, R-B **245,014**, inner **222,002** | **Recomputed:** defective R-B = `222002+23012=245014`; R-A is B. |
+| `X_RA_NODUP` path sizes | R-A **245,014**, R-B **222,002**, inner **222,002** | **Recomputed** symmetrically. |
+| NODUP decision-set/portfolio delta | **+23,012 rows**, or **+10.3657%** versus 222,002 | **Recomputed:** `23012 / 222002 × 100`. Raw arm rows report 23,012 one-sided keys. |
+| NODUP shared-key agreement identity | `n_agree=222,002`; `222,002 + 0 = 222,002` | **Recomputed** because `n_disagree=0` on the 222,002-key intersection. |
+| `X_RB_NOTHIN` sizes | R-A **222,002**, R-B **222,002**, inner **222,002** | **Recomputed** from zero one-sided keys. |
+| `X_RA_NOTHIN` sizes | R-A **222,002**, R-B **222,002**, inner **222,002** | **Recomputed** from zero one-sided keys. |
+| NOTHIN agreement identity | `n_agree = 222,002 − 6,377 = 215,625`; `215,625 + 6,377 = 222,002` | **Recomputed** for each NOTHIN arm. |
+| NOTHIN classification delta | **6,377 labels**, or **2.8725%** of the 222,002-key portfolio | Count **quoted**; percentage **recomputed**. |
+| Seeded-path fixtures | **52/56 pass**, **4/56 fail** | **Recomputed:** four seeded paths ×14 fixtures, each 13/14. |
+| All raw fixture executions, including B | **80/84 pass** | **Recomputed:** B contributes 28/28 and seeded paths 52/56. |
+| Fixture failure distribution | F07: **2** failures; F06: **2** failures | **Recomputed:** F07 fails in both NODUP paths; F06 in both NOTHIN paths. |
+| Harm set H | **4/4 arms:** `{X_RB_NODUP, X_RA_NODUP, X_RB_NOTHIN, X_RA_NOTHIN}` | **Recomputed** from every arm having `locked_field_changes_vs_B > 0`; matches H4. |
+| Mismatch-visible set | **4/4**, same four arms | **Recomputed** from key/label reconciliation and fixture failures; matches H5. |
+| `H − mismatch-visible` | **∅**, cardinality **0** | **Recomputed** set difference. |
+| Arms with zero locked-field change | **∅**, cardinality **0** | **Recomputed** from the four raw arm rows. |
+| Shortcut equality with truth | **4/12 equal**, **8/12 differ** | **Recomputed** from twelve raw resolution rows. This is **33.3333%** equal and **66.6667%** different. |
+| `D_copy_RA` | `{X_RA_NODUP, X_RA_NOTHIN}`; **2/4** scenarios differ | **Recomputed** from `equals_truth=FALSE`. |
+| `D_copy_RB` | `{X_RB_NODUP, X_RB_NOTHIN}`; **2/4** scenarios differ | **Recomputed**. |
+| `D_max_severity` | all four seeded scenarios; **4/4** differ | **Recomputed**. |
+| Full D set | **8 scenario×rule pairs** | **Recomputed:** 2 copy-R-A + 2 copy-R-B + 4 max-severity. |
+| NODUP shortcut error cardinality when the defective side is propagated | **23,012** extra keys | **Quoted/recomputed** from each applicable resolution row. |
+| NOTHIN defective-side copy error | **6,377** wrong labels | **Quoted** from the relevant `copy_RA`/`copy_RB` resolution rows. |
+| NOTHIN `max_severity` residual error | **24** wrong labels per arm | **Quoted**; relative to 6,377 original disagreements, `6377−24=6,353` no longer differ from truth after the rule. |
+| Cross-arm source-hash equality | **12/12 seeded-to-B comparisons equal** across the three common source inputs | **Recomputed:** four seeded arms × `src_extract_lineage`, `src_open_candidates`, `src_peer_stats`; manifest strings are identical. |
+| Source variants used | **0** | **Quoted:** “no source variants used.” |
+| Unseeded R-B code hash comparisons in R-B seed arms | **4/4 equal to B** | **Recomputed:** `00_config.R` and `run_RB.R` each remain identical in both R-B seed arms. |
+| Seeded code comparison to B | **4/4 seeded code files differ** | **Recomputed:** two R-A `run_RA.R` hashes and two R-B `20_integrity_and_classify.R` hashes differ from the B versions. |
+| Seeded-path output hashes vs corresponding B output | **8/8 differ** | **Recomputed:** classification + fixture output for each of four seeded path runs all have hashes different from the corresponding B file. |
+| Read-only source preflight counts | open candidates **245,193**; peer stats **104** | **Quoted** from runner preflight. |
+
+The exact recomputed full D set is:
+
+`{X_RB_NODUP:copy_RB, X_RB_NODUP:max_severity, X_RA_NODUP:copy_RA, X_RA_NODUP:max_severity, X_RB_NOTHIN:copy_RB, X_RB_NOTHIN:max_severity, X_RA_NOTHIN:copy_RA, X_RA_NOTHIN:max_severity}`.
+
+This independently reproduces the eight pairs listed mechanically by the runner.
+
+## 4. P1 assessment against the frozen predicate in the SPEC.
+
+The frozen P1 condition is explicit: **all 4 scenarios × all 3 shortcut rules = 12 resolutions must equal arm B in key set and classification**. A single differing resolution is sufficient for the alternative P1 condition.
+
+The observed resolution matrix contains exactly **4 truth-equal results and 8 truth-different results**. The four truth-equal pairs are `X_RB_NODUP:copy_RA`, `X_RA_NODUP:copy_RB`, `X_RB_NOTHIN:copy_RA`, and `X_RA_NOTHIN:copy_RB`. In every case, the successful copy rule happens to copy the **unseeded/B side**. `max_severity` equals truth in **0/4** scenarios.
+
+Therefore the observed matrix is **4/12 rather than the frozen requirement of 12/12**. The P1 condition specified at lines 61–62 is consequently not satisfied by the observed resolutions. No broader terminal disposition is made here.
+
+## 5. Fixture and reconciliation implications.
+
+The two seed families are mechanically distinct. Dropping DUPLICATE exclusion changes **set membership**: the defective path gains **23,012 keys**, while classifications on the 222,002 shared keys still agree. The corresponding semantic fixture is **F07**, which changes from expected `OUT_OF_SET` to observed `ESCALATE` on both seeded implementations.
+
+Dropping the thin-peer clause leaves the key population unchanged but produces **6,377 classification disagreements**. Its semantic fixture is **F06**, which changes from expected `INCONCLUSIVE` to observed `ESCALATE` in both implementations.
+
+Thus every seeded semantic defect is visible before shortcut resolution: the two NODUP arms expose a **23,012-key reconciliation mismatch plus F07 failure**, and the two NOTHIN arms expose a **6,377-label reconciliation mismatch plus F06 failure**. All four seeded executions nevertheless exit **0**, so none is represented by a process crash. The remaining checks therefore identify all four seeded defects mechanically.
+
+A separate reconciliation fact must not be conflated with the seeds: clean arm B has exact key/classification reconciliation but already has **1** `dormant_h` **mismatch and 2** `open_age_h` **mismatches** between R-A and R-B. Those same counts, **1 and 2**, appear in every seeded arm. They are therefore unchanged cross-path numerical differences, not induced by any C29 seed.
+
+The frozen P1 comparison itself is narrower than the full locked-field harm definition: P1 judges shortcut resolution against **arm B R-A key set and classification**, whereas the harm set also includes `dormant_h` and `open_age_h`.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+| Surface | Evidence-based implication |
+| --- | --- |
+| Side-copy shortcut | The correctness of `copy_RA` versus `copy_RB` depends entirely on which side contains the defect. In the R-B-seeded cases, `copy_RA` is exact and `copy_RB` propagates the defect; in the R-A-seeded cases the relation reverses. The shortcut itself supplies no evidence identifying the defective side. |
+| NODUP semantic risk | Copying the defective side or taking the union via `max_severity` retains all **23,012** erroneous extra keys. Thus severity ordering cannot repair a membership error. |
+| NOTHIN semantic risk | Copying the defective side preserves **6,377** wrong classifications. `max_severity` reduces the difference to **24** labels but does not make the result identical to truth. |
+| Fixture interaction | Every seed that produces a harmful output also produces an explicit semantic fixture failure—F07 for NODUP or F06 for NOTHIN. Automatic resolution without correction/rerun can therefore produce a truth-different resolved output even though the defect was already mechanically visible. |
+| Crash surface | Unchanged: all six actual path runs exit 0. These are semantic defects rather than execution failures. |
+| Source/data surface | Unchanged: no source variant is used, and all three common source-file hashes are identical across B and every seeded arm. |
+| Seed scope | Each seeded arm changes only its declared defective R path: R-A `run_RA.R` for the two R-A seeds or R-B `20_integrity_and_classify.R` for the two R-B seeds. The nonseed R-B config and runner hashes remain identical where present. |
+| Frozen baseline surface | B reproduces both frozen classification outputs with zero key, label, dormant, and open-age differences against each path's own frozen artifact. |
+| Existing cross-path numeric differences | Unchanged: the **1 dormant / 2 open-age** R-A-vs-R-B differences occur in B and every seed. No C29 evidence attributes them to the ablation. |
+| Remaining-check visibility | Unchanged detection coverage for these four seeds: all four belong to the mismatch-visible set and `H − mismatch-visible = ∅`. The observed risk is therefore not failure to expose these defects; it is the truth divergence produced by shortcut resolution after exposure. |
+
+## 7. Claim → evidence map.
+
+| Claim | Frozen evidence section and table row |
+| --- | --- |
+| C29 tests automatic shortcut resolution in place of investigation and rerun. | **SPEC → Control under test / Exact change being tested**, lines 34–42. |
+| The four seeds are exactly removal of DUPLICATE exclusion or disabling of the thin-peer clause in one R path. | **SEED DIFFS**, hunks `RB_NODUP`, `RA_NODUP`, `RB_NOTHIN`, `RA_NOTHIN`, lines 509–550. |
+| B has 222,002 rows on each path, no key/label disagreement, and 1/2 dormant/open-age mismatches. | **C29_RESULTS.md → Arm B recon**, row `222002 / 222002 / 222002 / 0 / 0 / 0 / 1 / 2`. |
+| B reproduces each frozen path output exactly on all five comparison dimensions. | **C29_RESULTS.md → Arm B repro vs frozen pack**, rows `B R-A vs frozen RA_classifications` and `B R-B vs frozen RB_classifications`. |
+| Each NODUP seed creates 23,012 extra keys and each NOTHIN seed creates 6,377 label differences. | **C29_RESULTS.md → Seeded arms**, rows `X_RB_NODUP`, `X_RA_NODUP`, `X_RB_NOTHIN`, `X_RA_NOTHIN`. |
+| All four seeded arms are harmful and visible to the remaining checks. | **C29_RESULTS.md → Mechanical facts**, H4–H6. |
+| NODUP breaks F07 and NOTHIN breaks F06 on both implementations. | **FIXTURE RESULTS**, rows `X_RB_NODUP/RB/F07`, `X_RA_NODUP/RA/F07`, `X_RB_NOTHIN/RB/F06`, `X_RA_NOTHIN/RA/F06`. |
+| Exactly four of twelve automatic resolutions equal truth. | **C29_resolution.csv**, all twelve scenario×rule rows; recomputed TRUE count = 4 and FALSE count = 8. |
+| `max_severity` differs from truth in every scenario. | **C29_resolution.csv**, the four `max_severity` rows: two with 23,012 extra keys and two with 24 label differences. |
+| P1 requires all twelve resolutions to equal arm B. | **SPEC → Operational benefit predicate P1**, outcome definition at lines 58–63. |
+| Sources are unchanged across arms and no source variant is used. | **SOURCE VARIANTS**, “no source variants used”; **ARM MANIFESTS**, identical source hashes in B and all four seeded arms. |
+| The seeded code hashes differ while declared nonseed inputs remain unchanged. | **ARM MANIFESTS**, B and seeded input rows; **SPEC → Seeded mismatch scenarios** for declared seed hashes. |
+
+END C29 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+# C29 VALIDATOR REPORT
+
+## 1. Role attestation and ablation ID
+
+I am DeepSeek, acting only as Validator for ablation **C29**. I am blind to the Builder and have not seen, requested, or used any Builder output. The frozen role assignment in the SPEC is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Constitution version 1.0. Ablation ID: **C29**, batch N15 batch 1 of 3, target Stage 4 handling of R-A/R-B mismatches. I do not return a terminal state.
+
+## 2. Independent test plan
+
+I checked the packet by:
+
+- Comparing SPEC-frozen hashes against the preflight and ARM MANIFESTS for frameworks, frozen code, frozen classifications, seeds, and source files.
+- Recomputing source row-count claims from the preflight MySQL summary.
+- Checking run completeness, exit codes, and recorded run durations from the RUN LOG.
+- Recomputing arm B fixture counts from the raw fixture rows.
+- Recomputing arm B reproduction and reconciliation counts from the arm B recon table.
+- Recomputing each seeded arm’s fixture failures, reconciliation deltas, locked-field changes, decision changes, harm flag, and input diff from `C29_arms.csv` and the fixture table.
+- Recomputing the harm set H, mismatch-visible set, H-minus-mismatch-visible, no-locked-field-change set, and auto-resolution equality counts from `C29_RESULTS.md` and `C29_resolution.csv`.
+- Checking the SEED DIFFS against the SPEC descriptions of the four seeded defects.
+- Checking SHA-256 equalities and non-equalities for arm B and seeded arm outputs.
+- Flagging places where the packet lacks row-level evidence needed to independently recompute an aggregate.
+
+## 3. Independently recomputed hard facts
+
+### Frozen input checks
+
+- Baseline framework hashes in the packet match the SPEC:
+
+  - `70a14831...600c4c` measurement framework.
+  - `24aec49c...cdb2e` validation framework.
+- Frozen source hashes match the SPEC and preflight:
+
+  - `src_open_candidates.csv` `ba089fcc...d81b9`.
+  - `src_peer_stats.csv` `cb78ae21...eb58`.
+- Frozen code hashes match the SPEC and preflight:
+
+  - `R-A/run_RA.R` `f4e8993c...8587`.
+  - `R-B/R/00_config.R` `6c9b0e31...450b`.
+  - `R-B/R/20_integrity_and_classify.R` `72ac5def...1d99`.
+- Seed hashes match the SPEC and preflight:
+
+  - `RA_NODUP__run_RA.R` `94aef544...1421`.
+  - `RA_NOTHIN__run_RA.R` `65e90bf8...f98b`.
+  - `RB_NODUP__20_integrity_and_classify.R` `4f1d8422...ec69`.
+  - `RB_NOTHIN__20_integrity_and_classify.R` `487b769c...39ff`.
+- Source row counts: preflight reports `src_open_candidates=245193`, `src_peer_stats=104`; this matches the SPEC row count for `src_open_candidates`.
+- Source variants used: `(no source variants used)`, consistent with the SPEC allowed scope.
+
+### Run completeness
+
+- RUN LOG records six runs: B RA, B RB, X_RB_NODUP RB, X_RA_NODUP RA, X_RB_NOTHIN RB, X_RA_NOTHIN RA.
+- All recorded exits are 0.
+- Seeded arms with every run recorded: **4/4**. H3 is consistent.
+
+### Arm B
+
+- B RA exit=0, B RB exit=0.
+- B fixtures: RA 14/14, RB 14/14. I recomputed this from the fixture rows.
+- B reproduction vs frozen pack table:
+
+  - B R-A vs frozen RA_classifications: only_x=0, only_truth=0, label_diff=0, dormant_diff=0, open_age_diff=0.
+  - B R-B vs frozen RB_classifications: only_x=0, only_truth=0, label_diff=0, dormant_diff=0, open_age_diff=0.
+- B output hashes match the preflight frozen classification hashes:
+
+  - B RA `c099e092...ae0d9`.
+  - B RB `a0e42b86...e193`.
+- B recon table:
+
+  - n_ra=222002, n_rb=222002, n_inner=222002.
+  - only_ra=0, only_rb=0, disagree=0.
+  - dormant_mismatch=1, open_age_mismatch=2.
+- Internal inconsistency flagged: H2 states “B recon is 0/0/0: TRUE” and also states “B full-field recon mismatches: dormant_h 1, open_age_h 2.” The B recon table confirms `n_dormant_mismatch=1` and `n_open_age_mismatch=2`. If “0/0/0” means only key/label/disagree, then it is consistent with the table but ambiguous. If it means all reconciliation fields including dormant/open_age, it directly contradicts the table and the SPEC halt condition.
+
+### Seeded arm recomputation
+
+- **X_RB_NODUP**
+
+  - Paths run: RB; exit RB=0.
+  - Fixtures: RA 14/14; RB 13/14, F07 expected OUT_OF_SET, observed ESCALATE.
+  - Recon: only_ra=0, only_rb=23012, disagree=0, dormant=1, open_age=2.
+  - RA_vs_B: all zero. RB_vs_B: only_x=23012, only_B=0, label=0, dormant=0, open_age=0.
+  - Locked_field_changes_vs_B=23012; decision_changes_vs_B=23012; harm=TRUE.
+  - Input differing from B: `R-B\R\20_integrity_and_classify.R`.
+- **X_RA_NODUP**
+
+  - Paths run: RA; exit RA=0.
+  - Fixtures: RA 13/14, F07 expected OUT_OF_SET, observed ESCALATE; RB 14/14.
+  - Recon: only_ra=23012, only_rb=0, disagree=0, dormant=1, open_age=2.
+  - RA_vs_B: only_x=23012, only_B=0, label=0, dormant=0, open_age=0. RB_vs_B: all zero.
+  - Locked_field_changes_vs_B=23012; decision_changes_vs_B=23012; harm=TRUE.
+  - Input differing from B: `R-A\run_RA.R`.
+- **X_RB_NOTHIN**
+
+  - Paths run: RB; exit RB=0.
+  - Fixtures: RA 14/14; RB 13/14, F06 expected INCONCLUSIVE, observed ESCALATE.
+  - Recon: only_ra=0, only_rb=0, disagree=6377, dormant=1, open_age=2.
+  - RA_vs_B: all zero. RB_vs_B: only_x=0, only_B=0, label=6377, dormant=0, open_age=0.
+  - Locked_field_changes_vs_B=6377; decision_changes_vs_B=6377; harm=TRUE.
+  - Input differing from B: `R-B\R\20_integrity_and_classify.R`.
+- **X_RA_NOTHIN**
+
+  - Paths run: RA; exit RA=0.
+  - Fixtures: RA 13/14, F06 expected INCONCLUSIVE, observed ESCALATE; RB 14/14.
+  - Recon: only_ra=0, only_rb=0, disagree=6377, dormant=1, open_age=2.
+  - RA_vs_B: only_x=0, only_B=0, label=6377, dormant=0, open_age=0. RB_vs_B: all zero.
+  - Locked_field_changes_vs_B=6377; decision_changes_vs_B=6377; harm=TRUE.
+  - Input differing from B: `R-A\run_RA.R`.
+
+### D-sets and sets
+
+- H4 harm set H = `{X_RB_NODUP, X_RA_NODUP, X_RB_NOTHIN, X_RA_NOTHIN}`. Recomputed from locked_field_changes_vs_B > 0 for all four.
+- H5 mismatch-visible set = same four. Recomputed from fixture failure and/or recon key/label mismatch for each seeded arm.
+- H6 H minus mismatch-visible = `{}`. Consistent.
+- H7 arms with no locked-field change = `{}`. Consistent.
+- H8 auto-resolution results equal to arm B: **4/12**. Recomputed from `equals_truth=TRUE` rows.
+- H9 differing scenario × rule pairs: **8/12**:
+
+  - X_RB_NODUP:copy_RB, X_RB_NODUP:max_severity
+  - X_RA_NODUP:copy_RA, X_RA_NODUP:max_severity
+  - X_RB_NOTHIN:copy_RB, X_RB_NOTHIN:max_severity
+  - X_RA_NOTHIN:copy_RA, X_RA_NOTHIN:max_severity
+- Auto-resolution equal-to-truth TRUE rows are exactly:
+
+  - X_RB_NODUP:copy_RA
+  - X_RA_NODUP:copy_RB
+  - X_RB_NOTHIN:copy_RA
+  - X_RA_NOTHIN:copy_RB
+
+### Cross-arm hash equalities
+
+- B outputs match frozen classifications:
+
+  - B RA `c099e092...ae0d9` equals preflight frozen `RA_classifications.csv`.
+  - B RB `a0e42b86...e193` equals preflight frozen `RB_classifications.csv`.
+- Seeded run-path outputs do not equal the corresponding arm B output:
+
+  - X_RA_NODUP RA output `eb28be6b...9e64` ≠ B RA `c099e092...ae0d9`.
+  - X_RA_NOTHIN RA output `40c85fac...bfa5` ≠ B RA `c099e092...ae0d9`.
+  - X_RB_NODUP RB output `ca411fca...8fab` ≠ B RB `a0e42b86...e193`.
+  - X_RB_NOTHIN RB output `f6611d8d...19f8` ≠ B RB `a0e42b86...e193`.
+- Non-run path outputs for seeded arms are not present in the seeded arm manifests. The packet states the non-run path is taken from arm B, and the runner’s `RA_vs_B`/`RB_vs_B` columns show zero for the non-run path, but this cannot be independently recomputed from the listed seeded arm manifests.
+
+### Seed diffs
+
+The four SEED DIFFS match the SPEC descriptions:
+
+- RB_NODUP removes `!dup_flag` from `in_decision`.
+- RA_NODUP removes `is_true_like(dup)` from `exclude`.
+- RB_NOTHIN replaces `p_thin <- peer_n < RB_N_MIN` with `p_thin <- rep(FALSE, n)`.
+- RA_NOTHIN replaces the thin-peer check with `check(rep(FALSE, nrow(base)), "thin_type_or_missing_peer")`.
+
+### Other internal consistency checks
+
+- Fixture failures match the seeded defects:
+
+  - NODUP arms fail F07 on the seeded path.
+  - NOTHIN arms fail F06 on the seeded path.
+- The `caught_with_control` column is `NA` for all four seeded arms in `C29_arms.csv`. This does not allow independent recomputation of the control-regime catch status, although H5 says the mismatches are visible to the remaining checks.
+- The `max_severity` rows for X_RB_NOTHIN and X_RA_NOTHIN report `n_label_diff=24`. This cannot be independently derived from the provided aggregate `recon_disagree=6377` without row-level label data. It is not necessarily inconsistent, because max-severity can resolve some disagreements in favor of the truth reference, but the packet does not contain the underlying rows.
+
+## 4. Facts that cannot be recomputed from this packet
+
+- The exact row-level key sets and label sets behind the 23012 and 6377 deltas.
+- The identities of the `dormant_h 1` and `open_age_h 2` B recon mismatches.
+- The derivation of `max_severity n_label_diff=24` for X_RB_NOTHIN and X_RA_NOTHIN.
+- The non-run path outputs for each seeded arm, since seeded arm manifests contain only the path(s) that arm runs.
+- Full stdout/stderr beyond the RUN LOG exit codes and timings.
+- Raw reconciliation output files or row-level diff files; only aggregate CSV tables and runner summaries are present.
+- The basis for `caught_with_control=NA` in `C29_arms.csv`.
+
+## 5. P1 assessment against the frozen predicate in the SPEC
+
+The frozen P1 predicate is: P1 satisfied iff every scenario × rule resolution (4 × 3 = 12) equals arm B on R-A labels, key set, and classification. P1 failed if at least one resolution differs from arm B.
+
+From the provided evidence:
+
+- Auto-resolution equal to arm B: **4/12**.
+- Auto-resolution differing from arm B: **8/12**.
+- The 8 differing pairs are all `max_severity` rows plus the wrong-side `copy_RA`/`copy_RB` rows:
+
+  - X_RB_NODUP:copy_RB, X_RB_NODUP:max_severity
+  - X_RA_NODUP:copy_RA, X_RA_NODUP:max_severity
+  - X_RB_NOTHIN:copy_RB, X_RB_NOTHIN:max_severity
+  - X_RA_NOTHIN:copy_RA, X_RA_NOTHIN:max_severity
+- The harm set H contains all four seeded arms.
+- The mismatch-visible set contains all four seeded arms.
+- H minus mismatch-visible is empty; there are no hidden harmed arms in this packet.
+- No seeded arm has zero locked-field change.
+
+Therefore, on the frozen predicate as written, P1 is **not satisfied** by the provided evidence. I state this as a factual assessment only and do not return a terminal state.
+
+## 6. Blocking objections
+
+- **B recon inconsistency/ambiguity:** H2 states “B recon is 0/0/0: TRUE” while the same results section reports “B full-field recon mismatches: dormant_h 1, open_age_h 2.” The B recon table confirms `n_dormant_mismatch=1` and `n_open_age_mismatch=2`. Under the SPEC, if B recon is required to be 0/0/0 including dormant and open_age, this is a blocking defect. If 0/0/0 means only key/label/disagree, the text is ambiguous and prevents independent confirmation of the halt condition.
+- **Missing row-level evidence for hard facts:** The packet provides aggregate tables and hashes but not raw reconciliation/diff outputs or row-level classification files. That prevents independent recomputation of the exact 23012/6377 D-sets, the B recon 1/2 mismatches, and the `max_severity n_label_diff=24` values. Constitution evidence requirements may make this a blocking gap.
+- **Control-regime catch status missing:** `caught_with_control` is `NA` for all four seeded arms even though the column exists. The packet does not report the control-regime catch result independently.
+- Otherwise, the seed diffs match the SPEC descriptions, the recorded exits are all 0, the fixture failures align with the seeded defects, and the auto-resolution equality counts recompute consistently from the provided tables.
+
+## 7. Claim → evidence map
+
+| Claim | Evidence |
+| --- | --- |
+| Frozen framework hashes match SPEC | Packet baseline framework hashes vs SPEC hashes |
+| Frozen source hashes and row counts match SPEC | Preflight lines; SPEC source hashes; MySQL summary 245193/104 |
+| Frozen code hashes match SPEC | Preflight frozen OK lines; SPEC frozen code hashes |
+| Seed hashes match SPEC | Preflight seed OK lines; SPEC seed hashes |
+| Arm B exits 0 and fixtures 14/14 | RUN LOG; C29_RESULTS H1; fixture rows |
+| Arm B reproduces frozen pack | B repro table all zeros; B output hashes `c099e092...` and `a0e42b86...` |
+| B recon key/label/disagree are zero | B recon table: only_ra=0, only_rb=0, disagree=0 |
+| B recon dormant/open_age are nonzero | B recon table: dormant=1, open_age=2; H2 full-field text |
+| Seeded arms complete | RUN LOG; H3 4/4 |
+| Harm set H is all four seeded arms | `C29_arms.csv` locked_field_changes_vs_B > 0 for all four |
+| Mismatch-visible set is all four | Fixture failures F07/F06 and recon only/label mismatches |
+| H minus mismatch-visible is empty | H4 and H5 identical; H6 `{}` |
+| No seeded arm has zero locked-field change | H7 `{}`; arm table locked changes 23012/6377 |
+| Auto-resolution equals arm B 4/12 | `C29_resolution.csv` equals_truth TRUE rows |
+| Auto-resolution differs 8/12 | `C29_resolution.csv` equals_truth FALSE rows |
+| Seed defects match SPEC | SEED DIFFS for NODUP and NOTHIN on RA/RB |
+| Seeded outputs differ from B on run path | ARM MANIFESTS output hashes differ from B RA/RB hashes |
+| P1 not satisfied on frozen predicate | 4/12 equal vs required 12/12 |
+| Blocking objection on B recon | H2 “B recon is 0/0/0” vs B recon table dormant=1/open_age=2 |
+| Row-level facts unavailable | No raw reconciliation/diff/classification row files in packet |
+
+END C29 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C29 ADJUDICATION'.

@@ -1,0 +1,642 @@
+# C39 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Reconciliation scope & tolerance (addendum #39) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C39 ADJUDICATION
+
+---
+# COORDINATOR NOTES (added 2026-10-03 after the run, before any Grok chat; nothing in the spec, predicate or numbers changed)
+- N1 (open finding): in clean arm B, R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the two paths; this is not confirmed. The finding is latent in the frozen pack, which is not changed. Consequence: any regime that gates on full-field recon (dormant_h/open_age_h, |d| > 1e-6) raises an alarm on the clean pair. The H2 line of the RESULTS shows these baseline mismatches ("B full-field recon mismatches: dormant_h 1, open_age_h 2").
+- N1 applied to C39: the control's full-field regime alarms on the clean pair. So H8 ('caught with the control') includes the baseline false alarm. R_GT appears in H9 ('caught with the control but no locked-field change') because of the baseline mismatch, not because of its seed. P1 uses D_abl (key set and classification only), and N1 does not affect it.
+
+---
+# SPEC
+# C39 — Ablation specification (FROZEN)
+
+**Ablation ID:** C39 (ablation Addendum 01, control #39 "Reconciliation scope & tolerance")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (reconciliation field scope)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+R-A vs R-B must match on the full locked field list, exact on non-prediction fields, with no tolerance waiver. For this pack the comparable locked fields in both outputs are the key set, classification, dormant_h and open_age_h. Exact means |d| ≤ 1e-6, because R-A writes 6 decimals.
+
+## Exact change being tested (ablation)
+Reconcile only the decision-driving fields: the key set and classification. dormant_h and open_age_h are reported but do not gate. This pack has no prediction fields, so no prediction tolerance applies.
+Disclosure: the frozen 2026-09-19 recon (`recon/run_recon.R`) compares classification only. The ablated variant therefore equals the frozen pack's own recon practice, and the control is the stricter full-field match.
+**Caught with the control:** crash, a full-field recon mismatch, or a fixture failure.
+**Caught without the control (D_abl):** crash, a decision-field recon mismatch (key set + classification), or a fixture failure.
+Arm B's full-field recon (R-A vs R-B) is reported, to show whether the strict regime raises an alarm on the clean pair.
+
+## Seeded defects (frozen before execution; R-B only, R-A = arm B)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **R_ROUND1** (paths run: RB): R-B reports dormant_h rounded to 0.1 h (labels computed before rounding).
+  - code seed `seeds/C39/RB_ROUND1__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `c7080cecaea56428b1544b0d9a366f7b17adf315bf31f26720cc86c169506bfd`
+- **R_OPENAGE** (paths run: RB): R-B reports open_age_h from mod_ts instead of created_ts (not a decision input).
+  - code seed `seeds/C39/RB_OPENAGE__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `9be2b7e928124cc96bf0e1e85bcab326a55533f65702906be4e27ad4a15e1ac5`
+- **R_GT** (paths run: RB): R-B kappa threshold uses > instead of >= (boundary rows only).
+  - code seed `seeds/C39/RB_GT__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `484db21bbd924040b990afdca785e4fafa6d7dabe967b19e8fe94b45cf07fb8f`
+- **R_NOTHIN** (paths run: RB): R-B I04 thin-peer integrity clause removed (decision defect).
+  - code seed `seeds/C39/RB_NOTHIN__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff`
+## Operational benefit predicate P1
+Owner threshold: Addendum 01: "KEEP (relax the control) if the reduced regime catches every defect that changes a decision or a reported result. REVERT (keep full exact match) if it lets through a defect that changes either."
+Definitions:
+- **H:** harm set (above).
+- **D_abl:** seeded arms caught without the control (definition above).
+Outcomes:
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. A reported result = a locked field of the classification output.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C39_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C39 RESULTS — Reconciliation scope & tolerance (addendum #39) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 4/4
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {R_ROUND1,R_OPENAGE,R_NOTHIN}
+- H5 caught without the control [crash, decision-field recon mismatch (key set, classification only), or fixture failure]: {R_NOTHIN}
+- H6 H minus caught-without-control: {R_ROUND1,R_OPENAGE}
+- H7 arms with no locked-field change: {R_GT}
+- H8 caught with the control [crash, full-field recon mismatch (key set, classification, dormant_h, open_age_h; |d| > 1e-6), or fixture failure]: {R_ROUND1,R_OPENAGE,R_GT,R_NOTHIN}
+- H9 caught with the control but no locked-field change: {R_GT}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| R_ROUND1 | RB | R-B reports dormant_h rounded to 0.1 h (labels computed before rounding) | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 221457 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=221457 open_age=0 | 221457 | 0 | TRUE | R-B\R\20_integrity_and_classify.R | TRUE | FALSE |
+| R_OPENAGE | RB | R-B reports open_age_h from mod_ts instead of created_ts (not a decision input) | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 221986 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=221986 | 221986 | 0 | TRUE | R-B\R\20_integrity_and_classify.R | TRUE | FALSE |
+| R_GT | RB | R-B kappa threshold uses > instead of >= (boundary rows only) | RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | R-B\R\20_integrity_and_classify.R | TRUE | FALSE |
+| R_NOTHIN | RB | R-B I04 thin-peer integrity clause removed (decision defect) | RB=0 | 14/14 | 13/14 (F06) | 0 | 0 | 6377 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=6377 dormant=0 open_age=0 | 6377 | 6377 | TRUE | R-B\R\20_integrity_and_classify.R | TRUE | TRUE |
+
+
+---
+# C39_EVIDENCE.sha256
+6783dbfdb3d573022cdb1e81d4119cb6385692ba65950de005c2da0e3589eaea  C39_ARM_MANIFESTS.txt
+433e3fd14bc69d6b08fddda0c2a4aca61e1bf7e7f2407f061ba6a4a44a5d2bc0  C39_arms.csv
+8b0c8d647501225b6177dfc2fb9c430a3fc207ef7193e3cba68754cbddda3888  C39_RESULTS.md
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C39",
+  "frozen_at_ct": "2026-10-03 05:33:50 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C39/C39-builder/builder_report.md", "bytes": 19164, "sha256": "73bb73ca8ea03a26f59d58ac4b16bc199ad27d83da8a5e441ea2c066ef244806", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C39/C39-validator/validator_report.md", "bytes": 9538, "sha256": "bdbda30b4b7b662cb43dcc1ca23d1194540c50d7a7e07188ed5ab67c33fbc492", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "800f8e9dd78e51c1a56dd6329550c0fa620cf9983c48a571e8aadb3fdbd3674b"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+## 1. Role attestation and ablation ID.
+
+I am acting **only as the Builder** for an **independent first pass**, blind to the Validator. I am not performing terminal adjudication.
+
+**Ablation:** C39 — Addendum 01, control #39, **“Reconciliation scope & tolerance.”**  
+**Batch:** N15 batch 1 of 3.  
+**Target:** Stage 4 reconciliation-field scope.  
+**Builder:** ChatGPT.  
+**Validator:** DeepSeek.  
+**Adjudicator:** Grok.  
+**Constitution:** version 1.0.  [source: C39_1_BUILDER_ChatGPT]
+
+The frozen control requires R-A and R-B to reconcile the locked key set, `classification`, `dormant_h`, and `open_age_h`, with non-prediction numeric differences counted when `|d| > 1e-6`. The ablation removes `dormant_h` and `open_age_h` from gating: they remain reported, but only the key set and `classification` gate reconciliation. This pack contains no prediction fields.  [source: C39_1_BUILDER_ChatGPT]
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+### Conceptual diff
+
+The control under test is the requirement that reconciliation protect **all four locked output surfaces**:
+
+`SR_NUMBER key set` + `classification` + `dormant_h` + `open_age_h`.
+
+The ablated regime removes the two reported numeric fields from the gating predicate. Under the ablation:
+
+`SR_NUMBER key set` + `classification`
+
+remain gating fields, whereas:
+
+`dormant_h` + `open_age_h`
+
+are still produced but no longer determine whether reconciliation catches an arm. This is explicitly narrower than the control and matches the frozen 2026-09-19 reconciliation practice described in the specification.  [source: C39_1_BUILDER_ChatGPT]
+
+### Exact seeded changes
+
+| Seed | Exact code change | Semantic target |
+| --- | --- | --- |
+| `R_ROUND1` | `dormant_h = dormant_h` → `dormant_h = round(dormant_h, 1)` | Changes the reported `dormant_h` precision after labels have already been computed. |
+| `R_OPENAGE` | `open_age_h[has_created] <- rb_hours_diff(t_freeze, created_ts[has_created])` → `open_age_h[has_mod] <- rb_hours_diff(t_freeze, mod_ts[has_mod])` | Changes reported open age from elapsed time since creation to elapsed time since modification. |
+| `R_GT` | `(dormant_h >= thresh)` → `(dormant_h > thresh)` | Changes the κ boundary comparison from inclusive to strict. |
+| `R_NOTHIN` | `p_thin <- peer_n < RB_N_MIN` → `p_thin <- rep(FALSE, n)` | Eliminates the thin-peer integrity predicate from R-B. |
+
+These are the only declared seed edits shown in the unified diffs.  [source: C39_1_BUILDER_ChatGPT]
+
+## 3. Hard mechanical facts table.
+
+| Hard mechanical fact | Result | Status | Recalculation / basis |
+| --- | --- | --- | --- |
+| Frozen `src_open_candidates.csv` rows | 245,193 | **Quoted** | Preflight reports 245,193. |
+| Frozen `src_peer_stats.csv` rows | 104 | **Quoted** | Preflight reports 104. |
+| Arm B R-A fixture passes | 14/14 | **Recomputed** | Counted 14 `TRUE` rows F01–F14 in raw fixture table. |
+| Arm B R-B fixture passes | 14/14 | **Recomputed** | Counted 14 `TRUE` rows F01–F14. |
+| B `n_ra` | 222,002 | **Quoted** | B reconciliation table. |
+| B `n_rb` | 222,002 | **Quoted** | B reconciliation table. |
+| B `n_inner` | 222,002 | **Quoted** | B reconciliation table. |
+| B `n_only_ra` | 0 | **Quoted** | B reconciliation table. |
+| B `n_only_rb` | 0 | **Quoted** | B reconciliation table. |
+| B classification disagreements | 0 | **Quoted** | B reconciliation table. |
+| B classification agreements | 222,002 | **Recomputed** | `222,002 - 0 = 222,002`; therefore `n_agree + n_disagree = 222,002 + 0 = n_inner`. |
+| B `dormant_h` cross-path mismatches | 1 | **Quoted** | B full-field reconciliation. |
+| B `open_age_h` cross-path mismatches | 2 | **Quoted** | B full-field reconciliation. |
+| B R-A differences vs frozen R-A | key 0; label 0; dormant 0; open age 0 | **Quoted** | Arm-B reproduction table. |
+| B R-B differences vs frozen R-B | key 0; label 0; dormant 0; open age 0 | **Quoted** | Arm-B reproduction table. |
+| Seeded runs recorded | 4/4 | **Recomputed** | Four declared seeded arms each have an exit record: `R_ROUND1`, `R_OPENAGE`, `R_GT`, `R_NOTHIN`. |
+| Seeded crashes | 0/4 | **Recomputed** | All four R-B runs have exit 0. |
+| `R_ROUND1` fixtures | 14/14 | **Recomputed** | All F01–F14 raw fixture rows pass. |
+| `R_OPENAGE` fixtures | 14/14 | **Recomputed** | All F01–F14 pass. |
+| `R_GT` fixtures | 14/14 | **Recomputed** | All F01–F14 pass. |
+| `R_NOTHIN` fixtures | 13/14 | **Recomputed** | Only F06 is `FALSE`; 13 other rows pass. |
+| `R_ROUND1` locked-field changed rows vs B | 221,457 | **Recomputed** | R-B vs B has `dormant=221457`, all other compared changes 0. |
+| `R_ROUND1` decision changes vs B | 0 | **Recomputed** | Key set and label deltas are both zero. |
+| `R_ROUND1` changed share of 222,002 rows | 99.7545% | **Recomputed** | `221,457 / 222,002`. |
+| `R_ROUND1` unchanged `dormant_h` rows | 545 | **Recomputed** | `222,002 - 221,457`. |
+| `R_OPENAGE` locked-field changed rows vs B | 221,986 | **Recomputed** | R-B vs B has `open_age=221986`, all other compared changes 0. |
+| `R_OPENAGE` decision changes vs B | 0 | **Recomputed** | Key set and label deltas are zero. |
+| `R_OPENAGE` changed share of 222,002 rows | 99.9928% | **Recomputed** | `221,986 / 222,002`. |
+| `R_OPENAGE` unchanged `open_age_h` rows | 16 | **Recomputed** | `222,002 - 221,986`. |
+| `R_GT` locked-field changed rows vs B | 0 | **Recomputed** | R-B vs B shows zero key, label, dormant, and open-age changes. |
+| `R_GT` decision changes vs B | 0 | **Recomputed** | Same comparison. |
+| `R_NOTHIN` locked-field changed rows vs B | 6,377 | **Recomputed** | Exactly 6,377 label differences and zero other locked-field differences. |
+| `R_NOTHIN` decision changes vs B | 6,377 | **Recomputed** | All 6,377 locked-field changes are classification changes. |
+| `R_NOTHIN` decision-change share | 2.8725% | **Recomputed** | `6,377 / 222,002`. |
+| `R_NOTHIN` classification agreements | 215,625 | **Recomputed** | `222,002 - 6,377`. |
+| Harm set `H` | `{R_ROUND1, R_OPENAGE, R_NOTHIN}` | **Recomputed** | These and only these arms have a nonzero change on at least one locked field. |
+| ` | H | ` | 3 |
+| Arms with no locked-field change | `{R_GT}` | **Recomputed** | Its four locked-field deltas are all zero. |
+| Reduced-regime detection set `D_abl` | `{R_NOTHIN}` | **Recomputed** | No crashes; only `R_NOTHIN` has a decision-field reconciliation difference and fixture failure. |
+| ` | D_abl | ` | 1 |
+| `H ∩ D_abl` | `{R_NOTHIN}` | **Recomputed** | Set intersection. |
+| `H \ D_abl` | `{R_ROUND1, R_OPENAGE}` | **Recomputed** | Harmful locked-output changes not caught by reduced gating. |
+| ` | H \ D_abl | ` | 2 |
+| Full-control caught set | `{R_ROUND1, R_OPENAGE, R_GT, R_NOTHIN}` | **Recomputed** | Every seeded arm has at least one full-field R-A/R-B mismatch; `R_NOTHIN` additionally has classification and fixture failures. |
+| Full-control caught count | 4 | **Recomputed** | Cardinality. |
+| Full-control harmful catches | 3/3 | **Recomputed** | Intersection of full-control set with H equals all three H members. |
+| Reduced-regime harmful catches | 1/3 | **Recomputed** | Only `R_NOTHIN`. |
+| Incremental harmful catches supplied by full-field control | +2 | **Recomputed** | `3 - 1`. |
+| Incremental total seeded catches supplied by full-field control | +3 | **Recomputed** | `4 - 1`; includes `R_GT`, which has no locked-field change vs B. |
+| `R_GT` R-B classification output hash equals B | TRUE | **Recomputed** | Both are `a0e42b...e193`. |
+| `R_GT` fixture-output hash equals B | TRUE | **Recomputed** | Both are `0d7224...e9e9`. |
+| `R_ROUND1` classification hash equals B | FALSE | **Recomputed** | `08ab59...4609` vs `a0e42b...e193`. |
+| `R_ROUND1` fixture hash equals B | TRUE | **Recomputed** | Both `0d7224...e9e9`. |
+| `R_OPENAGE` classification hash equals B | FALSE | **Recomputed** | `58a44c...15f5` vs `a0e42b...e193`. |
+| `R_OPENAGE` fixture hash equals B | TRUE | **Recomputed** | Both `0d7224...e9e9`. |
+| `R_NOTHIN` classification hash equals B | FALSE | **Recomputed** | `f6611d...19f8` vs `a0e42b...e193`. |
+| `R_NOTHIN` fixture hash equals B | FALSE | **Recomputed** | `22638d...21bb` vs `0d7224...e9e9`. |
+| Frozen source/extract-lineage hashes equal across B and all four seeded arms | TRUE | **Recomputed** | Each common manifest entry repeats the same hash in all five arms. |
+| `R-B/R/00_config.R` hash equal across B and all seeded arms | TRUE | **Recomputed** | All five use `6c9b0e...450b`. |
+| `R-B/run_RB.R` hash equal across B and all seeded arms | TRUE | **Recomputed** | All five use `6786fc...efd`. |
+| Seeded `20_integrity_and_classify.R` hash differs from B in each seeded arm | TRUE | **Recomputed** | All four seed hashes differ from B's `72ac5d...d99` and from one another. |
+
+The baseline and seeded-arm reconciliation numbers are given in the runner result and raw-arm table.  [source: C39_1_BUILDER_ChatGPT] The raw arm rows independently expose each seed's locked-field delta, decision delta, fixture result, and detection flags.  [source: C39_1_BUILDER_ChatGPT]
+
+The fixture recomputations come directly from the F01–F14 rows. Arm B passes every fixture on both paths; `R_ROUND1`, `R_OPENAGE`, and `R_GT` pass all R-B fixtures; `R_NOTHIN` fails only F06, where expected `INCONCLUSIVE` becomes `ESCALATE`.  [source: C39_1_BUILDER_ChatGPT]
+
+The manifest hash comparisons show that source files, configuration, and `run_RB.R` are invariant across the arms, while each seed replaces `20_integrity_and_classify.R`; they also establish the output-hash equalities and differences above.  [source: C39_1_BUILDER_ChatGPT]
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen predicate defines:
+
+- `H` as seeded arms whose output differs from arm B on any locked field.
+- `D_abl` as seeded arms caught without the full-field control: crash, decision-field reconciliation mismatch on key set/classification, or fixture failure.
+- P1 is satisfied exactly when `H ⊆ D_abl`.
+- P1 fails when `H \ D_abl` is non-empty.  [source: C39_1_BUILDER_ChatGPT]
+
+From the raw arm evidence:
+
+`H = {R_ROUND1, R_OPENAGE, R_NOTHIN}`
+
+and
+
+`D_abl = {R_NOTHIN}`.
+
+Therefore:
+
+`H \ D_abl = {R_ROUND1, R_OPENAGE}`
+
+with cardinality 2.
+
+Accordingly, **P1 is not satisfied** under its frozen definition. Two seeded arms change locked reported results while producing neither a crash, a decision-field reconciliation mismatch, nor a fixture failure.
+
+`R_ROUND1` alters `dormant_h` on 221,457 rows while leaving classifications unchanged; `R_OPENAGE` alters `open_age_h` on 221,986 rows while leaving classifications unchanged. Both therefore belong to H under the frozen definition of a reported result, but neither belongs to `D_abl`.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+No terminal state is supplied here.
+
+## 5. Fixture and reconciliation implications.
+
+The fixtures and reconciliation channels protect different surfaces in this experiment.
+
+`R_NOTHIN` demonstrates overlap between them. Removing the thin-peer integrity clause changes 6,377 classifications, produces 6,377 R-A/R-B classification disagreements, and causes F06 to change from expected `INCONCLUSIVE` to observed `ESCALATE`. Thus this decision defect is independently visible through both decision-field reconciliation and the behavioral fixture suite.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+By contrast, `R_ROUND1` and `R_OPENAGE` demonstrate a coverage gap in the fixture suite for the two reported numeric outputs. Each passes all 14 fixtures and preserves the entire classification key/label surface, yet changes a locked reported field on 221,457 and 221,986 rows respectively. Their output hashes also differ from B. Reduced reconciliation therefore supplies no detection channel for those two seeded reported-result defects.
+
+`R_GT` behaves differently. Its seeded source code changes `>=` to `>`, but its R-B classification output and fixture-result files are byte-for-byte identical to B according to the manifest hashes, and all locked-field changes versus B are zero. It is consequently outside H. Nevertheless its R-A/R-B full-field reconciliation reports the same 1 `dormant_h` and 2 `open_age_h` mismatches seen on clean arm B, which causes the strict-control detection rule to flag it.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+The clean B pair itself is therefore important: key sets and classifications reconcile at 0/0/0, but full-field comparison is not numerically identical—there is 1 `dormant_h` mismatch and 2 `open_age_h` mismatches. The specification explicitly requires those full-field results to be reported in order to show whether the stricter regime raises an alarm on the clean pair.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal semantic risk of the ablation is not loss of classification-defect detection in the supplied seeds; it is loss of protection for **reported locked numeric results**. In the frozen experiment, both `R_ROUND1` and `R_OPENAGE` establish that a large report-level corruption can leave the key set, classification, and fixtures unchanged. The ablated gate therefore cannot distinguish those altered reported outputs from an acceptable run.
+
+There is also an observed cost on the stricter side: clean arm B contains 1 cross-implementation `dormant_h` difference and 2 `open_age_h` differences, despite reproducing each path's own frozen output exactly. Thus full-field cross-path exactness is stricter than frozen-path reproducibility. `R_GT` exposes the resulting behavior particularly clearly: its seeded R-B outputs are hash-identical to B, yet it inherits the clean-pair full-field discrepancies and is marked caught under the full-field rule.  [source: C39_1_BUILDER_ChatGPT]
+
+The following surfaces remain unchanged across all seeded arms according to the manifests: frozen source extract lineage, `src_open_candidates.csv`, `src_peer_stats.csv`, `R-B/R/00_config.R`, and `R-B/run_RB.R`. No source variants were used. The only declared seeded input file is `R-B/R/20_integrity_and_classify.R`.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+All seeded executions completed with exit 0. Arm B reproduced each frozen R-A/R-B output on its own path with zero key, classification, dormant, or open-age differences, and both B paths passed 14/14 fixtures. The seeded execution therefore isolates the declared code variants rather than a changed source pack or an execution crash.  [source: C39_1_BUILDER_ChatGPT]  [source: C39_1_BUILDER_ChatGPT]
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence section | Exact table / row evidence |
+| --- | --- | --- |
+| C39 removes `dormant_h` and `open_age_h` from gating while retaining key set and classification | SPEC → “Exact change being tested (ablation)” | Lines describing decision-driving fields and reported-but-nongating numeric fields.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_ROUND1` changes reporting precision only | SEED DIFFS | `dormant_h = dormant_h` → `round(dormant_h, 1)`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_OPENAGE` changes the basis of reported open age | SEED DIFFS | `created_ts`/`has_created` → `mod_ts`/`has_mod`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_GT` changes threshold inclusivity | SEED DIFFS | `>= thresh` → `> thresh`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_NOTHIN` disables the thin-peer predicate | SEED DIFFS | `peer_n < RB_N_MIN` → `rep(FALSE, n)`.  [source: C39_1_BUILDER_ChatGPT] |
+| Arm B has 222,002 common keys and zero classification disagreements | C39_RESULTS → Arm B recon | Row with `n_ra=222002`, `n_rb=222002`, `n_inner=222002`, `n_only_ra=0`, `n_only_rb=0`, `n_disagree=0`.  [source: C39_1_BUILDER_ChatGPT] |
+| Clean B has 1 dormant and 2 open-age full-field mismatches | C39_RESULTS → Arm B recon | Same row: `n_dormant_mismatch=1`, `n_open_age_mismatch=2`.  [source: C39_1_BUILDER_ChatGPT] |
+| Arm B reproduces each frozen path output exactly | C39_RESULTS → Arm B repro | Both R-A and R-B comparison rows contain six zeros.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_ROUND1` changes 221,457 locked reported values but zero decisions | C39_arms.csv | `R_ROUND1` row: dormant=221457, `locked_field_changes_vs_B=221457`, `decision_changes_vs_B=0`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_OPENAGE` changes 221,986 locked reported values but zero decisions | C39_arms.csv | `R_OPENAGE` row: open_age=221986, `locked_field_changes_vs_B=221986`, `decision_changes_vs_B=0`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_GT` produces no locked-field or decision change | C39_arms.csv | `R_GT` row: all B-comparison deltas zero; locked and decision changes both zero.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_NOTHIN` changes 6,377 classifications | C39_arms.csv | `label=6377`, locked changes=6377, decision changes=6377.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_NOTHIN` is the sole seeded fixture failure | Fixture results | F06 expected `INCONCLUSIVE`, observed `ESCALATE`, pass=`FALSE`; its other fixture rows pass.  [source: C39_1_BUILDER_ChatGPT] |
+| Other seeded R-B paths pass 14/14 fixtures | Fixture results | All F01–F14 rows for `R_ROUND1`, `R_OPENAGE`, and `R_GT` are TRUE.  [source: C39_1_BUILDER_ChatGPT] |
+| `H={R_ROUND1,R_OPENAGE,R_NOTHIN}` | C39_RESULTS mechanical facts + recomputation from raw arm rows | H4 and nonzero locked-field deltas in the corresponding raw rows.  [source: C39_1_BUILDER_ChatGPT] |
+| `D_abl={R_NOTHIN}` | C39_RESULTS mechanical facts + raw arm rows | H5 and `caught_without_control` column.  [source: C39_1_BUILDER_ChatGPT] |
+| `H \ D_abl={R_ROUND1,R_OPENAGE}` | C39_RESULTS mechanical facts + set subtraction | H6.  [source: C39_1_BUILDER_ChatGPT] |
+| P1 is not satisfied | SPEC P1 definition + recomputed H and D sets | Frozen rule says failure occurs when `H \ D_abl` is non-empty; the observed difference contains two arms.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_GT` classification and fixture files are hash-identical to B | ARM MANIFESTS | B hashes at output rows and identical `R_GT` hashes.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_ROUND1` and `R_OPENAGE` classification hashes differ from B while fixture hashes equal B | ARM MANIFESTS | Their classification hashes differ; both fixture hashes equal B's `0d7224...e9e9`.  [source: C39_1_BUILDER_ChatGPT] |
+| `R_NOTHIN` classification and fixture hashes both differ from B | ARM MANIFESTS | `f6611d...` and `22638d...` versus B output hashes.  [source: C39_1_BUILDER_ChatGPT] |
+| Source/config/runner surfaces are unchanged across the arms | ARM MANIFESTS | Same source, config, and `run_RB.R` hashes repeated in B and all seeded-arm manifests.  [source: C39_1_BUILDER_ChatGPT] |
+| No source variants were used | SOURCE VARIANTS | Explicit `(no source variants used)`.  [source: C39_1_BUILDER_ChatGPT] |
+| All four seeded runs completed | RUN LOG | Four seeded R-B executions, each exit=0.  [source: C39_1_BUILDER_ChatGPT] |
+
+END C39 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. **Role attestation and ablation ID**  
+   I am DeepSeek, acting as Validator only, DeepThink on. I am blind to the Builder and have not seen its output. I do not return KEEP, REVERT, or HALT.  
+   Ablation ID: **C39** — Ablation Addendum 01, control #39 “Reconciliation scope & tolerance.” Batch N15 batch 1 of 3. Target stage: Stage 4 reconciliation field scope. Constitution version: 1.0. Roles: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Frozen at CT 2026-10-03 before runner execution.
+2. **Independent test plan: what I checked, and how**  
+   I parsed the frozen SPEC, CONSTITUTION, PREFLIGHT, RUN LOG, C39_RESULTS.md, C39_arms.csv, fixture rows, C39_EVIDENCE.sha256, ARM_MANIFESTS, and SEED_DIFFS. I independently reconstructed: arm list, exits, fixture pass counts, recon counts, locked-field deltas vs arm B, harm set H, D_abl, and the P1 subset relation. I cross-checked declared seed hashes against preflight and manifests, compared output hashes across arms to arm B, and checked seed diffs against the declared changes. I also checked arithmetic/set identities from the aggregate evidence. I could not recompute row-level outputs because only aggregate tables and hashes are in this packet.
+3. **Independently recomputed hard facts**  
+   Preflight: `src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, 245,193 rows; `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 104 rows. Preflight gating result: PASS.
+
+Run log: all six runs recorded exit=0: B RA 12.1s, B RB 26.3s, R_ROUND1 RB 26.6s, R_OPENAGE RB 25.3s, R_GT RB 26.4s, R_NOTHIN RB 27.3s.
+
+Arm B:
+
+- Fixtures: R-A 14/14, R-B 14/14.
+- Repro vs frozen pack: for B R-A vs frozen RA and B R-B vs frozen RB, all `n_only_x=0`, `n_only_truth=0`, `n_label_diff=0`, `n_dormant_diff=0`, `n_open_age_diff=0`.
+- B recon R-A vs R-B: `n_ra=222002`, `n_rb=222002`, `n_inner=222002`, `n_only_ra=0`, `n_only_rb=0`, `n_disagree=0`, `n_dormant_mismatch=1`, `n_open_age_mismatch=2`.
+
+Seeded arms:
+
+| arm | exit | fx_RA | fx_RB | recon_disagree | recon_dormant | recon_open_age | locked_changes | decision_changes | harm | caught_with_control | caught_without_control |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| R_ROUND1 | RB=0 | 14/14 | 14/14 | 0 | 221457 | 2 | 221457 | 0 | TRUE | TRUE | FALSE |
+| R_OPENAGE | RB=0 | 14/14 | 14/14 | 0 | 1 | 221986 | 221986 | 0 | TRUE | TRUE | FALSE |
+| R_GT | RB=0 | 14/14 | 14/14 | 0 | 1 | 2 | 0 | 0 | FALSE | TRUE | FALSE |
+| R_NOTHIN | RB=0 | 14/14 | 13/14 (F06) | 6377 | 1 | 2 | 6377 | 6377 | TRUE | TRUE | TRUE |
+
+Recomputed sets:
+
+- H = {R_ROUND1, R_OPENAGE, R_NOTHIN}
+- D_abl = {R_NOTHIN}
+- H \ D_abl = {R_ROUND1, R_OPENAGE}
+- H ∩ D_abl = {R_NOTHIN}
+- D_abl \ H = ∅
+- Arms with no locked-field change = {R_GT}
+- Caught with control = {R_ROUND1, R_OPENAGE, R_GT, R_NOTHIN}
+- Caught with control but no locked-field change = {R_GT}
+
+Fixture recomputation: R_NOTHIN R-B F06 expected `INCONCLUSIVE`, observed `ESCALATE`, pass FALSE. All other fixture rows shown pass. B R-B F14 expected/observed `STANDARD|STANDARD`; B R-A F14 expected/observed `TWO_INDEPENDENT_LABELS`.
+
+Cross-arm hash equalities:
+
+- B R-B `RB_classifications.csv` hash `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193` equals R_GT R-B `RB_classifications.csv` hash `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`.
+- B R-B `RB_fixture_results.csv` hash `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9` equals R_GT, R_ROUND1, and R_OPENAGE R-B `RB_fixture_results.csv` hashes.
+- R_NOTHIN R-B `RB_classifications.csv` hash `f6611d8dcec6b65e6f6a9cfee6f9b500dd5b4b2b9667b4785be42d0a28f419f8` differs from B; R_NOTHIN R-B `RB_fixture_results.csv` hash `22638dab341ff6c64dc00b8697ceceb73f52331dffcbadc037659b17865921bb` differs from B.
+- R_ROUND1 R-B `RB_classifications.csv` hash `08ab597bfa23dde172e1d67f6994bab4647d6c1df5743db5182772add7070469` differs from B.
+- R_OPENAGE R-B `RB_classifications.csv` hash `58a44c72585b1e57bc3bd1292cc866d0490badcda9b48828158258a7576715f5` differs from B.
+- Seeded input code hashes match preflight and manifests: R_ROUND1 `c7080cecaea56428b1544b0d9a366f7b17adf315bf31f26720cc86c169506bfd`; R_OPENAGE `9be2b7e928124cc96bf0e1e85bcab326a55533f65702906be4e27ad4a15e1ac5`; R_GT `484db21bbd924040b990afdca785e4fafa6d7dabe967b19e8fe94b45cf07fb8f`; R_NOTHIN `487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff`.
+
+Seed diffs match declared changes:
+
+- R_ROUND1: `dormant_h = round(dormant_h, 1)`.
+- R_OPENAGE: `open_age_h[has_created]` from `created_ts` changed to `open_age_h[has_mod]` from `mod_ts`.
+- R_GT: `dormant_h >= thresh` changed to `dormant_h > thresh`.
+- R_NOTHIN: `p_thin <- peer_n < RB_N_MIN` changed to `p_thin <- rep(FALSE, n)`.
+
+Internal inconsistency flags:
+
+- The B recon table shows `n_dormant_mismatch=1` and `n_open_age_mismatch=2`, while H2 states “B recon is 0/0/0: TRUE.” This is consistent only if “0/0/0” means `only_ra=0`, `only_rb=0`, `disagree=0`. Under a full locked-field reading, B recon is not 0/0/0.
+- The HALT rule says to halt if B recon is not 0/0/0. That rule is ambiguous against the B recon table because full-field dormant/open-age mismatches are nonzero.
+- The strict control catches R_GT even though R_GT has no locked-field change, because inherited B R-A vs R-B dormant/open-age mismatches remain. This is not an arithmetic contradiction, but it shows the strict control raises an alarm on a clean output.
+
+4. **Facts that cannot be recomputed from this packet**  
+   Exact row-level values and the derivation of counts `221457`, `221986`, `6377`, `1`, and `2` cannot be independently recomputed from this packet; only aggregate tables are provided. The full arm manifests beyond the listed key files are not present. Raw stdout/stderr beyond the RUN LOG is not present. The actual source code beyond the provided unified diffs is not present. MySQL behavior beyond the preflight COUNT is not present. Builder hard facts are not present because the first pass is blind. I cannot independently verify the listed SHA-256 hashes without the underlying files, though the listed hashes are internally cross-referenced.
+5. **P1 assessment against the frozen predicate in the SPEC**  
+   The frozen predicate is: P1 satisfied iff `H ⊆ D_abl`; P1 failed iff `H \ D_abl` is non-empty.  
+   Recomputed: `H = {R_ROUND1, R_OPENAGE, R_NOTHIN}`. `D_abl = {R_NOTHIN}`. `H \ D_abl = {R_ROUND1, R_OPENAGE}`. This subset is non-empty.  
+   R_ROUND1 changes `dormant_h` on 221,457 rows vs arm B, with `decision_changes_vs_B=0`, and is not caught without the control. R_OPENAGE changes `open_age_h` on 221,986 rows vs arm B, with `decision_changes_vs_B=0`, and is not caught without the control. R_NOTHIN changes classification on 6,377 rows and is caught without the control. R_GT has no locked-field change and does not count for or against P1. Therefore, on the frozen evidence, P1 is not satisfied.
+6. **Blocking objections**
+
+- Ambiguity/conflict in B recon: B recon has full-field mismatches `dormant_h=1` and `open_age_h=2`, while H2 says “B recon is 0/0/0: TRUE.” If the HALT rule’s “B recon is not 0/0/0” is read as full-field recon, the clean arm does not meet it. This should be resolved before a verdict.
+- The strict control is not clean on arm B/R_GT: R_GT is “caught with control” with zero locked-field changes because the inherited B R-A vs R-B dormant/open-age mismatches persist. This complicates interpretation of the strict regime’s alarm behavior.
+- Raw row-level evidence is not in this packet, so exact counts cannot be independently recomputed from source. If raw artifacts are unavailable in the authoritative evidence pack, the constitution’s raw-evidence requirement is not met.
+- No other blocking objection found from the provided aggregate tables: exits are recorded, fixture pass counts reconcile, seed hashes match declared seeds, and the H/D set arithmetic is internally consistent.
+
+7. **Claim → evidence map**
+
+| Claim | Evidence |
+| --- | --- |
+| Ablation ID C39, target Stage 4, roles Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok | SPEC header and role line |
+| Frozen data/code hashes and row counts | PREFLIGHT lines: `ba089...`, `cb78...`, `f4e899...`, `6c9b...`, `72ac...`; MySQL 245193 / 104 |
+| Preflight PASS | PREFLIGHT “preflight gating result: PASS” |
+| All six runs recorded exit=0 | RUN LOG |
+| Arm B fixtures 14/14 both paths | C39_RESULTS H1 and fixture rows |
+| Arm B reproduces frozen pack with 0 differences | C39_RESULTS “Arm B repro vs frozen pack” table |
+| B recon `n_inner=222002`, `only=0/0`, `disagree=0`, `dormant=1`, `open_age=2` | C39_RESULTS “Arm B recon” table |
+| H = {R_ROUND1, R_OPENAGE, R_NOTHIN} | C39_RESULTS H4; C39_arms.csv `harm=TRUE` rows |
+| D_abl = {R_NOTHIN} | C39_RESULTS H5; C39_arms.csv `caught_without_control` column |
+| H \ D_abl = {R_ROUND1, R_OPENAGE} | Recomputed from H and D_abl |
+| R_ROUND1 locked changes 221457, decision changes 0 | C39_arms.csv / C39_RESULTS seeded table |
+| R_OPENAGE locked changes 221986, decision changes 0 | C39_arms.csv / C39_RESULTS seeded table |
+| R_GT no locked-field change but caught with control | C39_RESULTS H7/H9; C39_arms.csv |
+| R_NOTHIN fixture F06 fail, recon_disagree 6377 | Fixture rows; C39_arms.csv |
+| Seed diffs match declared changes | SEED_DIFFS |
+| Cross-arm hash equalities | ARM_MANIFESTS |
+
+END C39 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C39 ADJUDICATION'.

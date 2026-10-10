@@ -1,0 +1,5 @@
+PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/COLLAPSED
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/COLLAPSED/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/COLLAPSED/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/COLLAPSED/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/COLLAPSED/R-A/outputs/RA_fixture_results.csv pass=14/14

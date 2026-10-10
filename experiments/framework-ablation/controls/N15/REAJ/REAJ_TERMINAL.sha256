@@ -1,0 +1,7 @@
+# N15 re-adjudication terminal records (C26, C45), 2026-10-03 10:12 CDT; TERMINAL_STATE.txt written on PC by runner/record_terminal.R (sha a8e82729…) with WORK_ROOT=N15/REAJ; box copies byte-identical; old N15/<CID> records unchanged
+0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0  C26/TERMINAL_STATE.txt
+859f39bff593792c5afb027974b7eb1718785d720ba433461feeaed9af399417  C26/REAJ_RECORD.txt
+756b25c9bd66cd2e129c2a407bbd607a4351040f21f40593364cba5dd56368cc  C26/C26-adjudicator/adjudicator_raw.md
+e9de6d76830686297d286076637427a820c1b7a4424c80d62e1e36f1f4edc234  C45/TERMINAL_STATE.txt
+7e646f7e8fc4d07be5ce39a6003f9102f81c43d7a6258d9dd51584a927e8c657  C45/REAJ_RECORD.txt
+62b3d3f2785a4f8fc068275ae56cf782e3557e3713e55997bf3c375bb0b2f066  C45/C45-adjudicator/adjudicator_raw.md

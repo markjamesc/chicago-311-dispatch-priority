@@ -1,0 +1,5 @@
+"arm","path","exit","secs","min_free_MB","peak_R_MB","decision_rows","fixtures_pass","fixtures_n"
+"B","RA","0","25.7","16808","551",222002,14,14
+"B","RB","1","14.8","16748","442",NA,14,14
+"COLLAPSED","RA","MEMKILL","91.3","2038","15297",NA,14,14
+"COLLAPSED","RB","MEMKILL","470.4","1528","17242",NA,14,14

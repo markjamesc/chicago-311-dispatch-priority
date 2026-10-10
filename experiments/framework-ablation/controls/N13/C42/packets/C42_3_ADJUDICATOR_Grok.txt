@@ -1,0 +1,1342 @@
+# C42 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: batched owner rulings are adopted: builder and design questions are collected into one ruling round before reconciliation, plus one round after the run for questions that can only arise then (owner ruling 42A playback).
+- REVERT: piecemeal owner rulings stay.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4 = byte identity of the piecemeal and batched final outputs (P1 condition 4) and R0 = the frozen R-B outputs 4/4 (P1 condition 5); condition 5 = the fixture results inside each run_RB.R all (R0 must equal the frozen RB_fixture_results.csv hash); conditions 6–7: the frozen pack is only read (preflight hashes). Addendum 01 'go down' is read as strictly lower, as the SPEC declares; the alternative reading is INFO only.
+- Items the SPEC marks "not measured" (e.g. owner minutes per ruling round, brief-writing minutes, real builder behaviour, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Batched owner rulings (Addendum 01 #42)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C42 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. In C42 the 3 rows are a numbers difference settled by ruling 53A, not a reason-wording difference, so they are outside Q5; every C42 arm is an R-B run compared with R-B, so N1 cannot change a C42 count.
+---
+# SPEC
+# C42 — Ablation specification (FROZEN)
+
+**Ablation ID:** C42 (Addendum 01, control #42 "Batched owner rulings"; PricePoint evidence links in Addendum 02)
+**Batch:** N13 b5 follow-on (C42 alone; run after C41, C47, C53, C48 with runner `runner_c42/run_c42.ps1`, R only, no MySQL)
+**Owner rulings (operational definitions, constitution §9):** ruling 42A in `ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba` (ruled 2026-10-03 09:58 CT). Answer sheet `ablation_plan/OWNER_42_SHEET.md` SHA-256 `37acd34e2a76793bb5942c100f703b2a4045b6161c5ba4f76295b4322bd642c9`. **Owner answers 2026-10-03 10:49 CT: `1B 2A 3A 4A 5A`** in `ablation_plan/OWNER_42_ANSWERS.md` SHA-256 `a368b908804f8915a603241edf555891fc31857a3c9e36f4486e0198747e894f`, frozen in `ablation_plan/OWNER_42_ANSWERS.sha256` (SHA-256 `d0fac1d07c102c37416689edcdb613d2bf2f8af069e9b3ed0f3c4beb81167193`, written 10:51 CT) before any C42 file was built.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 owner-ruling handling (cut/relax of piecemeal interruptions)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_c42/run_c42.ps1`, evaluator `runner_c42/eval_c42.R`)
+
+## Control under test (Addendum 01 #42)
+Rule as it stands: interpretive questions go to the owner piecemeal, as they surface (PricePoint: 9 interruptions on Oct 2; R1–R6 already batched in one round; R7, CC-S4-01, R9 and R11 depended on outputs that did not yet exist). Change: collect every builder or design question into one ruling round before reconciliation. Metric: owner interruptions, repair rounds, and any question left unresolved.
+
+## Verdict convention (Addendum 01)
+**KEEP = batched owner rulings are adopted (one round before reconciliation, plus one round after the run for questions that can only arise then). REVERT = piecemeal stays.** Addendum 01: "KEEP if interruptions and rounds go down with nothing unresolved. REVERT if a gating question is missed." HALT as in constitution §9.
+
+## Exact change being tested (ruling 42A playback)
+The owner answered five planted questions once (sheet). The run plays the frozen answers back two ways on the frozen pack. Declared timeline (sheet coordinator note): Q1–Q3 surface during the build; Q4–Q5 can only arise after a run.
+- **Builder defaults** (read from the frozen code of both paths before this spec; identical on R-A and R-B): Q1 κ·0 = 0 → ESCALATE (= option A); Q2 only the exact status "open" is in the set, others out (= option C); Q3 blank DUPLICATE → not a duplicate (= option A); Q4 nothing reported; Q5 no rule.
+- **Arises:** a question arises if its situation exists on the frozen pack (`q_probe.R`): Q1 a decision row reaches the κ rule with peer_p75_h = 0; Q2 a source STATUS starts with "open" (trimmed, any case) but is not exactly "open"; Q3 a source DUPLICATE is blank (empty or the text NULL); Q4 the ruled #47 check flags a type; Q5 R-A and R-B word the reason column differently on a row with the same label.
+- **Change (gating):** a question is gating if its frozen answer changes at least one written output row relative to the builders' defaults. Q1–Q3: measured by R-B `all` runs with the answers switched on (`RB_RULED__20_integrity_and_classify.R`, switches `C42_RULINGS`; with no switch set it must reproduce the frozen R-B outputs byte for byte). Q1 = PM_1 vs R0, Q2 = PM_12 vs PM_1, Q3 = PM_123 vs PM_12. Q4 answer A changes nothing by its own wording (report the caveat). Q5 answer A changes nothing if the R-A and R-B reason codes correspond one-to-one; rows outside a one-to-one correspondence count as Q5 change rows.
+- **Piecemeal (baseline):** each arising question is one owner interruption at the point it surfaces. The builders continue on their defaults meanwhile (as with PricePoint R-B's r1 questions at ~03:05, ruled at 09:57), so each gating answer arrives separately and costs one repair round (both-path rebuild and rerun).
+- **Batched (variant):** round A = Q1–Q3 in one ruling round before reconciliation; round B = Q4–Q5 in one round after the run (ruling 42A: a question that can only arise after a run may come later; it counts as an interruption, not as "missed"). Each round with ≥ 1 arising question = one interruption; each round with ≥ 1 gating answer = one repair round.
+- **Unresolved:** a gating question whose answer is not applied in the regime's final output (every change row of that question must appear unchanged in the final output: PM_123 for piecemeal, BATCH for batched).
+- Not measured: owner minutes per round, brief-writing minutes, real builder behaviour (ruling 42A tests the counting and the nothing-missed check on planted questions, not live builders).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, confirmed on the PC (R 4.6.1, 2026-10-03): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), R-A's lubridate parse as the second (CST; 1762068600). Open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). Owner ruling 53A (clock rule: first occurrence, daylight time) makes R-B the conforming path. In C42: the 3 rows are a numbers difference, not a reason-wording difference, so they are outside Q5 (which is about reason text only); they were settled by ruling 53A and are not counted as a C42 question. All C42 arms are R-B runs compared with R-B, so N1 cannot change a C42 count.
+
+## Arms (runner `run_c42.ps1`, `seeds/C42/ARMS.tsv`)
+- **R0**: switched judge file, no switch (builders' defaults); must equal the frozen R-B outputs 4/4.
+- **PM_1** (Q1B), **PM_12** (Q1B,Q2A), **PM_123** (Q1B,Q2A,Q3A): the piecemeal repair sequence; PM_123 = piecemeal final output.
+- **BATCH** (Q1B,Q2A,Q3A at once): batched round A = batched final output.
+- Every arm also runs the #47 dominance check on its output (Q4 context). **PROBE**: `q_probe.R` on the frozen source, frozen R-A and frozen R-B (arises facts, Q5 code pairs).
+
+## Operational benefit predicate P1 (made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. owner interruptions go down: batched < piecemeal;
+2. repair rounds go down: batched < piecemeal;
+3. nothing unresolved: 0 gating questions unanswered in the batched final output;
+4. same answer either way: the piecemeal and batched final outputs (4 R-B key outputs) are byte-identical;
+5. validity: R0 equals the frozen R-B outputs 4/4 (else HALT).
+REVERT side: any of 1–4 fails (Addendum 01 wording "go down" is read as strictly lower for both counts). The alternative reading "neither goes up and at least one goes down" is computed and reported as INFO only, not scored. Note, declared before execution: under this model batched repair rounds equal piecemeal ones whenever each round holds at most one gating answer, so condition 2 can only be met if two or more of Q1–Q5 change output rows in the same round.
+
+## Regression / HALT rules
+- HALT if an R-B run, dominance check or the probe fails or is missing; if R0 differs from the frozen R-B outputs (harness defect); or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4 = byte identity of the two regimes' final outputs (condition 4 of P1) and R0 = frozen; condition 5 = the fixture results inside each `run_RB.R all` (R0 must equal the frozen RB_fixture_results.csv hash); conditions 6–7: the frozen pack is only read (preflight hashes).
+
+## Allowed source/data scope
+Frozen PC pack, read only, copied into the work folder. No MySQL (another batch holds the database), no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+**Runner-side files (frozen list `runner_c42/SEEDS_C42.sha256`; preflight gating):**
+- `runner_c42/eval_c42.R` SHA-256 `c0e9df0b73deca7a2bd72509d670e8e8161160f0e10f8468719233f8d2fb0012`
+- `runner_c42/run_c42.ps1` SHA-256 `57de245c6d3f7f14bcf4c70e35f14600215dc018d26bb2ce76e2e4d64f1d4c32`
+- `runner_c42/seeds/C42/ARMS.tsv` SHA-256 `e88d84eb48ef31737eb46b6d3372b81087ca13ee9b6a1e5c0179a1c0b4733a10`
+- `runner_c42/seeds/C42/PLAYBACK.json` SHA-256 `b55d22785b2ea4416883b2358ab165832bf2a8ebdff9d186567bf685f5032f0a`
+- `runner_c42/seeds/C42/RB_RULED__20_integrity_and_classify.R` SHA-256 `f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd`
+- `runner_c42/seeds/C42/SEEDFILE` SHA-256 `1135254f6dfdee01dc9eda4ef9ee7c7aa7cae199d5b8891cf36e96b99b485a5a`
+- `runner_c42/seeds/C42/dom_check.R` SHA-256 `582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145`
+- `runner_c42/seeds/C42/q_probe.R` SHA-256 `a70189af575adcee6ac27d6acb64fc4cbf4d5a1aa5ea1cfc1e68ad4bab41617c`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; owner rulings, sheet and answers as above. This spec is hashed in `SPEC_FREEZE_C42.sha256` before the reporting run.
+**Condition 5 for R0 = the 4 frozen R-B key outputs listed above under `RB_`.**
+
+## Pre-execution check (disclosed)
+The predicate text (`eval_c42.R`, SHA-256 in `SEEDS_C42.sha256`) was hashed before any execution. The complete runner was then exercised twice on the PC in scratch folders (non-reporting, `NON_REPORTING.txt`). Scratch 1 (`N13\_preflight_c42`, 10:56 CT, tar `N13_runner_c42_v1.tar` SHA-256 007a2c3b8b9ccd8d85ab053bc7eb4a12c6c40d8a0bc94a7c2fbe80392fbab985) stopped at arm setup on a harness bug (PowerShell indexed a one-line file as a character: `(Get-Content SEEDFILE)[0]`); it was fixed to `@(Get-Content SEEDFILE)[0]` in `run_c42.ps1`, the seeds were regenerated (the earlier set is kept unexecuted in `runner_c42/_superseded_v0/`), and `eval_c42.R` (the predicate) is unchanged (same SHA-256 before and after). Scratch 2 (`N13\_preflight_c42_2`, 10:56–11:00 CT, tar `N13_runner_c42_v2.tar` SHA-256 25d4893771e86d7c5f73e3793d3198df38c49cacf3dd94ea1bb2f103865ff400): preflight PASS, every run exit 0. Scratch outcome: Q1 arises (29 ESCALATE rows of type SEF with peer_p75_h = 0; answer B changes all 29 to INCONCLUSIVE); Q2 and Q3 do not arise (source STATUS is only 'Open'; DUPLICATE only 'true'/'false'); Q4 arises (WCA2 flagged), Q5 arises (reason codes one-to-one, 0 change rows); piecemeal 3 interruptions / 1 repair round, batched 2 / 1; final outputs identical; R0 = frozen 4/4; mechanical result P1 NOT MET (condition 2), INFO alternative reading met. The scratch result was therefore known before this spec was frozen. No arm, threshold, rule or predicate was changed after scratch 2; the reporting run repeats every arm from scratch.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   e88d84eb48ef31737eb46b6d3372b81087ca13ee9b6a1e5c0179a1c0b4733a10 seeds/C42/ARMS.tsv
+seed   OK   b55d22785b2ea4416883b2358ab165832bf2a8ebdff9d186567bf685f5032f0a seeds/C42/PLAYBACK.json
+seed   OK   f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd seeds/C42/RB_RULED__20_integrity_and_classify.R
+seed   OK   1135254f6dfdee01dc9eda4ef9ee7c7aa7cae199d5b8891cf36e96b99b485a5a seeds/C42/SEEDFILE
+seed   OK   582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145 seeds/C42/dom_check.R
+seed   OK   a70189af575adcee6ac27d6acb64fc4cbf4d5a1aa5ea1cfc1e68ad4bab41617c seeds/C42/q_probe.R
+seed   OK   57de245c6d3f7f14bcf4c70e35f14600215dc018d26bb2ce76e2e4d64f1d4c32 run_c42.ps1
+seed   OK   c0e9df0b73deca7a2bd72509d670e8e8161160f0e10f8468719233f8d2fb0012 eval_c42.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by C42 (R-only; another batch holds the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 14188 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+e88d84eb48ef31737eb46b6d3372b81087ca13ee9b6a1e5c0179a1c0b4733a10  511  runner_c42/seeds/C42/ARMS.tsv
+b55d22785b2ea4416883b2358ab165832bf2a8ebdff9d186567bf685f5032f0a  1020  runner_c42/seeds/C42/PLAYBACK.json
+f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  runner_c42/seeds/C42/RB_RULED__20_integrity_and_classify.R
+1135254f6dfdee01dc9eda4ef9ee7c7aa7cae199d5b8891cf36e96b99b485a5a  82  runner_c42/seeds/C42/SEEDFILE
+582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  runner_c42/seeds/C42/dom_check.R
+a70189af575adcee6ac27d6acb64fc4cbf4d5a1aa5ea1cfc1e68ad4bab41617c  3714  runner_c42/seeds/C42/q_probe.R
+57de245c6d3f7f14bcf4c70e35f14600215dc018d26bb2ce76e2e4d64f1d4c32  10647  runner_c42/run_c42.ps1
+c0e9df0b73deca7a2bd72509d670e8e8161160f0e10f8468719233f8d2fb0012  9048  runner_c42/eval_c42.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_C42.sha256` (written before the reporting run):
+# N13 C42 spec freeze, written 2026-10-03 11:01 CDT before the reporting run (scratch checks in N13/_preflight_c42 and _preflight_c42_2 disclosed in the spec)
+2763949ae21a7df5b11646db854e8b292141fb5a298360fd13c1d969f1755305  C42/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C42/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C42/BASELINE_FRAMEWORK.sha256
+f6f5654fbccb8530e6a693f1b3458e93da72a96b8ae9ce0ba945ceb11c300539  runner_c42/SEEDS_C42.sha256
+8a66c405696a97e5f16aee0599cf8db071945fdaed167a85f0a6b13c8c93ce46  runner_c42/SEED_DIFFS_C42.txt
+847c8d8eaddd109d346cb6ce876377e3b667a75865f6b4c9507fb837091b3175  runner_c42/PRECHECK_C42.json
+ca9dd2c2caa1195a99ae9d6cddb2d4ca590215f30e65987bb47e52d21ec203a1  runner_c42/make_seeds_c42.py
+a70189af575adcee6ac27d6acb64fc4cbf4d5a1aa5ea1cfc1e68ad4bab41617c  runner_c42/src/q_probe.R
+5cb093d4333d3395fbebde82d7efb1e113ba0506d7a02e0515495cc9c2582b5f  tools_make_spec_c42.py
+a368b908804f8915a603241edf555891fc31857a3c9e36f4486e0198747e894f  ablation_plan/OWNER_42_ANSWERS.md
+d0fac1d07c102c37416689edcdb613d2bf2f8af069e9b3ed0f3c4beb81167193  ablation_plan/OWNER_42_ANSWERS.sha256
+37acd34e2a76793bb5942c100f703b2a4045b6161c5ba4f76295b4322bd642c9  ablation_plan/OWNER_42_SHEET.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+
+---
+# RUN LOG (this control)
+11:01:16 C42 arms
+11:01:43   R0 RB exit=0 secs=26.5 timeout=0
+11:01:47   R0 DOM exit=0 secs=3.9 timeout=0
+11:02:17   PM_1 RB exit=0 secs=27.1 timeout=0
+11:02:20   PM_1 DOM exit=0 secs=3 timeout=0
+11:02:49   PM_12 RB exit=0 secs=26.9 timeout=0
+11:02:52   PM_12 DOM exit=0 secs=2.8 timeout=0
+11:03:21   PM_123 RB exit=0 secs=26.4 timeout=0
+11:03:24   PM_123 DOM exit=0 secs=3.3 timeout=0
+11:03:53   BATCH RB exit=0 secs=26.7 timeout=0
+11:03:56   BATCH DOM exit=0 secs=3.1 timeout=0
+11:04:05   PROBE PROBE exit=0 secs=9 timeout=0
+
+---
+# C42_RESULTS.md (runner output)
+# C42 RESULTS (mechanical; generated 2026-10-03 11:04:19 CDT)
+
+**Mechanical predicate result: P1 NOT MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. owner interruptions go down: batched 2 < piecemeal 3 | MET |
+| 2. repair rounds go down: batched 1 < piecemeal 1 | NOT MET |
+| 3. nothing unresolved: 0 gating questions left unanswered in the batched final output (batched 0, piecemeal 0) | MET |
+| 4. same answer either way: piecemeal and batched final outputs (4 R-B key outputs) are byte-identical | MET |
+| 5. validity: arm R0 (switched code, no switch set) equals the frozen R-B outputs 4/4 | MET |
+
+## Playback per question (answers 1B 2A 3A 4A 5A)
+| q | answer | surfaces | arises | arise_rows | output_rows_changed_by_ruling | labels_changed | gating | piecemeal_interruption | piecemeal_repair_round |
+|---|---|---|---|---|---|---|---|---|---|
+| Q1 | B | build | TRUE | 29 | 29 | 29 | TRUE | TRUE | TRUE |
+| Q2 | A | build | FALSE | 0 |  0 |  0 | FALSE | FALSE | FALSE |
+| Q3 | A | build | FALSE | 0 |  0 |  0 | FALSE | FALSE | FALSE |
+| Q4 | A | after_run | TRUE | 64922 |  0 |  0 | FALSE | TRUE | FALSE |
+| Q5 | A | after_run | TRUE | 222002 |  0 |  0 | FALSE | TRUE | FALSE |
+
+## Counts
+- piecemeal: 3 interruptions, 1 repair rounds (one per arising question; one per arising question whose answer changes an output row)
+- batched: 2 interruptions (round A = Q1-Q3 before reconciliation: TRUE; round B = Q4-Q5 after the run: TRUE), 1 repair rounds
+- batched round A changes 29 output rows (29 labels, 0 rows added, 0 removed) vs R0; first ids: SR23-01580128|SR23-01673698|SR23-01674828|SR23-01675615|SR23-01805283|SR23-01928666|SR23-01992885|SR23-02109730|SR24-00395772|SR24-00395829
+- Q1 change ids (first 10): SR23-01580128|SR23-01673698|SR23-01674828|SR23-01675615|SR23-01805283|SR23-01928666|SR23-01992885|SR23-02109730|SR24-00395772|SR24-00395829
+- Q2 change ids (first 10): 
+- Q3 change ids (first 10): 
+- final classifications sha (first 16): piecemeal 5e4140dabac24724, batched 5e4140dabac24724
+- INFO, not scored (alternative reading 'neither count goes up and at least one goes down'): would be met
+
+## Question probe (Q_FACTS.csv)
+| q | arises | rows | detail | ruled_answer_change_rows_report_only |
+|---|---|---|---|---|
+| Q1 | TRUE | 29 | types: SEF; labels: ESCALATE=29 | NA |
+| Q2 | FALSE | 0 | distinct source STATUS values: Open=245193 | NA |
+| Q3 | FALSE | 0 | DUPLICATE values: false=222176/true=23017 | NA |
+| Q4 | TRUE | 64922 | flagged: WCA2; top share 0.491953 of 131968 | 0 |
+| Q5 | TRUE | 222002 | code pairs (R-A -> R-B): dormant_ge_kappa_peer_p75 -> E_dormant_ge_kappa_p75 -> 131968 / thin_type_or_missing_peer -> I04_thin_peer_n -> 6377 / within_type_dormancy -> S_dormant_lt_kappa_p75 -> 83657; one-to-one: TRUE | 0 |
+
+## Arms
+| arm | rulings | regime | rb_exit | rb_s | classifications_sha | outputs_equal_frozen | fixtures_equal_frozen | portfolio | dom_exit | dom_status | dom_flagged |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| R0 | - | both | 0 | 26.5 | a0e42b8667b38baf | 4/4 | TRUE | 2,222002,131968,6377,83657,23191 | 0 | FLAG | WCA2 |
+| PM_1 | Q1B | piecemeal | 0 | 27.1 | 5e4140dabac24724 | 1/4 | TRUE | 2,222002,131939,6406,83657,23191 | 0 | FLAG | WCA2 |
+| PM_12 | Q1B,Q2A | piecemeal | 0 | 26.9 | 5e4140dabac24724 | 1/4 | TRUE | 2,222002,131939,6406,83657,23191 | 0 | FLAG | WCA2 |
+| PM_123 | Q1B,Q2A,Q3A | piecemeal | 0 | 26.4 | 5e4140dabac24724 | 1/4 | TRUE | 2,222002,131939,6406,83657,23191 | 0 | FLAG | WCA2 |
+| BATCH | Q1B,Q2A,Q3A | batched | 0 | 26.7 | 5e4140dabac24724 | 1/4 | TRUE | 2,222002,131939,6406,83657,23191 | 0 | FLAG | WCA2 |
+
+
+---
+# C42_arms.csv (raw, full file)
+arm,rulings,regime,rb_exit,rb_s,classifications_sha,outputs_equal_frozen,fixtures_equal_frozen,portfolio,dom_exit,dom_status,dom_flagged
+R0,-,both,0,26.5,a0e42b8667b38baf,4/4,TRUE,"2,222002,131968,6377,83657,23191",0,FLAG,WCA2
+PM_1,Q1B,piecemeal,0,27.1,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+PM_12,"Q1B,Q2A",piecemeal,0,26.9,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+PM_123,"Q1B,Q2A,Q3A",piecemeal,0,26.4,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+BATCH,"Q1B,Q2A,Q3A",batched,0,26.7,5e4140dabac24724,1/4,TRUE,"2,222002,131939,6406,83657,23191",0,FLAG,WCA2
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/BATCH/C42_RULINGS.txt
+Q1B,Q2A,Q3A
+
+## arms/BATCH/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/BATCH/R-B/outputs/RB_kappa_grid_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152263,6406,63333
+1.5,222002,140311,6406,75285
+2,222002,131939,6406,83657
+3,222002,118217,6406,97379
+
+## arms/BATCH/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131939,6406,83657,23191
+
+## arms/BATCH/RUN_DOM.exit
+0,3.1,2026-10-03T11:03:56-05:00,0,600
+
+## arms/BATCH/RUN_RB.exit
+0,26.7,2026-10-03T11:03:52-05:00,0,1800
+
+## arms/BATCH/outputs/dom/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131939,1000,30,> 1/3,80,WCA2,64922,0.492061,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/PM_1/C42_RULINGS.txt
+Q1B
+
+## arms/PM_1/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/PM_1/R-B/outputs/RB_kappa_grid_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152263,6406,63333
+1.5,222002,140311,6406,75285
+2,222002,131939,6406,83657
+3,222002,118217,6406,97379
+
+## arms/PM_1/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131939,6406,83657,23191
+
+## arms/PM_1/RUN_DOM.exit
+0,3,2026-10-03T11:02:20-05:00,0,600
+
+## arms/PM_1/RUN_RB.exit
+0,27.1,2026-10-03T11:02:17-05:00,0,1800
+
+## arms/PM_1/outputs/dom/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131939,1000,30,> 1/3,80,WCA2,64922,0.492061,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/PM_12/C42_RULINGS.txt
+Q1B,Q2A
+
+## arms/PM_12/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/PM_12/R-B/outputs/RB_kappa_grid_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152263,6406,63333
+1.5,222002,140311,6406,75285
+2,222002,131939,6406,83657
+3,222002,118217,6406,97379
+
+## arms/PM_12/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131939,6406,83657,23191
+
+## arms/PM_12/RUN_DOM.exit
+0,2.8,2026-10-03T11:02:52-05:00,0,600
+
+## arms/PM_12/RUN_RB.exit
+0,26.9,2026-10-03T11:02:49-05:00,0,1800
+
+## arms/PM_12/outputs/dom/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131939,1000,30,> 1/3,80,WCA2,64922,0.492061,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/PM_123/C42_RULINGS.txt
+Q1B,Q2A,Q3A
+
+## arms/PM_123/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/PM_123/R-B/outputs/RB_kappa_grid_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152263,6406,63333
+1.5,222002,140311,6406,75285
+2,222002,131939,6406,83657
+3,222002,118217,6406,97379
+
+## arms/PM_123/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131939,6406,83657,23191
+
+## arms/PM_123/RUN_DOM.exit
+0,3.3,2026-10-03T11:03:24-05:00,0,600
+
+## arms/PM_123/RUN_RB.exit
+0,26.4,2026-10-03T11:03:21-05:00,0,1800
+
+## arms/PM_123/outputs/dom/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131939,1000,30,> 1/3,80,WCA2,64922,0.492061,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/PROBE/RUN_PROBE.exit
+0,9,2026-10-03T11:04:05-05:00,0,900
+
+## arms/PROBE/outputs/Q5_CODE_PAIRS.csv
+ra_code,rb_code,Freq
+dormant_ge_kappa_peer_p75,E_dormant_ge_kappa_p75,131968
+thin_type_or_missing_peer,I04_thin_peer_n,6377
+within_type_dormancy,S_dormant_lt_kappa_p75,83657
+
+## arms/PROBE/outputs/Q_FACTS.csv
+q,arises,rows,detail,ruled_answer_change_rows_report_only
+Q1,TRUE,29,types: SEF; labels: ESCALATE=29,NA
+Q2,FALSE,0,distinct source STATUS values: Open=245193,NA
+Q3,FALSE,0,DUPLICATE values: false=222176|true=23017,NA
+Q4,TRUE,64922,flagged: WCA2; top share 0.491953 of 131968,0
+Q5,TRUE,222002,code pairs (R-A -> R-B): dormant_ge_kappa_peer_p75 -> E_dormant_ge_kappa_p75 -> 131968 | thin_type_or_missing_peer -> I04_thin_peer_n -> 6377 | within_type_dormancy -> S_dormant_lt_kappa_p75 -> 83657; one-to-one: TRUE,0
+
+## arms/R0/C42_RULINGS.txt
+-
+
+## arms/R0/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/R0/R-B/outputs/RB_kappa_grid_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152292,6377,63333
+1.5,222002,140340,6377,75285
+2,222002,131968,6377,83657
+3,222002,118246,6377,97379
+
+## arms/R0/R-B/outputs/RB_portfolio_counts.csv
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+
+## arms/R0/RUN_DOM.exit
+0,3.9,2026-10-03T11:01:47-05:00,0,600
+
+## arms/R0/RUN_RB.exit
+0,26.5,2026-10-03T11:01:43-05:00,0,1800
+
+## arms/R0/outputs/dom/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131968,1000,30,> 1/3,81,WCA2,64922,0.491953,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/BATCH/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131939 INCONCLUSIVE=6406 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C42/arms/BATCH/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/PM_1/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131939 INCONCLUSIVE=6406 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C42/arms/PM_1/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/PM_12/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131939 INCONCLUSIVE=6406 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C42/arms/PM_12/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/PM_123/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131939 INCONCLUSIVE=6406 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C42/arms/PM_123/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/R0/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C42/arms/R0/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+
+---
+# C42_EVIDENCE.sha256
+715a11d5349a1047a883c246003e822f1c23595436d52c4a18ba5adddc5bea57  C42_ARM_MANIFESTS.txt
+96682933da521d55aff91aa0747eb926b15573887a2aa05179bb016860ce936f  C42_arms.csv
+85eda717eeda53919edb92cec6dff472e08fc261e855b41f2881a22457e8e5d6  C42_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files) are listed by hash and size only.
+arms/BATCH in  :: d39e6b64472f725742b8ee12c80848131f5a62a6aa7d7f2d89f0ae28f830ed81  13  C42_RULINGS.txt
+arms/BATCH in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/BATCH in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/BATCH in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/BATCH in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/BATCH in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/BATCH in  :: f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  R-B\R\20_integrity_and_classify.R
+arms/BATCH in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/BATCH in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/BATCH out :: 1f624f15c64f58bd65d8b55f6427cd6ea56f0b01ff07c8c11b74803fa6900621  311  outputs\dom\DOM_RESULT.csv
+arms/BATCH out :: 4d9d2339601695c2a13768e8c57db126be84dfeae2ca98559fc1a35ce3c39835  3279  outputs\dom\DOM_TABLE.csv
+arms/BATCH out :: 5e4140dabac2472464ff37ce215a1c44b6b7d71a6b375a83e2e742f84f8f3b4a  41962574  R-B\outputs\RB_classifications.csv
+arms/BATCH out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/BATCH out :: 189e8009dcc43c6754c76b14daaa72e4980df4a5624c573f4b982d1b1cf0066d  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/BATCH out :: abe261e723311b0b4553b398c1dd5f82a0ffb78f2f0a27edbea6ae8fb6fbeb4e  100  R-B\outputs\RB_portfolio_counts.csv
+arms/BATCH out :: 93ebbe27ebf021e973f0a044fe11f52c0add50296798a5427604c3f01f7abf2c  39  RUN_DOM.exit
+arms/BATCH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/BATCH out :: 18f6395df7950756ae5e935d53eff8ecc642b3a76c6c4f2a56db6c29c1217df6  486  RUN_DOM.stdout.txt
+arms/BATCH out :: 6fec53eb903f22ec5669c7b5f9edfd1cb575f64bbb88f5ecb7b2b18c757cac96  41  RUN_RB.exit
+arms/BATCH out :: bef451c2efe53af53ad5ea48dd2da0f6aa4f5f3ece1f644b7348f7d814d0b5d2  1280  RUN_RB.stderr.txt
+arms/BATCH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/PM_1 in  :: e57e6b0e087a250085f7acfae59301a566eb94ff5ad00eabdb10cdae813c4923  5  C42_RULINGS.txt
+arms/PM_1 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/PM_1 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/PM_1 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/PM_1 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/PM_1 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/PM_1 in  :: f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  R-B\R\20_integrity_and_classify.R
+arms/PM_1 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/PM_1 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/PM_1 out :: 1f624f15c64f58bd65d8b55f6427cd6ea56f0b01ff07c8c11b74803fa6900621  311  outputs\dom\DOM_RESULT.csv
+arms/PM_1 out :: 4d9d2339601695c2a13768e8c57db126be84dfeae2ca98559fc1a35ce3c39835  3279  outputs\dom\DOM_TABLE.csv
+arms/PM_1 out :: 5e4140dabac2472464ff37ce215a1c44b6b7d71a6b375a83e2e742f84f8f3b4a  41962574  R-B\outputs\RB_classifications.csv
+arms/PM_1 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/PM_1 out :: 189e8009dcc43c6754c76b14daaa72e4980df4a5624c573f4b982d1b1cf0066d  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/PM_1 out :: abe261e723311b0b4553b398c1dd5f82a0ffb78f2f0a27edbea6ae8fb6fbeb4e  100  R-B\outputs\RB_portfolio_counts.csv
+arms/PM_1 out :: 4f13828959743b16698986b622f563547ee31ac75bc2e20ff726ba4406e5a96a  37  RUN_DOM.exit
+arms/PM_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/PM_1 out :: 18f6395df7950756ae5e935d53eff8ecc642b3a76c6c4f2a56db6c29c1217df6  486  RUN_DOM.stdout.txt
+arms/PM_1 out :: 394246a02bce54d4b9ee2675598e9af8962bb73d31d5a4b82895a206dae8debc  41  RUN_RB.exit
+arms/PM_1 out :: 5753fa01295dbd291257725d9a8a111dfb55e3bc14a4566466e493358078a2eb  1275  RUN_RB.stderr.txt
+arms/PM_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/PM_12 in  :: b6b11b378e02f565bcba657f76be7454fd1397629a76e4bf2caa023ee24be071  9  C42_RULINGS.txt
+arms/PM_12 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/PM_12 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/PM_12 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/PM_12 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/PM_12 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/PM_12 in  :: f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  R-B\R\20_integrity_and_classify.R
+arms/PM_12 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/PM_12 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/PM_12 out :: 1f624f15c64f58bd65d8b55f6427cd6ea56f0b01ff07c8c11b74803fa6900621  311  outputs\dom\DOM_RESULT.csv
+arms/PM_12 out :: 4d9d2339601695c2a13768e8c57db126be84dfeae2ca98559fc1a35ce3c39835  3279  outputs\dom\DOM_TABLE.csv
+arms/PM_12 out :: 5e4140dabac2472464ff37ce215a1c44b6b7d71a6b375a83e2e742f84f8f3b4a  41962574  R-B\outputs\RB_classifications.csv
+arms/PM_12 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/PM_12 out :: 189e8009dcc43c6754c76b14daaa72e4980df4a5624c573f4b982d1b1cf0066d  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/PM_12 out :: abe261e723311b0b4553b398c1dd5f82a0ffb78f2f0a27edbea6ae8fb6fbeb4e  100  R-B\outputs\RB_portfolio_counts.csv
+arms/PM_12 out :: cfc68dcbfaa65a75f57aaf629d90546cedcf67d48be3e1f1b07bcd0f4daeea16  39  RUN_DOM.exit
+arms/PM_12 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/PM_12 out :: 18f6395df7950756ae5e935d53eff8ecc642b3a76c6c4f2a56db6c29c1217df6  486  RUN_DOM.stdout.txt
+arms/PM_12 out :: 58bc660a9e7f172d2ba6f1966dbc68de57e95c398e91fad07c93387a7cfb933d  41  RUN_RB.exit
+arms/PM_12 out :: 9810ede067a82a2ff7a4b4f95b5f1f6fcb201982302edf46db9334a588df1784  1280  RUN_RB.stderr.txt
+arms/PM_12 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/PM_123 in  :: d39e6b64472f725742b8ee12c80848131f5a62a6aa7d7f2d89f0ae28f830ed81  13  C42_RULINGS.txt
+arms/PM_123 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/PM_123 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/PM_123 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/PM_123 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/PM_123 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/PM_123 in  :: f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  R-B\R\20_integrity_and_classify.R
+arms/PM_123 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/PM_123 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/PM_123 out :: 1f624f15c64f58bd65d8b55f6427cd6ea56f0b01ff07c8c11b74803fa6900621  311  outputs\dom\DOM_RESULT.csv
+arms/PM_123 out :: 4d9d2339601695c2a13768e8c57db126be84dfeae2ca98559fc1a35ce3c39835  3279  outputs\dom\DOM_TABLE.csv
+arms/PM_123 out :: 5e4140dabac2472464ff37ce215a1c44b6b7d71a6b375a83e2e742f84f8f3b4a  41962574  R-B\outputs\RB_classifications.csv
+arms/PM_123 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/PM_123 out :: 189e8009dcc43c6754c76b14daaa72e4980df4a5624c573f4b982d1b1cf0066d  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/PM_123 out :: abe261e723311b0b4553b398c1dd5f82a0ffb78f2f0a27edbea6ae8fb6fbeb4e  100  R-B\outputs\RB_portfolio_counts.csv
+arms/PM_123 out :: 626a05c62017232ed7059c35712c03d09a6f08b555b909db0edc9a10076df001  39  RUN_DOM.exit
+arms/PM_123 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/PM_123 out :: 18f6395df7950756ae5e935d53eff8ecc642b3a76c6c4f2a56db6c29c1217df6  486  RUN_DOM.stdout.txt
+arms/PM_123 out :: 406ae49f7b7080937a3b65c3a0b0b43422030e810083ee6075e9b5b7418fa387  41  RUN_RB.exit
+arms/PM_123 out :: 203b91a69a875da66a8b8f9b95241b16f9944fb38a3f646153379bd0d9d91c23  1285  RUN_RB.stderr.txt
+arms/PM_123 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/PROBE in  :: a70189af575adcee6ac27d6acb64fc4cbf4d5a1aa5ea1cfc1e68ad4bab41617c  3714  q_probe.R
+arms/PROBE out :: 704022f8d9aa1801c5827e8803f61ece84e397bf561465f7aa48ad2d04dd2452  512  outputs\Q_FACTS.csv
+arms/PROBE out :: e81126d9af7b4982797e0a18e209ecd93c373117eaf5aa543cf9be78bec02528  174  outputs\Q5_CODE_PAIRS.csv
+arms/PROBE out :: 6b24c927bc2674348571cce6ad99a1af566729120889c4538ae9836feca06c15  37  RUN_PROBE.exit
+arms/PROBE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PROBE.stderr.txt
+arms/PROBE out :: fcaca617e7e2b780f5f55e618728aacf0e89bf77f13da063b80c8a63026a86c9  1686  RUN_PROBE.stdout.txt
+arms/R0 in  :: 204186334624a3b0dfb97ca25b9a55680ed46da561f9dade54ed4c0712dd8f4e  3  C42_RULINGS.txt
+arms/R0 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/R0 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/R0 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/R0 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/R0 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/R0 in  :: f43c4abec68274bde4f4e3c30e41f8e30beffbf5d7f4b4d02afffa363ab41fcd  6933  R-B\R\20_integrity_and_classify.R
+arms/R0 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/R0 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/R0 out :: 7bf5c0119085839d66d1a8615662756f3cd2a4b9c0daf72b984f3dc49ca8e570  311  outputs\dom\DOM_RESULT.csv
+arms/R0 out :: b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182  3330  outputs\dom\DOM_TABLE.csv
+arms/R0 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/R0 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/R0 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/R0 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/R0 out :: 7ee07a9178cdd6bb3603c9a8e663e0f922c2a71e879149d550973585aac50366  39  RUN_DOM.exit
+arms/R0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/R0 out :: dcae561b5900f22fbc1dfd918dd8dc299541eadd8de6ff6ffcf8d9140d42b527  486  RUN_DOM.stdout.txt
+arms/R0 out :: 0b807240e5cc0ec3f5a6500849d3e5228cbdc3661765a6362ad534ddbc43354a  41  RUN_RB.exit
+arms/R0 out :: 3396b3a2a383508a2c4b20c409d0e102ba314e161178eb7527fc48b782a53941  1265  RUN_RB.stderr.txt
+arms/R0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C42/RB_RULED__20_integrity_and_classify.R
+@@ -67,13 +67,21 @@
+   integrity_clause[is.na(integrity_clause) & p_thin] <- "I04_thin_peer_n"
+   integrity_clause[is.na(integrity_clause) & p_parent] <- "I05_parent_sr_present"
+   integrity_clause[is.na(integrity_clause) & p_missing_dormant] <- "I06_missing_dormant_clock"
++  # [seed C42] owner #42 answers as switches (environment variable C42_RULINGS, comma list); none set = frozen behaviour, byte for byte
++  c42 <- strsplit(Sys.getenv("C42_RULINGS", ""), ",")[[1]]
++  # Q1 answer B: a type whose typical closing time (peer P75) is zero -> INCONCLUSIVE (frozen default on both paths: kappa*0 = 0, so ESCALATE)
++  if ("Q1B" %in% c42) integrity_clause[is.na(integrity_clause) & !is.na(peer_p75) & peer_p75 == 0] <- "I07_zero_peer_p75"
++  # Q2 answer A: status starting with "open" (trimmed, any case) but not exactly "open" -> INCONCLUSIVE (frozen default on both paths: out of set)
++  open_like <- startsWith(tolower(status_norm), "open") & !is_open
++  if ("Q2A" %in% c42) integrity_clause[open_like] <- "I08_open_like_status"
++  # Q3 answer A: blank DUPLICATE = not a duplicate. rb_truthy() (and R-A is_true_like()) already read blank as FALSE: no code change
+ 
+   integrity_fail <- !is.na(integrity_clause)
+ 
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- (is_open | ("Q2A" %in% c42 & open_like)) & !dup_flag & !leg_flag  # [seed C42] Q2A brings open-like rows into the decision set
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+
+### seeds/C42/q_probe.R (new file, 3714 bytes)
+#!/usr/bin/env Rscript
+# N13 C42 question probe (owner ruling 42A; answers OWNER_42_ANSWERS.md 1B 2A 3A 4A 5A). Read-only.
+# Usage: Rscript q_probe.R <FROZEN_SOURCE_DIR> <FROZEN_RA_CSV> <FROZEN_RB_CSV> <OUT_DIR>
+# For each sheet question: does it ARISE on the frozen Chicago pack (the situation exists in the data or outputs)?
+#   Q1 a decision row reaches the kappa rule with peer_p75_h == 0;  Q2 a source STATUS starts with "open" (case-insensitive, trimmed) but is not exactly "open";
+#   Q3 a source DUPLICATE flag is blank (empty or the text NULL);    Q4 the ruled #47 check flags a type (> 1/3 of ESCALATE, total >= 1000, type >= 30);
+#   Q5 R-A and R-B word the reason column differently on some row with the same label.
+# Q5 answer A also needs: the reason codes correspond one-to-one (each R-A code occurs with exactly one R-B code and vice versa). Rows outside that = Q5 change rows.
+suppressPackageStartupMessages(library(readr))
+a <- commandArgs(trailingOnly = TRUE); src <- a[[1]]; od <- a[[4]]; dir.create(od, showWarnings = FALSE, recursive = TRUE)
+s <- read_tsv(file.path(src, "src_open_candidates.csv"), col_types = cols(.default = col_character()), col_select = c("SR_NUMBER", "STATUS", "DUPLICATE"), progress = FALSE, na = character())
+ra <- read_csv(a[[2]], col_types = cols(.default = col_character()), progress = FALSE)
+rb <- read_csv(a[[3]], col_types = cols(.default = col_character()), progress = FALSE)
+st <- tolower(trimws(s$STATUS)); dp <- trimws(s$DUPLICATE)
+q1 <- rb$classification %in% c("ESCALATE", "STANDARD") & suppressWarnings(as.numeric(rb$peer_p75_h)) == 0
+q1[is.na(q1)] <- FALSE
+q2 <- startsWith(st, "open") & st != "open"
+q3 <- dp == "" | toupper(dp) == "NULL"
+esc <- rb$type_key[rb$classification == "ESCALATE"]; tb <- sort(table(esc), decreasing = TRUE); sh <- as.numeric(tb) / length(esc)
+q4f <- names(tb)[length(esc) >= 1000 & as.integer(tb) >= 30 & sh > 1/3]
+m <- match(rb$SR_NUMBER, ra$SR_NUMBER)
+ca <- ra$integrity_clause[m]; cb <- sub(" \\(.*$", "", rb$evidence_reason)
+same_lab <- !is.na(m) & ra$classification[m] == rb$classification
+q5 <- same_lab & (ifelse(is.na(ca), "", ca) != ifelse(is.na(rb$evidence_reason), "", rb$evidence_reason))
+pairs <- as.data.frame(table(ra_code = ca[same_lab], rb_code = cb[same_lab]), stringsAsFactors = FALSE); pairs <- pairs[pairs$Freq > 0, ]
+bad_a <- names(which(table(pairs$ra_code) > 1)); bad_b <- names(which(table(pairs$rb_code) > 1))
+q5_change <- sum(same_lab & (ca %in% bad_a | cb %in% bad_b))
+facts <- data.frame(
+  q = c("Q1", "Q2", "Q3", "Q4", "Q5"),
+  arises = c(any(q1), any(q2), any(q3), length(q4f) > 0, any(q5)),
+  rows = c(sum(q1), sum(q2), sum(q3), if (length(q4f)) as.integer(tb[q4f[1]]) else 0L, sum(q5)),
+  detail = c(paste0("types: ", paste(unique(rb$type_key[q1]), collapse = "|"), "; labels: ", paste(names(table(rb$classification[q1])), as.integer(table(rb$classification[q1])), sep = "=", collapse = "|")),
+             paste0("distinct source STATUS values: ", paste(names(table(s$STATUS)), as.integer(table(s$STATUS)), sep = "=", collapse = "|")),
+             paste0("DUPLICATE values: ", paste(names(table(s$DUPLICATE)), as.integer(table(s$DUPLICATE)), sep = "=", collapse = "|")),
+             paste0("flagged: ", paste(q4f, collapse = "|"), "; top share ", sprintf("%.6f", sh[1]), " of ", length(esc)),
+             paste0("code pairs (R-A -> R-B): ", paste(pairs$ra_code, pairs$rb_code, pairs$Freq, sep = " -> ", collapse = " | "), "; one-to-one: ", !length(bad_a) && !length(bad_b))),
+  ruled_answer_change_rows_report_only = c(NA, NA, NA, 0L, q5_change), stringsAsFactors = FALSE)
+write_csv(facts, file.path(od, "Q_FACTS.csv")); write_csv(pairs, file.path(od, "Q5_CODE_PAIRS.csv")); print(facts)
+
+### seeds/C42/ARMS.tsv (new file, 511 bytes)
+arm	rulings	regime	desc
+R0	-	both	build with the builders' defaults (no ruling yet); switched code with no switch set; must equal the frozen R-B outputs
+PM_1	Q1B	piecemeal	piecemeal repair after ruling 1 alone
+PM_12	Q1B,Q2A	piecemeal	piecemeal repair after ruling 2 (rulings 1-2 applied)
+PM_123	Q1B,Q2A,Q3A	piecemeal	piecemeal repair after ruling 3 (rulings 1-3 applied) = piecemeal final output
+BATCH	Q1B,Q2A,Q3A	batched	batched round A (rulings 1-3 in one round, before reconciliation) = batched final output
+
+### seeds/C42/SEEDFILE (new file, 82 bytes)
+seeds/C42/RB_RULED__20_integrity_and_classify.R>R-B\R\20_integrity_and_classify.R
+
+### seeds/C42/PLAYBACK.json (new file, 1020 bytes)
+{
+ "answers": {
+  "Q1": "B",
+  "Q2": "A",
+  "Q3": "A",
+  "Q4": "A",
+  "Q5": "A"
+ },
+ "answers_file": "ablation_plan/OWNER_42_ANSWERS.md",
+ "answers_sha256": "a368b908804f8915a603241edf555891fc31857a3c9e36f4486e0198747e894f",
+ "surfaces": {
+  "Q1": "build",
+  "Q2": "build",
+  "Q3": "build",
+  "Q4": "after_run",
+  "Q5": "after_run"
+ },
+ "batched_rounds": {
+  "A_before_reconciliation": [
+   "Q1",
+   "Q2",
+   "Q3"
+  ],
+  "B_after_run": [
+   "Q4",
+   "Q5"
+  ]
+ },
+ "builder_default_both_paths": {
+  "Q1": "A (kappa*0 = 0 -> ESCALATE)",
+  "Q2": "C (exact 'open' only; others out of set)",
+  "Q3": "A (blank = not duplicate)",
+  "Q4": "no rule (nothing reported)",
+  "Q5": "no rule"
+ },
+ "change_arms": {
+  "Q1": [
+   "R0",
+   "PM_1"
+  ],
+  "Q2": [
+   "PM_1",
+   "PM_12"
+  ],
+  "Q3": [
+   "PM_12",
+   "PM_123"
+  ],
+  "roundA": [
+   "R0",
+   "BATCH"
+  ]
+ },
+ "report_only": {
+  "Q4": "answer A changes nothing (report the caveat)",
+  "Q5": "answer A changes nothing if the reason codes correspond one-to-one (q_probe)"
+ }
+}
+
+### seeds/C42/dom_check.R (new file, 2017 bytes)
+#!/usr/bin/env Rscript
+# N13 b5 C47 single-unit dominance check (owner ruling 47A, 2026-10-03 09:58 CT). Read-only on its input.
+# Usage: Rscript dom_check.R <CLASSIFICATIONS_CSV> <OUT_DIR>
+# Metric: share of ESCALATE rows by service type (type_key). Applies only if total ESCALATE >= 1000; a type is eligible if it has >= 30
+# ESCALATE rows. FLAG = an eligible type with share > 1/3. A flag never drops or changes a row: it is reported and routed to the owner.
+suppressPackageStartupMessages(library(readr))
+a <- commandArgs(trailingOnly = TRUE); inp <- a[[1]]; od <- a[[2]]; dir.create(od, showWarnings = FALSE, recursive = TRUE)
+MIN_TOTAL <- 1000L; MIN_TYPE <- 30L; MAX_SHARE <- 1/3
+x <- read_csv(inp, col_types = cols(.default = col_character()), col_select = c("SR_NUMBER", "type_key", "classification"), progress = FALSE)
+esc <- x[x$classification %in% "ESCALATE", ]; tot <- nrow(esc)
+tb <- table(esc$type_key); tb <- tb[order(-as.integer(tb), names(tb))]
+d <- data.frame(type_key = names(tb), n_escalate = as.integer(tb), stringsAsFactors = FALSE)
+d$share <- if (tot > 0) d$n_escalate / tot else NA_real_
+d$eligible <- tot >= MIN_TOTAL & d$n_escalate >= MIN_TYPE
+d$flag <- d$eligible & d$share > MAX_SHARE
+write_csv(d, file.path(od, "DOM_TABLE.csv"))
+status <- if (tot < MIN_TOTAL) "NOT_APPLICABLE_BELOW_MIN_TOTAL" else if (any(d$flag)) "FLAG" else "NO_FLAG"
+r <- data.frame(input = basename(inp), n_rows = nrow(x), n_escalate_total = tot, min_total = MIN_TOTAL, min_type = MIN_TYPE, max_share_rule = "> 1/3",
+                n_types_escalate = nrow(d), top_type = if (nrow(d)) d$type_key[1] else "", top_n = if (nrow(d)) d$n_escalate[1] else 0L,
+                top_share = if (nrow(d)) sprintf("%.6f", d$share[1]) else "", flagged_types = paste(d$type_key[d$flag], collapse = "|"), status = status,
+                routing = if (status == "FLAG") "reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped" else "none")
+write_csv(r, file.path(od, "DOM_RESULT.csv")); print(r)
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C42",
+  "frozen_at_ct": "2026-10-03 11:21:14 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C42/C42-builder/builder_report.md", "bytes": 16993, "sha256": "df3d01067dbe266d4c93ec66d46f0a1151357f2e85efcf66aa99e2d43f0147a1", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C42/C42-validator/validator_report.md", "bytes": 9846, "sha256": "90dc977a01c878b83169d4e8b8a51df1cb5c77dcbefccb4fdc7f71e7d32a3fae", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "f81bf9afef260dfa568d3d65183d4b6f76d150348952e4395ea9faf8dc10dbe7"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C42 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting solely as **Builder** for **C42**, Addendum 01 control #42, “Batched owner rulings.” This is an independent first pass; I am blind to the Validator’s first-pass output and am not acting as Validator or Adjudicator. The assigned roles in the frozen specification are Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok.
+
+C42 tests whether owner questions that otherwise surface piecemeal can instead be collected into a pre-reconciliation batch for Q1–Q3, with a second post-run batch for Q4–Q5 when those questions cannot exist before execution. The measured quantities are interruptions, repair rounds, unresolved gating questions, equality of final outputs, and validity of the switched-but-unswitched R0 arm.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+Conceptually, C42 removes **piecemeal owner interruption as the default timing model**. Under the baseline model, every arising question interrupts the owner independently, and every separately arriving gating answer produces a repair round. Under the variant, Q1–Q3 are consolidated into round A before reconciliation and Q4–Q5 into round B after execution. It does not eliminate the later round for questions that are definitionally post-run.
+
+| Seeded surface | Exact seeded change |
+| --- | --- |
+| `RB_RULED__20_integrity_and_classify.R` | Reads comma-separated switches from environment variable `C42_RULINGS`; no switches is intended to preserve frozen behavior byte-for-byte. |
+| Q1B | When no earlier integrity clause exists and `peer_p75 == 0`, assigns `I07_zero_peer_p75`. This changes the frozen default from reaching the κ rule and becoming ESCALATE to becoming INCONCLUSIVE. |
+| Q2A | Defines `open_like <- startsWith(tolower(status_norm), "open") & !is_open`; when Q2A is active, assigns `I08_open_like_status` and admits those open-like records into `in_decision`. |
+| Q3A | No executable semantic change is added: existing `rb_truthy()` already interprets blank as false/not-duplicate. |
+| Decision membership | Changes `in_decision <- is_open & !dup_flag & !leg_flag` to include `open_like` when Q2A is active. |
+| `q_probe.R` | New read-only probe for whether Q1–Q5 arise, including Q4 dominance and Q5 R-A↔R-B reason-code correspondence. |
+| `ARMS.tsv` | Defines R0, PM_1, PM_12, PM_123, and BATCH, with PM_123 and BATCH as the two final regimes. |
+| `SEEDFILE` | Maps the ruled classification file onto `R-B\R\20_integrity_and_classify.R`. |
+| `PLAYBACK.json` | Freezes answers `1B 2A 3A 4A 5A`, question surfaces, the two batching rounds, builder defaults, comparison arms, and report-only treatment for Q4/Q5. |
+| `dom_check.R` | New read-only #47 dominance check: eligible type share `>1/3`, with total ESCALATE ≥1000 and type count ≥30; a flag is reported/routed but does not remove or alter rows. |
+
+The executable classification diff is exactly the switch parsing, Q1B integrity clause, Q2A `open_like` clause, and Q2A decision-set inclusion shown above; Q3A is explicitly documented as requiring no code change. The remaining new runner-side seed files are the probe, arm definition, seed mapping, playback declaration, and dominance checker.
+
+## 3. Hard mechanical facts table.
+
+| Mechanical fact | Recalculation / evidence | Result | Status |
+| --- | --- | --- | --- |
+| Frozen source row count from DUPLICATE values | 222,176 false + 23,017 true | **245,193** | **Recomputed** |
+| STATUS population | Probe reports `Open=245193` | **245,193** | Quoted |
+| R0 decision partition identity | 131,968 ESCALATE + 6,377 INCONCLUSIVE + 83,657 STANDARD | **222,002** | **Recomputed** |
+| Ruled decision partition identity | 131,939 + 6,406 + 83,657 | **222,002** | **Recomputed** |
+| R0 full source partition | 222,002 decision + 23,191 out-of-set | **245,193** | **Recomputed** |
+| Ruled full source partition | 222,002 + 23,191 | **245,193** | **Recomputed** |
+| Portfolio Δ, ruled − R0 | decision 0; ESCALATE 131,939−131,968; INCONCLUSIVE 6,406−6,377; STANDARD 0; out-of-set 0 | **0, −29, +29, 0, 0** | **Recomputed** |
+| κ=1 identity, R0 | 152,292 + 6,377 + 63,333 | **222,002** | **Recomputed** |
+| κ=1 identity, ruled | 152,263 + 6,406 + 63,333 | **222,002** | **Recomputed** |
+| κ=1.5 identity, R0 / ruled | 140,340+6,377+75,285; 140,311+6,406+75,285 | **222,002 / 222,002** | **Recomputed** |
+| κ=2 identity, R0 / ruled | 131,968+6,377+83,657; 131,939+6,406+83,657 | **222,002 / 222,002** | **Recomputed** |
+| κ=3 identity, R0 / ruled | 118,246+6,377+97,379; 118,217+6,406+97,379 | **222,002 / 222,002** | **Recomputed** |
+| κ-grid semantic delta at every κ ∈ {1,1.5,2,3} | Ruled minus R0 | **ESCALATE −29; INCONCLUSIVE +29; STANDARD 0** | **Recomputed** |
+| Q1 arises / change set | 29 SEF rows are ESCALATE under R0 and changed under Q1B | **|D(R0,PM_1)|=29** | Recomputed from probe + arm delta |
+| Q2 change set | PM_1 and PM_12 classification hashes equal; probe has 0 qualifying rows | **|D(PM_1,PM_12)|=0** | **Recomputed** |
+| Q3 change set | PM_12 and PM_123 classification hashes equal; probe has 0 qualifying rows | **|D(PM_12,PM_123)|=0** | **Recomputed** |
+| Round-A change set | R0→BATCH has the same −29/+29 portfolio movement as Q1 | **|D(R0,BATCH)|=29** | **Recomputed** |
+| Final-regime change set | PM_123 and BATCH have identical four key-output hashes | **D(PM_123,BATCH)=∅** | **Recomputed** |
+| Q1 labels changed | Output rows changed=29 and labels changed=29 | **29** | Quoted |
+| Q2/Q3 output changes | 0 and 0 | **0 / 0** | Quoted |
+| Q4 answer-induced output changes | Probe/report-only field | **0** | Quoted |
+| Q5 answer-induced output changes | One-to-one code map leaves no out-of-correspondence rows | **0** | **Recomputed/quoted** |
+| Q5 code-pair population | 131,968 + 6,377 + 83,657 | **222,002** | **Recomputed** |
+| Q5 correspondence | Three observed R-A→R-B code pairs, each unique in both directions | **one-to-one over 222,002 rows** | **Recomputed** |
+| Arising questions | Q1, Q4, Q5 arise; Q2, Q3 do not | **3 of 5** | **Recomputed** |
+| Gating questions | Only Q1 changes a written output row | **1 of 5** | **Recomputed** |
+| Piecemeal interruptions | one for each arising Q: Q1+Q4+Q5 | **3** | **Recomputed** |
+| Batched interruptions | round A contains Q1; round B contains Q4/Q5 | **2** | **Recomputed** |
+| Piecemeal repair rounds | only arising+gating Q1 creates one | **1** | **Recomputed** |
+| Batched repair rounds | only round A contains a gating answer | **1** | **Recomputed** |
+| Unresolved gating questions, batched final | Q1 applied; no other gating Q exists | **0** | **Recomputed** |
+| R0 key-output equality to frozen | classification, fixtures, κ grid, portfolio hashes all equal frozen references | **4/4** | **Recomputed from hashes** |
+| Ruled-arm equality to frozen | fixture hash equal; classification/grid/portfolio hashes differ | **1/4** | **Recomputed from hashes** |
+| Candidate-arm classification hash equality | PM_1=PM_12=PM_123=BATCH=`5e4140…f3b4a` | **4/4 equal** | **Recomputed from hashes** |
+| Candidate-arm fixture hash equality | all four=`0d7224…e9e9`, also frozen R-B fixture hash | **4/4 candidate equal; frozen equal** | **Recomputed from hashes** |
+| Candidate-arm κ-grid hash equality | all four=`189e80…066d` | **4/4 equal** | **Recomputed from hashes** |
+| Candidate-arm portfolio hash equality | all four=`abe261…eb4e` | **4/4 equal** | **Recomputed from hashes** |
+| Q4 R0 top share | 64,922 / 131,968 | **0.491952595 ≈ 0.491953** | **Recomputed** |
+| Q4 ruled top share | 64,922 / 131,939 | **0.492060725 ≈ 0.492061** | **Recomputed** |
+| Q4 share Δ | 0.492060725−0.491952595 | **+0.000108130** | **Recomputed** |
+| ESCALATE type count | R0 81; ruled 80 | **−1** | **Recomputed** |
+| Reporting executions | 5 R-B + 5 dominance + 1 probe | **11 executions; 11 exit=0** | **Recomputed** |
+| Mandatory fixture rows per arm | F01 through F14 | **14** | **Recomputed** |
+| Fixture-result observations across five R-B arms | 14 × 5 | **70** | **Recomputed** |
+| `n_agree+n_disagree=n_inner` | Those named fields are not present in the supplied C42 evidence. No substitute values are invented. The available analogous Q5 identity is the 222,002-row code-pair partition above. | **Not supplied as C42 fields** | Source limitation |
+
+The raw arm portfolios independently show R0 at `131968/6377/83657` and every ruled arm at `131939/6406/83657`, with the decision population and out-of-set population unchanged. The R0 κ grid supplies the four baseline rows used above, while the ruled grid supplies the corresponding −29/+29 changes at each κ.
+
+The Q5 frequencies independently sum to the complete 222,002-row decision population: 131,968 + 6,377 + 83,657 = 222,002. The packet does not enumerate all 29 Q1 IDs; it gives the set size and only the first ten IDs, so exact membership beyond those printed IDs cannot be reconstructed from the supplied textual evidence.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen P1 predicate is conjunctive: batched interruptions must be strictly lower, batched repair rounds must be strictly lower, unresolved gating questions must be zero, the two final regimes must have four byte-identical R-B key outputs, and R0 must reproduce the four frozen R-B outputs.
+
+| P1 condition | Independent assessment |
+| --- | --- |
+| 1. Batched interruptions < piecemeal interruptions | **True:** 2 < 3. |
+| 2. Batched repair rounds < piecemeal repair rounds | **False:** 1 < 1 is false. |
+| 3. Zero unresolved gating questions in batched final | **True:** 0. |
+| 4. Same final answer either way | **True:** PM_123 and BATCH have byte-identical classification, fixture, κ-grid, and portfolio hashes. |
+| 5. R0 reproduces frozen R-B outputs | **True:** 4/4 hashes match. |
+
+Thus the condition vector is **[True, False, True, True, True]**. Because the frozen definition requires all five conditions simultaneously, the P1 conjunction is **false solely because condition 2 is false**. The packet’s unscored alternative interpretation—neither count increases and at least one decreases—evaluates true because interruptions fall 3→2 while repairs remain 1→1.
+
+## 5. Fixture and reconciliation implications.
+
+The fixture evidence is stable. The BATCH output lists F01–F14 with `pass=TRUE`; the fixture file has SHA-256 `0d72245c…e9e9`, and that same hash appears in R0, PM_1, PM_12, PM_123, BATCH, and the frozen R-B reference. Therefore the locked fixture artifact is byte-identical across all five R-B arms even though 29 real-pack classifications move under Q1B.
+
+Final-regime reconciliation is exact at the four declared R-B key outputs. PM_123 and BATCH share the full classification hash `5e4140da…f3b4a`, fixture hash `0d72245c…e9e9`, κ-grid hash `189e8009…066d`, and portfolio hash `abe261e7…eb4e`. In fact, PM_1, PM_12, PM_123, and BATCH all share those four hashes, mechanically confirming that Q2A and Q3A add no effect on this frozen pack after Q1B has been applied.
+
+The Q5 cross-path reason reconciliation is also mechanically coherent for the decision population: the probe finds exactly three R-A→R-B reason-code pairings whose frequencies sum to 222,002 and reports a one-to-one mapping, so Q5’s frozen answer produces zero change rows.
+
+The known OF-1 clock discrepancy does not contaminate this reconciliation. It concerns three 1.000-hour numerical clock differences on rows whose labels agree; Q5 is restricted to reason wording, and every C42 arm comparison is R-B against R-B. The packet therefore places those three rows outside the C42 question/change counts.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal semantic change is narrow but real: Q1B reclassifies exactly 29 SEF rows from ESCALATE to INCONCLUSIVE. Because the locked fixture output remains byte-identical, the current fixture suite does **not** exercise this zero-peer-P75 production-data case. The semantic movement is declared rather than accidental, but fixture invariance by itself cannot validate that particular newly ruled branch.
+
+Q2A is a latent branch on this pack. The source contains 245,193 records whose distinct STATUS value is only `Open`, so no open-like/non-exact-open case exists. Q3A is likewise unexercised because DUPLICATE contains only `false` and `true`; there are no blank/`NULL` cases, and the seed itself adds no Q3 executable change. Accordingly, C42 demonstrates no empirical behavior for those two hypothetical data situations beyond confirming that activating their switches does not change this frozen dataset.
+
+Q4’s substantive flag/routing is unchanged, but its diagnostic output is not numerically invariant after Q1B. WCA2 remains the top and flagged type with 64,922 ESCALATE rows, yet the ESCALATE denominator falls from 131,968 to 131,939, so its share rises from 0.491953 to 0.492061; the number of represented ESCALATE types falls from 81 to 80. Those changes are downstream consequences of Q1’s 29-row movement, not output changes caused by the Q4 owner answer itself.
+
+The principal unchanged surfaces are the source row universe (245,193), decision population (222,002), STANDARD population (83,657), out-of-set population (23,191), all mandatory fixture results, the WCA2 flag/routing conclusion, and the four final outputs between PM_123 and BATCH. R0 also reproduces all four frozen key outputs exactly. The preflight separately reverified the frozen source, R-B runtime/config/parse/fixture files, runner-side seeds, and reported a passing gating preflight before the reporting arms executed.
+
+A process-level limitation is explicitly disclosed in the packet: scratch run 2 exposed the same substantive outcome before the final specification file was frozen. The mitigation recorded in the packet is that the evaluation predicate had already been hashed, remained unchanged through the harness fix, and no arm, threshold, rule, or predicate was altered after scratch 2; the reporting run then repeated every arm from scratch. This does not alter the reported arithmetic, but it is relevant when judging how strongly the exercise demonstrates outcome-blind experimental design.
+
+## 7. Claim → evidence map.
+
+| Claim | Packet section | Exact evidence row / artifact |
+| --- | --- | --- |
+| C42 is the batched-owner-rulings control with Builder=ChatGPT | SPEC | Ablation ID / Roles rows. |
+| Baseline is piecemeal; variant batches Q1–Q3 before reconciliation and Q4–Q5 after execution | SPEC → Exact change being tested | “Piecemeal (baseline)” and “Batched (variant)” rows. |
+| Q1B adds zero-peer-P75 integrity handling and Q2A adds open-like handling | SEED DIFFS | `RB_RULED__20_integrity_and_classify.R` diff rows. |
+| Q1 is the only gating question | C42_RESULTS.md → Playback per question | Q1 row: 29 changed/29 labels/gating TRUE; Q2–Q5 rows: gating FALSE. |
+| Piecemeal interruptions=3, batched interruptions=2, repair rounds=1 vs 1 | C42_RESULTS.md → Counts | Piecemeal and batched count rows. |
+| Q2 and Q3 do not arise; Q4 and Q5 do arise | C42_RESULTS.md → Question probe | Q2–Q5 rows. |
+| R0 portfolio is 131,968 / 6,377 / 83,657; ruled arms are 131,939 / 6,406 / 83,657 | C42_RESULTS.md → Arms | R0, PM_1, PM_12, PM_123, BATCH rows. |
+| Q1 produces the −29 ESCALATE / +29 INCONCLUSIVE delta | Raw per-arm portfolio tables | R0 and BATCH κ=2 portfolio rows; arithmetic recomputed in §3. |
+| The same −29/+29 movement occurs at κ=1, 1.5, 2, and 3 | Raw κ-grid tables | R0 grid and BATCH grid rows. |
+| Q5’s three code-pair frequencies sum to 222,002 and are one-to-one | PROBE → `Q5_CODE_PAIRS.csv` and `Q_FACTS.csv` | 131,968 / 6,377 / 83,657 pair rows and Q5 probe row. |
+| PM_123 and BATCH final key outputs are byte-identical | ARM MANIFESTS | BATCH four output hashes and PM_123 four output hashes. |
+| R0 reproduces the frozen four R-B key outputs | Frozen reference hashes / R0 manifest | Frozen hashes and R0 output hashes. |
+| Fixtures remain byte-identical despite Q1’s 29 real-row changes | Raw fixture output / manifests | BATCH F01–F14 all pass; same fixture hash across candidate and R0/frozen. |
+| P1 conditions 1,3,4,5 are true and condition 2 is false | SPEC → P1; C42_RESULTS → Predicate conditions | Frozen five-condition definition and observed condition rows. |
+| OF-1 cannot alter a C42 count under the declared comparison design | Coordinator Note N1 / OF-1 | Three repeated-hour numerical differences; all C42 arms compare R-B with R-B. |
+| Scratch 2 exposed the outcome before final spec freeze, while the predicate and declared rules were held fixed afterward | SPEC → Pre-execution check | Scratch-1 fix, scratch-2 result, and “no arm, threshold, rule or predicate was changed after scratch 2.” |
+
+END C42 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID
+
+- Role: Validator only. I am DeepSeek, operating blind to the Builder. I have not seen and will not ask for Builder output.
+- Ablation ID: C42 (Addendum 01, control #42 “Batched owner rulings”).
+- I do not return a terminal state in this report.
+
+2. Independent test plan: what I checked, and how
+
+- Checked frozen hashes against the runner preflight and against the arm manifests.
+- Reconstructed the arm-level outputs from the raw per-arm files and manifests: portfolio counts, kappa-grid counts, fixture results, dominance outputs, Q-probe facts, and Q5 code pairs.
+- Recomputed identities and deltas from the raw counts:
+
+  - total decision rows and sums by classification;
+  - R0 vs non-R0 portfolio deltas;
+  - kappa-grid deltas across kappa = 1, 1.5, 2, 3;
+  - dominance D-set totals, type counts, top type, top share, and flags.
+- Checked cross-arm hash equalities for the four R-B key outputs and the fixture results.
+- Checked P1 conditions 1–5 against the frozen predicate text and the runner output.
+- Checked internal consistency of the runner output, raw per-arm files, and manifests.
+
+3. Independently recomputed hard facts  
+   Identities and portfolio deltas
+
+- All arms have n_decision = 222002.
+- R0 portfolio: ESCALATE = 131968, INCONCLUSIVE = 6377, STANDARD = 83657, out_of_set = 23191.
+
+  - Sum: 131968 + 6377 + 83657 = 222002.
+- Non-R0 arms PM_1, PM_12, PM_123, BATCH portfolio: ESCALATE = 131939, INCONCLUSIVE = 6406, STANDARD = 83657, out_of_set = 23191.
+
+  - Sum: 131939 + 6406 + 83657 = 222002.
+- Delta from R0 to every non-R0 arm: ESCALATE −29, INCONCLUSIVE +29, STANDARD 0, n_decision 0, out_of_set 0.
+- This delta is exactly the Q1B effect: 29 ESCALATE rows moved to INCONCLUSIVE.
+
+Kappa-grid deltas
+
+- R0 kappa grid:
+
+  - kappa 1: ESCALATE 152292, INCONCLUSIVE 6377, STANDARD 63333.
+  - kappa 1.5: ESCALATE 140340, INCONCLUSIVE 6377, STANDARD 75285.
+  - kappa 2: ESCALATE 131968, INCONCLUSIVE 6377, STANDARD 83657.
+  - kappa 3: ESCALATE 118246, INCONCLUSIVE 6377, STANDARD 97379.
+- Non-R0 kappa grid:
+
+  - kappa 1: ESCALATE 152263, INCONCLUSIVE 6406, STANDARD 63333.
+  - kappa 1.5: ESCALATE 140311, INCONCLUSIVE 6406, STANDARD 75285.
+  - kappa 2: ESCALATE 131939, INCONCLUSIVE 6406, STANDARD 83657.
+  - kappa 3: ESCALATE 118217, INCONCLUSIVE 6406, STANDARD 97379.
+- Delta at every kappa: ESCALATE −29, INCONCLUSIVE +29, STANDARD 0.
+- Each kappa row sums to 222002.
+
+D-sets / dominance
+
+- R0 dominance:
+
+  - n_escalate_total = 131968.
+  - n_types_escalate = 81.
+  - top_type = WCA2, top_n = 64922, top_share = 0.491953.
+  - flagged_types = WCA2, status = FLAG.
+- Non-R0 dominance:
+
+  - n_escalate_total = 131939.
+  - n_types_escalate = 80.
+  - top_type = WCA2, top_n = 64922, top_share = 0.492061.
+  - flagged_types = WCA2, status = FLAG.
+- Reconciliation:
+
+  - Top type and top_n are unchanged. The denominator drops by 29, so top_share rises slightly.
+  - n_types_escalate drops by 1 because the SEF type had exactly 29 ESCALATE rows in R0 and drops out of the ESCALATE type table after Q1B.
+  - This is consistent with Q1 probe detail: types: SEF; labels: ESCALATE=29.
+
+Fixture results
+
+- All arms have 14 fixture rows.
+- All fixture rows have pass = TRUE.
+- The fixture-results hash in all arms is 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9, matching the frozen RB_fixture_results.csv hash.
+
+Cross-arm hash equalities
+
+- R0 equals frozen R-B 4/4:
+
+  - RB_classifications.csv: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 = frozen.
+  - RB_fixture_results.csv: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 = frozen.
+  - RB_kappa_grid_counts.csv: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a = frozen.
+  - RB_portfolio_counts.csv: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c = frozen.
+- PM_1, PM_12, PM_123, BATCH classifications hash: 5e4140dabac2472464ff37ce215a1c44b6b7d71a6b375a83e2e742f84f8f3b4a for all four.
+- PM_1, PM_12, PM_123, BATCH fixture-results hash: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 for all four.
+- PM_1, PM_12, PM_123, BATCH kappa-grid hash: 189e8009dcc43c6754c76b14daaa72e4980df4a5624c573f4b982d1b1cf0066d for all four.
+- PM_1, PM_12, PM_123, BATCH portfolio hash: abe261e723311b0b4553b398c1dd5f82a0ffb78f2f0a27edbea6ae8fb6fbeb4e for all four.
+- Therefore PM_123 and BATCH are byte-identical for the four R-B key outputs.
+
+Q-probe facts
+
+- Q1: arises TRUE, rows 29, detail types SEF; labels ESCALATE=29.
+- Q2: arises FALSE, rows 0, detail distinct source STATUS values: Open=245193.
+- Q3: arises FALSE, rows 0, detail DUPLICATE values: false=222176, true=23017.
+- Q4: arises TRUE, rows 64922, detail flagged WCA2; top share 0.491953 of 131968; ruled_answer_change_rows_report_only = 0.
+- Q5: arises TRUE, rows 222002, detail code pairs:
+
+  - dormant_ge_kappa_peer_p75 -> E_dormant_ge_kappa_p75: 131968
+  - thin_type_or_missing_peer -> I04_thin_peer_n: 6377
+  - within_type_dormancy -> S_dormant_lt_kappa_p75: 83657
+  - one-to-one: TRUE; ruled_answer_change_rows_report_only = 0.
+- Q5 pair frequencies sum to 131968 + 6377 + 83657 = 222002.
+
+Internal inconsistency flags
+
+- None found. The Q4 top share 0.491953 appears in the Q-probe against frozen R-B/R0, while non-R0 dominance shows 0.492061. These are consistent: the probe uses the frozen R0 denominator 131968, while non-R0 arms have denominator 131939 after the 29-row Q1B shift.
+
+4. Facts that cannot be recomputed from this packet
+
+- Full byte content of the large classifications CSVs is not included, so I cannot independently recompute every row-level change, every Q1 changed SR number, or every Q5 row-level wording difference.
+- Full source text of eval_c42.R and run_c42.ps1 is not included, only their SHA-256 hashes. I cannot re-execute the predicate or runner logic from source.
+- I cannot recompute the actual SHA-256 of the provided text blocks C42_RESULTS.md, C42_arms.csv, or C42_ARM_MANIFESTS.txt because encoding and line endings are not guaranteed from the packet; I can only compare the listed hashes against the frozen references.
+- I cannot independently recompute the PC preflight, R package versions, wall-clock timings, or file LastWriteTime values.
+- I cannot independently recompute the owner-answer, sheet, decisions, spec-freeze, or constitution hashes from raw files; only the listed hashes are available.
+
+5. P1 assessment against the frozen predicate in the SPEC
+
+- Condition 1: owner interruptions go down: batched < piecemeal.
+
+  - Piecemeal interruptions = 3: Q1, Q4, Q5 arise.
+  - Batched interruptions = 2: round A Q1–Q3, round B Q4–Q5.
+  - 2 < 3. MET.
+- Condition 2: repair rounds go down: batched < piecemeal.
+
+  - Gating questions: only Q1 is gating. Q1 answer B changes 29 output rows.
+  - Piecemeal repair rounds = 1.
+  - Batched repair rounds = 1.
+  - 1 < 1 is false. NOT MET.
+- Condition 3: nothing unresolved: 0 gating questions unanswered in the batched final output.
+
+  - Gating questions = Q1 only.
+  - Batched final output BATCH includes Q1B; Q1 change rows appear in BATCH vs R0.
+  - Unresolved count = 0. MET.
+- Condition 4: same answer either way: piecemeal and batched final outputs (4 R-B key outputs) are byte-identical.
+
+  - PM_123 and BATCH hashes match for RB_classifications.csv, RB_fixture_results.csv, RB_kappa_grid_counts.csv, RB_portfolio_counts.csv.
+  - MET.
+- Condition 5: validity: R0 equals the frozen R-B outputs 4/4.
+
+  - R0 matches frozen RB_classifications.csv, RB_fixture_results.csv, RB_kappa_grid_counts.csv, RB_portfolio_counts.csv.
+  - MET.
+- Overall mechanical predicate result in the runner output: P1 NOT MET, due to condition 2. INFO alternative reading “neither goes up and at least one goes down” is reported as met. No terminal state assigned.
+
+6. Blocking objections
+
+- None. I found no defect in the harness, seed, predicate application, or evidence that should block a verdict.
+
+7. Claim → evidence map  
+   | Claim | Evidence |  
+   |---|---|  
+   | R0 equals frozen R-B outputs 4/4. | C42_arms.csv row R0; R0 manifest hashes a0e42…, 0d722…, 7a18…, eb677… matching frozen reference hashes. |  
+   | Q1 arises on 29 ESCALATE SEF rows. | Q_FACTS.csv Q1 TRUE, rows 29, detail types SEF; labels ESCALATE=29. |  
+   | Q1B is gating and changes 29 rows. | PM_1 vs R0 portfolio delta: ESCALATE −29, INCONCLUSIVE +29; Q1 output_rows_changed_by_ruling = 29. |  
+   | Q2 does not arise. | Q_FACTS.csv Q2 FALSE, rows 0, distinct STATUS Open=245193; PM_12 vs PM_1 outputs identical. |  
+   | Q3 does not arise. | Q_FACTS.csv Q3 FALSE, rows 0, DUPLICATE values false/true only; PM_123 vs PM_12 outputs identical. |  
+   | Q4 arises but is not gating. | Q_FACTS.csv Q4 TRUE, rows 64922, flagged WCA2; ruled_answer_change_rows_report_only = 0; dom_check FLAG WCA2 on all arms. |  
+   | Q5 arises but is not gating. | Q_FACTS.csv Q5 TRUE, rows 222002; Q5_CODE_PAIRS one-to-one TRUE; ruled_answer_change_rows_report_only = 0. |  
+   | Piecemeal and batched final outputs are byte-identical. | PM_123 and BATCH share hashes 5e4140…, 0d722…, 189e8009…, abe261… for the four R-B key outputs. |  
+   | Condition 1 MET. | Piecemeal 3 interruptions, batched 2; C42_RESULTS condition 1 MET. |  
+   | Condition 2 NOT MET. | Piecemeal 1 repair round, batched 1 repair round; C42_RESULTS condition 2 NOT MET. |  
+   | Condition 3 MET. | Batched 0 gating questions unanswered; Q1B applied in BATCH; C42_RESULTS condition 3 MET. |  
+   | Condition 4 MET. | PM_123 and BATCH 4 R-B key output hashes identical; C42_RESULTS condition 4 MET. |  
+   | Condition 5 MET. | R0 4/4 frozen; C42_RESULTS condition 5 MET. |  
+   | No blocking objection found. | Internal cross-checks of counts, hashes, deltas, D-sets, Q-probe, and manifests are coherent. |
+
+END C42 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C42 ADJUDICATION'.

@@ -1,0 +1,13 @@
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed on DESKTOP-RPECRM9 2026-10-03 ~06:09 CDT (read-only)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv
+2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs/validated_action_list.csv
+ed8694277737989d301b9b1f7e6a06a2dbb87a2ad25254fd53b1db47d92c1ec2  3443  stage-05/run_deeper_analysis.R
+4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05/deeper/independent_checks_critical_counts.csv
+b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05/deeper/portfolio_summary.csv
+0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05/deeper/escalate_by_type.csv
+6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05/deeper/escalate_by_type_top25.csv
+f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05/deeper/inconclusive_by_clause.csv
+1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05/deeper/escalate_dormancy_summary.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05/deeper/kappa_sensitivity.csv
+4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05/deeper/capacity_coverage_note.csv

@@ -1,0 +1,34 @@
+{
+ "cid": "C05",
+ "role": "validator",
+ "source": "C05/C05-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 8957,
+ "source_sha256": "57ffb76819942d48ff2e2689e46eba340f3dfd98bd1d5d7b7685b43c808a214d",
+ "output": "C05/C05-validator/validator_report.md",
+ "output_bytes": 8954,
+ "output_sha256": "33dd453d448c004c0774eaf271a67eb47643543e7b75548e5e3fd068a4067b96",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [
+   1,
+   2,
+   3
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 05:02:35\nreply_complete=2026-10-09 05:11:35\n# reply_complete = first-seen (upper bound; page \"Thought for 65 seconds\" covers thinking only)"
+}

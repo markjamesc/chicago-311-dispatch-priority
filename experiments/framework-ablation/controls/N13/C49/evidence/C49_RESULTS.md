@@ -1,0 +1,31 @@
+# C49 RESULTS (mechanical; generated 2026-10-03 11:34:22 CDT)
+
+**Mechanical predicate result: PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 0. delivery sets valid (pre-chat): the zip holds byte-identical copies of the individual files and SHA256SUMS matches them | MET |
+| 1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file | PENDING |
+| 2. inventory hashes: DS_FILES and GPT_FILES list every evidence file with the SHA256SUMS hash | PENDING |
+| 3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP + 2 min (DS_ZIP not usable = met) | PENDING |
+
+## Arms
+| arm | exit | status | n_evidence_files | zip_entries | zip_bytes | files_bytes_total |
+|---|---|---|---|---|---|---|
+| CHECK | 0 | PASS | 9 | 10 | 9592 | 17323 |
+
+## DELIVERY_FILES.csv
+| file | bytes | sha256_listed | sha256_file | in_zip | sha256_zip |
+|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | 4051 | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 | TRUE | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 |
+| STAGE5_DEEPER_FINDINGS.md | 2007 | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 | TRUE | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 |
+| capacity_coverage_note.csv | 644 | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 | TRUE | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 |
+| escalate_by_type_top25.csv | 1264 | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 | TRUE | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 |
+| inconclusive_by_clause.csv | 58 | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d | TRUE | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d |
+| independent_checks_critical_counts.csv | 190 | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 | TRUE | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 |
+| kappa_sensitivity.csv | 164 | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | TRUE | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a |
+| portfolio_summary.csv | 183 | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 | TRUE | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 |
+| AI1_INTERPRETATION.md | 7929 | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 | TRUE | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 |
+| SHA256SUMS | 833 | NA | 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75 | TRUE | 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75 |
+

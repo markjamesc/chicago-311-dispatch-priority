@@ -1,0 +1,8 @@
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+FB_KGRID,0,0,R-B\outputs\RB_kappa_grid_counts.csv,R-B\outputs\RB_kappa_grid_counts.csv,kappa_sensitivity.csv,,,,,"R-B kappa grid regenerated after validation (kappa=3 row moves 1,500 rows)",TRUE,TRUE,FALSE
+FB_TF24,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,escalate_dormancy_summary.csv,,escalate_dormancy_summary.csv,,,R-A timing fields re-derived at T_freeze+24 h after validation; labels kept,TRUE,TRUE,FALSE
+FB_CLAUSE,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,inconclusive_by_clause.csv,,inconclusive_by_clause.csv,,,INCONCLUSIVE clause relabelled after validation (missing or <30-peer rows split out),TRUE,TRUE,FALSE
+FB_ROUND,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,escalate_dormancy_summary.csv,,escalate_dormancy_summary.csv,,,dormant_h rounded to whole hours after validation,TRUE,TRUE,FALSE
+FB_RECLASS,0,1,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,,,,,,10 INCONCLUSIVE labels edited to ESCALATE after validation,FALSE,TRUE,TRUE
+FB_VALSORT,0,0,outputs\validated_action_list.csv,outputs\validated_action_list.csv,,,,,,validated list re-sorted after validation (same rows; benign for Stage-5 outputs),FALSE,TRUE,FALSE

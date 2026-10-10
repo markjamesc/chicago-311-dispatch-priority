@@ -1,0 +1,1416 @@
+# C51 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the proposed addition is adopted: a declared reduced-scale real-data smoke run (1/16 then 1/4 of the frozen extract, non-reporting) becomes a required step before the full pipeline run.
+- REVERT: the addition is not adopted; the framework stays as is.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 apply to clean arm B: condition 4 = byte equality of its 7 key outputs with the FROZEN REFERENCE HASHES; condition 5 = its R-A and R-B fixture rows (all must pass). The seeded arms' effects are assessed through P1 (conditions 8–9).
+- Items the SPEC marks "not measured" (e.g. design minutes for C46, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Reduced-scale real-data smoke run (Addendum 02 #51)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C51 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. In C51 the R-A vs R-B pair is not reconciled; arm B is compared byte-for-byte with the 7 frozen key outputs, which already contain these three rows. N1 therefore cannot cause a C51 mismatch.
+---
+# SPEC
+# C51 — Ablation specification (FROZEN)
+
+**Ablation ID:** C51 (Addendum 02, candidate #51 "Reduced-scale real-data smoke run before the full pipeline")
+**Batch:** N13 batch 4 (controls C51, C46, C52; the only three of the 25 open controls that qualified under the owner's 2026-10-03 rules: no new data pulls, no design chat, no owner ruling, mechanical threshold)
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 execution (proposed addition)
+**Frozen at CT:** 2026-10-03, before the runner executed (runner `run_batch_v4.ps1`, evaluator `eval_b4.R`)
+
+## Control under test (proposed addition)
+Rule as it stands: preflight and the synthetic fixture harness pass, then the full pipeline runs. Proposed addition: a declared end-to-end smoke run on a fixed small subset of the frozen extract, before the full run. PricePoint evidence: R-B r2 (O(n²) loop, 43 min 43 s), r3 (renamed column at step 10, 22 min 13 s), r4 (object not found at output writing, 22 min 17 s) = 88 min 13 s of full runs.
+
+## Verdict convention (proposed addition)
+**KEEP = the smoke run is adopted as a required step before the full run. REVERT = it is not adopted; the framework stays as is.** HALT as in constitution §9.
+
+## Exact change being tested
+Variant = fixtures (inside `run_*.R all`), then a smoke run at 1/16 scale, then at 1/4 scale, then the full run. Baseline = the full run only.
+- **Declared subset rule** (`runner/seeds/common/make_subset.R`): header + every k-th data line of the frozen `src_open_candidates.csv` (data lines 1, 1+k, …; file order = SR_NUMBER order). k = 16 (15,325 rows) and k = 4. `src_peer_stats.csv` and `src_extract_lineage.csv` are copied unchanged.
+- Smoke roots live under `<CID>/smoke/<arm>_<path>_k<k>`, outside every arm root, and each carries `NON_REPORTING.txt`. **Smoke runs are real-data, non-reporting runs: they are never reconciled, never used as results and never enter a receipt.**
+- **Smoke failure (detection) rule:** k16 exits non-zero or hits its cap → detected at k16; else k4 exits non-zero, hits its cap, or t(k4)/t(k16) > 6 (more than 1.5× the linear 4× ratio) → detected at k4; else not detected.
+- Caps: smoke 600 s each; full run 1800 s (killed with `taskkill /T /F`; the capped time is used). All three runs are executed for every unit so both regimes can be costed from one execution.
+
+## Known open finding N1 / OF-1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). C51 does not reconcile R-A vs R-B; clean arm B is instead compared byte-for-byte with the 7 frozen key outputs, which already embed N1.
+
+## Arms (runner v4, `seeds/C51/SMOKE`)
+- **B**: frozen code, both paths (R-A, R-B): smoke k16, smoke k4, full.
+- **SM_QUADLOOP** (R-B): O(n²) full-frame subset loop after loading (PricePoint r2 analogue).
+- **SM_MIDCRASH** (R-B): selects a renamed column `.dormant_h` when writing classifications, after judging (r3 analogue).
+- **SM_OUTCRASH** (R-B): writes an undefined object `grid_out_final` at the last output, the kappa grid (r4 analogue).
+- **SM_RARECRASH** (R-B, outside H): stops on SR_SHORT_CODE = ODM (6 rows, none in either smoke subset). Subset-bias probe; counted in the time sum.
+Seeded arms run R-B only; diffs vs frozen `run_RB.R` are in the packet.
+
+## Time accounting (declared; seconds measured by the runner)
+- Baseline per seeded unit = seeded full run (or its cap) + clean full run (arm B, same path) as the rerun after the fix.
+- Variant per seeded unit = smoke time up to detection (k16; or k16 + k4) + clean smoke k16 + k4 + clean full run (arm B); if not detected: k16 + k4 + seeded full run + clean smoke + clean full run.
+- Arm B (clean code) per path: baseline = full run; variant = k16 + k4 + full (the smoke overhead is charged).
+
+## Operational benefit predicate P1 (Addendum 02 #51 success metric, made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. smoke detects SM_QUADLOOP, SM_MIDCRASH and SM_OUTCRASH (each at k16 or k4, i.e. before its full run);
+2. no false smoke flag on clean arm B (R-A and R-B);
+3. the summed time over all units (B R-A, B R-B, the four seeded arms) is lower under the variant than under the baseline;
+4. arm B's full-run 7 key outputs equal the frozen hashes below and no full-run manifest references a smoke path (no smoke output in any receipt).
+REVERT side: any of 1–4 fails. Disclosed limitation: the baseline cost of SM_QUADLOOP is bounded by the 1800 s cap, so the saving reported is a lower bound for that unit.
+
+## Regression / HALT rules
+- HALT if a run exit record is missing, if arm B's full run fails, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 conditions 4–7 apply to clean arm B: exact reconciliation = byte equality of its 7 key outputs with the frozen outputs; mandatory fixtures = its R-A and R-B fixture results (all must pass; they run inside `run_*.R all`).
+
+## Allowed source/data scope
+Frozen PC pack, read only, copied into the work folder. MySQL only for a read-only COUNT preflight. No internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `R-A/run_RA.R` SHA-256 `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-A/outputs/RA_fixture_results.csv` SHA-256 `33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-A/outputs/RA_portfolio_counts.csv` SHA-256 `b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+- `sql/01_source_extract.sql` SHA-256 `f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5`
+- `sql/02_source_gate_checks.sql` SHA-256 `ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59`
+**Runner-side files for this control (frozen list `runner/SEEDS_b4.sha256`; preflight gating):**
+- `runner/seeds/C51/ARMS.tsv` SHA-256 `73965b209e03978243dd910b916976d2a883012653003d4ebd12b4b549de03b8`
+- `runner/seeds/C51/RB_SM_MIDCRASH__run_RB.R` SHA-256 `f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1`
+- `runner/seeds/C51/RB_SM_OUTCRASH__run_RB.R` SHA-256 `87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d`
+- `runner/seeds/C51/RB_SM_QUADLOOP__run_RB.R` SHA-256 `7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23`
+- `runner/seeds/C51/RB_SM_RARECRASH__run_RB.R` SHA-256 `8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6`
+- `runner/seeds/C51/SMOKE` SHA-256 `ad911cfd289a54744ec4a112e7ac75df752a58d45d7c049fa0c1c5f9735c7198`
+- `runner/seeds/common/make_subset.R` SHA-256 `fac8f1dd0f3f08af6e9bb964102a6fd5d15be5ece105cafee7eaa2eeeb8008fe`
+- `runner/run_batch_v4.ps1` SHA-256 `6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e`
+- `runner/eval_b4.R` SHA-256 `cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above. This spec is hashed in `SPEC_FREEZE_b4.sha256` before execution.
+**Condition 4 (exact reconciliation) for arm B = these 7 frozen key outputs:** RA/RB classifications, RA/RB fixture results, RA/RB portfolio counts, RB kappa grid (listed above under `outputs`).
+
+## Pre-execution check (disclosed)
+Before this spec was frozen the runner pieces were exercised once on the PC in a scratch folder (`N13\_preflight_smoketest`, non-reporting): at k16, clean R-B exit 0 in 3.4 s; SM_MIDCRASH and SM_OUTCRASH exit 1; SM_RARECRASH exit 0; SM_QUADLOOP exit 0 in 20.1 s. No arm parameter, cap or rule was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+seed   OK   73965b209e03978243dd910b916976d2a883012653003d4ebd12b4b549de03b8 seeds/C51/ARMS.tsv
+seed   OK   f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1 seeds/C51/RB_SM_MIDCRASH__run_RB.R
+seed   OK   87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d seeds/C51/RB_SM_OUTCRASH__run_RB.R
+seed   OK   7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23 seeds/C51/RB_SM_QUADLOOP__run_RB.R
+seed   OK   8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6 seeds/C51/RB_SM_RARECRASH__run_RB.R
+seed   OK   ad911cfd289a54744ec4a112e7ac75df752a58d45d7c049fa0c1c5f9735c7198 seeds/C51/SMOKE
+seed   OK   fac8f1dd0f3f08af6e9bb964102a6fd5d15be5ece105cafee7eaa2eeeb8008fe seeds/common/make_subset.R
+seed   OK   6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e run_batch_v4.ps1
+seed   OK   cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396 eval_b4.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | glmnet 5.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104 ; 8.0.46
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 15139 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+73965b209e03978243dd910b916976d2a883012653003d4ebd12b4b549de03b8  779  runner/seeds/C51/ARMS.tsv
+f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1  5948  runner/seeds/C51/RB_SM_MIDCRASH__run_RB.R
+87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d  5951  runner/seeds/C51/RB_SM_OUTCRASH__run_RB.R
+7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23  6197  runner/seeds/C51/RB_SM_QUADLOOP__run_RB.R
+8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6  6096  runner/seeds/C51/RB_SM_RARECRASH__run_RB.R
+ad911cfd289a54744ec4a112e7ac75df752a58d45d7c049fa0c1c5f9735c7198  31  runner/seeds/C51/SMOKE
+fac8f1dd0f3f08af6e9bb964102a6fd5d15be5ece105cafee7eaa2eeeb8008fe  1133  runner/seeds/common/make_subset.R
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  16968  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  14883  runner/eval_b4.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b4.sha256` (written 2026-10-03 08:48 CDT before execution):
+dc9181715aba584bc545528d8d8c70280d2acfba6cd7c7954eed32e24333995e  C51/ABLATION_SPEC.md
+6920322b91d2fee391706a98ca7d0dc99f475dc137ad536ce9e5e47fee62e139  C46/ABLATION_SPEC.md
+961faf00c0cd426e4105bf1be2fcaa820c40983241bac7d4d3d88c443b9f7e74  C52/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C51/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C51/BASELINE_FRAMEWORK.sha256
+555492335ba7cfd7bbce46bbf45d74fd287ac37b91e66b6333f1a2d44808885e  runner/SEEDS_b4.sha256
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  runner/eval_b4.R
+9facda2784ea89dbac4f5428dd36002cd6084f01108d183261fd0b7c39dfe8c8  runner/make_seeds_b4.py
+f33399fb73a246ba9d4b39fa6f3c6a364b2a498439349d1e3ec82d8e970d50b0  runner/SEED_DIFFS_b4.txt
+347ee93e0ee79cec9f895e5af6e59d40f5aa147b7f5b647716dc636039f3c37a  tools_make_specs_b4.py
+# frozen 2026-10-03 08:48 CDT before execution
+
+---
+# RUN LOG (this control)
+08:49:29 C51 arms
+08:49:37   B_RA_k16 RA exit=0 secs=2.4 timeout=0
+08:49:48   B_RA_k4 RA exit=0 secs=4.4 timeout=0
+08:49:59   B RA exit=0 secs=11 timeout=0
+08:50:07   B_RB_k16 RB exit=0 secs=3.1 timeout=0
+08:50:20   B_RB_k4 RB exit=0 secs=7.8 timeout=0
+08:50:45   B RB exit=0 secs=25 timeout=0
+08:51:11   SM_QUADLOOP_RB_k16 RB exit=0 secs=19.4 timeout=0
+08:57:14   SM_QUADLOOP_RB_k4 RB exit=0 secs=357.7 timeout=0
+09:27:14   SM_QUADLOOP RB exit=TIMEOUT secs=1800.4 timeout=1
+09:27:22   SM_MIDCRASH_RB_k16 RB exit=1 secs=2.4 timeout=0
+09:27:34   SM_MIDCRASH_RB_k4 RB exit=1 secs=6.4 timeout=0
+09:27:53   SM_MIDCRASH RB exit=1 secs=18.5 timeout=0
+09:28:02   SM_OUTCRASH_RB_k16 RB exit=1 secs=3.4 timeout=0
+09:28:16   SM_OUTCRASH_RB_k4 RB exit=1 secs=8.2 timeout=0
+09:28:41   SM_OUTCRASH RB exit=1 secs=25.6 timeout=0
+09:28:50   SM_RARECRASH_RB_k16 RB exit=0 secs=2.9 timeout=0
+09:29:04   SM_RARECRASH_RB_k4 RB exit=0 secs=7.9 timeout=0
+09:29:10   SM_RARECRASH RB exit=1 secs=5.8 timeout=0
+
+---
+# C51_RESULTS.md (runner output)
+Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C51 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C51 arm folders at 2026-10-03 09:41 CDT (PC folder N13\_interim_b4), and assembled C51_ARM_MANIFESTS.txt and C51_EVIDENCE.sha256 with the runner's own manifest code. All C51 arms had finished (RUN LOG below) before this evaluation. The batch-end evaluation will be compared with this one and any difference other than the generation timestamp line will be reported.
+
+# C51 RESULTS (mechanical; generated 2026-10-03 09:41:54 CDT)
+
+**Mechanical predicate result: P1 MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| smoke catches SM_QUADLOOP, SM_MIDCRASH, SM_OUTCRASH (each detected at k16 or k4, i.e. before its full run) | MET |
+| no false smoke flag on clean arm B (R-A and R-B) | MET |
+| summed time over all arms (incl. B and SM_RARECRASH) lower under the variant | MET |
+| B full-run 7 key outputs equal the frozen hashes and no full-run manifest references a smoke path | MET |
+
+## Arms
+| arm | path | k16_exit | k16_s | k4_exit | k4_s | ratio_k4_k16 | full_exit | full_s | full_timeout | smoke_detects | baseline_s | variant_s |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| B | RA | 0 |  2.4 | 0 |   4.4 |  1.83 | 0 |   11.0 | FALSE | none |   11.0 |  17.8 |
+| B | RB | 0 |  3.1 | 0 |   7.8 |  2.52 | 0 |   25.0 | FALSE | none |   25.0 |  35.9 |
+| SM_QUADLOOP | RB | 0 | 19.4 | 0 | 357.7 | 18.44 | TIMEOUT | 1800.4 | TRUE | k4 | 1825.4 | 413.0 |
+| SM_MIDCRASH | RB | 1 |  2.4 | 1 |   6.4 | NA | 1 |   18.5 | FALSE | k16 |   43.5 |  38.3 |
+| SM_OUTCRASH | RB | 1 |  3.4 | 1 |   8.2 | NA | 1 |   25.6 | FALSE | k16 |   50.6 |  39.3 |
+| SM_RARECRASH | RB | 0 |  2.9 | 0 |   7.9 |  2.72 | 1 |    5.8 | FALSE | none |   30.8 |  52.5 |
+
+## Totals
+- baseline (no smoke) summed seconds: 1986.3
+- variant (smoke first) summed seconds: 596.8
+- SM_RARECRASH (outside H, subset-bias probe): smoke_detects=none, full_exit=1
+
+## B full-run key outputs vs frozen
+| file | frozen | arm_B | equal |
+|---|---|---|---|
+| R-A/outputs/RA_classifications.csv | c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 | c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 | TRUE |
+| R-B/outputs/RB_classifications.csv | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 | TRUE |
+| R-A/outputs/RA_fixture_results.csv | 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 | 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 | TRUE |
+| R-B/outputs/RB_fixture_results.csv | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 | TRUE |
+| R-A/outputs/RA_portfolio_counts.csv | b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 | b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 | TRUE |
+| R-B/outputs/RB_portfolio_counts.csv | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c | eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c | TRUE |
+| R-B/outputs/RB_kappa_grid_counts.csv | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | TRUE |
+
+---
+# C51_arms.csv (raw, full file)
+arm,path,k16_exit,k16_s,k4_exit,k4_s,ratio_k4_k16,full_exit,full_s,full_timeout,smoke_detects,baseline_s,variant_s
+B,RA,0,2.4,0,4.4,1.83,0,11,FALSE,none,11,17.8
+B,RB,0,3.1,0,7.8,2.52,0,25,FALSE,none,25,35.9
+SM_QUADLOOP,RB,0,19.4,0,357.7,18.44,TIMEOUT,1800.4,TRUE,k4,1825.4,412.99999999999994
+SM_MIDCRASH,RB,1,2.4,1,6.4,NA,1,18.5,FALSE,k16,43.5,38.3
+SM_OUTCRASH,RB,1,3.4,1,8.2,NA,1,25.6,FALSE,k16,50.6,39.3
+SM_RARECRASH,RB,0,2.9,0,7.9,2.72,1,5.8,FALSE,none,30.8,52.5
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/B/R-A/outputs/RA_fixture_results.csv
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+
+## arms/B/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/B/RUN_RA.exit
+0,11,2026-10-03T08:49:59-05:00,0,1800
+
+## arms/B/RUN_RB.exit
+0,25,2026-10-03T08:50:45-05:00,0,1800
+
+## arms/SM_MIDCRASH/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/SM_MIDCRASH/RUN_RB.exit
+1,18.5,2026-10-03T09:27:53-05:00,0,1800
+
+## arms/SM_OUTCRASH/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/SM_OUTCRASH/RUN_RB.exit
+1,25.6,2026-10-03T09:28:41-05:00,0,1800
+
+## arms/SM_QUADLOOP/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/SM_QUADLOOP/RUN_RB.exit
+TIMEOUT,1800.4,2026-10-03T09:27:14-05:00,1,1800
+
+## arms/SM_RARECRASH/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## arms/SM_RARECRASH/RUN_RB.exit
+1,5.8,2026-10-03T09:29:10-05:00,0,1800
+
+## smoke/B_RA_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/B_RA_k16/R-A/outputs/RA_fixture_results.csv
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+
+## smoke/B_RA_k16/RUN_RA.exit
+0,2.4,2026-10-03T08:49:37-05:00,0,600
+
+## smoke/B_RA_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/B_RA_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/B_RA_k4/R-A/outputs/RA_fixture_results.csv
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+
+## smoke/B_RA_k4/RUN_RA.exit
+0,4.4,2026-10-03T08:49:48-05:00,0,600
+
+## smoke/B_RA_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## smoke/B_RB_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/B_RB_k16/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/B_RB_k16/RUN_RB.exit
+0,3.1,2026-10-03T08:50:07-05:00,0,600
+
+## smoke/B_RB_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/B_RB_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/B_RB_k4/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/B_RB_k4/RUN_RB.exit
+0,7.8,2026-10-03T08:50:20-05:00,0,600
+
+## smoke/B_RB_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## smoke/SM_MIDCRASH_RB_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_MIDCRASH_RB_k16/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_MIDCRASH_RB_k16/RUN_RB.exit
+1,2.4,2026-10-03T09:27:22-05:00,0,600
+
+## smoke/SM_MIDCRASH_RB_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/SM_MIDCRASH_RB_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_MIDCRASH_RB_k4/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_MIDCRASH_RB_k4/RUN_RB.exit
+1,6.4,2026-10-03T09:27:34-05:00,0,600
+
+## smoke/SM_MIDCRASH_RB_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## smoke/SM_OUTCRASH_RB_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_OUTCRASH_RB_k16/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_OUTCRASH_RB_k16/RUN_RB.exit
+1,3.4,2026-10-03T09:28:02-05:00,0,600
+
+## smoke/SM_OUTCRASH_RB_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/SM_OUTCRASH_RB_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_OUTCRASH_RB_k4/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_OUTCRASH_RB_k4/RUN_RB.exit
+1,8.2,2026-10-03T09:28:16-05:00,0,600
+
+## smoke/SM_OUTCRASH_RB_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## smoke/SM_QUADLOOP_RB_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_QUADLOOP_RB_k16/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_QUADLOOP_RB_k16/RUN_RB.exit
+0,19.4,2026-10-03T08:51:11-05:00,0,600
+
+## smoke/SM_QUADLOOP_RB_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/SM_QUADLOOP_RB_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_QUADLOOP_RB_k4/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_QUADLOOP_RB_k4/RUN_RB.exit
+0,357.7,2026-10-03T08:57:14-05:00,0,600
+
+## smoke/SM_QUADLOOP_RB_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## smoke/SM_RARECRASH_RB_k16/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/16 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_RARECRASH_RB_k16/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_RARECRASH_RB_k16/RUN_RB.exit
+0,2.9,2026-10-03T09:28:50-05:00,0,600
+
+## smoke/SM_RARECRASH_RB_k16/SUBSET_stdout.txt
+subset k=16 data rows=15325 of 245193
+
+## smoke/SM_RARECRASH_RB_k4/NON_REPORTING.txt
+SMOKE RUN - NON-REPORTING. 1/4 subset of the frozen extract (declared rule in runner/seeds/common/make_subset.R). Never reconciled, never used as a result.
+
+## smoke/SM_RARECRASH_RB_k4/R-B/outputs/RB_fixture_results.csv
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+
+## smoke/SM_RARECRASH_RB_k4/RUN_RB.exit
+0,7.9,2026-10-03T09:29:04-05:00,0,600
+
+## smoke/SM_RARECRASH_RB_k4/SUBSET_stdout.txt
+subset k=4 data rows=61299 of 245193
+
+## arms/B/RUN_RA.stderr.txt (last 6 non-empty lines of 9)
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/B/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/B/R-A/outputs/RA_fixture_results.csv pass=14/14
+open_n=245193 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/B/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/B/R-A/outputs/RA_portfolio_counts.csv
+R-A done. mode=all
+
+## arms/B/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/B/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/SM_MIDCRASH/RUN_RB.stderr.txt (last 6 non-empty lines of 16)
+Error in `[.data.frame`(labeled, , c("SR_NUMBER", "type_key", "classification",  : 
+  undefined columns selected
+Calls: run_production -> [ -> [.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## arms/SM_OUTCRASH/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+Error in run_production() : object 'grid_out_final' not found
+Calls: run_production ... <Anonymous> -> write_delim -> stopifnot -> is.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## arms/SM_QUADLOOP/RUN_RB.stderr.txt (last 6 non-empty lines of 9)
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/arms/SM_QUADLOOP/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03→STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+
+## arms/SM_RARECRASH/RUN_RB.stderr.txt (last 6 non-empty lines of 13)
+[R-B] source CSVs present
+[R-B] loading open candidates...
+Error: unhandled SR_SHORT_CODE ODM in normalization
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## smoke/B_RA_k16/RUN_RA.stderr.txt (last 6 non-empty lines of 9)
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k16/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k16/R-A/outputs/RA_fixture_results.csv pass=14/14
+open_n=15325 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k16/R-A/outputs/RA_classifications.csv n=13891
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k16/R-A/outputs/RA_portfolio_counts.csv
+R-A done. mode=all
+
+## smoke/B_RA_k4/RUN_RA.stderr.txt (last 6 non-empty lines of 9)
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k4/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k4/R-A/outputs/RA_fixture_results.csv pass=14/14
+open_n=61299 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k4/R-A/outputs/RA_classifications.csv n=55482
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RA_k4/R-A/outputs/RA_portfolio_counts.csv
+R-A done. mode=all
+
+## smoke/B_RB_k16/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=13891 ESCALATE=8185 INCONCLUSIVE=394 STANDARD=5312
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RB_k16/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## smoke/B_RB_k4/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=55482 ESCALATE=32905 INCONCLUSIVE=1610 STANDARD=20967
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/B_RB_k4/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## smoke/SM_MIDCRASH_RB_k16/RUN_RB.stderr.txt (last 6 non-empty lines of 16)
+Error in `[.data.frame`(labeled, , c("SR_NUMBER", "type_key", "classification",  : 
+  undefined columns selected
+Calls: run_production -> [ -> [.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## smoke/SM_MIDCRASH_RB_k4/RUN_RB.stderr.txt (last 6 non-empty lines of 16)
+Error in `[.data.frame`(labeled, , c("SR_NUMBER", "type_key", "classification",  : 
+  undefined columns selected
+Calls: run_production -> [ -> [.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## smoke/SM_OUTCRASH_RB_k16/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=13891 ESCALATE=8185 INCONCLUSIVE=394 STANDARD=5312
+Error in run_production() : object 'grid_out_final' not found
+Calls: run_production ... <Anonymous> -> write_delim -> stopifnot -> is.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## smoke/SM_OUTCRASH_RB_k4/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=55482 ESCALATE=32905 INCONCLUSIVE=1610 STANDARD=20967
+Error in run_production() : object 'grid_out_final' not found
+Calls: run_production ... <Anonymous> -> write_delim -> stopifnot -> is.data.frame
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted
+
+## smoke/SM_QUADLOOP_RB_k16/RUN_RB.stderr.txt (last 6 non-empty lines of 19)
+[R-B] portfolio: decision=13891 ESCALATE=8185 INCONCLUSIVE=394 STANDARD=5312
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/SM_QUADLOOP_RB_k16/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## smoke/SM_QUADLOOP_RB_k4/RUN_RB.stderr.txt (last 6 non-empty lines of 19)
+[R-B] portfolio: decision=55482 ESCALATE=32905 INCONCLUSIVE=1610 STANDARD=20967
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/SM_QUADLOOP_RB_k4/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## smoke/SM_RARECRASH_RB_k16/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=13891 ESCALATE=8185 INCONCLUSIVE=394 STANDARD=5312
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/SM_RARECRASH_RB_k16/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## smoke/SM_RARECRASH_RB_k4/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=55482 ESCALATE=32905 INCONCLUSIVE=1610 STANDARD=20967
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C51/smoke/SM_RARECRASH_RB_k4/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+
+---
+# C51_EVIDENCE.sha256
+1583a01f75d052fa5cea7f1dd9bcf6594609fb661675d9758603a45b35d0d75d  C51_ARM_MANIFESTS.txt
+8cb7170c3b002cfe4871ee1a5f74bda994b92ec82f30f41aa2b7f80424e5142e  C51_arms.csv
+48f53852f1d80026059389a589872cf4f3b72e04c51349e29c69a2b539b3fc14  C51_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm and smoke root
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root; prefix 'smoke/<arm>_<path>_k<k>' = a non-reporting smoke root (C51 only). Bulky data copies are listed by hash and size only.
+arms/B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+arms/B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+arms/B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+arms/B out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+arms/B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/B out :: 33109088dd24efe56023f898e632d9e950b2d18dcd6894bb72ddb34d0178c0f4  39  RUN_RA.exit
+arms/B out :: 4086add8826ed5200099a61a55b789a3e42d90935f835483538d4ab04ab16d78  779  RUN_RA.stderr.txt
+arms/B out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+arms/B out :: ca5a2c66c7378466987b8ce46dcce12a1a6d46d392cd705371fbfbd2ac8cdf27  39  RUN_RB.exit
+arms/B out :: 555067be59915f3aac875a09477f6867573ee42a2aeb90e50a862bb4309bb0d1  1260  RUN_RB.stderr.txt
+arms/B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SM_MIDCRASH in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SM_MIDCRASH in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SM_MIDCRASH in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SM_MIDCRASH in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SM_MIDCRASH in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/SM_MIDCRASH in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SM_MIDCRASH in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SM_MIDCRASH in  :: f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1  5948  R-B\run_RB.R
+arms/SM_MIDCRASH out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SM_MIDCRASH out :: a24a34b64a772c561f00b6b2b57682781c66bbca8535009e7eebd41293c4fbc5  41  RUN_RB.exit
+arms/SM_MIDCRASH out :: 399b9007b289bfe8c1ab08bb1619cba4921c73868be4e23bbb2c5bfea2426032  932  RUN_RB.stderr.txt
+arms/SM_MIDCRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SM_OUTCRASH in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SM_OUTCRASH in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SM_OUTCRASH in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SM_OUTCRASH in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SM_OUTCRASH in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/SM_OUTCRASH in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SM_OUTCRASH in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SM_OUTCRASH in  :: 87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d  5951  R-B\run_RB.R
+arms/SM_OUTCRASH out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/SM_OUTCRASH out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SM_OUTCRASH out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/SM_OUTCRASH out :: e5beaea1d55239e1a8cd8633c6dd80e8dcf0646c01d26a61e275beef5ae616f8  41  RUN_RB.exit
+arms/SM_OUTCRASH out :: 8017cb31c20face1a57007292037bfe939885e1433406403404c9c90259b6d7e  1283  RUN_RB.stderr.txt
+arms/SM_OUTCRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SM_QUADLOOP in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SM_QUADLOOP in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SM_QUADLOOP in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SM_QUADLOOP in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SM_QUADLOOP in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/SM_QUADLOOP in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SM_QUADLOOP in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SM_QUADLOOP in  :: 7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23  6197  R-B\run_RB.R
+arms/SM_QUADLOOP out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SM_QUADLOOP out :: ddf02ddecf2cbf760d78e575f5dfa3b2097272ac8a1f88021f2dbb78d9b39bea  49  RUN_RB.exit
+arms/SM_QUADLOOP out :: b30ac6949864fa789f069dacf88b6c5908c944e44a4149ecd197c749bb604a5b  551  RUN_RB.stderr.txt
+arms/SM_QUADLOOP out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SM_RARECRASH in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SM_RARECRASH in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SM_RARECRASH in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SM_RARECRASH in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SM_RARECRASH in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/SM_RARECRASH in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SM_RARECRASH in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SM_RARECRASH in  :: 8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6  6096  R-B\run_RB.R
+arms/SM_RARECRASH out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SM_RARECRASH out :: f80e1debdbf0489fac3b772df91fa6e5b32c03a38d7d31d8d1487140c4f72398  40  RUN_RB.exit
+arms/SM_RARECRASH out :: bb430385128dc25fc9c3848c26915952d8d8876859c8cb6e29eef0f84a721997  792  RUN_RB.stderr.txt
+arms/SM_RARECRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/B_RA_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/B_RA_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/B_RA_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/B_RA_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/B_RA_k16 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+smoke/B_RA_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/B_RA_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/B_RA_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/B_RA_k16 out :: 47058b6e2182a3466b79dedb5c51162bad903145cb97c1c015483146a826263c  1393394  R-A\outputs\RA_classifications.csv
+smoke/B_RA_k16 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+smoke/B_RA_k16 out :: 62495265ab2bb699cf4d3a7c355ab99d6aba553d97cf1f4722fc9ae386baf4e4  135  R-A\outputs\RA_portfolio_counts.csv
+smoke/B_RA_k16 out :: 68428508525730fd31e780256e81f2fa00f69229869b61b9694a65f6206ab075  39  RUN_RA.exit
+smoke/B_RA_k16 out :: e9cc0eb78f8071f0d76908e22b0ae60054f68849f923882bfc21aa3f862f1fba  833  RUN_RA.stderr.txt
+smoke/B_RA_k16 out :: 091026a493395709bba7b31e61960330aa4dccf8b968fe52ab20914cab59dcac  1361  RUN_RA.stdout.txt
+smoke/B_RA_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/B_RA_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/B_RA_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/B_RA_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/B_RA_k4 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+smoke/B_RA_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/B_RA_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/B_RA_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/B_RA_k4 out :: ac85e392f2cba461883c19e8a8a6c7673613757b9ebdce554cf3db44686dedca  5565964  R-A\outputs\RA_classifications.csv
+smoke/B_RA_k4 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+smoke/B_RA_k4 out :: d282f04ffd87ec02ad0e8e3c6acb86c317f7047720d20b8f5d81f58adcf975d6  138  R-A\outputs\RA_portfolio_counts.csv
+smoke/B_RA_k4 out :: 1c3aed061b2c9cc926a7bd787ab83506db1a4a7e8e850612b34e5699d1664ac4  39  RUN_RA.exit
+smoke/B_RA_k4 out :: 195687c794d92feb5b61848b5bb52783bf8ddf985b1607baf4fdc86ea61a357a  826  RUN_RA.stderr.txt
+smoke/B_RA_k4 out :: 53944af3a9823025ceca1f8daa1b68a025afbf3bc7e1a4a6bafddc1e8eccdef4  1361  RUN_RA.stdout.txt
+smoke/B_RB_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/B_RB_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/B_RB_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/B_RB_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/B_RB_k16 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/B_RB_k16 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/B_RB_k16 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/B_RB_k16 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/B_RB_k16 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+smoke/B_RB_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/B_RB_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/B_RB_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/B_RB_k16 out :: 52746de0940cb49a9e1cf49a6377cd0bd5bcd866d702228ec19ca6c4c2d1b876  2626680  R-B\outputs\RB_classifications.csv
+smoke/B_RB_k16 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/B_RB_k16 out :: 53201f7582345c31f0dde98a95074f9f7c2384d2d1dbb02dadb7ef14de5c2eb6  144  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/B_RB_k16 out :: 0f9521920905b732d4eeae0e842374db56c256b80cdd09f4f4e17737343ede70  94  R-B\outputs\RB_portfolio_counts.csv
+smoke/B_RB_k16 out :: f59777eeeefd85f3bde1547c5d5a966e7c778746af917df3ecb5ff712436954d  39  RUN_RB.exit
+smoke/B_RB_k16 out :: 01122dd1535e637c15819585835713626baf028353df7219d07500a85afc9bff  1293  RUN_RB.stderr.txt
+smoke/B_RB_k16 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/B_RB_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/B_RB_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/B_RB_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/B_RB_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/B_RB_k4 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/B_RB_k4 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/B_RB_k4 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/B_RB_k4 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/B_RB_k4 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+smoke/B_RB_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/B_RB_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/B_RB_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/B_RB_k4 out :: 52b3224d38534d5591d9817c37a8049f72da8298844239aa9ba44eeda1ba3600  10487064  R-B\outputs\RB_classifications.csv
+smoke/B_RB_k4 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/B_RB_k4 out :: 9d92bc77157a2adce0374a329b1b5817e5f70d1fdf0513bb756c9f6ecd65892a  156  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/B_RB_k4 out :: 13cfb1e1455424f9817f7ca6bc8400c68d94e7b20c26aa2ba4f07e2dfe80141f  97  R-B\outputs\RB_portfolio_counts.csv
+smoke/B_RB_k4 out :: 3b343f53aef21fe50e135ed9110fac23635f6e3655d261b90565a3bd42ca7f6e  39  RUN_RB.exit
+smoke/B_RB_k4 out :: c818ca98ef125a816eb4cb11758c898a85ff65a1f21c605e2165e0cd6e4804d7  1291  RUN_RB.stderr.txt
+smoke/B_RB_k4 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_MIDCRASH_RB_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_MIDCRASH_RB_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/SM_MIDCRASH_RB_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_MIDCRASH_RB_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_MIDCRASH_RB_k16 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_MIDCRASH_RB_k16 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_MIDCRASH_RB_k16 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_MIDCRASH_RB_k16 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_MIDCRASH_RB_k16 in  :: f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1  5948  R-B\run_RB.R
+smoke/SM_MIDCRASH_RB_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_MIDCRASH_RB_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/SM_MIDCRASH_RB_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_MIDCRASH_RB_k16 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_MIDCRASH_RB_k16 out :: 6aa416a462290dff7bf2be3e36daf0f09d1f721384d8b0952671875285527a78  39  RUN_RB.exit
+smoke/SM_MIDCRASH_RB_k16 out :: 885e4c91963da2367aaa6838f3c2529254be30f9aeff867b20a4d93b33dc0227  947  RUN_RB.stderr.txt
+smoke/SM_MIDCRASH_RB_k16 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_MIDCRASH_RB_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_MIDCRASH_RB_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/SM_MIDCRASH_RB_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_MIDCRASH_RB_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_MIDCRASH_RB_k4 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_MIDCRASH_RB_k4 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_MIDCRASH_RB_k4 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_MIDCRASH_RB_k4 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_MIDCRASH_RB_k4 in  :: f36a9b5dcf9144c9a1c251499c90f1134079948c30661272f435a2bced9fc1a1  5948  R-B\run_RB.R
+smoke/SM_MIDCRASH_RB_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_MIDCRASH_RB_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/SM_MIDCRASH_RB_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_MIDCRASH_RB_k4 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_MIDCRASH_RB_k4 out :: 146003375682b07118bfc393361d877526520c5c29783d9529d67809346b707a  39  RUN_RB.exit
+smoke/SM_MIDCRASH_RB_k4 out :: 0452298c49e56687d621377b9b5dfb382d62a6629fe2dc2701ca7bbac631e9fb  945  RUN_RB.stderr.txt
+smoke/SM_MIDCRASH_RB_k4 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_OUTCRASH_RB_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_OUTCRASH_RB_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/SM_OUTCRASH_RB_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_OUTCRASH_RB_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_OUTCRASH_RB_k16 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_OUTCRASH_RB_k16 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_OUTCRASH_RB_k16 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_OUTCRASH_RB_k16 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_OUTCRASH_RB_k16 in  :: 87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d  5951  R-B\run_RB.R
+smoke/SM_OUTCRASH_RB_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_OUTCRASH_RB_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/SM_OUTCRASH_RB_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_OUTCRASH_RB_k16 out :: 52746de0940cb49a9e1cf49a6377cd0bd5bcd866d702228ec19ca6c4c2d1b876  2626680  R-B\outputs\RB_classifications.csv
+smoke/SM_OUTCRASH_RB_k16 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_OUTCRASH_RB_k16 out :: 0f9521920905b732d4eeae0e842374db56c256b80cdd09f4f4e17737343ede70  94  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_OUTCRASH_RB_k16 out :: d193a1e670d38c1322b6eee1ce1612d56f1de01221d0815aff1e9b1c7af0ef2e  39  RUN_RB.exit
+smoke/SM_OUTCRASH_RB_k16 out :: c8621d7eeb3726d610efde86cba5efb8eb1bbcf70e8d9e4151b5230fa4be323c  1308  RUN_RB.stderr.txt
+smoke/SM_OUTCRASH_RB_k16 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_OUTCRASH_RB_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_OUTCRASH_RB_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/SM_OUTCRASH_RB_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_OUTCRASH_RB_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_OUTCRASH_RB_k4 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_OUTCRASH_RB_k4 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_OUTCRASH_RB_k4 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_OUTCRASH_RB_k4 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_OUTCRASH_RB_k4 in  :: 87ec66e12aa7473e46203fd961b2714e6f8722c2db9f246e4893d1ba838ae89d  5951  R-B\run_RB.R
+smoke/SM_OUTCRASH_RB_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_OUTCRASH_RB_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/SM_OUTCRASH_RB_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_OUTCRASH_RB_k4 out :: 52b3224d38534d5591d9817c37a8049f72da8298844239aa9ba44eeda1ba3600  10487064  R-B\outputs\RB_classifications.csv
+smoke/SM_OUTCRASH_RB_k4 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_OUTCRASH_RB_k4 out :: 13cfb1e1455424f9817f7ca6bc8400c68d94e7b20c26aa2ba4f07e2dfe80141f  97  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_OUTCRASH_RB_k4 out :: a805675251c437afce6e72cdf211c256625d77a0e0dad2e7e55e5162de6559a2  39  RUN_RB.exit
+smoke/SM_OUTCRASH_RB_k4 out :: 1c11a06212c22a09f86dffb3718fc95a993fb5eeb6272baf11df721636a32282  1307  RUN_RB.stderr.txt
+smoke/SM_OUTCRASH_RB_k4 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_QUADLOOP_RB_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_QUADLOOP_RB_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/SM_QUADLOOP_RB_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_QUADLOOP_RB_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_QUADLOOP_RB_k16 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_QUADLOOP_RB_k16 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_QUADLOOP_RB_k16 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_QUADLOOP_RB_k16 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_QUADLOOP_RB_k16 in  :: 7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23  6197  R-B\run_RB.R
+smoke/SM_QUADLOOP_RB_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_QUADLOOP_RB_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/SM_QUADLOOP_RB_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_QUADLOOP_RB_k16 out :: 52746de0940cb49a9e1cf49a6377cd0bd5bcd866d702228ec19ca6c4c2d1b876  2626680  R-B\outputs\RB_classifications.csv
+smoke/SM_QUADLOOP_RB_k16 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_QUADLOOP_RB_k16 out :: 53201f7582345c31f0dde98a95074f9f7c2384d2d1dbb02dadb7ef14de5c2eb6  144  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/SM_QUADLOOP_RB_k16 out :: 0f9521920905b732d4eeae0e842374db56c256b80cdd09f4f4e17737343ede70  94  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_QUADLOOP_RB_k16 out :: e6846cc059faa0eed6b7204fd4330e0965785335ffee9dd2780e5e2cb68ab0c4  40  RUN_RB.exit
+smoke/SM_QUADLOOP_RB_k16 out :: d64736f2fa6ad53f36433791588d795eeb35439c0a3829b22eb176fb003fc8a4  1386  RUN_RB.stderr.txt
+smoke/SM_QUADLOOP_RB_k16 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_QUADLOOP_RB_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_QUADLOOP_RB_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/SM_QUADLOOP_RB_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_QUADLOOP_RB_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_QUADLOOP_RB_k4 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_QUADLOOP_RB_k4 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_QUADLOOP_RB_k4 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_QUADLOOP_RB_k4 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_QUADLOOP_RB_k4 in  :: 7832b7176bb1520baa1da896614ef96290400746bca8d84a48c49c936a81fa23  6197  R-B\run_RB.R
+smoke/SM_QUADLOOP_RB_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_QUADLOOP_RB_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/SM_QUADLOOP_RB_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_QUADLOOP_RB_k4 out :: 52b3224d38534d5591d9817c37a8049f72da8298844239aa9ba44eeda1ba3600  10487064  R-B\outputs\RB_classifications.csv
+smoke/SM_QUADLOOP_RB_k4 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_QUADLOOP_RB_k4 out :: 9d92bc77157a2adce0374a329b1b5817e5f70d1fdf0513bb756c9f6ecd65892a  156  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/SM_QUADLOOP_RB_k4 out :: 13cfb1e1455424f9817f7ca6bc8400c68d94e7b20c26aa2ba4f07e2dfe80141f  97  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_QUADLOOP_RB_k4 out :: 92d3fe32bcc3597f4df73629f041cfe46b3ce90a4a52bbfa7f42b6e6425f9d33  41  RUN_RB.exit
+smoke/SM_QUADLOOP_RB_k4 out :: ed1cf89f0ffc84a9b89dc695daab14ce14b10491d1f338b2ea1147162b0d44c9  1384  RUN_RB.stderr.txt
+smoke/SM_QUADLOOP_RB_k4 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_RARECRASH_RB_k16 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_RARECRASH_RB_k16 in  :: 4805230360a77fee93753e6fcd12a7dd7fdd9384aabfb2719366866916bdf276  7403153  data\source\src_open_candidates.csv
+smoke/SM_RARECRASH_RB_k16 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_RARECRASH_RB_k16 in  :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_RARECRASH_RB_k16 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_RARECRASH_RB_k16 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_RARECRASH_RB_k16 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_RARECRASH_RB_k16 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_RARECRASH_RB_k16 in  :: 8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6  6096  R-B\run_RB.R
+smoke/SM_RARECRASH_RB_k16 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_RARECRASH_RB_k16 in  :: f0df2d27206aa6e73539bae35d7cbcb9973e59f48efaddad005fc6ab264e811d  39  SUBSET_stdout.txt
+smoke/SM_RARECRASH_RB_k16 out :: 32cd3778e6758b2e12e03f4781b040833f0370c97e5b67a8228f03d8c55638cf  161  NON_REPORTING.txt
+smoke/SM_RARECRASH_RB_k16 out :: 52746de0940cb49a9e1cf49a6377cd0bd5bcd866d702228ec19ca6c4c2d1b876  2626680  R-B\outputs\RB_classifications.csv
+smoke/SM_RARECRASH_RB_k16 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_RARECRASH_RB_k16 out :: 53201f7582345c31f0dde98a95074f9f7c2384d2d1dbb02dadb7ef14de5c2eb6  144  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/SM_RARECRASH_RB_k16 out :: 0f9521920905b732d4eeae0e842374db56c256b80cdd09f4f4e17737343ede70  94  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_RARECRASH_RB_k16 out :: d383716cc47dba497f47d8c936c0890e024cf554e4ffef2f34be4eefcc2ec849  39  RUN_RB.exit
+smoke/SM_RARECRASH_RB_k16 out :: 0f494109d35a2c6d5d4701845fa262fd2901ba997288a6ef1c73dde33da94345  1348  RUN_RB.stderr.txt
+smoke/SM_RARECRASH_RB_k16 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+smoke/SM_RARECRASH_RB_k4 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+smoke/SM_RARECRASH_RB_k4 in  :: 4f66865efa41a64a2e5928da2c989b39a40e5ef5f8d44e6fd2b321ada3d6cf45  29606917  data\source\src_open_candidates.csv
+smoke/SM_RARECRASH_RB_k4 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+smoke/SM_RARECRASH_RB_k4 in  :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_RARECRASH_RB_k4 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+smoke/SM_RARECRASH_RB_k4 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+smoke/SM_RARECRASH_RB_k4 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+smoke/SM_RARECRASH_RB_k4 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+smoke/SM_RARECRASH_RB_k4 in  :: 8afb11ce4f7af87b5cf5c4712cef52ca63b3c02f724952c6ecdcb958611a10b6  6096  R-B\run_RB.R
+smoke/SM_RARECRASH_RB_k4 in  :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  SUBSET_stderr.txt
+smoke/SM_RARECRASH_RB_k4 in  :: d2ef37a088607031d2e535cdf1834e241ccc32536e55e3fb4605725cf63f260c  38  SUBSET_stdout.txt
+smoke/SM_RARECRASH_RB_k4 out :: a94c86b31b186a7b9eade61fb8c609b7e2ad4d69eded42730b82de758fe4213b  160  NON_REPORTING.txt
+smoke/SM_RARECRASH_RB_k4 out :: 52b3224d38534d5591d9817c37a8049f72da8298844239aa9ba44eeda1ba3600  10487064  R-B\outputs\RB_classifications.csv
+smoke/SM_RARECRASH_RB_k4 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+smoke/SM_RARECRASH_RB_k4 out :: 9d92bc77157a2adce0374a329b1b5817e5f70d1fdf0513bb756c9f6ecd65892a  156  R-B\outputs\RB_kappa_grid_counts.csv
+smoke/SM_RARECRASH_RB_k4 out :: 13cfb1e1455424f9817f7ca6bc8400c68d94e7b20c26aa2ba4f07e2dfe80141f  97  R-B\outputs\RB_portfolio_counts.csv
+smoke/SM_RARECRASH_RB_k4 out :: e45ccc7b9389b34c04c2f7bbb781e71b73c67f6dea79a0c00fe430759d33c692  39  RUN_RB.exit
+smoke/SM_RARECRASH_RB_k4 out :: 0a04e4d81b973a91a78e1ca9f62fe2128feaf6f1e7978eb96ea1ea49322862e9  1346  RUN_RB.stderr.txt
+smoke/SM_RARECRASH_RB_k4 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+--- frozen/R-B/run_RB.R
++++ seeds/C51/RB_SM_QUADLOOP__run_RB.R
+@@ -97,6 +97,9 @@
+   open_raw <- rb_read_csv_flex(paths$open_csv)
+   peer_raw <- rb_read_csv_flex(paths$peer_csv)
+   open_df <- rb_normalize_open(open_raw)
++  # [seed C51 SM_QUADLOOP] per-row same-type count via a full-frame subset each row: O(n^2) (PricePoint R-B r2 pattern)
++  same_type_n <- vapply(seq_len(nrow(open_df)), function(i) nrow(open_df[open_df$type_key %in% open_df$type_key[i], , drop = FALSE]), integer(1))
++  message("[R-B] same_type_n computed for ", length(same_type_n), " rows")
+   peer_df <- rb_normalize_peers(peer_raw)
+   message("[R-B] open n=", nrow(open_df), " peer types=", nrow(peer_df))
+ 
+
+--- frozen/R-B/run_RB.R
++++ seeds/C51/RB_SM_MIDCRASH__run_RB.R
+@@ -107,7 +107,7 @@
+   # Critical recon columns + audit
+   class_out <- labeled[, c(
+     "SR_NUMBER", "type_key", "classification", "evidence_reason",
+-    "dormant_h", "open_age_h", "peer_n", "peer_p75_h", "peer_p50_h",
++    ".dormant_h", "open_age_h", "peer_n", "peer_p75_h", "peer_p50_h",  # [seed C51 SM_MIDCRASH] renamed column consumed mid-pipeline (PricePoint R-B r3 pattern)
+     "kappa", "integrity_clause", "rule_version", "design_version"
+   )]
+   write_csv_rb(class_out, file.path(paths$out_dir, "RB_classifications.csv"))
+
+--- frozen/R-B/run_RB.R
++++ seeds/C51/RB_SM_OUTCRASH__run_RB.R
+@@ -122,7 +122,7 @@
+   grid <- rb_kappa_grid_counts(open_df, peer_df, grid = RB_KAPPA_GRID, t_freeze = RB_T_FREEZE)
+   # Counts-only diagnostic table
+   grid_out <- grid[, c("kappa", "n_decision", "n_ESCALATE", "n_INCONCLUSIVE", "n_STANDARD")]
+-  write_csv_rb(grid_out, file.path(paths$out_dir, "RB_kappa_grid_counts.csv"))
++  write_csv_rb(grid_out_final, file.path(paths$out_dir, "RB_kappa_grid_counts.csv"))  # [seed C51 SM_OUTCRASH] object not found at output writing (PricePoint R-B r4 pattern)
+   message("[R-B] kappa grid written for {", paste(RB_KAPPA_GRID, collapse = ", "), "}")
+ 
+   invisible(list(judged = judged, portfolio = port, grid = grid_out))
+
+--- frozen/R-B/run_RB.R
++++ seeds/C51/RB_SM_RARECRASH__run_RB.R
+@@ -96,6 +96,8 @@
+   message("[R-B] loading open candidates...")
+   open_raw <- rb_read_csv_flex(paths$open_csv)
+   peer_raw <- rb_read_csv_flex(paths$peer_csv)
++  # [seed C51 SM_RARECRASH] unhandled rare value: SR_SHORT_CODE ODM (6 rows in the frozen extract, none in the smoke subsets)
++  if (any(open_raw$SR_SHORT_CODE %in% "ODM")) stop("unhandled SR_SHORT_CODE ODM in normalization", call. = FALSE)
+   open_df <- rb_normalize_open(open_raw)
+   peer_df <- rb_normalize_peers(peer_raw)
+   message("[R-B] open n=", nrow(open_df), " peer types=", nrow(peer_df))
+
+### seeds/C51/ARMS.tsv (new file, 779 bytes)
+arm	paths	code_seeds	desc
+SM_QUADLOOP	RB	seeds/C51/RB_SM_QUADLOOP__run_RB.R>R-B\run_RB.R	R-B adds an O(n^2) per-row full-frame subset loop after loading (PricePoint R-B r2: O(n^2) per-row loop, full run stopped at 43 min)
+SM_MIDCRASH	RB	seeds/C51/RB_SM_MIDCRASH__run_RB.R>R-B\run_RB.R	R-B selects a renamed column '.dormant_h' when writing classifications, after judging (PricePoint R-B r3: renamed column, EXIT 1 at step 10)
+SM_OUTCRASH	RB	seeds/C51/RB_SM_OUTCRASH__run_RB.R>R-B\run_RB.R	R-B writes an undefined object at the last output (kappa grid) (PricePoint R-B r4: object not found at output writing)
+SM_RARECRASH	RB	seeds/C51/RB_SM_RARECRASH__run_RB.R>R-B\run_RB.R	R-B stops on a rare SR_SHORT_CODE (ODM, 6 rows, none in the 1/4 or 1/16 smoke subsets): subset-bias probe
+
+### seeds/C51/SMOKE (new file, 31 bytes)
+C51 smoke-run arms (runner v4)
+
+### seeds/common/make_subset.R (new file, 1133 bytes)
+#!/usr/bin/env Rscript
+# N13 C51 smoke subset (declared before execution): header + every k-th data line of the frozen src_open_candidates.csv,
+# starting at the first data line (data lines 1, 1+k, 1+2k, ...). File order = SR_NUMBER order. One record per line (MySQL --batch export).
+# src_peer_stats.csv and src_extract_lineage.csv are copied unchanged. Usage: Rscript make_subset.R <FROZEN_SOURCE_DIR> <DEST_SOURCE_DIR> <k>
+a <- commandArgs(trailingOnly = TRUE); stopifnot(length(a) == 3); k <- as.integer(a[[3]]); stopifnot(k >= 1)
+dir.create(a[[2]], recursive = TRUE, showWarnings = FALSE)
+con <- file(file.path(a[[1]], "src_open_candidates.csv"), "rb"); x <- readLines(con, warn = FALSE); close(con)
+keep <- c(1L, 1L + which((seq_len(length(x) - 1L) - 1L) %% k == 0L))
+con <- file(file.path(a[[2]], "src_open_candidates.csv"), "wb"); writeLines(x[keep], con, sep = "\n", useBytes = TRUE); close(con)
+for (f in c("src_peer_stats.csv", "src_extract_lineage.csv")) file.copy(file.path(a[[1]], f), file.path(a[[2]], f), overwrite = TRUE)
+cat("subset k=", k, " data rows=", length(keep) - 1L, " of ", length(x) - 1L, "\n", sep = "")
+
+

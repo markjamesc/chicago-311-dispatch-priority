@@ -1,0 +1,3 @@
+sent=2026-10-09 05:54:59
+reply_complete=2026-10-09 06:03:41
+# reply_complete = first-seen (upper bound; still thinking at ~05:59:40, finish seen 06:03:41; true finish not observed). DeepThink ON, Search OFF (was ON by default, turned off before send)

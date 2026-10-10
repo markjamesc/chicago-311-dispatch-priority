@@ -1,0 +1,7 @@
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+RJ_INC2ESC,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv,,,analysis re-judges INCONCLUSIVE with dormant_h >= 8760 as ESCALATE,TRUE,TRUE,FALSE
+RJ_KAPPA3,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,,analysis re-judges ESCALATE at kappa 3 and reports kappa 3,TRUE,TRUE,FALSE
+RJ_OPENAGE,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,,analysis demotes ESCALATE with open_age_h < 720 (diagnostic-only field),TRUE,TRUE,FALSE
+RJ_PRECHECK,NA,1,,,,,,,,re-judging placed before Stage 5's own checks,FALSE,FALSE,TRUE
+RJ_BENIGN,NA,0,,,,escalate_by_peer_n_bin.csv,,,,benign: adds an ESCALATE-by-peer_n-bin table; labels unchanged,FALSE,FALSE,FALSE

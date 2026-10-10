@@ -1,0 +1,8 @@
+# C45 re-adjudication record (N15 REAJ). Written 2026-10-03 10:12 CDT by the coordinator; the state line is in TERMINAL_STATE.txt (written by runner/record_terminal.R on PC DESKTOP-RPECRM9, 10:09 CDT, exit 0).
+re-adjudication terminal state : KEEP  (on-screen verdict KEEP; match)
+supersedes                     : REVERT (N15 b3, evidence-gap REVERT, packet gap PD-2; ../../C45/TERMINAL_STATE.txt and ../../C45/C45-adjudicator/*, kept unchanged)
+packet                         : C45_3_ADJUDICATOR_Grok_REAJ.txt sha256 892fbb69a30645752f280e602fe22a4d6696db8baab9d376fa7844c15a7f6f3f (REAJ_FREEZE.sha256)
+saved page                     : C45-adjudicator-reaj/adjudicator_grok.html sha256 eff24f44d3eaa7375694a4eaa1bc0b993da6932f877e91953bfbc0c6ec077b45 (3 Grok turns; turns 2-3 after "continue" restate KEEP)
+raw (turn 1)                   : C45-adjudicator-reaj/adjudicator_raw.md sha256 62b3d3f2785a4f8fc068275ae56cf782e3557e3713e55997bf3c375bb0b2f066
+record_terminal.R input copy   : C45-adjudicator/adjudicator_raw.md (byte-identical copy of the raw; the tool only reads <CID>-adjudicator/adjudicator_raw.md)
+Grok one-line reason           : "Removing discretionary serialization did not change the analytical outcome on the frozen pack." (PD-2 closed: all 7 key outputs equal the FROZEN_KEY7 references on every arm; 12/12 exit 0; median 27.1 s vs 37.8 s)

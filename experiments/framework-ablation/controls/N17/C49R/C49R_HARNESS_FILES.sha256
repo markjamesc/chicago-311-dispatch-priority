@@ -1,0 +1,4 @@
+# C49R post-freeze harness files 2026-10-09 07:18:45 CDT (not part of the spec freeze); updated after chat-time notes
+03e2f4595f4a8a3198f9526620dace3111837326b3db0743721774234262557f  tools/c49_port.py
+c8ff4b3ab75d0c9dbc0f7f57cb4d9f24a74f274c6b2ad7ccc0e167cabb7de10b  tools/c49r_pipeline.py
+52d3af0cc0768ac6a472340b39976a94c1067cf0fe12a055a680d620a88a6e0c  C49R_HARNESS_NOTES.md

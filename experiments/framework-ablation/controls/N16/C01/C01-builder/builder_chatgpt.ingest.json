@@ -1,0 +1,38 @@
+{
+ "cid": "C01",
+ "role": "builder",
+ "source": "C01/C01-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 17993,
+ "source_sha256": "8e5a4f04e180796271b9951a48a4434a3857b3400a6f6189d0bad725486dfdbe",
+ "output": "C01/C01-builder/builder_report.md",
+ "output_bytes": 17994,
+ "output_sha256": "5f91130ab155abfebafc6eb30bb9f4464de46a2cc7100be06cbadf4ca283bc1f",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 1,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 06:36:05\nreply_complete=2026-10-09 06:40:12\n# reply_complete = first-seen (upper bound; polled ~4 min after send, true finish not observed; UI \"Worked for 2m 35s\"). Reasoning High, no tools enabled. Packet sent as file attachment (C01_1_BUILDER_ChatGPT.txt), no extra text. URL https://chatgpt.com/c/6ac8d192-1714-83ea-be37-7027b4f5c44b"
+}

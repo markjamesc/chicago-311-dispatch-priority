@@ -1,0 +1,941 @@
+# C49R Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: Stage 5 (and other reviewer) evidence is delivered as individual files plus SHA256SUMS.txt, with a mandatory first-section file inventory with hashes.
+- REVERT: the addition is not adopted; delivery stays at the coordinator's choice (e.g. one zip).
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4: the evidence is byte-identical across arms (delivery check, P1 condition 0); condition 5: the check's known-answer cases are the zip/file identity and SHA256SUMS.txt. Conditions 1–3 are decided from the frozen reviewer replies and TIMES (REPLY_FREEZE section) by the frozen scorer; recheck its access proofs against the delivery files.
+- Items the SPEC marks "not measured" or "not tested" (e.g. the C44 unchanged-file seed, the C49R Grok and ChatGPT-zip arms, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Individual-file evidence delivery (Addendum 02 #49)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C49R ADJUDICATION
+
+---
+# COORDINATOR NOTE N1 / OF-1
+The N1/OF-1 repeated-hour clock note (disclosed in the packets; owner ruling 53A) is known and expected; C49R delivers frozen Stage 5 text and CSVs only; no R path is rerun.
+
+---
+# SPEC
+# C49R: clean redo of C49 "Individual-file evidence delivery" (FROZEN)
+**Ablation ID:** C49R (redo of N13 C49, owner approval 2026-10-09 07:06 CT)  **Batch:** N17  **Roles:** Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Extra chats: 3 blind reviewer chats (DS_ZIP, DS_FILES, GPT_FILES), no Grok arm.
+**Target stage:** Stage 5 first-pass evidence delivery. **Capture mode:** text-only (owner-approved 2026-10-09 01:52 CT), `TEXTONLY_PROCEDURE.md` as in N16.
+**Why redo:** N13 C49 ended HALT: the DS_FILES arm was rerun after freeze (checksum file renamed SHA256SUMS -> SHA256SUMS.txt because DeepSeek refused an extensionless file; packet and ARMS.tsv changed post-freeze). In C49R the checksum file is `SHA256SUMS.txt` in every arm (zip included) from the start. Nothing in the delivery, packets or scorer may change after this freeze.
+**Verdict convention:** KEEP = deliver evidence as individual files plus checksum file with the inventory requirement. REVERT = not shown to help. HALT as in constitution §9.
+**Constitution** `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`. Baseline frameworks (frozen pre-hardening):
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+## Exact change tested (same as N13 C49 except the checksum filename and END marker)
+Evidence identical in all arms: the 9 frozen Chicago Stage 5 files used by the C48 audits (`STAGE5_EVIDENCE_PACKAGE.md`, `STAGE5_DEEPER_FINDINGS.md`, 6 deeper CSVs, `AI1_INTERPRETATION.md`; byte-identical to N13) plus `SHA256SUMS.txt`. Arms: **DS_ZIP** (DeepSeek, DeepThink ON, Search OFF; ONE attachment `evidence_pkg.zip` holding the same 10 files), **DS_FILES** (DeepSeek, DeepThink ON, Search OFF; 10 individual files), **GPT_FILES** (ChatGPT, highest reasoning; 10 individual files). Each reply: part 1 FILE INVENTORY (FILE/SHA256/OPENED/LINES/FIRST/LAST per file), part 2 hard facts Q1..Q5 (131968, 64922, 49.2, 25, 118246: reported, not scored), part 3 findings; last line `END C49R FIRST PASS`.
+Access proof (mechanical): a file counts as accessed when the reply's FIRST and LAST lines equal the file's first and last non-empty lines (whitespace-normalized). Usable first pass = END line + all 9 files proven + all 5 facts answered. Time to usable = reply_complete - sent from `TIMES.txt` (operator-logged at chat time, America/Chicago, two lines `sent=YYYY-mm-dd HH:MM:SS`, `reply_complete=YYYY-mm-dd HH:MM:SS`); unusable = infinite.
+## Operational benefit predicate P1
+KEEP side when all hold: 0. delivery sets pass `c49_check` (zip holds byte-identical copies; checksum file matches); 1. DS_FILES and GPT_FILES each prove access to all 9 files; 2. in both, every evidence file is listed with the SHA-256 from SHA256SUMS.txt; 3. DS_FILES time <= DS_ZIP time + 2 min (DS_ZIP unusable = met). REVERT if 1, 2 or 3 fails. HALT if 0 fails, a reply or TIMES.txt is missing or lacks its END line, any frozen file differs from this freeze, or Builder and Validator disagree on a hard number. DS_ZIP access is the baseline observation and does not decide P1.
+## No-rerun rule (the N13 defect)
+No arm may be rerun, no file renamed, no packet or ARMS.tsv edited after this freeze. Operator checks before sending: DS_FILES shows 10 evidence attachment chips (11 if the packet is also attached as a file); DS_ZIP shows the one zip chip. If an upload fails or is refused, the arm is recorded as it happened (e.g. OPENED: NO) and is NOT repaired; a model refusing a file type is a finding. A chat interrupted before END may be retried once in a new chat with the identical frozen packet and attachments (retry disclosed in TIMES.txt); no other change is allowed.
+## Known open finding N1 / OF-1
+Disclosed in each packet as in N13 (repeated fall-back hour; owner ruling 53A); frozen pack not changed.
+## Scoring harness
+Scorers: `scorer/c49_check.R` and `scorer/c49_score.R` (N13 scripts; only changes: checksum filename, paths to the C49R layout, `C49R-<arm>` folders). They are the authoritative logic. No Rscript exists on the box and the PC may be offline, so the box may run an equivalent Python port; any port, its parity proof against the N13 R outputs, and the pipeline are recorded in post-freeze addendum notes (`C49R_HARNESS_NOTES.md`), never by editing this spec. Disclosed limits: n = 1 per arm and model; ChatGPT zip handling untested; Grok untested.
+## FROZEN FILES (SHA-256; the freeze file `C49R_SPEC_FREEZE.sha256` repeats them with this spec's own hash)
+- `delivery/FILES/AI1_INTERPRETATION.md` SHA-256 `73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932` (7929 bytes)
+- `delivery/FILES/SHA256SUMS.txt` SHA-256 `1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75` (833 bytes)
+- `delivery/FILES/STAGE5_DEEPER_FINDINGS.md` SHA-256 `49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6` (2007 bytes)
+- `delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md` SHA-256 `c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7` (4051 bytes)
+- `delivery/FILES/capacity_coverage_note.csv` SHA-256 `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` (644 bytes)
+- `delivery/FILES/escalate_by_type_top25.csv` SHA-256 `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` (1264 bytes)
+- `delivery/FILES/inconclusive_by_clause.csv` SHA-256 `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` (58 bytes)
+- `delivery/FILES/independent_checks_critical_counts.csv` SHA-256 `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` (190 bytes)
+- `delivery/FILES/kappa_sensitivity.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` (164 bytes)
+- `delivery/FILES/portfolio_summary.csv` SHA-256 `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` (183 bytes)
+- `delivery/ZIP/evidence_pkg.zip` SHA-256 `dffa057583a1b75bef9eadb961f9fb900a96a910aba9309cabb07d8f56648435` (9600 bytes)
+- `packets/C49R_R_DS_FILES.txt` SHA-256 `685f9fdd864205f57bb40b4476c619625dcee4de5328931ed5d19c693aaeab86` (2817 bytes)
+- `packets/C49R_R_DS_ZIP.txt` SHA-256 `b93a174e38bf8de8fe964981c1370dc5c9d71019cc867a1c52c381c49ae8a349` (2852 bytes)
+- `packets/C49R_R_GPT_FILES.txt` SHA-256 `07ef2b4e759313ff37695378f2b94c541eef00bbb009de3b41f0f421c3fa7683` (2830 bytes)
+- `scorer/ARMS.tsv` SHA-256 `1d50bf212e415318069c29cd4dde311635f2d8fc39bd6340a2db40489d74d46b` (280 bytes)
+- `scorer/DELIVCHK` SHA-256 `0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30` (189 bytes)
+- `scorer/KNOWN_ANSWERS.csv` SHA-256 `13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2` (248 bytes)
+- `scorer/c49_check.R` SHA-256 `5f52e7d0629b97666920b627ca896983a74f67bd5cc6f5112581b867fa2dd410` (1955 bytes)
+- `scorer/c49_score.R` SHA-256 `64b10c401930dda3fb2ffb8e4ebe52e75b15f516eae96c58601c4aecb5fd114e` (7258 bytes)
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+
+---
+## SPEC FREEZE — `C49R_SPEC_FREEZE.sha256` (sha256 b3f7eb56b219f7337d556eda58e8c5e86ac14ecd8a6e1f12eff9f1f4e8cf862c, 2145 bytes, verbatim)
+````
+# C49R spec freeze, written 2026-10-09 07:07:33 CDT before any reviewer chat. Nothing listed may change.
+753d512e741d5f476659a65e7740453fcd0c2d6d3f622c6e9ade3505ae1f1e87  ABLATION_SPEC_C49R.md
+b7d0fe27581469e3df2b3e7914f229403b4f634f211d74b41dd8c11d32e9495f  chats/CHAT_SHEET.md
+73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  delivery/FILES/AI1_INTERPRETATION.md
+1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75  delivery/FILES/SHA256SUMS.txt
+49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  delivery/FILES/STAGE5_DEEPER_FINDINGS.md
+c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md
+4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  delivery/FILES/capacity_coverage_note.csv
+6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  delivery/FILES/escalate_by_type_top25.csv
+f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  delivery/FILES/inconclusive_by_clause.csv
+4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  delivery/FILES/independent_checks_critical_counts.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  delivery/FILES/kappa_sensitivity.csv
+b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  delivery/FILES/portfolio_summary.csv
+dffa057583a1b75bef9eadb961f9fb900a96a910aba9309cabb07d8f56648435  delivery/ZIP/evidence_pkg.zip
+685f9fdd864205f57bb40b4476c619625dcee4de5328931ed5d19c693aaeab86  packets/C49R_R_DS_FILES.txt
+b93a174e38bf8de8fe964981c1370dc5c9d71019cc867a1c52c381c49ae8a349  packets/C49R_R_DS_ZIP.txt
+07ef2b4e759313ff37695378f2b94c541eef00bbb009de3b41f0f421c3fa7683  packets/C49R_R_GPT_FILES.txt
+1d50bf212e415318069c29cd4dde311635f2d8fc39bd6340a2db40489d74d46b  scorer/ARMS.tsv
+0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30  scorer/DELIVCHK
+13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2  scorer/KNOWN_ANSWERS.csv
+5f52e7d0629b97666920b627ca896983a74f67bd5cc6f5112581b867fa2dd410  scorer/c49_check.R
+64b10c401930dda3fb2ffb8e4ebe52e75b15f516eae96c58601c4aecb5fd114e  scorer/c49_score.R
+````
+
+---
+## Pre-chat delivery check (c49_port.py check) — `post/check_out/DELIVERY_CHECK.txt` (sha256 076201f8e2d814fc93f1401a6c343f1933b8a36435c77ea5b6b9279bd4706071, 161 bytes, verbatim)
+status=PASS n_evidence_files=9 zip_entries=10 zip_bytes=9600 files_bytes_total=17323 zip_sha256=dffa057583a1b75bef9eadb961f9fb900a96a910aba9309cabb07d8f56648435
+
+---
+## DELIVERY_FILES.csv — `post/check_out/DELIVERY_FILES.csv` (sha256 92136c1d857678a173636ee14502d13b453c47d7543e785e4d78bfb80571d779, 2380 bytes, verbatim)
+"file","bytes","sha256_listed","sha256_file","in_zip","sha256_zip"
+"STAGE5_EVIDENCE_PACKAGE.md",4051,"c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7","c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7",TRUE,"c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7"
+"STAGE5_DEEPER_FINDINGS.md",2007,"49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6","49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6",TRUE,"49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6"
+"capacity_coverage_note.csv",644,"4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609","4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609",TRUE,"4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609"
+"escalate_by_type_top25.csv",1264,"6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176","6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176",TRUE,"6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176"
+"inconclusive_by_clause.csv",58,"f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d","f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d",TRUE,"f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d"
+"independent_checks_critical_counts.csv",190,"4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146","4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146",TRUE,"4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146"
+"kappa_sensitivity.csv",164,"7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a","7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a",TRUE,"7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a"
+"portfolio_summary.csv",183,"b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167","b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167",TRUE,"b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167"
+"AI1_INTERPRETATION.md",7929,"73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932","73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932",TRUE,"73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932"
+"SHA256SUMS.txt",833,NA,"1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75",TRUE,"1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75"
+
+---
+## Harness notes (Python port and parity) — `C49R_HARNESS_NOTES.md` (sha256 52d3af0cc0768ac6a472340b39976a94c1067cf0fe12a055a680d620a88a6e0c, 4407 bytes, verbatim)
+# C49R harness notes (post-freeze addendum; the frozen spec is unchanged)
+Written 2026-10-09 07:5x CT, after the spec freeze (C49R_SPEC_FREEZE.sha256, sha256 b3f7eb56b219f7337d556eda58e8c5e86ac14ecd8a6e1f12eff9f1f4e8cf862c) and before any reviewer chat.
+1. The box has no Rscript and the PC was offline, so scoring on the box uses `tools/c49_port.py`, a Python port of `scorer/c49_check.R` and `scorer/c49_score.R` (same logic, step by step: access proof by FIRST/LAST lines, SHA-256 inventory match, facts Q1-Q5, time to usable, conditions 1-3, verdict string). The R scripts in the freeze remain the authoritative logic; if the PC is later available they can be run on the same inputs as a cross-check, and any difference is reported (it does not change the box result unless the Adjudicator is told).
+2. Parity proof (run before any C49R reply existed): port vs the N13 R-scorer outputs on the saved N13 C49 data (3 reviewer replies, TIMES.txt, delivery set, ARMS.tsv with the PD-3 DS_FILES row, checksum name SHA256SUMS):
+   - `INVENTORY_<arm>.csv` x3, `FACTS_<arm>.csv` x3 and `C49_POST_arms.csv`: BYTE-IDENTICAL to `N13/C49/post/` (cmp, no differences).
+   - `C49_POST_RESULTS.md`: identical after removing the generated-timestamp line and collapsing runs of spaces (R pads columns with spaces; the port does not). Same verdict string (P1 MET) and same condition table.
+   - `c49_check` port vs the N13 PC output (`pc_run/b6/C49/arms/CHECK/outputs/DELIVERY_FILES.csv` and `DELIVERY_CHECK.txt`): identical (line endings CRLF vs LF normalized).
+   Not covered by parity: DS_FILES before the PD-3 rerun (no R output exists for it); R's behavior on malformed TIMES lines (the port treats an unparseable time as missing = HALT, as R does with NA).
+3. Pipeline (`tools/c49r_pipeline.py`): verify-freeze -> ingest-blind (reply_TEXTONLY.txt -> reply.md, END line once and last, no verdict token) -> score -> assemble-bv (REPLY_FREEZE.json, B/V packets and Grok HEAD) -> ingest builder/validator (N16 ingest_textonly.py, CID C49R) -> assemble-grok -> ingest adjudicator -> record-terminal. The Builder, Validator and Grok packets are built from the frozen spec, constitution, replies and score; their content follows the N13 C49 packets with C49 -> C49R and SHA256SUMS -> SHA256SUMS.txt.
+4. The pipeline was dry-run on a scratch copy outside the evidence tree with N13 replies relabelled as C49R replies; nothing from the dry run is kept as evidence.
+
+## Chat-time findings recorded 2026-10-09 07:2x CT (nothing altered; frozen rules applied)
+5. DS_ZIP: DeepSeek REJECTED the `evidence_pkg.zip` upload on the page ("The uploaded file format is not supported. Supported formats include PDF, DOC, XLSX, PPT, images, text, and code."). Attachment chip count at send = 0. Per the frozen no-rerun rule nothing was renamed, retried or re-sent; the packet text was sent without an attachment and the model reported OPENED: NO for all 9 files. This is the baseline observation of the control (zip delivery to DeepSeek), recorded as a finding, not a harness defect.
+6. GPT_FILES: 10 files attached (10 chips before send). ChatGPT itself displayed 9 of the attachment names with a "(1)" suffix (e.g. AI1_INTERPRETATION(1).md, portfolio_summary(1).csv); SHA256SUMS.txt was shown unchanged. Not renamed or repaired by the operator; sent as-is. The scorer matches the inventory by the file names the model writes in its reply, so a suffix in the reply's FILE: lines would count as unlisted; the score is reported as computed and any such effect is for the Adjudicator to weigh (no rescoring or repair).
+7. DS_FILES: 10 chips, no upload errors. All three chats: DeepThink ON/Search OFF (DeepSeek, Search was ON by default and switched off before send), ChatGPT High (3 of 3), no tools. TIMES.txt `reply_complete` values are approximate (observed at first check), disclosed in each TIMES.txt; the scorer ignores the trailing " CDT" text.
+8. Pipeline path fix (post-freeze tool bug, no evidence involved): `c49r_pipeline.py` looked for the N13 constitution and the N16 runner under N17/ instead of runs/ (the scratch dry run used symlinks that hid this). Fixed to use runs/N13 and runs/N16; the first assemble-bv attempt stopped before writing any packet (only REPLY_FREEZE.json had been written, unchanged on rerun). The ingest step for builder/validator/adjudicator uses the N16 ingest root `runs/N17`, CID C49R, unchanged.
+
+---
+## scorer c49_score.R (authoritative logic) — `scorer/c49_score.R` (sha256 64b10c401930dda3fb2ffb8e4ebe52e75b15f516eae96c58601c4aecb5fd114e, 7258 bytes, verbatim)
+````
+#!/usr/bin/env Rscript
+# C49 post-chat scorer (N13 b6). Usage: Rscript c49_score.R <C49R_ROOT>
+# Reads the frozen delivery set (runner_b6/seeds/C49), the three extracted replies C49R-<arm>/reply.md and their TIMES.txt; writes C49/post/.
+# Access proof per file = the reply's FIRST and LAST lines equal the file's first and last non-empty lines (whitespace-normalized). Mechanical; no judgment.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE)
+S <- file.path(W, "scorer"); C <- W; OUT <- file.path(W, "post"); dir.create(OUT, showWarnings = FALSE)
+rdl <- function(p) { x <- readLines(p, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2); x }
+nz <- function(x) x[nzchar(trimws(x))]
+norm <- function(s) { s <- gsub("`", "", s); s <- gsub("\\\\\\|", "|", s); s <- gsub("\\*\\*", "", s); s <- gsub("[[:space:]]+", " ", s); trimws(s) }
+arms <- read.delim(file.path(S, "ARMS.tsv"), colClasses = "character")
+sums <- nz(rdl(file.path(W, "delivery", "FILES", "SHA256SUMS.txt"))); H <- setNames(sub("  .*$", "", sums), sub("^[0-9a-f]{64}  ", "", sums))
+truth <- lapply(names(H), function(f) { x <- nz(rdl(file.path(W, "delivery", "FILES", f))); c(first = norm(x[1]), last = norm(x[length(x)])) }); names(truth) <- names(H)
+ka <- read.csv(file.path(S, "KNOWN_ANSWERS.csv"), colClasses = "character")
+tm <- function(p) { if (!file.exists(p)) return(NA_real_); x <- rdl(p); g <- function(k) { z <- grep(paste0("^", k, "="), x, value = TRUE); if (length(z)) as.POSIXct(sub(paste0("^", k, "="), "", z[1]), tz = "America/Chicago", format = "%Y-%m-%d %H:%M:%S") else as.POSIXct(NA) }
+  s <- g("sent"); d <- g("reply_complete"); if (is.na(s) || is.na(d)) NA_real_ else as.numeric(difftime(d, s, units = "mins")) }
+rows <- list(); halt <- character(0)
+for (arm in arms$arm) { f <- file.path(C, paste0("C49R-", arm), "reply.md"); endl <- arms$end_line[arms$arm == arm]
+  if (!file.exists(f)) { halt <- c(halt, paste("reply missing:", arm)); next }
+  x <- rdl(f); last <- tail(nz(trimws(x)), 1); end_ok <- length(last) == 1 && grepl(endl, last, fixed = TRUE)
+  if (!end_ok) halt <- c(halt, paste("reply has no END line as last line:", arm))
+  st <- grep("^[[:space:]>*`-]*FILE:", x); inv <- list()
+  for (i in seq_along(st)) { blk <- x[st[i]:min(length(x), if (i < length(st)) st[i + 1] - 1 else st[i] + 12)]
+    g <- function(k) { z <- grep(paste0("^[[:space:]>*`-]*", k, ":"), blk, value = TRUE); if (length(z)) norm(sub(paste0("^[[:space:]>*`-]*", k, ":\\**"), "", z[1])) else NA_character_ }
+    inv[[length(inv) + 1]] <- data.frame(file = g("FILE"), sha256 = g("SHA256"), opened = toupper(g("OPENED")), lines = g("LINES"), first = g("FIRST"), last = g("LAST"), stringsAsFactors = FALSE) }
+  inv <- if (length(inv)) do.call(rbind, inv) else data.frame(file = character(), sha256 = character(), opened = character(), lines = character(), first = character(), last = character())
+  inv$file <- basename(gsub("[`*]", "", inv$file))
+  ev <- data.frame(file = names(H), listed = names(H) %in% inv$file, stringsAsFactors = FALSE)
+  ev$sha_match <- sapply(ev$file, function(fn) { z <- inv$sha256[inv$file == fn]; length(z) > 0 && any(tolower(gsub("[^0-9a-fA-F]", "", z)) == H[[fn]]) })
+  ev$first_ok <- sapply(ev$file, function(fn) any(inv$first[inv$file == fn] == truth[[fn]][["first"]], na.rm = TRUE))
+  ev$last_ok <- sapply(ev$file, function(fn) any(inv$last[inv$file == fn] == truth[[fn]][["last"]], na.rm = TRUE))
+  ev$said_opened <- sapply(ev$file, function(fn) any(grepl("^YES", inv$opened[inv$file == fn])))
+  ev$opened_proven <- ev$first_ok & ev$last_ok
+  write.csv(ev, file.path(OUT, paste0("INVENTORY_", arm, ".csv")), row.names = FALSE)
+  qa <- sapply(ka$q, function(q) { z <- grep(paste0("^[[:space:]>*`-]*", q, "[:.)]"), x, value = TRUE); if (!length(z)) return(NA_character_)
+    s <- sub(paste0("^.*?", q, "[:.)]"), "", z[1], perl = TRUE); v <- regmatches(s, gregexpr("[0-9][0-9,]*\\.?[0-9]*", s))[[1]]; if (length(v)) gsub(",", "", v[1]) else NA_character_ })
+  fa <- data.frame(q = ka$q, expected = ka$answer, reply = unname(qa), correct = !is.na(qa) & suppressWarnings(abs(as.numeric(qa) - as.numeric(ka$answer)) < 1e-9), stringsAsFactors = FALSE)
+  write.csv(fa, file.path(OUT, paste0("FACTS_", arm, ".csv")), row.names = FALSE)
+  mins <- tm(file.path(C, paste0("C49R-", arm), "TIMES.txt"))
+  if (is.na(mins)) halt <- c(halt, paste("TIMES.txt missing or incomplete:", arm))
+  usable <- end_ok && all(ev$opened_proven) && all(!is.na(fa$reply))
+  rows[[arm]] <- data.frame(arm = arm, model = arms$model[arms$arm == arm], delivery = arms$delivery[arms$arm == arm], reply_sha256 = digest(file = f, algo = "sha256"), end_line = end_ok,
+    files_listed = sum(ev$listed), files_opened_proven = sum(ev$opened_proven), n_files = nrow(ev), files_said_opened = sum(ev$said_opened), sha_match = sum(ev$sha_match),
+    facts_answered = sum(!is.na(fa$reply)), facts_correct = sum(fa$correct), usable = usable, minutes = round(mins, 2), time_to_usable_min = if (usable) round(mins, 2) else Inf, stringsAsFactors = FALSE) }
+tab <- if (length(rows)) do.call(rbind, rows) else NULL
+g <- function(arm, col) if (!is.null(tab) && arm %in% tab$arm) tab[[col]][tab$arm == arm] else NA
+v <- c("DS_FILES", "GPT_FILES")
+conds <- data.frame(condition = c("1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file (FIRST and LAST lines match)",
+                                  "2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in SHA256SUMS.txt",
+                                  "3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met)"),
+                    met = c(isTRUE(all(sapply(v, g, col = "files_opened_proven") == sapply(v, g, col = "n_files"))),
+                            isTRUE(all(sapply(v, g, col = "sha_match") == sapply(v, g, col = "n_files"))),
+                            isTRUE(g("DS_FILES", "time_to_usable_min") <= g("DS_ZIP", "time_to_usable_min") + 2)))
+verdict <- if (length(halt)) "HALT" else if (all(conds$met)) "P1 MET" else "P1 NOT MET"
+md <- function(df) c(paste0("| ", paste(names(df), collapse = " | "), " |"), paste0("|", paste(rep("---", ncol(df)), collapse = "|"), "|"), apply(df, 1, function(r) paste0("| ", paste(gsub("\\|", "/", r), collapse = " | "), " |")))
+L <- c(paste0("# C49 POST-CHAT RESULTS (mechanical; generated ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), ")"), "", paste0("**Mechanical predicate result: ", verdict, "**"), "",
+       if (length(halt)) c("HALT reasons:", paste0("- ", halt), ""), "## Predicate conditions", md(transform(conds, met = ifelse(conds$met, "MET", "NOT MET"))), "", "## Arms", if (is.null(tab)) "(none)" else md(tab), "")
+for (arm in arms$arm) for (k in c("INVENTORY_", "FACTS_")) { p <- file.path(OUT, paste0(k, arm, ".csv")); if (file.exists(p)) L <- c(L, paste0("## ", k, arm, ".csv"), md(read.csv(p, colClasses = "character")), "") }
+writeLines(L, file.path(OUT, "C49_POST_RESULTS.md")); if (!is.null(tab)) write.csv(tab, file.path(OUT, "C49_POST_arms.csv"), row.names = FALSE)
+cat("C49:", verdict, "\n")
+````
+
+---
+## scorer c49_check.R — `scorer/c49_check.R` (sha256 5f52e7d0629b97666920b627ca896983a74f67bd5cc6f5112581b867fa2dd410, 1955 bytes, verbatim)
+````
+#!/usr/bin/env Rscript
+# C49 delivery-set check (N13 b6, pre-chat). Usage: Rscript c49_check.R <delivery_dir> <OUTDIR>
+# Verifies FILES/SHA256SUMS against the files, and that ZIP/evidence_pkg.zip holds byte-identical copies of the same files. Writes OUTDIR/DELIVERY_CHECK.txt, DELIVERY_FILES.csv.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); D <- a[[1]]; OUT <- a[[2]]; dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+sha <- function(p) digest(file = p, algo = "sha256")
+F <- file.path(D, "FILES"); sums <- readLines(file.path(F, "SHA256SUMS.txt"), warn = FALSE); sums <- sums[nzchar(sums)]
+h <- sub("  .*$", "", sums); nm <- sub("^[0-9a-f]{64}  ", "", sums)
+files <- setdiff(list.files(F), "SHA256SUMS.txt")
+uz <- file.path(OUT, "unzipped"); dir.create(uz, showWarnings = FALSE); zf <- file.path(D, "ZIP", "evidence_pkg.zip")
+zl <- utils::unzip(zf, list = TRUE); utils::unzip(zf, exdir = uz)
+tab <- data.frame(file = c(nm, "SHA256SUMS.txt"), bytes = file.info(file.path(F, c(nm, "SHA256SUMS.txt")))$size, sha256_listed = c(h, NA), sha256_file = sapply(file.path(F, c(nm, "SHA256SUMS.txt")), sha),
+                  in_zip = c(nm, "SHA256SUMS.txt") %in% zl$Name, stringsAsFactors = FALSE)
+tab$sha256_zip <- sapply(tab$file, function(f) { p <- file.path(uz, f); if (file.exists(p)) sha(p) else "MISSING" })
+ok <- setequal(nm, files) && all(tab$sha256_listed[seq_along(nm)] == tab$sha256_file[seq_along(nm)]) && all(tab$in_zip) && all(tab$sha256_zip == tab$sha256_file) && nrow(zl) == length(nm) + 1
+write.csv(tab, file.path(OUT, "DELIVERY_FILES.csv"), row.names = FALSE)
+writeLines(sprintf("status=%s n_evidence_files=%d zip_entries=%d zip_bytes=%d files_bytes_total=%d zip_sha256=%s", if (ok) "PASS" else "FAIL", length(nm), nrow(zl), file.info(zf)$size, sum(tab$bytes), sha(zf)), file.path(OUT, "DELIVERY_CHECK.txt"))
+cat(readLines(file.path(OUT, "DELIVERY_CHECK.txt")), "\n"); if (!ok) quit(status = 1)
+````
+
+---
+## Python port c49_port.py (box harness) — `tools/c49_port.py` (sha256 03e2f4595f4a8a3198f9526620dace3111837326b3db0743721774234262557f, 11295 bytes, verbatim)
+````
+#!/usr/bin/env python3
+"""Python port of c49_check.R / c49_score.R (box harness choice; the R scripts stay authoritative).
+Usage:
+  c49_port.py check <delivery_dir> <outdir> [--sums SHA256SUMS.txt]
+  c49_port.py score <root> [--layout c49r|n13] [--sums NAME] [--out DIR]
+c49r layout: <root>/scorer/{ARMS.tsv,KNOWN_ANSWERS.csv}, <root>/delivery/FILES, replies <root>/C49R-<arm>/{reply.md,TIMES.txt}, out <root>/post
+n13 layout : <root>/runner_b6/seeds/C49/{ARMS.tsv,KNOWN_ANSWERS.csv,delivery/FILES}, replies <root>/C49/C49-<arm>/..., out given by --out"""
+import sys, re, csv, hashlib, zipfile, pathlib, math, datetime, io
+from zoneinfo import ZoneInfo
+sha = lambda b: hashlib.sha256(b).hexdigest()
+def rdl(p):
+    t = pathlib.Path(p).read_bytes().decode("utf-8")
+    x = re.split(r"\r\n|\n|\r", t)
+    if x and x[-1] == "": x.pop()
+    if x and x[0].startswith("\ufeff"): x[0] = x[0][1:]
+    return x
+def trimws(s): return re.sub(r"^[ \t\r\n]+|[ \t\r\n]+$", "", s)
+nz = lambda x: [l for l in x if trimws(l) != ""]
+def norm(s):
+    s = s.replace("`", ""); s = s.replace("\\|", "|"); s = s.replace("**", ""); s = re.sub(r"[ \t\n\r\f\v]+", " ", s); return trimws(s)
+def q(v):
+    if v is None: return "NA"
+    if isinstance(v, bool): return "TRUE" if v else "FALSE"
+    if isinstance(v, (int,)): return str(v)
+    if isinstance(v, float):
+        if math.isinf(v): return "Inf" if v > 0 else "-Inf"
+        return ("%.15g" % v)
+    return '"' + str(v).replace('"', '""') + '"'
+def wcsv(path, cols, rows):
+    out = [",".join('"%s"' % c for c in cols)] + [",".join(q(r[c]) for c in cols) for r in rows]
+    pathlib.Path(path).write_bytes(("\n".join(out) + "\n").encode("utf-8"))
+def rcsv(path):
+    return list(csv.DictReader(io.StringIO(pathlib.Path(path).read_bytes().decode("utf-8-sig"))))
+def check(D, OUT, sums_name):
+    D = pathlib.Path(D); OUT = pathlib.Path(OUT); OUT.mkdir(parents=True, exist_ok=True); F = D/"FILES"
+    sums = [l for l in rdl(F/sums_name) if l]; h = [re.sub(r"  .*$", "", l) for l in sums]; nm = [re.sub(r"^[0-9a-f]{64}  ", "", l) for l in sums]
+    files = sorted(set(p.name for p in F.iterdir()) - {sums_name}); zf = D/"ZIP"/"evidence_pkg.zip"; z = zipfile.ZipFile(zf); zn = z.namelist()
+    allf = nm + [sums_name]; tab = []
+    for i, f in enumerate(allf):
+        b = (F/f).read_bytes(); zb = z.read(f) if f in zn else None
+        tab.append({"file": f, "bytes": len(b), "sha256_listed": h[i] if i < len(nm) else None, "sha256_file": sha(b), "in_zip": f in zn, "sha256_zip": sha(zb) if zb is not None else "MISSING"})
+    ok = set(nm) == set(files) and all(t["sha256_listed"] == t["sha256_file"] for t in tab[:len(nm)]) and all(t["in_zip"] for t in tab) and all(t["sha256_zip"] == t["sha256_file"] for t in tab) and len(zn) == len(nm) + 1
+    wcsv(OUT/"DELIVERY_FILES.csv", ["file","bytes","sha256_listed","sha256_file","in_zip","sha256_zip"], tab)
+    line = "status=%s n_evidence_files=%d zip_entries=%d zip_bytes=%d files_bytes_total=%d zip_sha256=%s" % ("PASS" if ok else "FAIL", len(nm), len(zn), zf.stat().st_size, sum(t["bytes"] for t in tab), sha(zf.read_bytes()))
+    (OUT/"DELIVERY_CHECK.txt").write_text(line + "\n"); print(line); return 0 if ok else 1
+def tm(p):
+    p = pathlib.Path(p)
+    if not p.exists(): return None
+    x = rdl(p); tz = ZoneInfo("America/Chicago")
+    def g(k):
+        z = [l for l in x if l.startswith(k + "=")]
+        if not z: return None
+        m = re.match(r"(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)", z[0][len(k)+1:])
+        if not m: return None
+        return datetime.datetime(*map(int, m.groups()), tzinfo=tz).astimezone(datetime.timezone.utc)
+    s, d = g("sent"), g("reply_complete")
+    return None if s is None or d is None else (d - s).total_seconds() / 60
+def rround(x, n):  # R round half-even on the decimal repr, as base R >= 4.0
+    return round(x, n)
+def score(W, layout, sums_name, outdir):
+    W = pathlib.Path(W)
+    if layout == "c49r": S = W/"scorer"; DF = W/"delivery"/"FILES"; rep = lambda a: W/f"C49R-{a}"; OUT = pathlib.Path(outdir) if outdir else W/"post"
+    else: S = W/"runner_b6"/"seeds"/"C49"; DF = S/"delivery"/"FILES"; rep = lambda a: W/"C49"/f"C49-{a}"; OUT = pathlib.Path(outdir)
+    OUT.mkdir(parents=True, exist_ok=True)
+    L = rdl(S/"ARMS.tsv"); hdr = L[0].split("\t"); arms = [dict(zip(hdr, l.split("\t"))) for l in L[1:] if l]
+    sums = nz(rdl(DF/sums_name)); H = {re.sub(r"^[0-9a-f]{64}  ", "", l): re.sub(r"  .*$", "", l) for l in sums}
+    truth = {}
+    for f in H:
+        x = nz(rdl(DF/f)); truth[f] = (norm(x[0]), norm(x[-1]))
+    ka = rcsv(S/"KNOWN_ANSWERS.csv"); rows = []; halt = []
+    PFX = r"^[ \t\n\r\f\v>*`-]*"
+    for a in arms:
+        arm = a["arm"]; endl = a["end_line"]; f = rep(arm)/"reply.md"
+        if not f.exists(): halt.append("reply missing: " + arm); continue
+        x = rdl(f); nzl = [trimws(l) for l in x if trimws(l) != ""]; last = nzl[-1] if nzl else None
+        end_ok = last is not None and endl in last
+        if not end_ok: halt.append("reply has no END line as last line: " + arm)
+        st = [i for i, l in enumerate(x) if re.search(PFX + "FILE:", l)]; inv = []
+        for j, s0 in enumerate(st):
+            e = (st[j+1] - 1) if j < len(st) - 1 else s0 + 12; blk = x[s0:min(len(x), e + 1)]
+            def g(k):
+                z = [l for l in blk if re.search(PFX + k + ":", l)]
+                return norm(re.sub(PFX + k + r":\**", "", z[0], count=1)) if z else None
+            op = g("OPENED"); inv.append({"file": g("FILE"), "sha256": g("SHA256"), "opened": op.upper() if op else None, "lines": g("LINES"), "first": g("FIRST"), "last": g("LAST")})
+        for r in inv: r["file"] = re.sub(r"[`*]", "", r["file"]).split("/")[-1].split("\\")[-1] if r["file"] is not None else None
+        ev = []
+        for fn in H:
+            rr = [r for r in inv if r["file"] == fn]
+            sm = len(rr) > 0 and any(r["sha256"] is not None and re.sub(r"[^0-9a-fA-F]", "", r["sha256"]).lower() == H[fn] for r in rr)
+            fo = any(r["first"] == truth[fn][0] for r in rr if r["first"] is not None); lo = any(r["last"] == truth[fn][1] for r in rr if r["last"] is not None)
+            so = any(r["opened"] is not None and r["opened"].startswith("YES") for r in rr)
+            ev.append({"file": fn, "listed": any(r["file"] == fn for r in inv), "sha_match": sm, "first_ok": fo, "last_ok": lo, "said_opened": so, "opened_proven": fo and lo})
+        wcsv(OUT/f"INVENTORY_{arm}.csv", ["file","listed","sha_match","first_ok","last_ok","said_opened","opened_proven"], ev)
+        fa = []
+        for k in ka:
+            qq = k["q"]; z = [l for l in x if re.search(PFX + re.escape(qq) + r"[:.)]", l)]; val = None
+            if z:
+                s = re.sub(r"^.*?" + re.escape(qq) + r"[:.)]", "", z[0], count=1)
+                v = re.findall(r"[0-9][0-9,]*\.?[0-9]*", s); val = v[0].replace(",", "") if v else None
+            ok = False
+            if val is not None:
+                try: ok = abs(float(val) - float(k["answer"])) < 1e-9
+                except ValueError: ok = False
+            fa.append({"q": qq, "expected": k["answer"], "reply": val, "correct": ok})
+        wcsv(OUT/f"FACTS_{arm}.csv", ["q","expected","reply","correct"], fa)
+        mins = tm(rep(arm)/"TIMES.txt")
+        if mins is None: halt.append("TIMES.txt missing or incomplete: " + arm)
+        usable = end_ok and all(e["opened_proven"] for e in ev) and all(r["reply"] is not None for r in fa)
+        rows.append({"arm": arm, "model": a["model"], "delivery": a["delivery"], "reply_sha256": sha(f.read_bytes()), "end_line": end_ok, "files_listed": sum(e["listed"] for e in ev),
+            "files_opened_proven": sum(e["opened_proven"] for e in ev), "n_files": len(ev), "files_said_opened": sum(e["said_opened"] for e in ev), "sha_match": sum(e["sha_match"] for e in ev),
+            "facts_answered": sum(r["reply"] is not None for r in fa), "facts_correct": sum(r["correct"] for r in fa), "usable": usable,
+            "minutes": None if mins is None else rround(mins, 2), "time_to_usable_min": (None if mins is None else rround(mins, 2)) if usable else float("inf")})
+    G = lambda arm, col: next((r[col] for r in rows if r["arm"] == arm), None)
+    v = ["DS_FILES", "GPT_FILES"]
+    def allv(col): return all(G(a, col) is not None and G(a, col) == G(a, "n_files") for a in v)
+    t1, t2 = G("DS_FILES", "time_to_usable_min"), G("DS_ZIP", "time_to_usable_min")
+    c3 = t1 is not None and t2 is not None and t1 <= t2 + 2
+    conds = [("1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file (FIRST and LAST lines match)", allv("files_opened_proven")),
+             ("2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in " + sums_name, allv("sha_match")),
+             ("3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met)", c3)]
+    verdict = "HALT" if halt else ("P1 MET" if all(c[1] for c in conds) else "P1 NOT MET")
+    cols = ["arm","model","delivery","reply_sha256","end_line","files_listed","files_opened_proven","n_files","files_said_opened","sha_match","facts_answered","facts_correct","usable","minutes","time_to_usable_min"]
+    if rows: wcsv(OUT/"C49_POST_arms.csv", cols, rows)
+    def fmtcol(col):  # R format() gives a column a common number of decimals
+        vals = [r[col] for r in rows if isinstance(r[col], float) and not math.isinf(r[col])]
+        dec = max([len(("%.15g" % x).split(".")[1]) if "." in ("%.15g" % x) else 0 for x in vals] or [0])
+        for r in rows:
+            if isinstance(r[col], float) and not math.isinf(r[col]): r[col] = ("%." + str(dec) + "f") % r[col]
+    mdrows = None
+    md = lambda hd, rs: ["| " + " | ".join(hd) + " |", "|" + "|".join(["---"] * len(hd)) + "|"] + ["| " + " | ".join(str(c).replace("|", "/") for c in r) + " |" for r in rs]
+    import copy; rows_fmt = copy.deepcopy(rows); rows_bak = rows; rows = rows_fmt; fmtcol("minutes"); fmtcol("time_to_usable_min")
+    Lm = ["# C49 POST-CHAT RESULTS (mechanical; generated %s by c49_port.py)" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "", "**Mechanical predicate result: %s**" % verdict, ""]
+    if halt: Lm += ["HALT reasons:"] + ["- " + h for h in halt] + [""]
+    Lm += ["## Predicate conditions"] + md(["condition", "met"], [(c, "MET" if m else "NOT MET") for c, m in conds]) + ["", "## Arms"] + (md(cols, [[("TRUE" if r[c] is True else "FALSE" if r[c] is False else "Inf" if r[c] == float("inf") else r[c]) for c in cols] for r in rows]) if rows else ["(none)"]) + [""]
+    rows = rows_bak
+    for a in arms:
+        for k in ("INVENTORY_", "FACTS_"):
+            pp = OUT/f"{k}{a['arm']}.csv"
+            if pp.exists():
+                rr = rcsv(pp); Lm += ["## %s%s.csv" % (k, a["arm"])] + md(list(rr[0].keys()), [list(r.values()) for r in rr]) + [""]
+    (OUT/"C49_POST_RESULTS.md").write_text("\n".join(Lm) + "\n"); print("C49:", verdict); return 0
+if __name__ == "__main__":
+    a = sys.argv[1:]
+    opt = lambda k, d=None: a[a.index(k)+1] if k in a else d
+    if a[0] == "check": sys.exit(check(a[1], a[2], opt("--sums", "SHA256SUMS.txt")))
+    elif a[0] == "score": sys.exit(score(a[1], opt("--layout", "c49r"), opt("--sums", "SHA256SUMS.txt"), opt("--out")))
+````
+
+---
+# C49R REVIEWER REPLIES AND POST-CHAT SCORE (frozen; P1 conditions 1-3 are decided from these)
+REPLY_FREEZE.json SHA-256 a1187329c30c9c5f4902b4dac96f4ea54dba0b045ea30ff147170f332bf2d1f5:
+{
+  "ablation_id": "C49R",
+  "frozen_at_ct": "2026-10-09 07:18:38 CT",
+  "records": [
+    {
+      "id": "DS_ZIP_reply.md",
+      "path": "C49R-DS_ZIP/reply.md",
+      "bytes": 1652,
+      "sha256": "1aa2a0c98488786cb7dbbdb87c53551d30a495e6f085d55e18df2bf1d36391e9"
+    },
+    {
+      "id": "DS_ZIP_TIMES.txt",
+      "path": "C49R-DS_ZIP/TIMES.txt",
+      "bytes": 699,
+      "sha256": "91e19dcc8e89b9c2e5fedfbf346847dd74d83532e2bdbf1a47314c09b5c37113"
+    },
+    {
+      "id": "DS_FILES_reply.md",
+      "path": "C49R-DS_FILES/reply.md",
+      "bytes": 2513,
+      "sha256": "ee4234668a87a386990a978c2c53afa2d9e4509057e94db4cca2eff906482688"
+    },
+    {
+      "id": "DS_FILES_TIMES.txt",
+      "path": "C49R-DS_FILES/TIMES.txt",
+      "bytes": 460,
+      "sha256": "8439126d0bdbf5df1967871510ce85730ae7ea8d86bc9ab46507aac4beb0fe97"
+    },
+    {
+      "id": "GPT_FILES_reply.md",
+      "path": "C49R-GPT_FILES/reply.md",
+      "bytes": 3622,
+      "sha256": "0f93bb24fcbc44487c08f970ad32d91160681ff3cfee813dbb5261a908508d29"
+    },
+    {
+      "id": "GPT_FILES_TIMES.txt",
+      "path": "C49R-GPT_FILES/TIMES.txt",
+      "bytes": 615,
+      "sha256": "b66ec6bdc32f5b0ec119db601a5723593d4f0bae247f861d47bbea80412f9f94"
+    }
+  ]
+}
+
+Each reviewer received only its packet (hashes in the spec freeze) and the delivery set of `delivery/` (DS_ZIP: `ZIP/evidence_pkg.zip`; FILES arms: the 10 files of `FILES/`), new chat, not told about the ablation. Times are operator-logged (TIMES.txt).
+
+---
+## C49R post-chat score (scorer output) — `post/C49_POST_RESULTS.md` (sha256 7e471ea8a502474853e9ee197181d797737aa745496b3b2ac8aebb254d2a50e8, 4407 bytes, verbatim)
+# C49 POST-CHAT RESULTS (mechanical; generated 2026-10-09 07:18:45 by c49_port.py)
+
+**Mechanical predicate result: P1 MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file (FIRST and LAST lines match) | MET |
+| 2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in SHA256SUMS.txt | MET |
+| 3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met) | MET |
+
+## Arms
+| arm | model | delivery | reply_sha256 | end_line | files_listed | files_opened_proven | n_files | files_said_opened | sha_match | facts_answered | facts_correct | usable | minutes | time_to_usable_min |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| DS_ZIP | DeepSeek | ZIP | 1aa2a0c98488786cb7dbbdb87c53551d30a495e6f085d55e18df2bf1d36391e9 | TRUE | 9 | 0 | 9 | 0 | 0 | 0 | 0 | FALSE | 0.42 | Inf |
+| DS_FILES | DeepSeek | FILES (SHA256SUMS.txt) | ee4234668a87a386990a978c2c53afa2d9e4509057e94db4cca2eff906482688 | TRUE | 9 | 9 | 9 | 9 | 9 | 5 | 5 | TRUE | 1.93 | 1.93 |
+| GPT_FILES | ChatGPT | FILES (SHA256SUMS.txt) | 0f93bb24fcbc44487c08f970ad32d91160681ff3cfee813dbb5261a908508d29 | TRUE | 9 | 9 | 9 | 9 | 9 | 5 | 5 | TRUE | 1.70 | 1.70 |
+
+## INVENTORY_DS_ZIP.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| capacity_coverage_note.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| escalate_by_type_top25.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| inconclusive_by_clause.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| independent_checks_critical_counts.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| kappa_sensitivity.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| portfolio_summary.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| AI1_INTERPRETATION.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+
+## FACTS_DS_ZIP.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | NA | FALSE |
+| Q2 | 64922 | NA | FALSE |
+| Q3 | 49.2 | NA | FALSE |
+| Q4 | 25 | NA | FALSE |
+| Q5 | 118246 | NA | FALSE |
+
+## INVENTORY_DS_FILES.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| capacity_coverage_note.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| escalate_by_type_top25.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| inconclusive_by_clause.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| independent_checks_critical_counts.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| kappa_sensitivity.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| portfolio_summary.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| AI1_INTERPRETATION.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+
+## FACTS_DS_FILES.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | 131968 | TRUE |
+| Q2 | 64922 | 64922 | TRUE |
+| Q3 | 49.2 | 49.2 | TRUE |
+| Q4 | 25 | 25 | TRUE |
+| Q5 | 118246 | 118246 | TRUE |
+
+## INVENTORY_GPT_FILES.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| capacity_coverage_note.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| escalate_by_type_top25.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| inconclusive_by_clause.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| independent_checks_critical_counts.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| kappa_sensitivity.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| portfolio_summary.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| AI1_INTERPRETATION.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+
+## FACTS_GPT_FILES.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | 131968 | TRUE |
+| Q2 | 64922 | 64922 | TRUE |
+| Q3 | 49.2 | 49.2 | TRUE |
+| Q4 | 25 | 25 | TRUE |
+| Q5 | 118246 | 118246 | TRUE |
+
+---
+## DS_ZIP TIMES.txt — `C49R-DS_ZIP/TIMES.txt` (sha256 91e19dcc8e89b9c2e5fedfbf346847dd74d83532e2bdbf1a47314c09b5c37113, 699 bytes, verbatim)
+sent=2026-10-09 07:11:45 CDT
+reply_complete=2026-10-09 07:12:10 CDT (observed complete at first check; approx)
+url=https://chat.deepseek.com/a/chat/s/39daee6c-84c4-4234-b83c-268958a74c5d
+notes: DeepThink ON, Search OFF (Search was ON by default; switched off, verified via toggle state). Attachment evidence_pkg.zip REJECTED by DeepSeek on upload with toast: "The uploaded file format is not supported. Supported formats include PDF, DOC, XLSX, PPT, images, text, and code." Attachment chip count at send = 0. Per frozen rules nothing renamed/retried; message sent with packet text only. Model reported all files OPENED: NO. Capture: select rendered reply, copy, clipget; unchanged + final newline.
+
+---
+## DS_ZIP reply (DeepSeek, ZIP) — `C49R-DS_ZIP/reply.md` (sha256 1aa2a0c98488786cb7dbbdb87c53551d30a495e6f085d55e18df2bf1d36391e9, 1652 bytes, verbatim)
+FILE: STAGE5_EVIDENCE_PACKAGE.md
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: STAGE5_DEEPER_FINDINGS.md
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: capacity_coverage_note.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: escalate_by_type_top25.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: inconclusive_by_clause.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: independent_checks_critical_counts.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: kappa_sensitivity.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: portfolio_summary.csv
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+FILE: AI1_INTERPRETATION.md
+SHA256: UNAVAILABLE (SHA256SUMS.txt not accessible)
+OPENED: NO
+LINES: UNAVAILABLE
+FIRST: UNAVAILABLE
+LAST: UNAVAILABLE
+
+HARD FACTS
+Q1: UNAVAILABLE
+Q2: UNAVAILABLE
+Q3: UNAVAILABLE
+Q4: UNAVAILABLE
+Q5: UNAVAILABLE
+
+FINDINGS
+unavailable | BLOCKING | AI1_INTERPRETATION.md not opened | evidence_pkg.zip not accessible | cannot audit AI1 claims or recompute required numerical checks
+
+END C49R FIRST PASS
+
+---
+## DS_FILES TIMES.txt — `C49R-DS_FILES/TIMES.txt` (sha256 8439126d0bdbf5df1967871510ce85730ae7ea8d86bc9ab46507aac4beb0fe97, 460 bytes, verbatim)
+sent=2026-10-09 07:12:44 CDT
+reply_complete=2026-10-09 07:14:40 CDT (approx; observed complete at check after ~2 min)
+url=https://chat.deepseek.com/a/chat/s/ec8baac5-4f85-41b7-95fa-8aa0e04a2828
+notes: DeepThink ON, Search OFF (Search ON by default; switched off, verified). Attachment chip count before send = 10 (all 10 files of delivery/FILES incl. SHA256SUMS.txt), no upload errors. Capture: select rendered reply, copy, clipget; unchanged + final newline.
+
+---
+## DS_FILES reply (DeepSeek, FILES (SHA256SUMS.txt)) — `C49R-DS_FILES/reply.md` (sha256 ee4234668a87a386990a978c2c53afa2d9e4509057e94db4cca2eff906482688, 2513 bytes, verbatim)
+FILE INVENTORY
+
+FILE: STAGE5_EVIDENCE_PACKAGE.md
+SHA256: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7
+OPENED: YES
+LINES: 67
+FIRST: # Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)
+LAST: - Human owner retains final authority.
+
+FILE: STAGE5_DEEPER_FINDINGS.md
+SHA256: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6
+OPENED: YES
+LINES: 55
+FIRST: # Stage 5 — Deeper findings (frozen pack)
+LAST: - High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+FILE: capacity_coverage_note.csv
+SHA256: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609
+OPENED: YES
+LINES: 5
+FIRST: label,attention_slots,escalate_n,coverage,note
+LAST: full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+FILE: escalate_by_type_top25.csv
+SHA256: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176
+OPENED: YES
+LINES: 26
+FIRST: type_key,n_ESCALATE,share_of_escalate,cum_share
+LAST: WCA,460,0.0034856935014548982,0.9593765155189137
+
+FILE: inconclusive_by_clause.csv
+SHA256: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d
+OPENED: YES
+LINES: 2
+FIRST: integrity_clause,n,share
+LAST: thin_type_or_missing_peer,6377,1
+
+FILE: independent_checks_critical_counts.csv
+SHA256: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146
+OPENED: YES
+LINES: 6
+FIRST: check,expected,observed,pass
+LAST: validated_action_list_n,131968,131968,TRUE
+
+FILE: kappa_sensitivity.csv
+SHA256: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a
+OPENED: YES
+LINES: 5
+FIRST: kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+LAST: 3,222002,118246,6377,97379
+
+FILE: portfolio_summary.csv
+SHA256: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167
+OPENED: YES
+LINES: 2
+FIRST: n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa
+LAST: 222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+FILE: AI1_INTERPRETATION.md
+SHA256: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932
+OPENED: YES
+LINES: 252
+FIRST: # AI1 Interpretation — Stage 5 Independent First Pass
+LAST: Is this conversation helpful so far?
+
+HARD FACTS
+
+Q1: 131968
+Q2: 64922
+Q3: 49.2
+Q4: 25
+Q5: 118246
+
+FINDINGS
+
+none
+
+END C49R FIRST PASS
+
+---
+## GPT_FILES TIMES.txt — `C49R-GPT_FILES/TIMES.txt` (sha256 b66ec6bdc32f5b0ec119db601a5723593d4f0bae247f861d47bbea80412f9f94, 615 bytes, verbatim)
+sent=2026-10-09 07:15:38 CDT
+reply_complete=2026-10-09 07:17:20 CDT (approx; UI "Worked for 1m 40s")
+url=https://chatgpt.com/c/6ac8dae2-ca04-83e8-9a9b-5f69c1589c2c
+notes: ChatGPT model picker = High (3 of 3, highest available), no tools enabled. Attachment chip count before send = 10. ChatGPT itself displayed 9 chips with a "(1)" suffix (e.g. AI1_INTERPRETATION(1).md, portfolio_summary(1).csv); SHA256SUMS.txt shown unchanged. Not renamed or repaired by operator; sent as-is. Reply shows "Analyzed" x3 (model used analysis on the files). Capture: select rendered reply, copy, clipget; unchanged + final newline.
+
+---
+## GPT_FILES reply (ChatGPT, FILES (SHA256SUMS.txt)) — `C49R-GPT_FILES/reply.md` (sha256 0f93bb24fcbc44487c08f970ad32d91160681ff3cfee813dbb5261a908508d29, 3622 bytes, verbatim)
+FILE INVENTORY
+FILE: STAGE5_EVIDENCE_PACKAGE.md
+SHA256: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7
+OPENED: YES
+LINES: 67
+FIRST: # Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)
+LAST: - Human owner retains final authority.
+
+FILE: STAGE5_DEEPER_FINDINGS.md
+SHA256: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6
+OPENED: YES
+LINES: 55
+FIRST: # Stage 5 — Deeper findings (frozen pack)
+LAST: - High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+FILE: capacity_coverage_note.csv
+SHA256: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609
+OPENED: YES
+LINES: 5
+FIRST: label,attention_slots,escalate_n,coverage,note
+LAST: full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+FILE: escalate_by_type_top25.csv
+SHA256: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176
+OPENED: YES
+LINES: 26
+FIRST: type_key,n_ESCALATE,share_of_escalate,cum_share
+LAST: WCA,460,0.0034856935014548982,0.9593765155189137
+
+FILE: inconclusive_by_clause.csv
+SHA256: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d
+OPENED: YES
+LINES: 2
+FIRST: integrity_clause,n,share
+LAST: thin_type_or_missing_peer,6377,1
+
+FILE: independent_checks_critical_counts.csv
+SHA256: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146
+OPENED: YES
+LINES: 6
+FIRST: check,expected,observed,pass
+LAST: validated_action_list_n,131968,131968,TRUE
+
+FILE: kappa_sensitivity.csv
+SHA256: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a
+OPENED: YES
+LINES: 5
+FIRST: kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+LAST: 3,222002,118246,6377,97379
+
+FILE: portfolio_summary.csv
+SHA256: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167
+OPENED: YES
+LINES: 2
+FIRST: n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa
+LAST: 222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+FILE: AI1_INTERPRETATION.md
+SHA256: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932
+OPENED: YES
+LINES: 252
+FIRST: # AI1 Interpretation — Stage 5 Independent First Pass
+LAST: Is this conversation helpful so far?
+
+
+HARD FACTS
+Q1: 131968
+Q2: 64922
+Q3: 49.2
+Q4: 25
+Q5: 118246
+
+
+FINDINGS
+F01 | MATERIAL | "The κ grid shows monotonic sensitivity rather than random instability." | kappa_sensitivity.csv: ESCALATE counts decline monotonically from 152,292 at κ=1 to 118,246 at κ=3, a difference of 34,046. The file provides aggregate counts, not individual-request label-transition evidence or repeated-run variability estimates. | Restrict the conclusion to observed monotonic aggregate sensitivity. The evidence does not independently establish individual-label stability or exclude other forms of instability. Preserve the distinction between fixed-rule reproducibility and sensitivity to κ.
+F02 | MINOR | "Pilot / monitor using ESCALATE list + type concentration" | escalate_by_type_top25.csv: WCA2 = 64,922 ESCALATE rows, representing 49.2% of all ESCALATE rows. SED = 17,254 (13.1%) and SKA = 7,316 (5.5%). The three types collectively represent approximately 67.8% of ESCALATE. | Quantify the dominant type concentration explicitly when recommending monitoring. Identify WCA2 as the primary concentration requiring descriptive review, without inferring operational causes or real-world urgency.
+END C49R FIRST PASS

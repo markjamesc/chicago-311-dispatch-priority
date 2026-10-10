@@ -1,0 +1,3 @@
+# C43 Adjudicator packet freeze 2026-10-03 12:24:52 CDT; assembled on PC by runner/assemble_adjudicator.R (1327ff98…) from builder_report.md 445f74af… + validator_report.md (r2) 4148f956… + HEAD 7a50b3e3…
+fc1e473d3741883344c86e68317e955dc18979cedfe40ca20006933c11beeeef  C43/EVIDENCE_FREEZE.json
+b26b417f37f7f4db1a81e00ef5b67f230d6f71a878af3bbfe901116a26fccd01  C43/packets/C43_3_ADJUDICATOR_Grok.txt

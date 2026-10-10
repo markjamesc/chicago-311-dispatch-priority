@@ -1,0 +1,31 @@
+{
+ "cid": "C38",
+ "role": "adjudicator",
+ "source": "C38/C38-adjudicator/adjudicator_grok_TEXTONLY.txt",
+ "source_bytes": 9514,
+ "source_sha256": "be6bd467b4e20b74034138982c6e37032f0c134ca9c8b6952a473a3e51ecb531",
+ "output": "C38/C38-adjudicator/adjudicator_raw.md",
+ "output_bytes": 9515,
+ "output_sha256": "b1a45807e36af4c9616904b6b465eac46a3d77dd97c24870a41ecec1c1578bc0",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "terminal_state_lines": 1,
+  "second_last_is_terminal": true,
+  "leak": false,
+  "sections_found_in_order": [],
+  "sections_by_title": [
+   "Role attestation",
+   "Freeze check",
+   "Hard-fact agreement",
+   "KEEP conditions",
+   "HALT conditions",
+   "Blocking objections",
+   "Verdict rationale"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 06:56:23\nreply_complete=2026-10-09 06:57:39\n# sent = approximate (\u00b15s; send-click script timed out waiting for page load after navigating to the chat URL; click occurred ~20s before 06:56:43). reply_complete = first-seen (upper bound; generating at 06:57:08 poll, done at 06:57:39 poll; UI \"Worked for 39s\"). Mode Expert (default, no custom mode). Packet sent as file attachment (C38_3_ADJUDICATOR_Grok.txt), no extra text. Captured via select+copy of rendered reply. URL https://grok.com/c/42060e8b-00f0-4225-b13b-d295168cacf0"
+}

@@ -1,0 +1,9 @@
+{
+  "ablation_id": "C48",
+  "frozen_at_ct": "2026-10-03 11:21:15 CDT",
+  "audits": [
+    {"id": "AI2", "role": "AI 2 second audit (Grok, decision/method critic)", "reply_path": "C48/C48-audit-ai2/ai2_second_audit.md", "reply_bytes": 4078, "reply_sha256": "06b3e1f75be60142b054ac034cdb78579b9812efb87a1e535d5d0a0530b22e27", "packet_path": "C48/packets/C48_A2_SECOND_AUDIT_Grok.txt", "packet_sha256": "9b21f81cfc99c4cc391a362d841b83d48a1dfe8a9463598f59cc3f3b2a868e1e"},
+    {"id": "AI3", "role": "AI 3 second audit (DeepSeek, claim/evidence auditor)", "reply_path": "C48/C48-audit-ai3/ai3_second_audit.md", "reply_bytes": 3053, "reply_sha256": "8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2", "packet_path": "C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt", "packet_sha256": "dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96"}
+  ]
+}
+

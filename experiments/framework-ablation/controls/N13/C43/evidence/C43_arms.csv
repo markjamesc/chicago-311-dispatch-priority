@@ -1,0 +1,2 @@
+arm,exit,secs,selftest,needed_by_hash,needed_by_path_or_name,needed_by_directory,status,trail_index_sha256
+AUDIT,0,35.7,PASS,10,2,3,INTERMEDIATE_NEEDED,0fcc3b64ac8d464a

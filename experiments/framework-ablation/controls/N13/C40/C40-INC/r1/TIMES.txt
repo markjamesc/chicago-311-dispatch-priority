@@ -1,0 +1,8 @@
+sent=2026-10-03 11:50:08
+reply_complete=2026-10-03 11:57:15
+# Written by the coordinator 2026-10-03 ~12:25 CT under the coordinator ruling 2026-10-03 12:20 CT (TIMES.txt was not written at chat time). Times are CT (CDT, UTC-5).
+# sent = the browser operator's logged send time: 16:50:08Z UTC = 11:50:08 CDT.
+# reply_complete = UPPER BOUND, not an observed completion time: box mtime of C40/C40-INC/r1/inc_r1_chatgpt.html = 2026-10-03 11:57:15.570128 CDT (truncated to the second above); the page is saved right after the END line appears.
+# minutes (sent -> reply_complete) = 7.12, an UPPER BOUND on the reply time.
+# cross-check (page's own duration indicator): Worked for 2m 49s and Worked for 3m (two indicators on the page; ChatGPT work time only).
+# Ruling: if an upper bound makes a timing condition ambiguous, report it as ambiguous; do not score it as met.

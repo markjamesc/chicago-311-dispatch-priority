@@ -1,0 +1,978 @@
+# C34 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Deterministic Workflow Gate (catalog #34) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C34 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+- Cross-reference: N1 is open finding **OF-1** in the coordinator's RESULTS_N15.md (DST ambiguous-hour clean-pair mismatch; coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It was disclosed to the Builder and Validator in their packets (COORDINATOR NOTE N1) and in every spec ("Known open finding N1"), all before execution.
+
+---
+# SPEC
+# C34 — Ablation specification (FROZEN)
+
+**Ablation ID:** C34 (owner Remaining Ablation Program, catalog #34 "Deterministic Workflow Gate")
+**Batch:** N15 batch 2 of 3 (controls C14, C11, C34, C16, C18)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`; `R-B/R/40_fixtures.R` `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4→5 (gate before interpretation)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Stage 5 may start only if the deterministic workflow gate (`validation/workflow-gate/workflow_gate.R`) returns PASS on the stage receipts.
+
+## Exact change being tested (ablation)
+There is no workflow gate. Stage 5 (`run_deeper_analysis.R`) runs on whatever Stage 4 produced. It keeps its own built-in independent count checks, a `stopifnot` on n_decision/ESCALATE/INCONCLUSIVE/STANDARD/validated-list counts.
+**Per-arm pipeline** (runner v2, run for arm B and for every seeded arm):
+1. R-A and R-B run (seeded).
+2. The validated action list is built from R-A.
+3. A Stage-4 receipt is written from that arm's mechanical results by `stage45_receipt.R`:
+   - r_a/r_b_status: exit 0 and output present.
+   - r_a/r_b_fixtures: all fixture rows pass.
+   - reconciliation: key set + classification, the frozen recon practice.
+   - sql_source_gate, structural_cross_review and lineage_attestation are copied as PASS from the frozen receipt, not re-run.
+   - validation_gate is PASS only if all mechanical fields pass.
+4. The frozen workflow gate runs on the receipt. Its result is recorded.
+5. Stage 5 runs anyway, and its exit code and outputs are recorded.
+
+The harness scripts are path-only substitutions of the frozen scripts (diffs in `runner/SEED_DIFFS_b2.txt`). Stage 1–3 receipts are copied verbatim from the pack:
+- `stage45/build_validated_action_list.R` SHA-256 `0d7256e38a04b6a429d9ceb36d3f9073674a06dcaf72213654395bcc2669b5c6`
+- `stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94`
+- `stage45/stage1_decision.json` SHA-256 `a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430`
+- `stage45/stage2_framing.json` SHA-256 `4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a`
+- `stage45/stage3_locked_design.json` SHA-256 `ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114`
+- `stage45/stage45_receipt.R` SHA-256 `8c2644405d052194b2f46d089dd04eeca67b631058ecbfd09b9c63c906e9d711`
+- `stage45/workflow_gate.R` SHA-256 `27a6e83c3ff2780aeb50c0a681d46b07590fe011ec45e6eb8bc87f28ca36c193`
+**Stage-5 harm set H:** seeded arms where Stage 5 completes (exit 0) and at least one of its 8 outputs differs from arm B's Stage-5 output. CSV content is compared, numbers to 1e-9.
+**Caught with the control:** gate result FAIL, or Stage 5 exits non-zero.
+**Caught without the control (D_abl):** Stage 5 exits non-zero, from its own count checks or a missing input.
+Disclosure: the receipts are written truthfully from mechanical results. A receipt that falsely claims PASS is outside this test.
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. As a result, arm B's full-field recon (R-A vs R-B) shows dormant_h 1 and open_age_h 2 in every control. These mismatches are present in the frozen pack itself. The HALT rule "B recon 0/0/0" uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h.
+
+## Seeded Stage-4 states (frozen before execution; every arm runs both paths)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b2.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b2.txt`. No source variants are used in batch 2.
+- **W_RA_NOTHIN** (paths run: RA+RB): Stage-4 failure: R-A drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs.
+  - code seed `seeds/C34/RA_NOTHIN__run_RA.R` → `R-A\run_RA.R`, SHA-256 `65e90bf81cb2f573f744636947175fb3531b9053d76ee90fed1b003212c1f98b`
+- **W_RB_NOTHIN** (paths run: RA+RB): Stage-4 failure: R-B drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs.
+  - code seed `seeds/C34/RB_NOTHIN__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff`
+- **W_RB_K25** (paths run: RA+RB): Stage-4 failure: R-B production kappa 2.5 (recon fails); Stage 5 then runs.
+  - code seed `seeds/C34/RB_K25__00_config.R` → `R-B\R\00_config.R`, SHA-256 `401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90`
+- **W_RB_CRASH** (paths run: RA+RB): Stage-4 failure: R-B exits non-zero with no outputs; Stage 5 then runs.
+  - code seed `seeds/C34/RB_CRASH__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `d0bc0daccd1c7ebc0d5dc906d8f46ffd637a7954e0fa55b80190d3608f04f6ad`
+- **W_RA_ROUND1** (paths run: RA+RB): R-A reports dormant_h rounded to 0.1 h (labels unchanged; the frozen key+label recon passes); Stage 5 then runs.
+  - code seed `seeds/C34/RA_ROUND1__run_RA.R` → `R-A\run_RA.R`, SHA-256 `29071d305d5d74f203e9eafc58568ff81ac6c642bc233125a3f348cbb4aa45fd`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No changes when skipping gate. Fail: Skipping gate allows errors (keep rule)."
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. Here H is the Stage-5 harm set. Arms where the gate fails but Stage 5's outputs are unchanged are reported separately. Classification-level changes are reported for context.
+
+Additional HALT rule: HALT if arm B's gate result is not PASS, or if arm B's Stage-5 outputs differ from the frozen `stage-05/deeper` outputs.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs (as frozen unless an arm's seed states a fixture rewrite).
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures in the pack.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon (key set + classification, the frozen definition; see N1) is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   526568c5898349b441373216475c8ea55c2e711fd00a21ada7b13a09e6e275fc seeds/C34/ARMS.tsv
+seed   OK   65e90bf81cb2f573f744636947175fb3531b9053d76ee90fed1b003212c1f98b seeds/C34/RA_NOTHIN__run_RA.R
+seed   OK   29071d305d5d74f203e9eafc58568ff81ac6c642bc233125a3f348cbb4aa45fd seeds/C34/RA_ROUND1__run_RA.R
+seed   OK   d0bc0daccd1c7ebc0d5dc906d8f46ffd637a7954e0fa55b80190d3608f04f6ad seeds/C34/RB_CRASH__20_integrity_and_classify.R
+seed   OK   401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90 seeds/C34/RB_K25__00_config.R
+seed   OK   487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff seeds/C34/RB_NOTHIN__20_integrity_and_classify.R
+seed   OK   3a044155628a20d73d3d6889cf5de058f4919fa35932ffe6ddf5eeb1c2c238ab seeds/C34/STAGE45
+seed   OK   0d7256e38a04b6a429d9ceb36d3f9073674a06dcaf72213654395bcc2669b5c6 stage45/build_validated_action_list.R
+seed   OK   a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94 stage45/run_deeper_analysis.R
+seed   OK   a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430 stage45/stage1_decision.json
+seed   OK   4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a stage45/stage2_framing.json
+seed   OK   ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114 stage45/stage3_locked_design.json
+seed   OK   8c2644405d052194b2f46d089dd04eeca67b631058ecbfd09b9c63c906e9d711 stage45/stage45_receipt.R
+seed   OK   27a6e83c3ff2780aeb50c0a681d46b07590fe011ec45e6eb8bc87f28ca36c193 stage45/workflow_gate.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+526568c5898349b441373216475c8ea55c2e711fd00a21ada7b13a09e6e275fc  966  runner/seeds/C34/ARMS.tsv
+65e90bf81cb2f573f744636947175fb3531b9053d76ee90fed1b003212c1f98b  24992  runner/seeds/C34/RA_NOTHIN__run_RA.R
+29071d305d5d74f203e9eafc58568ff81ac6c642bc233125a3f348cbb4aa45fd  25055  runner/seeds/C34/RA_ROUND1__run_RA.R
+d0bc0daccd1c7ebc0d5dc906d8f46ffd637a7954e0fa55b80190d3608f04f6ad  6002  runner/seeds/C34/RB_CRASH__20_integrity_and_classify.R
+401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90  1882  runner/seeds/C34/RB_K25__00_config.R
+487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff  5951  runner/seeds/C34/RB_NOTHIN__20_integrity_and_classify.R
+3a044155628a20d73d3d6889cf5de058f4919fa35932ffe6ddf5eeb1c2c238ab  89  runner/seeds/C34/STAGE45
+0d7256e38a04b6a429d9ceb36d3f9073674a06dcaf72213654395bcc2669b5c6  636  runner/stage45/build_validated_action_list.R
+a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94  3439  runner/stage45/run_deeper_analysis.R
+a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  runner/stage45/stage1_decision.json
+4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  runner/stage45/stage2_framing.json
+ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  runner/stage45/stage3_locked_design.json
+8c2644405d052194b2f46d089dd04eeca67b631058ecbfd09b9c63c906e9d711  4481  runner/stage45/stage45_receipt.R
+27a6e83c3ff2780aeb50c0a681d46b07590fe011ec45e6eb8bc87f28ca36c193  8004  runner/stage45/workflow_gate.R
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+05:48:56 C34 arms
+05:49:09   B RA exit=0 secs=12.2
+05:49:35   B RB exit=0 secs=26.2
+05:49:37   B S4VAL exit=0 secs=2
+05:49:41   B S4RCPT exit=0 secs=4
+05:49:42   B GATE exit=0 secs=1
+05:49:44   B S5 exit=0 secs=2
+05:49:58   W_RA_NOTHIN RA exit=0 secs=13.1
+05:50:23   W_RA_NOTHIN RB exit=0 secs=25.2
+05:50:25   W_RA_NOTHIN S4VAL exit=0 secs=2
+05:50:29   W_RA_NOTHIN S4RCPT exit=0 secs=4.1
+05:50:31   W_RA_NOTHIN GATE exit=1 secs=2
+05:50:33   W_RA_NOTHIN S5 exit=1 secs=2
+05:50:45   W_RB_NOTHIN RA exit=0 secs=11.1
+05:51:11   W_RB_NOTHIN RB exit=0 secs=26.3
+05:51:14   W_RB_NOTHIN S4VAL exit=0 secs=2
+05:51:18   W_RB_NOTHIN S4RCPT exit=0 secs=4.1
+05:51:20   W_RB_NOTHIN GATE exit=1 secs=2
+05:51:22   W_RB_NOTHIN S5 exit=0 secs=2
+05:51:34   W_RB_K25 RA exit=0 secs=11.2
+05:52:00   W_RB_K25 RB exit=0 secs=26.4
+05:52:02   W_RB_K25 S4VAL exit=0 secs=2.1
+05:52:06   W_RB_K25 S4RCPT exit=0 secs=4.1
+05:52:07   W_RB_K25 GATE exit=1 secs=1
+05:52:10   W_RB_K25 S5 exit=0 secs=3
+05:52:23   W_RB_CRASH RA exit=0 secs=12.1
+05:52:24   W_RB_CRASH RB exit=1 secs=1
+05:52:26   W_RB_CRASH S4VAL exit=0 secs=2
+05:52:28   W_RB_CRASH S4RCPT exit=0 secs=2.1
+05:52:32   W_RB_CRASH GATE exit=1 secs=4
+05:52:35   W_RB_CRASH S5 exit=1 secs=2.1
+05:52:47   W_RA_ROUND1 RA exit=0 secs=12.2
+05:53:14   W_RA_ROUND1 RB exit=0 secs=26.3
+05:53:16   W_RA_ROUND1 S4VAL exit=0 secs=2
+05:53:20   W_RA_ROUND1 S4RCPT exit=0 secs=4.1
+05:53:21   W_RA_ROUND1 GATE exit=0 secs=1.2
+05:53:23   W_RA_ROUND1 S5 exit=0 secs=2
+
+---
+# C34_RESULTS.md (runner output)
+# C34 RESULTS — Deterministic Workflow Gate (catalog #34) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 5/5
+- H2b arm B Stage 4->5: receipt PASS, gate PASS (exit 0), Stage 5 exit 0; Stage 5 files differing from the frozen stage-05/deeper: none
+- H4 Stage-5 harm set H (Stage 5 completed with exit 0 and at least one Stage-5 output differs from arm B): {W_RB_NOTHIN,W_RA_ROUND1}
+- H4b arms with any classification locked-field change vs arm B (context): {W_RA_NOTHIN,W_RB_NOTHIN,W_RB_K25,W_RA_ROUND1}
+- H5 caught without the control [Stage 5 exits non-zero (its own independent count checks or a missing input); the gate result is ignored]: {W_RA_NOTHIN,W_RB_CRASH}
+- H6 H minus caught-without-control: {W_RB_NOTHIN,W_RA_ROUND1}
+- H7 arms with Stage 5 exit 0 and no Stage-5 output difference: {W_RB_K25}
+- H8 caught with the control [workflow gate result FAIL, or Stage 5 exits non-zero]: {W_RA_NOTHIN,W_RB_NOTHIN,W_RB_K25,W_RB_CRASH}
+- H9 gate FAIL, Stage 5 exit 0, no Stage-5 output difference: {W_RB_K25}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| W_RA_NOTHIN | RA+RB | Stage-4 failure: R-A drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs | RA=0 RB=0 | 13/14 (F06) | 14/14 | 0 | 0 | 6377 | 1 | 2 | only_x=0 only_B=0 label=6377 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 6377 | 6377 | TRUE | R-A\run_RA.R | NA | TRUE |
+| W_RB_NOTHIN | RA+RB | Stage-4 failure: R-B drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs | RA=0 RB=0 | 14/14 | 13/14 (F06) | 0 | 0 | 6377 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=6377 dormant=0 open_age=0 | 6377 | 6377 | TRUE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| W_RB_K25 | RA+RB | Stage-4 failure: R-B production kappa 2.5 (recon fails); Stage 5 then runs | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 6893 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | 6893 | 6893 | TRUE | R-B\R\00_config.R | NA | TRUE |
+| W_RB_CRASH | RA+RB | Stage-4 failure: R-B exits non-zero with no outputs; Stage 5 then runs | RA=0 RB=1 | 14/14 | NA/NA (MISSING_FILE) | NA | NA | NA | NA | NA | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=NA only_B=NA label=NA dormant=NA open_age=NA | 0 | 0 | FALSE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| W_RA_ROUND1 | RA+RB | R-A reports dormant_h rounded to 0.1 h (labels unchanged; the frozen key+label recon passes); Stage 5 then runs | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 221457 | 2 | only_x=0 only_B=0 label=0 dormant=221457 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 221457 | 0 | TRUE | R-A\run_RA.R | NA | FALSE |
+
+## Stage 4 -> gate -> Stage 5 per arm (C34_stage45.csv)
+| arm | receipt_status | receipt_unresolved | receipt_fail_fields | gate_exit | gate_result | validated_list_exit | stage5_exit | stage5_files_differing_from_B | n_stage5_files_differing |
+|---|---|---|---|---|---|---|---|---|---|
+| B | PASS | 0 |  | 0 | PASS | 0 | 0 |  | 0 |
+| W_RA_NOTHIN | FAIL | 2 | r_a_fixtures;reconciliation | 1 | FAIL | 0 | 1 | independent_checks_critical_counts.csv;portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv;kappa_sensitivity.csv;capacity_coverage_note.csv | 8 |
+| W_RB_NOTHIN | FAIL | 2 | r_b_fixtures;reconciliation | 1 | FAIL | 0 | 0 | kappa_sensitivity.csv | 1 |
+| W_RB_K25 | FAIL | 1 | reconciliation | 1 | FAIL | 0 | 0 |  | 0 |
+| W_RB_CRASH | FAIL | 3 | r_b_status;r_b_fixtures;reconciliation | 1 | FAIL | 0 | 1 | independent_checks_critical_counts.csv;portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv;kappa_sensitivity.csv;capacity_coverage_note.csv | 8 |
+| W_RA_ROUND1 | PASS | 0 |  | 0 | PASS | 0 | 0 | escalate_dormancy_summary.csv | 1 |
+
+
+---
+# C34_arms.csv (raw, full file)
+arm,paths_run,change,exit,fx_RA,fx_RB,recon_only_ra,recon_only_rb,recon_disagree,recon_dormant_mismatch,recon_open_age_mismatch,RA_vs_B,RB_vs_B,locked_field_changes_vs_B,decision_changes_vs_B,harm,inputs_differing_from_B,caught_with_control,caught_without_control
+W_RA_NOTHIN,RA+RB,Stage-4 failure: R-A drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs,RA=0 RB=0,13/14 (F06),14/14,0,0,6377,1,2,only_x=0 only_B=0 label=6377 dormant=0 open_age=0,only_x=0 only_B=0 label=0 dormant=0 open_age=0,6377,6377,TRUE,R-A\run_RA.R,NA,TRUE
+W_RB_NOTHIN,RA+RB,Stage-4 failure: R-B drops the I04 thin-peer clause (fixture F06 and recon fail); Stage 5 then runs,RA=0 RB=0,14/14,13/14 (F06),0,0,6377,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=0 label=6377 dormant=0 open_age=0,6377,6377,TRUE,R-B\R\20_integrity_and_classify.R,NA,TRUE
+W_RB_K25,RA+RB,Stage-4 failure: R-B production kappa 2.5 (recon fails); Stage 5 then runs,RA=0 RB=0,14/14,14/14,0,0,6893,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=0 label=6893 dormant=0 open_age=0,6893,6893,TRUE,R-B\R\00_config.R,NA,TRUE
+W_RB_CRASH,RA+RB,Stage-4 failure: R-B exits non-zero with no outputs; Stage 5 then runs,RA=0 RB=1,14/14,NA/NA (MISSING_FILE),NA,NA,NA,NA,NA,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=NA only_B=NA label=NA dormant=NA open_age=NA,0,0,FALSE,R-B\R\20_integrity_and_classify.R,NA,TRUE
+W_RA_ROUND1,RA+RB,R-A reports dormant_h rounded to 0.1 h (labels unchanged; the frozen key+label recon passes); Stage 5 then runs,RA=0 RB=0,14/14,14/14,0,0,0,221457,2,only_x=0 only_B=0 label=0 dormant=221457 open_age=0,only_x=0 only_B=0 label=0 dormant=0 open_age=0,221457,0,TRUE,R-A\run_RA.R,NA,FALSE
+
+---
+# C34_stage45.csv (raw, full file)
+arm,receipt_status,receipt_unresolved,receipt_fail_fields,gate_exit,gate_result,validated_list_exit,stage5_exit,stage5_files_differing_from_B,n_stage5_files_differing
+B,PASS,0,,0,PASS,0,0,,0
+W_RA_NOTHIN,FAIL,2,r_a_fixtures;reconciliation,1,FAIL,0,1,independent_checks_critical_counts.csv;portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv;kappa_sensitivity.csv;capacity_coverage_note.csv,8
+W_RB_NOTHIN,FAIL,2,r_b_fixtures;reconciliation,1,FAIL,0,0,kappa_sensitivity.csv,1
+W_RB_K25,FAIL,1,reconciliation,1,FAIL,0,0,,0
+W_RB_CRASH,FAIL,3,r_b_status;r_b_fixtures;reconciliation,1,FAIL,0,1,independent_checks_critical_counts.csv;portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv;kappa_sensitivity.csv;capacity_coverage_note.csv,8
+W_RA_ROUND1,PASS,0,,0,PASS,0,0,escalate_dormancy_summary.csv,1
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+B,RA,F01,ESCALATE,ESCALATE,TRUE
+B,RA,F02,STANDARD,STANDARD,TRUE
+B,RA,F03,STANDARD,STANDARD,TRUE
+B,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F10,STANDARD,STANDARD,TRUE
+B,RA,F11,ESCALATE,ESCALATE,TRUE
+B,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+B,RB,F01,ESCALATE,ESCALATE,TRUE
+B,RB,F02,STANDARD,STANDARD,TRUE
+B,RB,F03,STANDARD,STANDARD,TRUE
+B,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F10,STANDARD,STANDARD,TRUE
+B,RB,F11,ESCALATE,ESCALATE,TRUE
+B,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+W_RA_NOTHIN,RA,F01,ESCALATE,ESCALATE,TRUE
+W_RA_NOTHIN,RA,F02,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RA,F03,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RA,F06,INCONCLUSIVE,ESCALATE,FALSE
+W_RA_NOTHIN,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RA,F10,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RA,F11,ESCALATE,ESCALATE,TRUE
+W_RA_NOTHIN,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+W_RA_NOTHIN,RB,F01,ESCALATE,ESCALATE,TRUE
+W_RA_NOTHIN,RB,F02,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RB,F03,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RB,F10,STANDARD,STANDARD,TRUE
+W_RA_NOTHIN,RB,F11,ESCALATE,ESCALATE,TRUE
+W_RA_NOTHIN,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_NOTHIN,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_NOTHIN,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+W_RB_NOTHIN,RA,F01,ESCALATE,ESCALATE,TRUE
+W_RB_NOTHIN,RA,F02,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RA,F03,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RA,F10,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RA,F11,ESCALATE,ESCALATE,TRUE
+W_RB_NOTHIN,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+W_RB_NOTHIN,RB,F01,ESCALATE,ESCALATE,TRUE
+W_RB_NOTHIN,RB,F02,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RB,F03,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RB,F06,INCONCLUSIVE,ESCALATE,FALSE
+W_RB_NOTHIN,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RB,F10,STANDARD,STANDARD,TRUE
+W_RB_NOTHIN,RB,F11,ESCALATE,ESCALATE,TRUE
+W_RB_NOTHIN,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_NOTHIN,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_NOTHIN,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+W_RB_K25,RA,F01,ESCALATE,ESCALATE,TRUE
+W_RB_K25,RA,F02,STANDARD,STANDARD,TRUE
+W_RB_K25,RA,F03,STANDARD,STANDARD,TRUE
+W_RB_K25,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RA,F10,STANDARD,STANDARD,TRUE
+W_RB_K25,RA,F11,ESCALATE,ESCALATE,TRUE
+W_RB_K25,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+W_RB_K25,RB,F01,ESCALATE,ESCALATE,TRUE
+W_RB_K25,RB,F02,STANDARD,STANDARD,TRUE
+W_RB_K25,RB,F03,STANDARD,STANDARD,TRUE
+W_RB_K25,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RB,F10,STANDARD,STANDARD,TRUE
+W_RB_K25,RB,F11,ESCALATE,ESCALATE,TRUE
+W_RB_K25,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_K25,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_K25,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+W_RB_CRASH,RA,F01,ESCALATE,ESCALATE,TRUE
+W_RB_CRASH,RA,F02,STANDARD,STANDARD,TRUE
+W_RB_CRASH,RA,F03,STANDARD,STANDARD,TRUE
+W_RB_CRASH,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_CRASH,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_CRASH,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_CRASH,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_CRASH,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_CRASH,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_CRASH,RA,F10,STANDARD,STANDARD,TRUE
+W_RB_CRASH,RA,F11,ESCALATE,ESCALATE,TRUE
+W_RB_CRASH,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RB_CRASH,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RB_CRASH,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+W_RA_ROUND1,RA,F01,ESCALATE,ESCALATE,TRUE
+W_RA_ROUND1,RA,F02,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RA,F03,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RA,F10,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RA,F11,ESCALATE,ESCALATE,TRUE
+W_RA_ROUND1,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+W_RA_ROUND1,RB,F01,ESCALATE,ESCALATE,TRUE
+W_RA_ROUND1,RB,F02,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RB,F03,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RB,F10,STANDARD,STANDARD,TRUE
+W_RA_ROUND1,RB,F11,ESCALATE,ESCALATE,TRUE
+W_RA_ROUND1,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+W_RA_ROUND1,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+W_RA_ROUND1,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+
+---
+# C34_EVIDENCE.sha256
+9e5697aae8aa941584a9e751648e3db8bbaa31955d61f221129e43135f8b4323  C34_ARM_MANIFESTS.txt
+941cb991903815d564b070caaeb09c6cae3dd53147308da000fcc45ead82d772  C34_arms.csv
+0de4d1c16118631d1080b3204c4e45cb0887ac621675426f10664718bd05f81a  C34_RESULTS.md
+d5d748025855eb6ac309b5800ce15dbfafcd9817df916d3a746c1d1af88ef8de  C34_stage45.csv
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+B out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+B out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+B out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+B out :: f341c8cafea24a8d2bfccc374ed958cbcbcd8270639d13c7295df58aa3811aab  977  docs\stage-04-execution-validation\stage4_validation_status.json
+B out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+B out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+B out :: 7f4cccf1653f3fdd51007a64f374549dd4259445e9a8c31206397907377df5f1  31  RUN_GATE.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+B out :: 94b6b55028eef49494fe3daa860a33f6b2f94e9a45e192c337ef43e2465855ea  2001  RUN_GATE.stdout.txt
+B out :: 5ac9403b5565993e51e20e496cb33d522196dbc256279b32a2e65d1d4192c6c4  34  RUN_RA.exit
+B out :: de71dc4c6b815ca26d8d393a4794d14cc52efabb4715769205274e12129c3ecf  779  RUN_RA.stderr.txt
+B out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+B out :: 29f09b5830470198a7a7f5ec67c5d4742525966622fb67f8aa7f30fe0f286f6e  34  RUN_RB.exit
+B out :: f340958728688a39e1168d179b796c154d09d1e58c1ecccce4ec9541637526c4  1260  RUN_RB.stderr.txt
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+B out :: 8f3a4e155c445cfd2845c0c95e57fdb6ef6520fa56c6b37f6b339064d08c0ac4  31  RUN_S4RCPT.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+B out :: 748f87cf1c25e715b437e861c18575c41ab851c15a62742460818ea74637e560  152  RUN_S4RCPT.stdout.txt
+B out :: 1b4a2bc136f1a18ff654be56405f427c99bcfb041a1dd2a9322ca4ba1ac52dc8  31  RUN_S4VAL.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+B out :: 8148a20025ac08e84418b23c6184b972074607adcec4819c3c68b2e586c1bca0  21  RUN_S4VAL.stdout.txt
+B out :: 7a6c9804e3bd2b90dba47d7f32f30ab2f0513f7a126c66257a2aaac5641690c8  31  RUN_S5.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+B out :: b1f4609074e36d9a6f1244337be0eb5cc99f9ecc534d6658a636cf71f0c5a4ea  1970  RUN_S5.stdout.txt
+B out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+B out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+B out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+B out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+B out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+B out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+B out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+B out :: 3280908332673d85e6c6dbedf0aeecb7e8d48d9e15c3b987d272331f1356f3cb  5159  validation\workflow-gate\workflow_gate_status.json
+W_RA_NOTHIN in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+W_RA_NOTHIN in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+W_RA_NOTHIN in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+W_RA_NOTHIN in  :: 65e90bf81cb2f573f744636947175fb3531b9053d76ee90fed1b003212c1f98b  24992  R-A\run_RA.R
+W_RA_NOTHIN in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+W_RA_NOTHIN in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+W_RA_NOTHIN in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+W_RA_NOTHIN in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+W_RA_NOTHIN in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+W_RA_NOTHIN out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+W_RA_NOTHIN out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+W_RA_NOTHIN out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+W_RA_NOTHIN out :: 6b3bd8cd1cfc94d41d0d9777d2ab31e34522191dec8f0f83f0ec4c67d34b7846  980  docs\stage-04-execution-validation\stage4_validation_status.json
+W_RA_NOTHIN out :: 43f28d6fe3d45750e9adaba1bc50b8c85b139aba6653fc8ccfad5121920c264a  13628028  outputs\validated_action_list.csv
+W_RA_NOTHIN out :: 40c85fac6c24a8b7e78d8f99639d7812ee90000caa20b0eb2a31e32739afbfa5  22214208  R-A\outputs\RA_classifications.csv
+W_RA_NOTHIN out :: 4a8430726b557a0f7a1b210e130349563d4acd17ff832f8833695d86622ba1c7  982  R-A\outputs\RA_fixture_results.csv
+W_RA_NOTHIN out :: 94cf2ea6e67d0cbcc8cbcf4951b842edc069e0e4e64f732391ffce2d9d088025  137  R-A\outputs\RA_portfolio_counts.csv
+W_RA_NOTHIN out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+W_RA_NOTHIN out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+W_RA_NOTHIN out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+W_RA_NOTHIN out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+W_RA_NOTHIN out :: d74e1bdef2502f7bb6c06ccdfa7721411b9e0c40ab207f290b7d1c3570e6fce6  31  RUN_GATE.exit
+W_RA_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+W_RA_NOTHIN out :: d0fb4ecebd53869ca14e73223e056538f48dc0d538b99de09fa197e603b00363  2010  RUN_GATE.stdout.txt
+W_RA_NOTHIN out :: 024987a785fe9deea632c5e9c31df4f9cfbbb5883ea505802ff42f38f15b3c05  34  RUN_RA.exit
+W_RA_NOTHIN out :: 8d0745a2758a6415b630abdec8c2f15ade83009baa106d4aefa23906f2eac989  849  RUN_RA.stderr.txt
+W_RA_NOTHIN out :: 8b21639ef974569d99562159a19a238987ccbf37e982804bb53d3d4117917e18  1361  RUN_RA.stdout.txt
+W_RA_NOTHIN out :: 661d505bf1e76b89e867526d473815dea4adb12435df4d70bc58d82862c9028b  34  RUN_RB.exit
+W_RA_NOTHIN out :: edd5aa2ef0057446e3b98709199a047b1895613244127c9c897a96f8120375d6  1310  RUN_RB.stderr.txt
+W_RA_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+W_RA_NOTHIN out :: 31810f31d3588ec31f5044b0a2cd6374ebf652928516315db3139c788902f23b  33  RUN_S4RCPT.exit
+W_RA_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+W_RA_NOTHIN out :: 66576d0052bfaa92cdaa54b6f0d53ff1ab8f964d9c47968bf88b47777433c69f  152  RUN_S4RCPT.stdout.txt
+W_RA_NOTHIN out :: 2250785d261437adbc611214ecedbdd709eb1cc81a400b61a84d10073b5d7504  31  RUN_S4VAL.exit
+W_RA_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+W_RA_NOTHIN out :: 818376b9163728f2aedc44e99362e70da79062ad067490d47ef5b7924f12d98e  21  RUN_S4VAL.stdout.txt
+W_RA_NOTHIN out :: 77edc89ed05c373eff6c8963ccbf85404070916ad49cf4d9af684d0c4fd30874  31  RUN_S5.exit
+W_RA_NOTHIN out :: dc58f53369f6cf0f187f87c54387c60036706884ec7f770a47f6601ebb59bf1d  52  RUN_S5.stderr.txt
+W_RA_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stdout.txt
+W_RA_NOTHIN out :: 900012c884a69e4e7bbd5c7c575eb443f55e85d94f186706fcabc006fd2563bc  191  stage-05\deeper\independent_checks_critical_counts.csv
+W_RA_NOTHIN out :: 747bc66dc649393dcbe98d0b05515901bc9de37a183fb79797106dd4e267259a  5210  validation\workflow-gate\workflow_gate_status.json
+W_RA_ROUND1 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+W_RA_ROUND1 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+W_RA_ROUND1 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+W_RA_ROUND1 in  :: 29071d305d5d74f203e9eafc58568ff81ac6c642bc233125a3f348cbb4aa45fd  25055  R-A\run_RA.R
+W_RA_ROUND1 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+W_RA_ROUND1 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+W_RA_ROUND1 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+W_RA_ROUND1 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+W_RA_ROUND1 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+W_RA_ROUND1 out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+W_RA_ROUND1 out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+W_RA_ROUND1 out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+W_RA_ROUND1 out :: f341c8cafea24a8d2bfccc374ed958cbcbcd8270639d13c7295df58aa3811aab  977  docs\stage-04-execution-validation\stage4_validation_status.json
+W_RA_ROUND1 out :: e6db30774bc56d9de4342a9a3ca2562e52bcb8abe3f9d065541ac6441b430f34  12962554  outputs\validated_action_list.csv
+W_RA_ROUND1 out :: cc6491d612670a73f15006ba4715cba3a8f8cb2605923b20df2b77981bde5f23  21158499  R-A\outputs\RA_classifications.csv
+W_RA_ROUND1 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+W_RA_ROUND1 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+W_RA_ROUND1 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+W_RA_ROUND1 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+W_RA_ROUND1 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+W_RA_ROUND1 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+W_RA_ROUND1 out :: c71ce7be2797bb5d8289e8f8b15c087bcb685587ba83ad8610d29c990670fb67  33  RUN_GATE.exit
+W_RA_ROUND1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+W_RA_ROUND1 out :: ccb5c27bf0bf7d7e12b1b384a12df4eca5c308de287c0b24c882c387e23ddff1  2011  RUN_GATE.stdout.txt
+W_RA_ROUND1 out :: 0138787c75718c81cb2665a4e470007eeed324d49b39b59b8c1c8d66c1917605  34  RUN_RA.exit
+W_RA_ROUND1 out :: b2658816a099cead4ccd66b8d7c578310a422ac69cdf2725dd6d9ad6be8efd1f  849  RUN_RA.stderr.txt
+W_RA_ROUND1 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+W_RA_ROUND1 out :: e90c549c1a97052761e2c3123c47c4da6abf43d800231559ea36e2bcbc9486b9  34  RUN_RB.exit
+W_RA_ROUND1 out :: c86ee61cb42cf2bb07013fd22a4f74fa968df7f6fc94ca7e1baa9d45569ae4bb  1310  RUN_RB.stderr.txt
+W_RA_ROUND1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+W_RA_ROUND1 out :: e165f9fbd1cce066d786432e9acd4c60c212c359bddc187e243ed1fbfc6badd9  33  RUN_S4RCPT.exit
+W_RA_ROUND1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+W_RA_ROUND1 out :: 748f87cf1c25e715b437e861c18575c41ab851c15a62742460818ea74637e560  152  RUN_S4RCPT.stdout.txt
+W_RA_ROUND1 out :: e1d5ec1a787f948a9548b375339ae5f4ce48cb6b0783cd81c12b7caf2ab97f4b  31  RUN_S4VAL.exit
+W_RA_ROUND1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+W_RA_ROUND1 out :: 8148a20025ac08e84418b23c6184b972074607adcec4819c3c68b2e586c1bca0  21  RUN_S4VAL.stdout.txt
+W_RA_ROUND1 out :: aae30f8cc0c0ec93de68e32267dc222b153ac4092bf038d18dcaed5cef6c01a1  31  RUN_S5.exit
+W_RA_ROUND1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+W_RA_ROUND1 out :: 76069be831ff68380f14a29fd0562b1161833f7a06baa821acd36ac15a39ef4c  1980  RUN_S5.stdout.txt
+W_RA_ROUND1 out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+W_RA_ROUND1 out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+W_RA_ROUND1 out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+W_RA_ROUND1 out :: 6ce012c4410a9c0b4e2331fc4fa1aecf92fe666da9498a03a6f577d497ca0e93  118  stage-05\deeper\escalate_dormancy_summary.csv
+W_RA_ROUND1 out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+W_RA_ROUND1 out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+W_RA_ROUND1 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+W_RA_ROUND1 out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+W_RA_ROUND1 out :: 8175ed61234920e77716f56c7b8cc6e4617b914b3ad3b8d93e1d55b7aaec3bfa  5209  validation\workflow-gate\workflow_gate_status.json
+W_RB_CRASH in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+W_RB_CRASH in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+W_RB_CRASH in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+W_RB_CRASH in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+W_RB_CRASH in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+W_RB_CRASH in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+W_RB_CRASH in  :: d0bc0daccd1c7ebc0d5dc906d8f46ffd637a7954e0fa55b80190d3608f04f6ad  6002  R-B\R\20_integrity_and_classify.R
+W_RB_CRASH in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+W_RB_CRASH in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+W_RB_CRASH out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+W_RB_CRASH out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+W_RB_CRASH out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+W_RB_CRASH out :: 9f5d3e5a9383bd984a9da87a2c5234ed8291e8119660b2ebe284122515d4a302  986  docs\stage-04-execution-validation\stage4_validation_status.json
+W_RB_CRASH out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+W_RB_CRASH out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+W_RB_CRASH out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+W_RB_CRASH out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+W_RB_CRASH out :: abcc6ac80beac25f16bd10dcf9457316f1e5acbc6a073a4fb412d2c4cd7befd1  31  RUN_GATE.exit
+W_RB_CRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+W_RB_CRASH out :: fce8105fdff66e91b1b419b895c5fef47e97737189dddf5196e2c0ef519e93d3  2009  RUN_GATE.stdout.txt
+W_RB_CRASH out :: 5480903a371d3cb9552b1345458f623ec22f684c4155dee386acad1646b74bc9  34  RUN_RA.exit
+W_RB_CRASH out :: 8d241a488e4f5450fd89b17fb76085212b5f9f5ed1747ffcef24735dabc5e3b6  842  RUN_RA.stderr.txt
+W_RB_CRASH out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+W_RB_CRASH out :: e7866ec0db4933ac779f72dfd287c35a395b3b73422579127f70459ecc9ea5b0  31  RUN_RB.exit
+W_RB_CRASH out :: 8d0b4a995ae38c18d8843497a21b5de173a406887d32f6439dcc5b8a8cff7413  449  RUN_RB.stderr.txt
+W_RB_CRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+W_RB_CRASH out :: ecf657a3627dc13714be5a74f8d4fc0c5eb3b9bc2dd857ae143ff2af2e6ef510  33  RUN_S4RCPT.exit
+W_RB_CRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+W_RB_CRASH out :: 9799f8d9dff7430d72360f9139f2d474684138b3fb1e3efe5ba4713df484cb0b  152  RUN_S4RCPT.stdout.txt
+W_RB_CRASH out :: 5c41f39b408ca0dc22ae82e943c89f3246016c1a01b715f618cf07352593f808  31  RUN_S4VAL.exit
+W_RB_CRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+W_RB_CRASH out :: 8148a20025ac08e84418b23c6184b972074607adcec4819c3c68b2e586c1bca0  21  RUN_S4VAL.stdout.txt
+W_RB_CRASH out :: cfbf58259d8e59d39ee1defe0b7045ffa9e31ad0441aefb1767bece986988639  33  RUN_S5.exit
+W_RB_CRASH out :: 769869b4725b804af302ec6ad1bf594887d83d4a591b43abaffc6b1e3af0623c  579  RUN_S5.stderr.txt
+W_RB_CRASH out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stdout.txt
+W_RB_CRASH out :: 5e2e7080047b2893102a59984ca7057e5b9fa14fa61b906bb6c284784217e497  5294  validation\workflow-gate\workflow_gate_status.json
+W_RB_K25 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+W_RB_K25 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+W_RB_K25 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+W_RB_K25 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+W_RB_K25 in  :: 401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90  1882  R-B\R\00_config.R
+W_RB_K25 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+W_RB_K25 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+W_RB_K25 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+W_RB_K25 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+W_RB_K25 out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+W_RB_K25 out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+W_RB_K25 out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+W_RB_K25 out :: 17ca9695d9d46616cf983ff59945fc0fd569d9e986870f8c5c599bf8813cfa48  980  docs\stage-04-execution-validation\stage4_validation_status.json
+W_RB_K25 out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+W_RB_K25 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+W_RB_K25 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+W_RB_K25 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+W_RB_K25 out :: 50f568f8472b3311fee4a45c93207f713dd0b481fdfd4bf259e67c3d4ae1c2d7  42407737  R-B\outputs\RB_classifications.csv
+W_RB_K25 out :: f777621e1e04035e18b38f927cdf4335d113da563b675fbcf689ba7d9f4edba9  1820  R-B\outputs\RB_fixture_results.csv
+W_RB_K25 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+W_RB_K25 out :: 5afe84701b13a4db781faf9fb22910dfee54879ad22cacc07027687330b33485  102  R-B\outputs\RB_portfolio_counts.csv
+W_RB_K25 out :: 9dfa88bff113be5286cb66333f6a59db9fd7475aadf0d43703dec9c8aadbdf48  31  RUN_GATE.exit
+W_RB_K25 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+W_RB_K25 out :: 6e1849e8a7429276109693c770416417d5f15987575c2b2e7a9b75f5151952c0  2007  RUN_GATE.stdout.txt
+W_RB_K25 out :: abd6796c53e5f4e61fcf5a85916c2abab694970d1d836fd26eb620f88e2fcbd0  34  RUN_RA.exit
+W_RB_K25 out :: dcfbe7a33c9d1f2efeaae426f5d7b0e8b2c1586d23e6a50e688380f391d9564f  828  RUN_RA.stderr.txt
+W_RB_K25 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+W_RB_K25 out :: 6c4b11a569bea9fb47d86958050054893a2d89803892993ad0431e55361589d6  34  RUN_RB.exit
+W_RB_K25 out :: 8d6814737456add3f1b11944d6f69a5a9a280dec81f8325c0e909e1f6176fcb6  1297  RUN_RB.stderr.txt
+W_RB_K25 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+W_RB_K25 out :: 98c8807ac402fa5b72474b839645821a365239b9c017bac716c375b67c4e6332  33  RUN_S4RCPT.exit
+W_RB_K25 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+W_RB_K25 out :: 108ef2222cdd130c942cc711a97a2ae84f572500cd19252127b7edb837e469ae  152  RUN_S4RCPT.stdout.txt
+W_RB_K25 out :: 9bdcf2940f208047cb955f923352925b6c1d7116fcc72f5cd344ddcee55798cb  33  RUN_S4VAL.exit
+W_RB_K25 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+W_RB_K25 out :: 8148a20025ac08e84418b23c6184b972074607adcec4819c3c68b2e586c1bca0  21  RUN_S4VAL.stdout.txt
+W_RB_K25 out :: 2dfe4567b4a14629052f960e2ae84d9be7613db514e8685feecc26f2c9823572  31  RUN_S5.exit
+W_RB_K25 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+W_RB_K25 out :: a298100ea8816840aa8a22311ac01f8f982ae96d610e9d050ca55b222631f16a  1977  RUN_S5.stdout.txt
+W_RB_K25 out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+W_RB_K25 out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+W_RB_K25 out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+W_RB_K25 out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+W_RB_K25 out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+W_RB_K25 out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+W_RB_K25 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+W_RB_K25 out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+W_RB_K25 out :: b57d430ca1ddee205bf0ac66f4c4001d61a73759dd1e5c8af008bea2786688ee  5195  validation\workflow-gate\workflow_gate_status.json
+W_RB_NOTHIN in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+W_RB_NOTHIN in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+W_RB_NOTHIN in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+W_RB_NOTHIN in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+W_RB_NOTHIN in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+W_RB_NOTHIN in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+W_RB_NOTHIN in  :: 487b769ce4cfcae6ad773f3611b11728271dc35e3ffc9f6590c49e30f65639ff  5951  R-B\R\20_integrity_and_classify.R
+W_RB_NOTHIN in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+W_RB_NOTHIN in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+W_RB_NOTHIN out :: a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430  1007  docs\stage-01-02-start-framing\stage1_decision.json
+W_RB_NOTHIN out :: 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a  1419  docs\stage-01-02-start-framing\stage2_framing.json
+W_RB_NOTHIN out :: ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114  9050  docs\stage-03-measurement-design\stage3_locked_design.json
+W_RB_NOTHIN out :: 4f56fcd9572841b51887a8bcc6de6790dace0245057b9b03a01307b24a1bda7a  980  docs\stage-04-execution-validation\stage4_validation_status.json
+W_RB_NOTHIN out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+W_RB_NOTHIN out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+W_RB_NOTHIN out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+W_RB_NOTHIN out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+W_RB_NOTHIN out :: f6611d8dcec6b65e6f6a9cfee6f9b500dd5b4b2b9667b4785be42d0a28f419f8  42217063  R-B\outputs\RB_classifications.csv
+W_RB_NOTHIN out :: 22638dab341ff6c64dc00b8697ceceb73f52331dffcbadc037659b17865921bb  1836  R-B\outputs\RB_fixture_results.csv
+W_RB_NOTHIN out :: 9346c86d6f6dfe60a40c29458c58a2d6b73b7a0a96d074240f5964faafe2581d  153  R-B\outputs\RB_kappa_grid_counts.csv
+W_RB_NOTHIN out :: c9982cb11d39f6f6cf10f8f1a0034abe160b039c05a04ffeff50e14d826bdb15  97  R-B\outputs\RB_portfolio_counts.csv
+W_RB_NOTHIN out :: 4b258f59e4505d01aff34d602e496278fdf06716ecad2d52e9333101ae84d2a2  31  RUN_GATE.exit
+W_RB_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+W_RB_NOTHIN out :: f394c8691b5bab074ce888b6bbacd4b52381a913047d05be6fefb105928c10bc  2010  RUN_GATE.stdout.txt
+W_RB_NOTHIN out :: ad7b12e726e91c1ce13ccd3089c1a548e1a6a3eef6250c7b9b054ce496cb0f14  34  RUN_RA.exit
+W_RB_NOTHIN out :: 8a2ceea0b373c59c974802364f954f8df5d0a8c6961e592e4a77da1364d62431  849  RUN_RA.stderr.txt
+W_RB_NOTHIN out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+W_RB_NOTHIN out :: 36a9824d2000dfc121c87b7d910448f71240988b0fd421fe2a85c141bfb0478f  34  RUN_RB.exit
+W_RB_NOTHIN out :: d40792b32a7b3f95abb2bfa11edd2a091bdc7c50c4ba2f44e6d2be72066b7ba7  1307  RUN_RB.stderr.txt
+W_RB_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+W_RB_NOTHIN out :: 56fcdb09d413f08cb0cb567fae9c86bffe02a6be159e0def65f44d2ded212ddf  33  RUN_S4RCPT.exit
+W_RB_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4RCPT.stderr.txt
+W_RB_NOTHIN out :: 047946ac4817eb1ff21db8963d4a84f2b9568f9d1a89f4f30e0cb501fe9f71e7  152  RUN_S4RCPT.stdout.txt
+W_RB_NOTHIN out :: 312054b39fb83cf9a888057736439c71223a822baa6997fc0866d03ae2365c5b  31  RUN_S4VAL.exit
+W_RB_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S4VAL.stderr.txt
+W_RB_NOTHIN out :: 8148a20025ac08e84418b23c6184b972074607adcec4819c3c68b2e586c1bca0  21  RUN_S4VAL.stdout.txt
+W_RB_NOTHIN out :: 8e3a8209bfc0fd5698cccf3093766540b8982d220961d35aad4774d5b8b1de61  31  RUN_S5.exit
+W_RB_NOTHIN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+W_RB_NOTHIN out :: f8ccb8089036bac580acb4f7b821d38a5ecea35608f420edb5ea7d21df47dee1  1980  RUN_S5.stdout.txt
+W_RB_NOTHIN out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+W_RB_NOTHIN out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+W_RB_NOTHIN out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+W_RB_NOTHIN out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+W_RB_NOTHIN out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+W_RB_NOTHIN out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+W_RB_NOTHIN out :: 9346c86d6f6dfe60a40c29458c58a2d6b73b7a0a96d074240f5964faafe2581d  153  stage-05\deeper\kappa_sensitivity.csv
+W_RB_NOTHIN out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+W_RB_NOTHIN out :: 3bc6b4b5fd0ee260cd29753c60a4e638123dd69c40cbc0bffc3873e73bcdc203  5210  validation\workflow-gate\workflow_gate_status.json
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-A/run_RA.R
++++ seeds/C34/RA_NOTHIN__run_RA.R
+@@ -298,7 +298,7 @@
+   check(!is.na(base$created_ts) & !is.na(base$mod_ts) & base$mod_ts < base$created_ts, "inverted_clocks")
+   check(!is.na(base$created_ts) & base$created_ts > t_freeze, "created_after_T")
+   check(base$parent_nonblank, "orphan_parent_nonblank")
+-  check(base$peer_missing | base$peer_n < n_min, "thin_type_or_missing_peer")
++  check(rep(FALSE, nrow(base)), "thin_type_or_missing_peer")
+   check(is.na(base$dormant_h), "unparseable_dormant_h")
+ 
+   # Decision among remaining coherent rows
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C34/RB_NOTHIN__20_integrity_and_classify.R
+@@ -56,7 +56,7 @@
+   p_bad_clock <- is.na(created_ts) | is.na(mod_ts) | (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+-  p_thin <- peer_n < RB_N_MIN
++  p_thin <- rep(FALSE, n)
+   p_parent <- parent_nonblank
+   p_missing_dormant <- is.na(mod_ts) | is.na(dormant_h)
+ 
+--- frozen/R-B/R/00_config.R
++++ seeds/C34/RB_K25__00_config.R
+@@ -10,7 +10,7 @@
+ RB_T_FREEZE <- as.POSIXct("2026-09-12 23:59:59", tz = "America/Chicago")
+ 
+ # Owner-tunable production knob
+-RB_KAPPA_DEFAULT <- 2.0
++RB_KAPPA_DEFAULT <- 2.5
+ 
+ # Method constants (not knobs)
+ RB_N_MIN <- 50L
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C34/RB_CRASH__20_integrity_and_classify.R
+@@ -3,6 +3,7 @@
+ #' Apply locked decision rules independently (R-B).
+ #' Returns one row per input SR with classification or OUT_OF_SET.
+ rb_judge_rows <- function(open_df, peer_df, kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE) {
++  stop("[seed] simulated R-B Stage-4 failure")
+   peers <- peer_df[!duplicated(peer_df$type_key), , drop = FALSE]
+   joined <- merge(open_df, peers, by = "type_key", all.x = TRUE, sort = FALSE)
+ 
+--- frozen/R-A/run_RA.R
++++ seeds/C34/RA_ROUND1__run_RA.R
+@@ -314,7 +314,7 @@
+     SR_NUMBER = base$SR_NUMBER,
+     type_key = base$type_key,
+     classification = classification,
+-    dormant_h = round(base$dormant_h, 6),
++    dormant_h = round(base$dormant_h, 1),  # [seed] reported dormant_h rounded to 0.1 h
+     peer_n = base$peer_n,
+     peer_p75_h = base$peer_p75_h,
+     kappa = base$kappa,
+--- frozen/outputs/build_validated_action_list.R
++++ stage45/build_validated_action_list.R
+@@ -1,7 +1,8 @@
+ suppressPackageStartupMessages({library(readr); library(dplyr)})
+-ra <- read_csv("C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_classifications.csv", show_col_types=FALSE)
++ra <- read_csv(file.path(Sys.getenv("CHICAGO311_ROOT"), "R-A/outputs/RA_classifications.csv"), show_col_types=FALSE)
+ names(ra) <- tolower(names(ra))
+ esc <- ra %>% filter(classification == "ESCALATE") %>%
+   transmute(SR_NUMBER = sr_number, type_key, action = classification, dormant_h, peer_n, peer_p75_h, kappa, open_age_h, integrity_clause, rule_version)
+-write_csv(esc, "C:/Users/Mark/Documents/R Working Directory/chicago311/outputs/validated_action_list.csv")
++dir.create(file.path(Sys.getenv("CHICAGO311_ROOT"), "outputs"), showWarnings = FALSE)
++write_csv(esc, file.path(Sys.getenv("CHICAGO311_ROOT"), "outputs/validated_action_list.csv"))
+ cat("escalate_n=", nrow(esc), "\n")--- frozen/stage-05/run_deeper_analysis.R
++++ stage45/run_deeper_analysis.R
+@@ -6,7 +6,7 @@
+   library(stringr)
+ })
+ 
+-root <- "C:/Users/Mark/Documents/R Working Directory/chicago311"
++root <- Sys.getenv("CHICAGO311_ROOT")  # [harness] path only
+ out <- file.path(root, "stage-05", "deeper")
+ dir.create(out, recursive = TRUE, showWarnings = FALSE)
+ 
+
+

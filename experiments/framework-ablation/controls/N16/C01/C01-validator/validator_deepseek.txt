@@ -1,0 +1,162 @@
+C01 VALIDATOR REPORT
+1. Role attestation and ablation ID
+I am the Validator, DeepSeek (DeepThink on, Search off). I am blind to the Builder and did not request or use Builder output. I return no terminal state.
+
+Ablation ID: C01, batch N16, owner control #1: Stage-3 blindness (one unblinded design chat). Extra chat X12, shared with C02. BASE arm: real blind Design A (frozen/stage3/AI1_DESIGN_A.md). VARIANT arm: X12 ChatGPT design chat (X12/packets/X12_DESIGN_ChatGPT.txt). Constitution version 1.0.
+
+2. Independent test plan: what I checked, and how
+I checked:
+
+the frozen SPEC, constitution, preflight, extra-freeze record, post-chat score, scorer source, seed-diff record, frozen baseline Design A, and the verbatim X12 reply;
+
+hash and byte equality across the records;
+
+manual replay of the scorer’s mechanical logic for S1 detection/adoption, S2 cross-check, 8-topic coverage, and END-line completeness;
+
+source-manifest arithmetic and identity sums;
+
+N16 scope facts: no R run, no fixture, no MySQL, text-only capture.
+
+Fixture and reconciliation items are not applicable to N16: there is no R run and no fixture pack. Text-level equivalents I used are: END count/last-line check, ingest byte/hash checks, and the frozen mechanical scorer conditions.
+
+3. Independently recomputed hard facts
+Hash and byte equalities
+Item	Recomputed / cross-checked value	Equality result
+Constitution	e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9	Matches SPEC, preflight frozen/CONSTITUTION_v1.md, FROZEN REFERENCE HASHES
+Owner rulings sheet	1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417	Matches SPEC, preflight frozen/rulings/OWNER_RULINGS_BATCH_02.md
+Owner answers	3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b	Matches SPEC, preflight frozen/rulings/OWNER_BATCH_02_ANSWERS.md
+Baseline framework 1	70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c	Matches SPEC baseline hashes
+Baseline framework 2	24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e	Matches SPEC baseline hashes
+scorers/score_x12.py	fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1	Matches SPEC, FROZEN REFERENCE HASHES, EXTRA_FREEZE.json, post-chat score
+scorers/build_x12.py	73f4e8ab7c4625526de13917f410b3ebfdf062bd79c6bcdf17648588116b4abc	Matches SPEC, FROZEN REFERENCE HASHES
+scorers/n16lib.py	4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47	Matches SPEC, FROZEN REFERENCE HASHES
+X12 packet	1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372, 48576 bytes	Matches SPEC and EXTRA_FREEZE.json
+X12 reply	95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38, 66709 bytes	Matches EXTRA_FREEZE.json reply hash and post-chat score
+Text-only source	aee7f51dc16e390d86a83b7bda9f468295c06fb2cc04e949ef040a87c7c4d0ad, 66712 bytes	Matches EXTRA_FREEZE.json ingest source; output is 66709 bytes, difference 3 bytes
+X12 post score	0ebccad90338bcce3476c4d45d033bf2e75900998df98efd488fd8a83d2fe8f0	Recorded in EXTRA_FREEZE.json; text hash not independently recomputed from the full raw file here
+Preflight	75 frozen files OK; failures: 0	Matches PREFLIGHT text
+Frozen baseline Design A	7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988, 11256 bytes	Preflight OK
+Source-manifest arithmetic
+From the frozen source manifest excerpt:
+
+Completed 14,177,547
+
+Open 245,193
+
+Canceled 212,654
+
+Closed 1
+
+Sum: 14,177,547 + 245,193 + 212,654 + 1 = 14,635,395
+
+Physical source rows: 14,635,395
+
+Distinct SR_NUMBER: 14,635,395
+
+Duplicate SR_NUMBER: 0
+
+Import skipped/deleted/warnings: 0 / 0 / 0
+
+Missing CLOSED_DATE: 245,217
+
+Open count: 245,193
+
+Marginal difference: 245,217 - 245,193 = 24
+
+This 24-row difference is a source-manifest fact only. It is not an N16 executed result and is not used in the C01 mechanical P1 score.
+
+D-sets / detection and adoption sets
+Manual replay of scorer logic:
+
+S1 p25 lines: n = 1
+
+S1 detected (s1_det): n = 1
+
+S1 adopted (s1_adopt): n = 0
+
+S2 detected (s2_det), cross-check for C02: n = 2
+
+S2 adopted (s2_adopt), cross-check for C02: n = 3
+
+The S1 critique line is the reply’s Design B review line: it flags peer_p25_h as an internal specification inconsistency against peer_p75_h. The reply’s own rule uses open_age_days_threshold=14, not peer_p25.
+
+Coverage recomputation
+Topic	Real Design A baseline	X12 reply
+window	True	True
+open_eligible	True	True
+parse_tz	False	True
+dup_legacy_parent	False	True
+activity	True	True
+knob	True	True
+fixtures	True	True
+capacity	True	True
+Sum	6	8
+Coverage delta: 8 - 6 = +2. Condition 3 is therefore mechanically satisfied.
+
+END / ingest completeness
+From EXTRA_FREEZE.json ingest checks:
+
+end_count = 1
+
+end_last_line = true
+
+length_ok = true
+
+ok = true
+
+The verbatim reply ends with END X12 DESIGN as the last non-empty line. Condition 4 is mechanically satisfied.
+
+Cross-arm and N16 scope
+No R-A/R-B path is run in N16.
+
+No MySQL, no fresh pull, no PC run.
+
+N1 / OF-1 cannot enter N16 numbers because N16 reads only frozen Stage 1–5 text, logs, and C48 outputs.
+
+X12 is a shared chat with C02; the SPEC declares that effects are not separated and are attributed by seed/scorer conditions.
+
+Internal inconsistency check
+No mechanical inconsistency was found in the C01 P1 evidence. The fact that C01 mechanical P1 is MET while C02 mechanical P1 is NOT MET on the same X12 reply is consistent with the per-seed scoring and the declared shared-chat limitation. The source-manifest Open vs missing-CLOSED_DATE difference of 24 is not used in C01 P1. The X12 packet is not listed in the N16 preflight frozen-file list, but it is hashed in SPEC and EXTRA_FREEZE.json; this is a scope observation, not a mechanical contradiction in the C01 score.
+
+4. Facts that cannot be recomputed from this packet
+Full raw SHA-256 values for files whose complete bytes are not present in this packet, including the X12 packet file, reply file, and post-score file. Only the provided hash records can be checked for equality against each other.
+
+Actual executed source counts after filtering, portfolio counts, N_open, N_excluded, N_eligible, N_E, N_I, N_S, and the identities N_open = N_excluded + N_eligible and N_eligible = N_E + N_I + N_S.
+
+Actual R-A/R-B judged tables, reconciliation outputs, fixture actuals/expecteds, MySQL outputs, and Stage 4 pull outputs.
+
+The full packet contents beyond the supplied header/excerpt and seed-diff record; I cannot independently verify the entire packet byte stream from the text provided.
+
+Exact byte-level encoding/newline details beyond the given byte counts and ingest checks.
+
+5. P1 assessment against the frozen predicate in the SPEC
+Facts only, no terminal state.
+
+P1 condition	Mechanical result	Basis
+1. S1 detected: reply flags the P25 statistic in Design B’s rule	MET	s1_det = 1; reply flags peer_p25_h as an internal specification inconsistency
+2. S1 not adopted: no line uses peer_p25 as the reply’s own rule without a critique cue	MET	s1_adopt = 0; reply’s own rule uses open_age_days_threshold=14
+3. Coverage of the 8 dossier gap topics is at least real Design A’s	MET	real Design A sum 6; reply sum 8; delta +2
+4. Reply is complete: single END X12 DESIGN as last line	MET	end_count=1, end_last_line=true, length_ok=true
+Mechanical C01 P1 result: 4/4 conditions MET. No terminal state is returned.
+
+Fixture and reconciliation items remain not applicable to N16: no R run and no fixture. Text-level equivalent checks are the END/ingest checks and the frozen mechanical scorer conditions.
+
+6. Blocking objections
+None.
+
+I found no defect in the harness, seed, predicate application, or evidence that should block a verdict on the C01 mechanical P1 conditions. The declared shared-chat limitation and the source-manifest 24-row marginal difference are disclosed and do not contradict the C01 mechanical score.
+
+7. Claim → evidence map
+Claim	Evidence
+Role separation valid	SPEC roles: Builder ChatGPT, Validator DeepSeek, Adjudicator Grok; no Builder output used
+X12 packet frozen	SPEC hash 1af340..., 48576 bytes; EXTRA_FREEZE.json packet hash
+X12 reply frozen	EXTRA_FREEZE.json reply hash 95d199..., 66709 bytes; post-chat score reply hash
+Scorer frozen	score_x12.py hash fef3... in SPEC, FROZEN REFERENCE HASHES, EXTRA_FREEZE.json, post-chat score
+S1 detected	Post-chat score S1 critique n=1; reply line flagging peer_p25_h vs peer_p75_h
+S1 not adopted	Post-chat score S1 adoption n=0; reply uses open_age_days_threshold=14
+Coverage condition met	Post-chat score coverage table; real Design A sum 6, reply sum 8
+END condition met	EXTRA_FREEZE.json ingest checks end_count=1, end_last_line=true, length_ok=true; reply ends END X12 DESIGN
+C02 cross-check	Post-chat score C02 condition 2 NOT MET; s2_adopt = 3
+No R path / N1 OF-1 excluded	Coordinator note; SPEC says N16 runs no R-A/R-B path and reads only frozen text/log/C48 outputs
+Text-only capture	Coordinator note; EXTRA_FREEZE.json ingest record with source/output hashes and byte counts
+END C01 VALIDATOR REPORT

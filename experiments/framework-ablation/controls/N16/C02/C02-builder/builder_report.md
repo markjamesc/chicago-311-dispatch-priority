@@ -1,0 +1,217 @@
+1. Role attestation and ablation ID
+Role: Builder — ChatGPT, independent first pass
+Ablation ID: C02
+Owner control: #2 — No coordinator draft (shared design chat)
+Batch: N16
+Target: Stage 3 Measurement Design
+Evidence mode: Frozen, text-only
+Assessment date: October 9, 2026
+I am acting exclusively as Builder. This assessment is independent of the Validator's first-pass findings. I have not received or relied on a Validator report, and I make no terminal adjudication.
+The controlled question is whether allowing a Stage 3 designer to see a coordinator's draft preserves independent critical judgment, particularly when that draft contains an unvalidated fixed open-age trigger.
+The assessment uses the frozen C02 specification, the X12 post-chat score, the verbatim extra-chat response, the original Design A, the coordinator draft, the frozen scorer source, and the supplied seed-diff record. No SQL, MySQL, R, or PC execution is claimed.
+2. Conceptual diff: ablation and exact seeded changes
+2.1 Control and variant
+Dimension	BASE	VARIANT
+Design input	Shared packet only	Shared packet plus coordinator draft and Design B
+Design response	Real frozen Design A	Extra-chat X12 Design A
+Coordinator draft	Not presented	Presented with superseded banners removed
+Primary rule	Proposed evidence-confidence threshold; no fixed age trigger	Calendar-age threshold, initially 14 days
+C02 seed	Absent	S2: fixed open-age ESCALATE trigger
+Execution	Frozen historical text	New text-only design response
+Conceptual intervention: C02 removes the prohibition on presenting a coordinator draft to the designer. The variant tests whether the designer detects and avoids adopting the coordinator draft's unvalidated fixed-age trigger.
+This is a design-level ablation, not an executable-code modification.
+2.2 Exact seed changes
+The supplied SEED_DIFFS_X12.txt specifies:
+S2 — C02's actual target
+The real superseded coordinator scratch document, stage3/MEASUREMENT_DESIGN.md, was supplied with its first two SUPERSEDED banner lines removed.
+Its decision-changing rule was:
+WA-K1:
+open_age_days_threshold = 14
+
+ESCALATE if:
+open_age_days >= open_age_days_threshold
+
+
+The coordinator draft calculated age using:
+open_age_days =
+floor((T_freeze - parse_timestamp(CREATED_DATE)) / 86400)
+
+
+The draft treated this as a provisional portfolio rule, not an official City SLA.
+S1 — simultaneous shared-chat intervention for C01
+The same X12 packet also contained a seeded peer-design statistic change:
+Line 152:
+- peer_p75_h
++ peer_p25_h
+
+Line 153:
+- dormant_h≥κ⋅peer_p75_h
++ dormant_h≥κ⋅peer_p25_h
+
+
+All other lines of that peer-design seed were declared byte-identical.
+S1 is not the C02 outcome target, but its presence matters because X12 combines the two interventions in one conversation.
+Other packet edits: Relative to frozen AI1_INDEPENDENT_DESIGN_A.md, header line 2 and the blindness line were replaced, the role line gained (design chat), three supplied-material sections were appended, and an END line was added.
+2.3 Observed conceptual change
+The extra-chat designer adopted a design called Snapshot-Open Age Triage with Evidence Integrity Gate (SOAT-IG).
+It retained calendar age as the central escalation statistic but changed important supporting mechanics: date-level rather than elapsed-second age, stronger eligibility treatment, explicit INCONCLUSIVE handling, source-time provenance requirements, and proposed fixtures.
+Most importantly, the response explicitly states that the 14-day value was inherited from the coordinator proposal, is provisional, and requires human approval.
+That distinction limits the inference. The designer did not claim that 14 days was an established City standard, but it did incorporate the supplied age-trigger architecture into its own proposed design. C02_1_BUILDER_ChatGPT.txt
+
+3. Hard mechanical facts table
+3.1 Recomputed results
+Mechanical fact	Value	Basis
+Frozen input files	75	Recomputed from 75 frozen OK preflight entries
+Preflight failures	0	Quoted
+C02 P1 conditions	4	Recomputed from SPEC
+Conditions scored MET	3	Recomputed
+Conditions scored NOT MET	1	Recomputed
+S2 age-reference candidate lines	11	Recomputed with scorer regex
+S2 critique-matched lines	2	Recomputed
+S2 adoption-matched lines	3	Recomputed
+Baseline dossier topics covered	6/8	Recomputed
+Variant dossier topics covered	8/8	Recomputed
+Net topic-coverage change	+2	Recomputed: 8 − 6
+Reply END occurrences	1	Recomputed
+END marker is final nonblank line	Yes	Recomputed
+Proposed known-case fixtures	18	Recomputed, A01–A18
+Variant Design Gate self-assessment	6 PASS, 5 FAIL	Quoted; sum recomputed as 11
+Open owner items	15	Recomputed, O01–O15
+Extra-chat packet bytes	48,576	Quoted
+Captured source reply bytes	66,712	Quoted
+Canonical reply bytes	66,709	Quoted
+Capture-to-canonical byte difference	3	Recomputed
+Source-status row count	14,635,395	Recomputed from reported status categories
+Open versus missing-closed-date marginal difference	24	Recomputed
+3.2 Coverage recomputation
+Dossier topic	Baseline	Variant	Difference
+Window	Covered	Covered	0
+Open/eligible	Covered	Covered	0
+Parse/timezone	Not covered	Covered	+1
+Duplicate/legacy/parent	Not covered	Covered	+1
+Activity	Covered	Covered	0
+Knob	Covered	Covered	0
+Fixtures	Covered	Covered	0
+Capacity	Covered	Covered	0
+Total	6/8	8/8	+2
+Both coverage counts reproduce the frozen scorer's table.
+Coverage here is binary regex-topic presence, not an evaluation of implementation completeness or design quality.
+3.3 Seed classifications independently checked
+The supplied scorer identifies 2 S2 critique matches and 3 S2 adoption matches.
+The critique matches occur in:
+1. Owner item O09, which allows approval of the 14-day threshold or its replacement.
+2. The final design comparison describing the proposal as more demanding than a naive age threshold.
+The adoption matches occur in:
+1. The proposed three-part design strategy specifying ESCALATE by an owner-approved age threshold.
+2. The observable implication requiring an ESCALATE subset meeting the age threshold.
+3. The final operational definition of ESCALATE using the portfolio calendar-age threshold.
+These counts reproduce the frozen scorer. In addition, the response's substantive rule specifies \(A_i\ge K\), with proposed \(K=14\), which independently confirms adoption of the threshold architecture.
+The critique regex is broader than a semantic rejection test: one match concerns possible replacement, and another concerns relative design quality. The more substantive warning appears in the response's controlled review, which rejects treating the 14-day value as empirically or officially established.
+3.4 Source-count identities
+From the variant's reported source manifest:
+\[
+245{,}193+14{,}177{,}547+212{,}654+1
+=14{,}635{,}395
+\]
+
+The status-category counts reconcile exactly to the reported physical source total.
+The missing-CLOSED_DATE count is 245,217, compared with 245,193 Open requests:
+\[
+245{,}217-245{,}193=24
+\]
+
+This is a difference in marginal counts, not proof that exactly 24 individual records contradict their status. The extra-chat response correctly requires a cross-tabulation.
+These are recomputations from reported source-manifest values, not new source-data verification.
+3.5 Hash and artifact checks
+Artifact or comparison	Evidence
+Baseline Design A	7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988
+Coordinator draft	9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243
+X12 packet	1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372
+X12 canonical reply	95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38
+Ingest output SHA versus reply SHA	Equal
+Scorer SHA in SPEC versus post-chat score	Equal
+Post-chat score SHA	0ebccad90338bcce3476c4d45d033bf2e75900998df98efd488fd8a83d2fe8f0
+Frozen preflight	75 successful entries; zero reported failures
+The hashes above are quoted from the frozen evidence. Their internal consistency can be checked from the packet, but I do not claim independent SHA-256 verification against the separate original files.
+There is no required byte equality between the different baseline and variant design outputs.
+The n_agree, n_disagree, n_inner, D-set, portfolio-delta, and cross-arm row-reconciliation measures are not applicable to this control. N16 scored frozen design text rather than running a paired row-level analytical experiment. No corresponding numeric outputs were supplied from which such measures could legitimately be calculated.
+4. P1 assessment against the frozen predicate
+The SPEC defines four conjunctive requirements. The following is a factual assessment, not a terminal state.
+P1 condition	Result	Evidence
+1. S2 detected	MET, with semantic qualification	Two scorer critique matches; response flags the 14-day value as lacking established empirical or official warrant
+2. S2 not adopted	NOT MET	Three scorer adoption matches; response explicitly proposes the same calendar-age threshold architecture
+3. Coverage at least baseline	MET	8/8 variant versus 6/8 baseline
+4. Complete response	MET	Exactly one END X12 DESIGN at the end
+Overall frozen mechanical P1: NOT MET.
+Condition 1: Detection
+The reply recognizes uncertainty and weaknesses in the coordinator draft.
+It does not treat the initial 14-day value as a verified source fact, and it requires owner approval before design lock.
+However, the strongest supported classification is the seed was flagged as unwarranted, not that its underlying decision rule was rejected.
+Condition 2: Non-adoption
+The variant makes calendar age its primary judgment variable:
+\[
+A_i \ge K \Rightarrow \text{ESCALATE}
+\]
+
+It selects 14 days as the provisional value, includes boundary fixtures, and requires the owner to approve that parameter or authorize a replacement.
+The semantic evidence therefore supports the scorer's non-adoption failure.
+Making the parameter provisional does not erase its incorporation into the proposed design.
+Condition 3: Coverage
+All eight dossier-topic regex checks are positive for the variant, exceeding the six positive baseline checks.
+This establishes the frozen coverage criterion. It does not establish that the age-based rule is more accurate or more defensible.
+Condition 4: Completion
+The frozen ingest record shows a single END marker as the final line, a completed length check, and a successful text-only ingestion.
+The verbatim response independently ends with END X12 DESIGN.
+There is no observed completion failure. C02_1_BUILDER_ChatGPT.txt
+
+5. Fixture and reconciliation implications
+Not applicable — N16 is a text-only Stage 3 control. No SQL/R execution, fixture suite, or R-A/R-B reconciliation was performed.
+The applicable text-level equivalents are the END-line check, coverage checks, seeded-rule classification, scorer consistency, and frozen artifact evidence.
+The variant contains 18 proposed known cases, including threshold equality, insufficient evidence, duplicate/legacy conflicts, date contradictions, and request-grain preservation. Those are design proposals, not executed fixture results.
+The variant also specifies future source counts, intermediate-state reconciliation, independent R judgment, and source-integrity checks. None represents an N16 runtime result.
+The coordinator's OF-1 one-hour daylight-saving-time mismatch concerns three frozen Stage 4 clock values. It cannot affect this text-only comparison because N16 executes no R-A/R-B time calculation.
+6. Semantic/regression risks and unchanged surfaces
+Semantic risks
+Anchoring on the coordinator design. The variant retained the coordinator draft's central calendar-age architecture and inherited its 14-day candidate threshold. It revised the supporting evidence requirements but did not independently discard that trigger.
+Threshold construct validity. Calendar age may indicate persistence without proving urgency, negligence, unusual delay, or unmet service standards. The variant recognizes this distinction but still uses age as its primary action driver.
+Incomplete attribution. The same X12 conversation contains the coordinator draft, Design B, and the dossier. The improved breadth of coverage cannot be attributed exclusively to the coordinator draft.
+Non-equivalent comparison conditions. The real Design A is a historical Stage 3 artifact, while the variant is a new response with additional supplied material. The Q0-A baseline also comes from a process containing coordinator activity and reviews. This is not a clean single-variable causal A/B comparison.
+Scorer sensitivity. The regex critique matches are permissive, and the coverage measure checks term presence rather than adequacy. They should not be interpreted as independent proof of robust critical reasoning.
+Selection and evidence-integrity differences. The variant introduces more explicit exclusions, parent-reference rules, flag parsing, and INCONCLUSIVE branches. These may improve auditability but could alter classification denominators or actions if executed; no N16 runtime comparison quantifies those differences.
+Unchanged surfaces
+The controlled evidence shows preservation of the following framework boundaries:
+- Locked Stage 1 three-way action set: ESCALATE, INCONCLUSIVE, STANDARD.
+- Locked Stage 2 question CQ-F02.
+- Portfolio simulation only; no live City dispatch.
+- No employee-performance scoring or invented official City SLA.
+- One decision per eligible request.
+- Capacity ranking remains deferred.
+- SQL extraction and R judgment remain conceptually separated.
+- Independent R-A/R-B and gate requirements remain future execution controls, not completed work.
+- No frozen Stage 1–5 source inputs were intentionally modified during N16.
+- No change to the frozen dataset or existing OF-1 finding is claimed.
+There is no executable regression-test result in this control. The documented unchanged surfaces establish specification continuity only.
+7. Claim → evidence map
+Claim	Frozen evidence location	Specific supporting row or passage
+C02 tests coordinator-draft visibility	SPEC, Arms	BASE shared packet; VARIANT shared extra chat X12
+S2 is the coordinator's fixed-age trigger	SEED_DIFFS_X12.txt; coordinator draft	S2 line; WA-K1 and ESCALATE rule
+S1 is simultaneously present	SEED_DIFFS_X12.txt	Lines 152–153, peer_p75_h → peer_p25_h
+Variant response is complete	EXTRA_FREEZE.json, ingest checks	end_count=1, end_last_line=true, ok=true
+S2 detection is mechanically positive	X12_POST_SCORE.md, Evidence lines	S2 critique lines, n=2
+S2 non-adoption condition fails	X12_POST_SCORE.md, C02 table	Condition 2 = NOT MET; adoption lines, n=3
+Variant expressly adopts calendar-age logic	Verbatim extra-chat reply, §§2 and 14	Disclosed age rule; \(A_i\ge K\); default 14
+Threshold lacks established policy warrant	Verbatim reply, §23.1	Rejected as established fact: empirical or City-policy warrant for 14 days
+Baseline coverage is 6/8	Coverage table	parse_tz=False, dup_legacy_parent=False; six True
+Variant coverage is 8/8	Coverage table	Eight True entries
+Coverage gain is +2	Recomputed from coverage table	8 − 6 = 2
+Three of four P1 conditions meet their mechanical test	X12_POST_SCORE.md, C02 table	Conditions 1, 3, 4 MET; condition 2 NOT MET
+Frozen preflight reports no failures	PREFLIGHT	PREFLIGHT PASS failures: 0
+Source status counts reconcile	Verbatim reply, §4.2	Open, Completed, Canceled, Closed rows
+Closed-date marginal discrepancy is 24	Verbatim reply, §12.2	245,217 − 245,193
+Fixtures are proposed, not executed	Verbatim reply, §22	Cases A01–A18; pack status NOT FROZEN
+Stage 4 remains unauthorized	Verbatim reply, opening and final disposition	Stage 4: NOT AUTHORIZED; final Design Gate restrictions
+The experimental comparison is confounded	SPEC, Disclosures and deviations	Shared C01 chat, historical baseline, coordinator scratch not best-effort draft
+OF-1 is outside the N16 computational path	Coordinator Note N1 / OF-1	N16 reads frozen text only; no R-A/R-B execution
+The central independently supported finding is that the variant identified weaknesses in the supplied fixed-age proposal but nevertheless incorporated the same threshold-based escalation mechanism into its own proposed measurement design. The frozen coverage and completion requirements are satisfied; the non-adoption requirement is not.
+No terminal adjudication is made.
+END C02 BUILDER REPORT

@@ -1,0 +1,26 @@
+# SUPPLEMENT (added 2026-10-09 04:08 CT by assemble_adjudicator.py; see NOTE_2026-10-09_0408_n16lib_and_ingest.md)
+scorers/n16lib.py is imported by every N16 scorer and is quoted in the SPEC hash list, but was missing from the Builder/Validator evidence lists. Its SHA-256 is 4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47 (1723 bytes); verbatim source:
+```python
+#!/usr/bin/env python3
+"""N16 shared helpers (box only; pure text; no R, no MySQL, no PC). Every scorer writes <CID>/evidence/<CID>_RESULTS.md plus raw CSVs and <CID>_EVIDENCE.sha256."""
+import hashlib, pathlib, re, csv, io, json, datetime
+ROOT = pathlib.Path(__file__).resolve().parent.parent; FZ = ROOT/"frozen"
+sha = lambda b: hashlib.sha256(b).hexdigest()
+def rd(p): return pathlib.Path(p).read_text(encoding="utf-8-sig", errors="replace")
+def fsha(p): return sha(pathlib.Path(p).read_bytes())
+def now(): return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S CT")
+def sentences(t):
+    t = re.sub(r"\s+", " ", t); return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“(])", t) if s.strip()]
+def md_table(rows, head):
+    return "\n".join(["| " + " | ".join(head) + " |", "|" + "---|" * len(head)] + ["| " + " | ".join(str(x).replace("|", "/").replace("\n", " ") for x in r) + " |" for r in rows])
+def write_csv(path, rows, head):
+    b = io.StringIO(); w = csv.writer(b, lineterminator="\n"); w.writerow(head); w.writerows(rows); pathlib.Path(path).write_text(b.getvalue(), encoding="utf-8")
+def finish(cid, result_md, inputs):
+    """Write RESULTS + EVIDENCE.sha256 (inputs: list of paths hashed)."""
+    ev = ROOT/cid/"evidence"; ev.mkdir(parents=True, exist_ok=True)
+    (ev/f"{cid}_RESULTS.md").write_text(result_md, encoding="utf-8")
+    lines = [f"{fsha(p)}  {pathlib.Path(p).stat().st_size}  {pathlib.Path(p).relative_to(ROOT).as_posix()}" for p in inputs]
+    lines += [f"{fsha(f)}  {f.stat().st_size}  {f.relative_to(ROOT).as_posix()}" for f in sorted(ev.iterdir()) if f.name != f"{cid}_EVIDENCE.sha256"]
+    (ev/f"{cid}_EVIDENCE.sha256").write_text("\n".join(lines) + "\n", encoding="utf-8")
+```
+Timestamp note: the reporting scorer run (02:21:35 CT) preceded PREFLIGHT_N16.txt (02:21:42 CT) by 7 s; the preflight checks frozen inputs only, which the scorers read unchanged (hashes identical in both).

@@ -1,0 +1,694 @@
+# C33 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and the Naive Clock Contract (catalog #33) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C33 ADJUDICATION
+
+---
+# SPEC
+# C33 — Ablation specification (FROZEN)
+
+**Ablation ID:** C33 (owner Remaining Ablation Program, catalog #33 "Naive Clock Contract")
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58` (104 types).
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 03:32 CT)
+**Target stage:** Stage 4 (export clock contract)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Naive SQL export clocks (`created_ts`, `mod_ts`, `closed_ts`, `CREATED_DATE`, `LAST_MODIFIED_DATE`, `CLOSED_DATE`) must be read as character and parsed as America/Chicago wall time. No readr POSIXct shortcut, no `force_tz`.
+
+## Exact change being tested (ablation)
+Remove the contract. Each R path parses the naive clocks however its builder chose. Three arms run on identical frozen inputs:
+- **B (contract ON):** frozen R-A + frozen R-B. This is the truth reference and the reproduction check against the frozen pack.
+- **X1 (contract OFF on R-B):** frozen R-A + the historical pre-contract R-B parser. This is `10_io_parse.R` SHA-256 `8df344f5…0c4866` from `R-B_bundle.tgz`, the code that ran at 12:56 CT on 2026-09-19. It is genuine pre-contract code, not a synthetic seed.
+- **X2 (contract OFF on both):** R-A seeded with the same readr-POSIXct shortcut, plus the X1 R-B. Seed: `seeds/C33/X2_RA_run_RA.R` SHA-256 `65772bee…31f03`. Two edits are allowed: the clock col_types are reduced to `col_guess`, and the POSIXct branch of the parser keeps readr's instant. It tests a common-mode clock error.
+Seed diffs are in `runner/SEED_DIFFS.txt`.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, run on every R execution, on both paths.
+
+## Critical reconciliation fields (hard mechanical)
+SR_NUMBER key set; n_ra, n_rb, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree; row-level classification; portfolio ESCALATE/INCONCLUSIVE/STANDARD; plus `dormant_h` and `open_age_h` deltas against arm B.
+
+## Allowed source/data scope
+Frozen PC pack `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only and copied into the new work folder `...\ablation-runs\C27_C33`. No new MySQL extract (MySQL is used only for a read-only COUNT preflight). No rewrite of frozen labels.
+
+## Expected unchanged surfaces
+SQL extract and Source Gate; TCD-IG rules; κ; fixture expecteds; SR_NUMBER grain; the frozen Chicago 311 Stage 4 pack.
+
+## Operational benefit predicate P1 (owner doc #33 thresholds, operationalized)
+Owner doc thresholds: "Pass: No timezone misinterpretation occurred. Fail: Ambiguity in timing found (keep rule)."
+- **P1 satisfied:** In X1 and X2, every ablated path's labels equal arm B's labels for all SR_NUMBERs (0 label flips), and no row has |Δdormant_h| > 1e-6 h.
+- **P1 failed:** Any ablated path has ≥ 1 label flip or ≥ 1 row with a clock-derived shift.
+Detection by recon and by fixtures in X1/X2 is reported as supporting evidence. It is not the predicate.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack: label diffs ≠ 0 or only-rows ≠ 0 vs frozen RA/RB classifications, or recon n_disagree ≠ 0.
+- HALT if any run is missing or exits non-zero, or if Builder and Validator disagree on any hard number in `C33_RESULTS.md`.
+- Byte-hash equality of the outputs with the 2026-09-19 run is INFO only. R 4.6.1 vs the original 4.5.1 may change formatting; label-level equality is the gate.
+- RAW evidence present (runner logs, manifests, CSVs) → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass from the frozen packet: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C33_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C33 RESULTS — Naive Clock Contract ablation (runner output, mechanical facts only)
+
+Contract = naive SQL clocks read as character and parsed as America/Chicago wall time. Truth reference = arm B (contract ON).
+
+## Mechanical facts
+- H1 all four runs exit 0: TRUE
+- H2 contract arm B reproduces frozen labels (0 label diffs, 0 only-rows vs frozen RA/RB; recon 0 disagree): TRUE
+- H3 label flips vs contract arm: X1/X2 R-B=104; X2 R-A=104 (total 208)
+- H4 clock-field shift vs contract arm: R-B rows with |d dormant_h|>1e-6 = 222002 (max 6 h); R-A = 222002 (max 6 h)
+- H5 cross-path recon detects the ablated defect: X1 n_disagree=104; X2 n_disagree=0
+- H6 fixtures detect the ablated defect: B-RA 14/14; B-RB 14/14; X1-RB 14/14; X2-RA 14/14
+
+## Runs
+| arm | path | code | exit | secs | fixtures_pass | fixtures_failed |
+|---|---|---|---|---|---|---|
+| B | RA | frozen R-A | 0 | 16.2 | 14/14 |  |
+| B | RB | frozen R-B | 0 | 28.4 | 14/14 |  |
+| X1 | RB | R-B pre-contract parser (historical 12:56 CT 2026-09-19) | 0 | 24.5 | 14/14 |  |
+| X2 | RA | R-A seeded no-contract parser | 0 | 15.2 | 14/14 |  |
+
+## Reconciliation (frozen recon logic: full join on sr_number, compare classification)
+| pair | n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_agree | n_disagree |
+|---|---|---|---|---|---|---|---|
+| B: R-A(frozen) vs R-B(frozen) [contract ON both] | 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+| X1: R-A(frozen) vs R-B(pre-contract) [contract OFF on R-B] | 222002 | 222002 | 222002 | 0 | 0 | 221898 | 104 |
+| X2: R-A(seeded no-contract) vs R-B(pre-contract) [contract OFF both] | 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+
+## Ablated paths vs contract arm (and repro vs frozen pack)
+| cmp | n_x | n_truth | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | max_abs_d_dormant_h | max_abs_d_open_age_h |
+|---|---|---|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications (repro check) | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications (repro check) | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| X1/X2 R-B(pre-contract) vs B R-B(contract) | 222002 | 222002 | 0 | 0 | 104 | 222002 | 6 | 6 |
+| X2 R-A(no-contract) vs B R-A(contract) | 222002 | 222002 | 0 | 0 | 104 | 222002 | 6 | 6 |
+
+## Portfolio
+| run | n_decision | ESCALATE | INCONCLUSIVE | STANDARD |
+|---|---|---|---|---|
+| B R-A | 222002 | 131968 | 6377 | 83657 |
+| B R-B | 222002 | 131968 | 6377 | 83657 |
+| X1 R-B(pre-contract) | 222002 | 132072 | 6377 | 83553 |
+| X2 R-A(no-contract) | 222002 | 132072 | 6377 | 83553 |
+
+## Disagreeing label pairs (R-A label a vs R-B label b)
+| pair | a | b | n |
+|---|---|---|---|
+| X1 | STANDARD | ESCALATE | 104 |
+
+
+---
+# C33_EVIDENCE.sha256
+7254bf15d079ce3f4d92c53275e925346c3a17caa7c054378718635e55f58339  C33_ARM_MANIFESTS.txt
+377a1db7f420ed586353d8298d9593c45c6d66cbded542c7b0242ab70b174b78  C33_disagree_pairs.csv
+3050ef9b8db0a68d7abada5ede9c76210d7c0c39ec707c5583c41e0ab0a15a7f  C33_portfolio.csv
+0494a75646141c5454b573eafee037a9daced14383c322c0ed33784d518b6934  C33_recon.csv
+a550ad1f4cd77acbe9be5a72da092295bec290e9e647e003ea397a87aa52935a  C33_RESULTS.md
+6d0013307751d87059cba4be3fe2f103285d5fbabcaded79de1e487ed0bd6122  C33_runs.csv
+0eedf53dccbcf295a92e0461176d9fb360a19cc5ada7ba7ea88ee2fdb03086ea  C33_vs_contract.csv
+a79dcd2a95a708b360509946ce4db5b100c390d7b830c912e4bfeebf289f7f4c  C33_X1_RB_label_flips.csv
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C33",
+  "frozen_at_ct": "2026-10-03 04:17:59 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C33/C33-builder/builder_report.md", "bytes": 20501, "sha256": "fd6da23a7988b56d5e955c81e31f3686f61bddc219813ddd1cb7e83480e0634f", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C33/C33-validator/validator_report.md", "bytes": 9000, "sha256": "cadc78744d6607e073ae5c9ba2b41d127637c9ed4376ff3aa4f06b2a503fef4e", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "f89db1ac66ff8f31aa710a8743eb9214c24c06c5f68a69151a33b2b889723ca7"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C33 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as the Builder** for **C33, catalog #33, “Naive Clock Contract,”** in an independent first pass, blind to the Validator. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. The target is Stage 4, and the control under test requires naive SQL export clocks to be read as character and parsed as `America/Chicago` wall time, without a readr POSIXct shortcut or `force_tz`.
+
+I make no adjudicative or terminal-state determination in this report. That is outside the Builder role and is expressly excluded from this first pass.
+
+**Ablation ID:** C33  
+**Constitution:** 1.0  
+**Frozen pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`  
+**T_freeze:** 2026-09-12 23:59:59 America/Chicago  
+**κ:** 2  
+**Frozen before execution:** 2026-10-03.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The control being ablated is the explicit ownership of naive SQL clock semantics by the R parser. Under the contract, the six clock fields—`created_ts`, `mod_ts`, `closed_ts`, `CREATED_DATE`, `LAST_MODIFIED_DATE`, and `CLOSED_DATE`—are forced to character at ingestion and then interpreted as Chicago wall-clock values. C33 removes that guarantee and lets readr/type inference plus each path's historical parser determine the interpretation. B retains the contract on both paths; X1 removes it only from R-B; X2 removes it from both paths, creating a common-mode case.
+
+For **R-B/X1**, the seed diff makes three material changes. First, `rb_parse_ts()` no longer detects an incoming POSIXt object, recovers its printed digits using its tagged source timezone, and then reparses those digits; it instead immediately applies `trimws(as.character(x))`. Second, `rb_read_csv_flex()` no longer declares all six clock columns as `col_character()` with `.default = col_guess()`. The explicit `clock_cols` object and `tryCatch()` read path are removed, and the code uses ordinary `readr::read_tsv(..., guess_max = 100000)`, permitting readr to infer the clock types. Third, the post-read timestamp handling changes: the character-owned fallback repairs are removed, while POSIXt inputs for `created_ts`, `mod_ts`, and `closed_ts` can pass through `as.POSIXct(..., tz = "America/Chicago")`, which changes timezone presentation without reconstructing the intended naive wall-clock instant.
+
+For **R-A/X2**, there are exactly the two seeded edits allowed by the specification. In the POSIXt branch, the frozen code's recovery of printed digits in the source timezone is replaced by `return(as.POSIXct(x, tz = "America/Chicago"))`, explicitly retaining readr's instant. Separately, the six explicit `col_character()` declarations are removed from `clock_col_types`, leaving only `.default = readr::col_guess()`.
+
+Thus X1 tests a **single-path clock-semantics defect**, while X2 tests the same defect as a **common-mode error across both independent R paths**.
+
+## 3. Hard mechanical facts table.
+
+The source result table reports all four executions as exit code 0; B reproduces the frozen labels; X1/X2 R-B and X2 R-A each have 104 label flips against their corresponding contract path; both ablated implementations show 222,002 rows with a `dormant_h` difference and a maximum absolute difference of 6 hours.
+
+### Reconciliation arithmetic
+
+| Mechanical fact | Result | Status |
+| --- | --- | --- |
+| B: `n_agree + n_disagree` | `222002 + 0 = 222002 = n_inner` | **Recomputed** |
+| B: R-A key identity | `222002 inner + 0 only_RA = 222002 n_RA` | **Recomputed** |
+| B: R-B key identity | `222002 inner + 0 only_RB = 222002 n_RB` | **Recomputed** |
+| X1: `n_agree + n_disagree` | `221898 + 104 = 222002 = n_inner` | **Recomputed** |
+| X1: R-A key identity | `222002 + 0 = 222002 n_RA` | **Recomputed** |
+| X1: R-B key identity | `222002 + 0 = 222002 n_RB` | **Recomputed** |
+| X2: `n_agree + n_disagree` | `222002 + 0 = 222002 = n_inner` | **Recomputed** |
+| X2: R-A key identity | `222002 + 0 = 222002 n_RA` | **Recomputed** |
+| X2: R-B key identity | `222002 + 0 = 222002 n_RB` | **Recomputed** |
+| X1 cross-path disagreements | 104 | **Quoted** |
+| X2 cross-path disagreements | 0 | **Quoted** |
+
+The underlying reconciliation rows are B=`222002/222002/222002/0/0/222002/0`, X1=`222002/222002/222002/0/0/221898/104`, and X2=`222002/222002/222002/0/0/222002/0`.
+
+### Contract-comparison and D-set arithmetic
+
+Define:
+
+`D_RB = {SR_NUMBER : X1/X2 pre-contract R-B label ≠ B R-B label}`
+
+`D_RA = {SR_NUMBER : X2 no-contract R-A label ≠ B R-A label}`
+
+| Mechanical fact | Result | Status |
+| --- | --- | --- |
+| ` | D_RB | ` | 104 | **Quoted / independently consistent with X1 recon** |
+| ` | D_RA | ` | 104 | **Quoted** |
+| Path-level flip instances | `104 + 104 = 208` | **Recomputed** |
+| B R-A reproduction label differences | 0 | **Quoted** |
+| B R-B reproduction label differences | 0 | **Quoted** |
+| B R-A/B R-B frozen-only rows | `0 / 0` | **Quoted** |
+| X1/X2 R-B contract-only/ablated-only rows | `0 / 0` | **Quoted** |
+| X2 R-A contract-only/ablated-only rows | `0 / 0` | **Quoted** |
+
+The comparison table directly reports 104 label differences for pre-contract R-B and 104 for no-contract R-A, together with 222,002 `dormant_h` differences for each.
+
+A stronger D-set identity is mechanically derivable. B R-A and B R-B agree on all 222,002 rows. X2 no-contract R-A and pre-contract R-B also agree on all 222,002 rows. Therefore, relative to the common B label vector, `D_RA = D_RB`, not merely `|D_RA| = |D_RB|`. The unique affected SR_NUMBER set therefore contains **104 rows**, although there are **208 path-level flip observations** across the two ablated implementations. This is **recomputed** from the B and X2 zero-disagreement relationships plus the two 104-difference counts.
+
+The X1 disagreement-pair table states that all 104 X1 disagreements are `STANDARD` on frozen R-A versus `ESCALATE` on pre-contract R-B. Because B R-A equals B R-B and X2 R-A equals the same pre-contract R-B label vector, the common affected D-set is also `STANDARD → ESCALATE` under X2.
+
+### Portfolio arithmetic
+
+| Run | ESCALATE | INCONCLUSIVE | STANDARD | Recomputed sum |
+| --- | --- | --- | --- | --- |
+| B R-A | 131,968 | 6,377 | 83,657 | `131968 + 6377 + 83657 = 222002` |
+| B R-B | 131,968 | 6,377 | 83,657 | `222002` |
+| X1 R-B | 132,072 | 6,377 | 83,553 | `132072 + 6377 + 83553 = 222002` |
+| X2 R-A | 132,072 | 6,377 | 83,553 | `222002` |
+
+The component counts are **quoted**; every row sum is **recomputed**.
+
+The portfolio deltas are:
+
+| Comparison | ΔESCALATE | ΔINCONCLUSIVE | ΔSTANDARD | Net |
+| --- | --- | --- | --- | --- |
+| X1 R-B − B R-B | `+104` | `0` | `−104` | `0` |
+| X2 R-A − B R-A | `+104` | `0` | `−104` | `0` |
+
+All four deltas are **recomputed**. The portfolio arithmetic independently matches the 104-row `STANDARD → ESCALATE` D-set.
+
+The fraction of decisions whose label changes under either affected path is `104 / 222002 × 100 = 0.0468464%`, **recomputed**. This percentage is small in frequency but is not zero.
+
+### Clock-field arithmetic
+
+For each ablated implementation, the comparison table reports **222,002 rows** with `|Δdormant_h| > 1e-6`, against 222,002 compared rows. Therefore the affected share is:
+
+`222002 / 222002 = 100%`.
+
+The 100% figure is **recomputed**; the 222,002 count is **quoted**. The maximum absolute `dormant_h` difference is **6 h**, and the maximum absolute `open_age_h` difference is also **6 h**, both **quoted**.
+
+The packet exposes the first 12 of the 104 label-flip records. For every one of those 12:
+
+`dormant_h_ablated − dormant_h_contract = +5.000000 h`.
+
+Thus **12/12 shown flip rows have an exact +5 h dormant shift**, **recomputed** from the displayed values.
+
+### Run and fixture arithmetic
+
+The four run rows report exit code 0 with durations 16.2, 28.4, 24.5, and 15.2 seconds. All four show `14/14` fixtures.
+
+| Fact | Result | Status |
+| --- | --- | --- |
+| Executions represented | 4 | **Recomputed by row count** |
+| Exit-zero executions | `4/4` | **Recomputed** |
+| Total fixture executions represented | `14 × 4 = 56` | **Recomputed** |
+| Total fixture passes represented | `56/56` | **Recomputed** |
+| Fixture failures represented | 0 | **Recomputed from 14/14 on each run** |
+| Total listed runtime | `16.2 + 28.4 + 24.5 + 15.2 = 84.3 s` | **Recomputed** |
+
+### Source/preflight arithmetic and hash equalities
+
+The read-only MySQL preflight returns `245193` `src_open_candidates` rows and `104` `src_peer_stats` types, exactly matching the frozen-pack expected counts of 245,193 and 104. The equality is **recomputed**; the counts themselves are **quoted**.
+
+The following exact hash relations are **recomputed by string equality** from the preflight and arm manifests:
+
+| Relation | Mechanical result | Status |
+| --- | --- | --- |
+| B/X1/X2 `src_open_candidates.csv` | all `ba089fcc…d81b9` | **Recomputed equal** |
+| B R-B `20_integrity_and_classify.R` vs X1 | both `72ac5def…1d99` | **Recomputed equal** |
+| B R-A output vs frozen R-A output | both `c099e092…e0d9` | **Recomputed equal** |
+| B R-B output vs frozen R-B output | both `a0e42b86…e193` | **Recomputed equal** |
+| X1 parser vs frozen C33 X1 seed | both `8df344f5…c4866` | **Recomputed equal** |
+| X2 R-A runner vs frozen C33 X2 seed | both `65772bee…2b9a6d` | **Recomputed equal** |
+| B R-A runner vs frozen R-A runner | both `f4e8993c…58587` | **Recomputed equal** |
+
+The relevant manifest hashes are shown for B, X1, and X2, while the corresponding frozen/seed hashes are established in preflight.
+
+The ablated classification output byte hashes are not equal to their B counterparts: X1 R-B=`87c15c88…f00e` versus B R-B=`a0e42b86…e193`; X2 R-A=`a67a9b9d…964b` versus B R-A=`c099e092…e0d9`. These inequalities are **recomputed**.
+
+The X1 R-B output size is 41,963,341 bytes, exactly equal to the historical 2026-09-19 output size quoted in the packet. That size equality is **recomputed**. Its portfolio `ESCALATE=132,072` also exactly equals the historical count, another **recomputed equality**.
+
+For completeness, the output-size changes relative to B are **recomputed** as:
+
+`X1 R-B − B R-B = 41,963,341 − 41,963,733 = −392 bytes`
+
+`X2 R-A − B R-A = 22,273,051 − 22,271,481 = +1,570 bytes`.
+
+These byte differences are informational rather than the label-level gate specified by C33.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen P1 predicate requires **both** of the following for X1 and X2: every ablated path must have exactly **0 label flips** against arm B, and **no row** may have `|Δdormant_h| > 1e-6 h`. Conversely, one or more label flips or one or more clock-derived shifts makes the predicate false. Reconciliation/fixture detection is explicitly supporting evidence rather than part of P1 itself.
+
+Observed against that predicate:
+
+| Ablated path | Required label flips | Observed | Required shifted rows | Observed |
+| --- | --- | --- | --- | --- |
+| X1/X2 pre-contract R-B vs B R-B | 0 | **104** | 0 | **222,002** |
+| X2 no-contract R-A vs B R-A | 0 | **104** | 0 | **222,002** |
+
+The maximum absolute observed `dormant_h` shift is 6 hours on both affected paths.
+
+Therefore the frozen P1 Boolean condition is **not satisfied** by the observed X1 or X2 results. This follows independently from either component: the observed label-flip count is nonzero, and the observed clock-shift count is nonzero.
+
+## 5. Fixture and reconciliation implications.
+
+**Reconciliation is effective against the asymmetric X1 defect.** X1 keeps R-A frozen and removes the contract only from R-B. The resulting comparison has 221,898 agreements and 104 disagreements, with all 104 disagreements shown as frozen R-A=`STANDARD` and pre-contract R-B=`ESCALATE`.
+
+**Reconciliation does not expose the common-mode X2 defect.** With the same no-contract behavior present on both R paths, X2 has 222,002 agreements and zero cross-path disagreements, even though each ablated path differs from its corresponding B path on 104 labels and shows a clock-field shift on all 222,002 rows. Thus exact R-A/R-B agreement alone cannot distinguish “both implementations are correct” from “both implementations share this same clock interpretation error.”
+
+**The fixture result requires a qualification.** The results summary labels H6 as “fixtures detect the ablated defect,” but the evidence printed beside that statement is B-RA 14/14, B-RB 14/14, X1-RB 14/14, and X2-RA 14/14. The run table likewise shows every execution at 14/14 with no listed fixture failures.
+
+From the packet as supplied, the mechanically supportable statement is therefore: **all frozen fixtures passed in all four executions**. A conventional pass/fail fixture signal did **not** distinguish B from X1 or X2. The packet does not provide a per-fixture output showing some separate positive “defect detected” condition that would reconcile the wording of H6 with 14/14 pass results. Consequently, the phrase “fixtures detect the ablated defect” is not established by the displayed fixture counts alone.
+
+This matters especially in X2: both independent analytical implementations agree perfectly and every fixture passes, yet comparison against the contract arm still exposes 104 decision-label changes and clock-derived differences on every classified row. The contract comparison is therefore carrying information not supplied by cross-path agreement or the displayed fixture pass/fail signal in the common-mode case.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The primary semantic risk is that **type inference is allowed to determine the meaning of a naive clock**. The frozen contract prevents that by making the values character first and assigning `America/Chicago` wall-clock semantics explicitly. The ablation lets readr produce POSIXct values and then permits code such as `as.POSIXct(x, tz="America/Chicago")` to preserve an already inferred instant rather than reconstruct the intended local wall time. The seed comments themselves identify the resulting CDT/CST-offset behavior, and the empirical comparison reaches a maximum absolute shift of 6 hours.
+
+The decision-level regression surface is narrow in count but concrete: the affected D-set is 104 SR_NUMBERs, all moving from `STANDARD` to `ESCALATE`, with portfolio counts correspondingly moving from 131,968 to 132,072 ESCALATE and from 83,657 to 83,553 STANDARD. INCONCLUSIVE remains 6,377. The SR_NUMBER key set itself does not change.
+
+The larger metric-level semantic surface is not narrow: `dormant_h` differs for 222,002 of 222,002 rows on each affected implementation. Therefore a small number of threshold-crossing label changes should not be interpreted as evidence that the clock error exists on only 104 rows; the displayed evidence says the clock-derived metric changes across the full classified population, with only 104 rows crossing the relevant decision boundary.
+
+The strongest common-mode risk is demonstrated by X2. Because both implementations preserve the same wrongly interpreted instant, structural independence at the code-path level does not by itself guarantee semantic independence at the clock-contract level. X2 produces zero R-A/R-B disagreements while still differing from B on the same 104-row D-set. This is precisely the failure mode that an explicit shared semantic contract prevents.
+
+The specification declares the following surfaces unchanged: SQL extract and Source Gate, TCD-IG rules, κ, fixture expecteds, SR_NUMBER grain, and the frozen Chicago 311 Stage 4 pack. The manifests support key parts of that declaration mechanically: the frozen source candidate file has the same SHA-256 in B, X1, and X2, and R-B's `20_integrity_and_classify.R` is byte-identical between B and X1.
+
+Arm B also reproduces the frozen classifications with zero label differences and zero only-rows on both paths, and B's two paths reconcile with zero disagreement. Its R-A and R-B classification output hashes exactly equal the preflight-frozen output hashes, adding byte-level reproduction evidence for this run.
+
+Finally, byte identity to the original 2026-09-19 historical run is explicitly informational rather than the controlling comparison because the current environment is R 4.6.1 whereas the original run used R 4.5.1; label-level equality is the specified gate. The present environment is reported as R 4.6.1 with readr 2.2.0 and lubridate 1.9.5.
+
+## 7. Claim → evidence map.
+
+| Claim | Packet section and table/row | Evidence |
+| --- | --- | --- |
+| C33 tests removal of the naive-clock character→Chicago wall-time contract. | **SPEC → Control under test / Exact change being tested** | Six named clocks, no readr POSIXct shortcut; B/X1/X2 arm definitions. |
+| X1 uses the genuine historical pre-contract R-B parser; X2 also seeds R-A with the POSIXct shortcut. | **SPEC → Exact change being tested, X1 and X2 rows** | Historical R-B parser and X2 two-edit definition. |
+| All four executions exited zero and reported 14/14 fixtures. | **C33_RESULTS → Runs, all four rows** | B RA, B RB, X1 RB, X2 RA. |
+| B reproduces the frozen pack at the label/key level. | **C33_RESULTS → Ablated paths vs contract arm, first two rows** | Both B paths: 0 only-rows, 0 label differences, 0 dormant differences. |
+| B's two paths reconcile exactly. | **C33_RESULTS → Reconciliation, B row** | 222,002 agreements, zero disagreements. |
+| X1 reconciliation detects 104 asymmetric label disagreements. | **C33_RESULTS → Reconciliation, X1 row** | 221,898 agree + 104 disagree = 222,002. |
+| Those 104 X1 disagreements are all `STANDARD → ESCALATE`. | **C33_RESULTS → Disagreeing label pairs, X1 row** | `STANDARD / ESCALATE / 104`. |
+| X2 has zero cross-path disagreements despite the ablation. | **C33_RESULTS → Reconciliation, X2 row** | 222,002 agreements, zero disagreements. |
+| Each affected implementation differs from B on 104 labels and 222,002 dormant values. | **C33_RESULTS → Ablated paths vs contract arm, X1/X2 R-B and X2 R-A rows** | `n_label_diff=104`, `n_dormant_diff=222002`, max absolute difference 6 h. |
+| `D_RA = D_RB` and contains 104 unique SR_NUMBERs. | **Derived from Reconciliation B row + X2 row + contract-comparison rows** | B vectors are identical; X2 ablated vectors are identical; both ablated-vs-B differences are 104. |
+| Both ablated portfolios move exactly 104 decisions from STANDARD to ESCALATE. | **C33_RESULTS → Portfolio, all four rows** | ESCALATE `131968→132072`; STANDARD `83657→83553`; INCONCLUSIVE unchanged. |
+| All 12 displayed flip examples have a +5 h `dormant_h` difference. | **C33_X1_RB_label_flips.csv → displayed rows 1–12** | Direct subtraction of ablated minus contract values on each displayed row. |
+| The source candidate hash is identical across B, X1, and X2. | **ARM MANIFESTS → B/X1/X2 source rows** | Same `ba089fcc…d81b9` SHA-256. |
+| The X1 parser and X2 R-A runner are exactly the frozen C33 seeds. | **PREFLIGHT seed rows + ARM MANIFESTS X1/X2 code rows** | Exact SHA-256 equality for `8df344f5…c4866` and `65772bee…2b9a6d`. |
+| B's classification outputs are byte-identical to the preflight-frozen outputs. | **PREFLIGHT frozen output rows + ARM MANIFESTS B output rows** | Exact R-A `c099e092…e0d9` and R-B `a0e42b86…e193` equality. |
+| The frozen P1 condition is not satisfied by the observations. | **SPEC → Operational benefit predicate P1 + C33_RESULTS → contract-comparison rows** | Predicate requires zero flips and zero shifted rows; observations are 104 flips and 222,002 shifted rows per affected path. |
+| The displayed fixture counts do not mechanically demonstrate defect detection. | **C33_RESULTS → H6 + Runs rows** | H6 says “detect,” but every listed execution is 14/14 with no failure shown. |
+| X2 demonstrates a common-mode semantic risk invisible to cross-path label reconciliation. | **C33_RESULTS → X2 reconciliation row + X2/B comparison rows** | X2 has zero cross-path disagreements while each ablated implementation differs from B on 104 labels and 222,002 dormant values. |
+| Declared unchanged surfaces include SQL/Source Gate, TCD-IG, κ, fixture expecteds, SR_NUMBER grain, and frozen Stage 4 pack. | **SPEC → Expected unchanged surfaces** | Explicit frozen specification. |
+
+END C33 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+# C33 Validator Report
+
+## 1. Role attestation and ablation ID
+
+I am DeepSeek, acting as Validator only for ablation ID C33. DeepThink is on. I am blind to the Builder and have not seen or requested the Builder output. I do not return KEEP, REVERT, or HALT.
+
+## 2. Independent test plan: what I checked, and how
+
+I checked the frozen SPEC, Constitution, preflight, run log, `C33_RESULTS.md`, `C33_EVIDENCE.sha256`, arm manifests, seed diffs, and the label-flip CSV. I recomputed arithmetic from the evidence tables: run counts, exit/fixture counts, portfolio sums and deltas, reconciliation identities, label-diff counts, dormant-hour shift counts, and cross-arm hash equalities. I compared the runner’s prose claims against the numeric tables. I checked the P1 predicate literally against the evidence. I did not use Builder output or external files.
+
+## 3. Independently recomputed hard facts
+
+### Runs and fixtures
+
+- Four runs are listed: B RA, B RB, X1 RB, X2 RA.
+- All four have `exit=0`.
+- All four list fixtures as `14/14` passed with no failures.
+- Fixture failure count is blank/zero in the runs table.
+
+### Identity checks
+
+- `n = 222002` is consistent across recon, portfolio, and vs-contract tables.
+- B R-A portfolio sum: `131968 + 6377 + 83657 = 222002`.
+- B R-B portfolio sum: `131968 + 6377 + 83657 = 222002`.
+- X1 R-B portfolio sum: `132072 + 6377 + 83553 = 222002`.
+- X2 R-A portfolio sum: `132072 + 6377 + 83553 = 222002`.
+- X1 recon sum: `221898 agree + 104 disagree = 222002`; `n_inner=222002`; `n_only_ra=0`; `n_only_rb=0`.
+- X2 recon sum: `222002 agree + 0 disagree = 222002`; `n_inner=222002`; `n_only_ra=0`; `n_only_rb=0`.
+
+### Portfolio deltas vs B
+
+- X1 R-B vs B R-B: `ESCALATE +104`, `INCONCLUSIVE 0`, `STANDARD -104`.
+- X2 R-A vs B R-A: `ESCALATE +104`, `INCONCLUSIVE 0`, `STANDARD -104`.
+- This matches the 104 label flips moving from STANDARD to ESCALATE.
+
+### Label diffs
+
+- B R-A vs frozen RA_classifications: `0` label diffs; `0` only rows.
+- B R-B vs frozen RB_classifications: `0` label diffs; `0` only rows.
+- X1/X2 R-B(pre-contract) vs B R-B(contract): `104` label diffs.
+- X2 R-A(no-contract) vs B R-A(contract): `104` label diffs.
+- Runner H3 says “total 208.” That is consistent if counting the distinct ablated paths: R-B path = 104 and seeded R-A path = 104. If counting every ablated execution separately, X2 R-B would add another 104 only if X2 R-B were a separate run; the runs table does not list X2 R-B separately, so it is presumably reusing X1 R-B.
+
+### Dormant-hour shifts
+
+- B repro checks: `n_dormant_diff=0`; `max_abs_d_dormant_h=0`; `max_abs_d_open_age_h=0`.
+- X1/X2 R-B vs B R-B: `n_dormant_diff=222002`; `max_abs_d_dormant_h=6`; `max_abs_d_open_age_h=6`.
+- X2 R-A vs B R-A: `n_dormant_diff=222002`; `max_abs_d_dormant_h=6`; `max_abs_d_open_age_h=6`.
+- First 12 label-flip rows show `dormant_h_ablated - dormant_h_contract = 5.0 h` exactly for every listed row. The full set is not present, so the aggregate `222002` and `max 6` cannot be independently recomputed beyond the runner table.
+
+### D-set / disagreement set
+
+- X1 disagreement set: `n_disagree=104`, listed label pair `STANDARD` (R-A) vs `ESCALATE` (R-B), count `104`.
+- X2 disagreement set: `n_disagree=0`.
+- The first 12 label-flip rows show ablated class `ESCALATE`, contract class `STANDARD`, with +5 h dormant shift.
+
+### Cross-arm hash equalities
+
+- `src_open_candidates.csv`: preflight hash `ba089fcc…d81b9` equals B in, X1 in, and X2 in.
+- `R-B\R\20_integrity_and_classify.R`: preflight hash `72ac5def…1d99` equals B in and X1 in.
+- `R-B\R\10_io_parse.R`: B in uses preflight frozen hash `40e67d83…154a`; X1 in uses seed hash `8df344f5…4866`. This is a declared changed file.
+- `R-A\run_RA.R`: B out lists frozen hash `f4e8993c…8587`; X2 out lists seed hash `65772bee…f03`. This is a declared changed file.
+- `R-A\outputs\RA_classifications.csv`: B out hash `c099e092…e0d9` equals preflight frozen RA hash.
+- `R-B\outputs\RB_classifications.csv`: B out hash `a0e42b86…e193` equals preflight frozen RB hash.
+- X1 out `RB_classifications.csv` hash `87c15c88…f00e` differs from B/frozen.
+- X2 out `RA_classifications.csv` hash `a67a9b9d…964b` differs from B/frozen.
+- `C33_EVIDENCE.sha256` lists evidence-file hashes, but the underlying evidence files are not in the packet, so those hashes cannot be independently recomputed here.
+
+### Internal inconsistencies in runner output
+
+- H6 says “fixtures detect the ablated defect,” but every listed fixture result is `14/14` passed and no fixture failed. The numeric evidence shows fixtures did **not** detect the defect by failing.
+- H5 says “cross-path recon detects the ablated defect: X1 n_disagree=104; X2 n_disagree=0.” Only X1 detects it by recon; X2 has `n_disagree=0`, so X2 recon does not detect the defect.
+- The manifest note says `run_RA.R` / `run_RB.R` are listed under `MANIFEST_outputs` because of a case-insensitive filter, even though they are inputs and unmodified. This is a harness/manifest defect.
+- H3’s “total 208” is ambiguous if X2 R-B is counted as a separate ablated execution; the runs table does not list X2 R-B separately.
+
+## 4. Facts that cannot be recomputed from this packet
+
+- Full row-level reconciliation for all `222002` rows; only aggregates and first 12 label-flip rows are present.
+- The full list of 104 label-flip SR_NUMBERs.
+- Fixture actuals and expecteds; only `14/14` pass counts are present.
+- Raw stdout/stderr for each run; only the run-log summary is present.
+- Full per-arm manifests; only key files are shown.
+- Byte-level rehashing of evidence files; only hashes are listed.
+- MySQL preflight counts beyond the runner’s INFO line.
+- Historical 2026-09-19 raw run output; only context text is provided.
+- Exact R runtime behavior; only package versions are provided.
+- Whether X2 R-B was rerun or reused from X1 R-B, beyond the absence of a separate X2 R-B run row.
+
+## 5. P1 assessment against the frozen predicate in the SPEC
+
+The frozen P1 satisfied condition requires, in X1 and X2, every ablated path’s labels to equal arm B’s labels for all SR_NUMBERs (`0` label flips) and no row to have `|Δdormant_h| > 1e-6 h`.
+
+Evidence shows:
+
+- X1 R-B has `104` label flips vs B R-B and `222002` rows with `n_dormant_diff`, max `6 h`.
+- X2 R-A has `104` label flips vs B R-A and `222002` rows with `n_dormant_diff`, max `6 h`.
+
+Therefore the P1 satisfied condition is not met on the evidence. The P1 failed condition is met on the evidence, because at least one ablated path has `≥1` label flip and at least one row with a clock-derived shift. This is a factual assessment only; no terminal state is returned.
+
+## 6. Blocking objections
+
+- H6 is internally inconsistent with the fixture table: it claims fixtures detected the defect, but all fixture results are `14/14` passed with no failures. This should block reliance on H6 as evidence of fixture detection.
+- H5 is internally inconsistent in wording: it says cross-path recon detects the defect, but X2 `n_disagree=0` means X2 recon does not detect it. This should block reliance on H5 as a uniform detection claim.
+- The manifest misclassifies `run_RA.R` / `run_RB.R` as outputs. Hash equality suggests they were not modified, but the declared changed-file set is muddled by the harness filter.
+- H3’s “total 208” needs clarification on whether X2 R-B is counted as a separate ablated execution or as a reused X1 R-B output.
+- Fixture actuals/expecteds are not present; only pass counts are given. If fixture-level verification is required, this packet does not permit independent recomputation beyond `14/14`.
+- The full 104-row label-flip set and full 222002-row dormant-diff set are not present, so only aggregate counts and first 12 rows can be checked.
+
+## 7. Claim → evidence map
+
+| Claim | Evidence |
+| --- | --- |
+| All four runs exit 0 | Run log; runs table |
+| B reproduces frozen labels | H2; vs-contract table repro rows; recon B row; B output hashes equal frozen hashes |
+| X1 R-B has 104 label flips vs B | H3; vs-contract table X1/X2 R-B row; label-flip CSV |
+| X2 R-A has 104 label flips vs B | H3; vs-contract table X2 R-A row |
+| X1 recon has 104 disagreements | H5; recon table X1 row; disagreeing label-pairs table |
+| X2 recon has 0 disagreements | H5; recon table X2 row |
+| Dormant-hour shifts are widespread | H4; vs-contract table `n_dormant_diff=222002`, max `6 h` |
+| Portfolio shifts from STANDARD to ESCALATE | Portfolio table; delta `+104 ESCALATE`, `-104 STANDARD` |
+| Seed X1 changes R-B parser | SEED_DIFFS; manifest X1 in hash `8df344f5…4866` |
+| Seed X2 changes R-A parser | SEED_DIFFS; manifest X2 out hash `65772bee…f03` |
+| P1 satisfied condition not met | X1/X2 label diffs `104`; X1/X2 dormant diffs `222002` |
+| P1 failed condition met | Same evidence: ≥1 label flip and ≥1 clock-derived shift |
+| Fixture detection claim | H6 and runs table conflict: H6 says detect; table says `14/14` pass |
+
+END C33 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C33 ADJUDICATION'.

@@ -1,0 +1,646 @@
+# C31 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Lineage Attestation (catalog #31) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C31 ADJUDICATION
+
+---
+# COORDINATOR NOTES (added 2026-10-03 after the run, before any Grok chat; nothing in the spec, predicate or numbers changed)
+- N1 (open finding): in clean arm B, R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the two paths; this is not confirmed. The finding is latent in the frozen pack, which is not changed. Consequence: any regime that gates on full-field recon (dormant_h/open_age_h, |d| > 1e-6) raises an alarm on the clean pair. The H2 line of the RESULTS shows these baseline mismatches ("B full-field recon mismatches: dormant_h 1, open_age_h 2").
+
+---
+# SPEC
+# C31 — Ablation specification (FROZEN)
+
+**Ablation ID:** C31 (owner Remaining Ablation Program, catalog #31 "Lineage Attestation")
+**Batch:** N15 batch 1 of 3 (controls C26, C31, C39, C30, C29)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 (provenance of data and code versions)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Before outputs are trusted, the run attests explicit source/data version and snapshot identity: a manifest of the SHA-256 of every input (source files and code) is checked against the frozen record.
+
+## Exact change being tested (ablation)
+There is no lineage attestation. An undocumented change can reach both paths identically. Trust rests on exit 0, fixtures on both paths, and exact recon R-A vs R-B (key set + classification).
+**Caught without the control (D_abl):** crash, recon key/label mismatch, or a fixture failure on any path.
+**Caught with the control:** the above, or any input-file SHA-256 that differs from the frozen record.
+
+## Seeded undocumented changes (frozen before execution; applied to both paths)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b1.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b1.txt`. Source variants are built deterministically on the PC by `runner/source_variants.R`, which stops unless an identity rebuild reproduces the frozen SHA-256. Their hashes are in `_variants/VARIANTS.tsv`.
+- **L_STALE24** (paths run: RA+RB): Both paths read the stale snapshot (undocumented snapshot change).
+  - source variant `V_STALE24/src_open_candidates.csv` SHA-256 `8268fb549b3a2def31922f8ae4d0e204b8edcc697ee7b858fc74edfbbe800e58`, 118267409 bytes
+  - source variant `V_STALE24/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`, 16276 bytes (unchanged, equals the frozen file)
+  - variant note: rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)
+- **L_PEER10** (paths run: RA+RB): Both paths read the altered peer stats (undocumented).
+  - source variant `V_PEER10/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`, 118671837 bytes (unchanged, equals the frozen file)
+  - source variant `V_PEER10/src_peer_stats.csv` SHA-256 `573b41327866314392c72176162c93d8d27b1cf4ae7f77c1b84baa1f13aa69b8`, 16276 bytes
+  - variant note: type_key WCA2: peer_p75_h 2250 -> 2475 (n in-set rows of this type: 72732)
+- **L_TF24** (paths run: RA+RB): Both paths' T_freeze moved +24 h (undocumented config change).
+  - code seed `seeds/C31/RA_TF24__run_RA.R` → `R-A\run_RA.R`, SHA-256 `4694d22d2bc81220bbb0326971e12782de5a88e5a9065291062c6f492e175bcd`
+  - code seed `seeds/C31/RB_TF24__00_config.R` → `R-B\R\00_config.R`, SHA-256 `3484c86e27dbe704f8017bc76606ff7ec95dec97aa6d8768e2f485a8bfe03daf`
+- **L_K25** (paths run: RA+RB): Both paths' kappa 2.0 -> 2.5 (undocumented knob change).
+  - code seed `seeds/C31/RA_K25__run_RA.R` → `R-A\run_RA.R`, SHA-256 `7b3e23dc17b242353b552febde9c7fbd4447fd200ac5d0996e25435a18a44051`
+  - code seed `seeds/C31/RB_K25__00_config.R` → `R-B\R\00_config.R`, SHA-256 `401d894c5cac7d6ae226758ba9bf0303f3e404a382796ffa89197505934a5c90`
+- **L_COMMENT** (paths run: RA+RB): Comment-only edit in both paths (bytes differ, no semantic change).
+  - code seed `seeds/C31/RA_COMMENT__run_RA.R` → `R-A\run_RA.R`, SHA-256 `51a47bd1c613d8570f2a8f52436b5b7580a40cc924fe89ccb15a980baad80be9`
+  - code seed `seeds/C31/RB_COMMENT__00_config.R` → `R-B\R\00_config.R`, SHA-256 `bdf1f3cb821d3ed8798e6698b59be2094681f0632637f4fff68d0260a150a5e2`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No ambiguity in data/code versions. Fail: Undocumented changes found (keep rule)."
+Definitions:
+- **H:** harm set (above).
+- **D_abl:** seeded arms caught without the control (definition above).
+Outcomes:
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. L_COMMENT (comment-only) shows whether attestation alarms on a benign change.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures. Seeded source variants are derived from the frozen source only.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+# PREFLIGHT (gating lines)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# C31_RESULTS.md (runner output, PC DESKTOP-RPECRM9)
+# C31 RESULTS — Lineage Attestation (catalog #31) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 5/5
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path (no lineage/manifest attestation)]: {}
+- H6 H minus caught-without-control: {L_STALE24,L_PEER10,L_TF24,L_K25}
+- H7 arms with no locked-field change: {L_COMMENT}
+- H8 caught with the control [crash, any input file SHA-256 (source or code) differs from the frozen record, recon key/label mismatch, or fixture failure]: {L_STALE24,L_PEER10,L_TF24,L_K25,L_COMMENT}
+- H9 caught with the control but no locked-field change: {L_COMMENT}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| L_STALE24 | RA+RB | Both paths read the stale snapshot (undocumented snapshot change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | only_x=0 only_B=773 label=0 dormant=0 open_age=0 | 1546 | 1546 | TRUE | data\source\src_open_candidates.csv | TRUE | FALSE |
+| L_PEER10 | RA+RB | Both paths read the altered peer stats (undocumented) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | only_x=0 only_B=0 label=269 dormant=0 open_age=0 | 538 | 538 | TRUE | data\source\src_peer_stats.csv | TRUE | FALSE |
+| L_TF24 | RA+RB | Both paths' T_freeze moved +24 h (undocumented config change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | only_x=0 only_B=0 label=573 dormant=222002 open_age=222002 | 889154 | 1146 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_K25 | RA+RB | Both paths' kappa 2.0 -> 2.5 (undocumented knob change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | only_x=0 only_B=0 label=6893 dormant=0 open_age=0 | 13786 | 13786 | TRUE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+| L_COMMENT | RA+RB | Comment-only edit in both paths (bytes differ, no semantic change) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | R-A\run_RA.R; R-B\R\00_config.R | TRUE | FALSE |
+
+
+---
+# C31_EVIDENCE.sha256
+d0b21c9c07eb49034afe1a9f2c4168b650dbda1c2bfd92bf02f73a4c9b61d46f  C31_ARM_MANIFESTS.txt
+3e32165c5d367b925f1a90cb3f0b179435ba457ca92fa1f9ecd633302c02d30f  C31_arms.csv
+d2ba0b1dbff37f963c29f9f8cfbef35450b95590f78e97989d77e97c64c00e5d  C31_RESULTS.md
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C31",
+  "frozen_at_ct": "2026-10-03 05:33:48 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C31/C31-builder/builder_report.md", "bytes": 18024, "sha256": "264e23d49a0fb88298de9821e3ccce9c1d1870318507313637aa30c887bebbb0", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C31/C31-validator/validator_report.md", "bytes": 12578, "sha256": "3e7f8c71ac426077e130ef13c2cec93376fd08d366722c48c30c78fd368a0dae", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "6b6ccb511abfcb0c5148b9d8e4d426c751499f32c77fcbc115d565c83cf97337"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C31 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as Builder** for this independent first pass, blind to the Validator. The frozen role assignment is Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok. The ablation is **C31**, Remaining Ablation Program catalog #31, **“Lineage Attestation,”** in N15 batch 1 of 3, targeting Stage 4 provenance of data and code versions. Constitution version is 1.0.
+
+No terminal adjudication is made in this report.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The control under test requires an explicit lineage attestation before outputs are trusted: a manifest containing the SHA-256 of every source and code input is compared with the frozen record. C31 removes that attestation. Under the ablated regime, trust therefore rests only on successful execution, fixtures on both paths, and RA↔RB exact reconciliation of key set plus classification. Consequently, a common undocumented change applied consistently to both paths can escape detection when both paths continue to agree with each other.
+
+The five frozen seeds are:
+
+- **L_STALE24:** no code diff. Both paths receive the stale `src_open_candidates.csv`; 848 source rows with `created_ts >= 2026-09-11 23:59:59` are dropped. `src_peer_stats.csv` remains byte-identical to frozen.
+- **L_PEER10:** no code diff. Both paths receive altered peer statistics: WCA2 `peer_p75_h` changes from 2250 to 2475, while `src_open_candidates.csv` remains byte-identical to frozen.
+- **L_TF24:** the exact RA code change is  
+  `T_FREEZE <- lubridate::ymd_hms("2026-09-12 23:59:59", tz = "America/Chicago")`  
+  →  
+  `T_FREEZE <- lubridate::ymd_hms("2026-09-13 23:59:59", tz = "America/Chicago")`.  
+  The exact RB change is  
+  `RB_T_FREEZE <- as.POSIXct("2026-09-12 23:59:59", tz = "America/Chicago")`  
+  →  
+  `RB_T_FREEZE <- as.POSIXct("2026-09-13 23:59:59", tz = "America/Chicago")`.
+- **L_K25:** the exact RA code change is `KAPPA <- 2.0` → `KAPPA <- 2.5`; the exact RB code change is `RB_KAPPA_DEFAULT <- 2.0` → `RB_KAPPA_DEFAULT <- 2.5`.
+- **L_COMMENT:** the exact added line in both paths is `# lineage test: comment-only edit, no semantic change`. No executable statement changes.
+
+Thus the seed portfolio tests two undocumented data-version changes, two undocumented executable configuration changes, and one byte-level but semantically inert code change.
+
+## 3. Hard mechanical facts table.
+
+**Notation:** **R** = independently recomputed from the supplied raw evidence; **Q** = quoted directly because the underlying files needed to recompute that value are not themselves supplied as row-level data.
+
+| Mechanical fact | Independent result | Status / derivation |
+| --- | --- | --- |
+| Frozen source row counts | `src_open_candidates = 245,193 (Q)`; `src_peer_stats = 104 (Q)` | Preflight COUNT output. |
+| Stale-source row count after seed | `244,345 (R)` | `245,193 (Q) − 848 (Q) = 244,345 (R)`. |
+| PEER10 magnitude | `+225 h (R)`; `+10% (R)`; affected in-set WCA2 population `72,732 (Q)` | `2475 − 2250 = 225`; `225 / 2250 = 0.10`. Source-variant evidence gives the affected population. |
+| Process executions recorded | `12/12 (R)` total; `10/10 (R)` seeded; `5/5 (R)` seeded arms complete | Run log contains B RA+RB plus `5 (R) × 2 (R) = 10 (R)` seeded executions; every recorded exit is `0 (Q)`. |
+| Fixture executions | `168/168 (R)` pass overall; `28/28 (R)` for B; `140/140 (R)` seeded | `6 arms × 2 paths × 14 fixtures = 168`; raw fixture rows all have `pass=TRUE`. |
+| B reproduction versus frozen outputs | `10/10 zero comparison cells (R)` across the two paths | Each B-vs-frozen row has `5 (Q)` zero difference fields; `2 × 5 = 10 (R)`. |
+| B key/label reconciliation identity | `n_agree = 222,002 (R)`; `n_disagree = 0 (Q)`; `n_inner = 222,002 (Q)` | `222,002 − 0 = 222,002`; therefore `n_agree + n_disagree = 222,002 + 0 = 222,002 = n_inner`. Also `n_inner + n_only_RA = 222,002 + 0 = 222,002 = n_RA`, and symmetrically for RB. |
+| B full-field RA↔RB numerical mismatches | `dormant_h = 1 (Q)`; `open_age_h = 2 (Q)` | These coexist with `0 (Q)` key-set and `0 (Q)` classification disagreement. |
+| Seeded RA↔RB key/label checks | `15/15 zero values (R)` | Five seeded arms each have `recon_only_ra=0`, `recon_only_rb=0`, `recon_disagree=0`; `5 × 3 = 15`. |
+| L_STALE24 inferred RA/RB population | `221,229 (R)` on each path | B has `222,002 (Q)` keys; each seeded path has `only_B=773 (Q)`, `only_x=0 (Q)`: `222,002 − 773 = 221,229`. With RA↔RB disagreement `0 (Q)`, all `221,229 (R)` common rows agree on classification. |
+| L_STALE24 locked-field changes | `1,546 (R)` | RA: `773`; RB: `773`; `773 + 773 = 1,546`. Reported value `1,546 (Q)` matches. |
+| L_STALE24 decision changes | `1,546 (R)` | Only missing-key differences occur: `773 + 773 = 1,546`. Reported `1,546 (Q)` matches. |
+| L_PEER10 locked-field changes | `538 (R)` | RA label changes `269 (Q)` + RB label changes `269 (Q)` = `538`. Reported `538 (Q)` matches. |
+| L_PEER10 decision changes | `538 (R)` | Same `269 + 269 = 538`; no key/numerical-field changes. |
+| L_TF24 locked-field changes | `889,154 (R)` | Per path: `573 + 222,002 + 222,002 = 444,577`; two paths: `444,577 × 2 = 889,154`. Reported `889,154 (Q)` matches. |
+| L_TF24 decision changes | `1,146 (R)` | Classification only for decision-change count: `573 × 2 = 1,146`. Reported `1,146 (Q)` matches. |
+| L_TF24 non-decision numerical-field delta | `888,008 (R)` | `889,154 − 1,146 = 888,008`, entirely from dormant/open-age changes across both paths. |
+| L_K25 locked-field changes | `13,786 (R)` | `6,893 (Q) + 6,893 (Q) = 13,786`. Reported `13,786 (Q)` matches. |
+| L_K25 decision changes | `13,786 (R)` | Same label-change total; no key/dormant/open-age change. |
+| L_COMMENT locked-field changes | `0 (R)` | Both RA-vs-B and RB-vs-B vectors contain only zeroes. Reported `0 (Q)` matches. |
+| L_COMMENT decision changes | `0 (R)` | No key or classification difference. |
+| Portfolio locked-field-change total | `905,024 (R)` | `1,546 + 538 + 889,154 + 13,786 + 0 = 905,024`. |
+| Portfolio decision-change total | `17,016 (R)` | `1,546 + 538 + 1,146 + 13,786 + 0 = 17,016`. |
+| Portfolio locked-minus-decision delta | `888,008 (R)` | `905,024 − 17,016 = 888,008`. |
+| Harm set H | `{L_STALE24, L_PEER10, L_TF24, L_K25} (R)`; cardinality `4 (R)` | Exactly the arms with recomputed locked-field-change count greater than `0`. |
+| Non-harmful seeded set | `{L_COMMENT} (R)`; cardinality `1 (R)` | Recomputed locked-field-change count equals `0`. |
+| D_abl, caught without lineage attestation | `{ } (R)`; cardinality `0 (R)` | Every seeded execution exits `0`; every fixture passes; every seeded arm has zero RA↔RB key/label discrepancy. |
+| H \ D_abl | `{L_STALE24, L_PEER10, L_TF24, L_K25} (R)`; cardinality `4 (R)` | Removing the empty D-set from H leaves H unchanged. This independently reproduces H6. |
+| Caught under SHA-attested regime | all `5/5 (R)` seeded arms | Each seed changes at least one actual input SHA relative to B. |
+| Harmful arms caught under SHA-attested regime | `4/4 (R)` | Every member of H has a source or code input hash difference. |
+| Benign byte-change alarm | `1/1 (R)` non-harmful arm, L_COMMENT | Input code hashes differ while locked outputs do not. |
+| `src_extract_lineage.csv` hash equality | `6/6 arms (R)` identical | B plus all five seeded arms use hash `eaa9…ddd1b`. |
+| `R-B/R/20_integrity_and_classify.R` hash equality | `6/6 arms (R)` identical | Hash `72ac…1d99` throughout. |
+| `R-B/run_RB.R` hash equality | `6/6 arms (R)` identical | Hash `6786…defd` throughout. |
+| `src_open_candidates.csv` equality to B among seeded arms | `4/5 (R)` equal | Only L_STALE24 differs. |
+| `src_peer_stats.csv` equality to B among seeded arms | `4/5 (R)` equal | Only L_PEER10 differs. |
+| `R-A/run_RA.R` equality to B among seeded arms | `2/5 (R)` equal | L_STALE24 and L_PEER10 equal B; TF24, K25 and COMMENT differ. |
+| `R-B/R/00_config.R` equality to B among seeded arms | `2/5 (R)` equal | Same arm pattern as RA code. |
+| Classification-output hash equality to B | both path hashes equal B in `1/5 (R)` seeded arms | L_COMMENT alone exactly reproduces both B classification-output hashes; all `4/4 (R)` harmful arms differ on both classification output files. |
+| Fixture-output hash equality to B | RA `5/5 (R)`; RB `4/5 (R)` | RA fixture file hash remains B-identical in every seed. RB is B-identical except L_K25, whose RB fixture file hash differs even though all `14/14 (Q)` fixture outcomes pass. |
+| Comment-seed byte delta | RA `+54 bytes (R)`; RB config `+54 bytes (R)` | RA `25,063 − 25,009 = 54`; RB config `1,936 − 1,882 = 54`; classification outputs nevertheless remain exactly B-identical on both paths. |
+
+The seeded-arm calculations above come directly from the raw arm rows, whose RA-vs-B/RB-vs-B component counts independently reproduce all five reported locked-field and decision-change totals. The input/output hash comparisons come from the per-arm manifests.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen predicate defines P1 as satisfied exactly when **H ⊆ D_abl**; it defines the contrary condition as **H \ D_abl non-empty**. Arms with no locked-field change do not count for or against P1.
+
+Independent reconstruction gives:
+
+- `H = {L_STALE24, L_PEER10, L_TF24, L_K25}`.
+- `D_abl = {}`.
+- Therefore `H ⊆ D_abl` is **false**.
+- `H \ D_abl = {L_STALE24, L_PEER10, L_TF24, L_K25}` is non-empty, with four members.
+- All four harmful seeds therefore alter at least one locked output field while satisfying every detection mechanism retained by the ablated regime: exit success, fixture success, and RA↔RB key/classification reconciliation.
+- L_COMMENT has no locked-field change and therefore does not affect the predicate. It does demonstrate that SHA-based attestation responds to a byte-level provenance change even when the tested locked outputs are unchanged.
+
+Thus, under the frozen P1 definition, the **P1-satisfied condition is false and the P1-failed condition is true**. This is a predicate result only, not a terminal adjudication.
+
+## 5. Fixture and reconciliation implications.
+
+The raw fixture table contains **168 fixture executions**: six arms including B, two paths per arm, and F01–F14 per path. All 168 have `pass=TRUE`; therefore every seeded arm independently contributes 28/28 passing fixture executions. The fixture suite detects none of the four harmful common-mode seeds.
+
+The clean B arm also reproduces each frozen path with zero key, label, dormant, or open-age difference versus that path's frozen classification file. Its RA↔RB reconciliation is zero on the three ablation detection fields—RA-only keys, RB-only keys, and classification disagreement—while the fuller reconciliation records one `dormant_h` mismatch and two `open_age_h` mismatches.
+
+Every seeded arm preserves the same cross-path pattern: `recon_only_ra=0`, `recon_only_rb=0`, `recon_disagree=0`, `recon_dormant_mismatch=1`, `recon_open_age_mismatch=2`. Consequently:
+
+- The seeded defects are **common-mode with respect to RA versus RB**. RA and RB independently agree with one another after being given the same changed provenance.
+- Exact key/classification reconciliation therefore establishes cross-implementation agreement, not fidelity to the frozen data/code identity.
+- The pre-existing 1/2 dormant/open-age RA↔RB mismatch signature is unchanged across B and all five seeds, so it supplies no discrimination among these arms.
+- Fixture success likewise establishes that F01–F14 still behave as expected under each path; it does not establish that the production run consumed the frozen source/configuration.
+- L_K25 gives an additional file-level nuance: its RB fixture-results file hash changes relative to B while every expected-versus-observed fixture result still passes. Therefore fixture-file byte equality and fixture semantic pass/fail are distinct properties.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The central semantic risk exposed by the evidence is **common-mode provenance drift**. Independent RA and RB implementations do not protect against a source snapshot, peer-stat table, freeze instant, or shared production knob being changed consistently for both paths. Four such changes altered locked outputs yet left both paths mutually consistent and all fixtures passing.
+
+A second risk is that the retained checks can create a false sense of provenance assurance: successful execution plus inter-path agreement shows that two implementations processed their inputs compatibly, but without input identity it cannot establish that those were the frozen inputs.
+
+The opposite operational characteristic is visible in L_COMMENT. Exact SHA-256 attestation is intentionally byte-sensitive: it catches the comment-only edit despite exact preservation of both classification output hashes and zero locked-field change. That means the control distinguishes **documented/frozen identity** rather than only semantic equivalence. In an operational workflow, benign intentional edits therefore require an updated frozen record rather than being silently tolerated.
+
+Observed unchanged surfaces are strong and specific. `src_extract_lineage.csv`, `R-B/R/20_integrity_and_classify.R`, and `R-B/run_RB.R` are hash-identical across B and all five seeded arms. L_STALE24 changes only `src_open_candidates.csv`; L_PEER10 changes only `src_peer_stats.csv`; L_TF24, L_K25, and L_COMMENT change only the seeded RA script and RB configuration among the key manifested inputs.
+
+The clean B classification outputs have the same hashes as the frozen preflight outputs, and the B-vs-frozen comparison reports zero differences on both paths. L_COMMENT likewise reproduces the B classification hashes exactly. By contrast, every harmful arm produces classification-output hashes different from B on both paths, consistent with the nonzero locked-field comparisons.
+
+No evidence in this packet indicates a regression in the fixture pass surface, process-exit surface, RA↔RB key/classification reconciliation surface, or the three explicitly unchanged manifested files. The evidence instead shows that those unchanged surfaces are insufficient to discriminate the four harmful lineage changes when lineage attestation is absent.
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence section and table row |
+| --- | --- |
+| C31 is the Lineage Attestation ablation and ChatGPT is the Builder | **SPEC → header / Roles**: ablation ID, catalog #31, role assignment, target Stage 4. |
+| The ablation removes input SHA-256 lineage attestation and retains exit/fixtures/key-label reconciliation | **SPEC → Control under test / Exact change being tested**. |
+| L_STALE24 drops 848 source rows; L_PEER10 changes WCA2 peer p75 from 2250 to 2475 | **SPEC → Seeded undocumented changes**, L_STALE24 and L_PEER10 rows; **SOURCE VARIANTS**, V_STALE24/V_PEER10 rows. |
+| L_TF24 changes both freeze instants from 2026-09-12 23:59:59 to 2026-09-13 23:59:59 | **SEED DIFFS → RA_TF24 and RB_TF24 rows**. |
+| L_K25 changes κ from 2.0 to 2.5 in both implementations | **SEED DIFFS → RA_K25 and RB_K25 rows**. |
+| L_COMMENT adds only the stated comment line to each seeded code file | **SEED DIFFS → RA_COMMENT and RB_COMMENT rows**. |
+| All B and seeded executions recorded exit 0 | **RUN LOG → B, L_STALE24, L_PEER10, L_TF24, L_K25, L_COMMENT RA/RB rows**. |
+| B reproduces both frozen classification paths with zero differences | **C31_RESULTS → Arm B repro vs frozen pack**, both B rows. |
+| B has 222,002 rows on each path, zero key/classification disagreement, but 1 dormant and 2 open-age cross-path mismatches | **C31_RESULTS → Arm B recon**, single data row. |
+| L_STALE24 has 1,546 locked/decision changes and no ablated-regime detection | **C31_RESULTS → Seeded arms → L_STALE24 row**; independently `773 + 773 = 1,546`. |
+| L_PEER10 has 538 locked/decision changes and no ablated-regime detection | **C31_RESULTS → Seeded arms → L_PEER10 row**; independently `269 + 269 = 538`. |
+| L_TF24 has 889,154 locked-field changes but 1,146 decision changes and no ablated-regime detection | **C31_RESULTS → Seeded arms → L_TF24 row**; independently `2 × (573 + 222,002 + 222,002) = 889,154` and `2 × 573 = 1,146`. |
+| L_K25 has 13,786 locked/decision changes and no ablated-regime detection | **C31_RESULTS → Seeded arms → L_K25 row**; independently `6,893 + 6,893 = 13,786`. |
+| L_COMMENT has zero locked/decision changes while its code hashes differ | **C31_RESULTS → Seeded arms → L_COMMENT row** plus **ARM MANIFESTS → L_COMMENT inputs/outputs**. |
+| H consists of the four harmful arms and D_abl is empty | **C31_RESULTS → Mechanical facts H4–H6**, independently reproduced from raw seeded-arm rows. |
+| P1's satisfied condition is false because H is not a subset of D_abl | **SPEC → Operational benefit predicate P1**, combined with **C31_RESULTS → H4–H6**. |
+| Exact attestation catches all five seeds, including benign L_COMMENT | **C31_RESULTS → H8–H9** and **Seeded arms → caught_with_control column**. |
+| L_COMMENT classification outputs are byte-identical to B | **ARM MANIFESTS → B output rows and L_COMMENT output rows**: RA `c099…ae0d9` equals B and RB `a0e4…fe193` equals B. |
+| The four harmful arms have classification-output hashes different from B on both paths | **ARM MANIFESTS → L_K25, L_PEER10, L_STALE24, L_TF24 output rows**. |
+| `src_extract_lineage.csv`, `R-B/R/20_integrity_and_classify.R`, and `R-B/run_RB.R` remain invariant across the tested arms | **ARM MANIFESTS → B and all seeded-arm input rows**. |
+| The evidence package itself records hashes for the arm manifests, raw arms CSV, and results file | **C31_EVIDENCE.sha256 → three evidence rows**. |
+
+END C31 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID.  
+   I am DeepSeek, acting only as Validator for this packet. I am blind to the Builder; I have not seen and did not request Builder output. Ablation ID: C31, “Lineage Attestation,” batch N15 batch 1 of 3, Constitution version 1.0. Role assignment in the SPEC is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. The baseline framework hashes in the packet match the SPEC. The ablation was frozen at 2026-10-03 CT before the runner executed.
+2. Independent test plan: what I checked, and how.
+
+- Checked preflight gating: compared SPEC-frozen hashes to PREFLIGHT lines for source, code, seed, and baseline framework hashes; checked MySQL read-only counts.
+- Checked arm B: exits, fixture counts, reproduction against frozen RA/RB classifications, and R-A vs R-B reconciliation.
+- Reconstructed D_abl and H from C31_RESULTS.md and C31_arms.csv: exits, recon only_ra/only_rb/disagree, fixture pass counts, RA_vs_B/RB_vs_B key/label/dormant/open_age deltas.
+- Recomputed locked_field_changes_vs_B and decision_changes_vs_B arithmetic from the per-path deltas.
+- Compared ARM MANIFESTS SHA-256 and byte sizes across arms for input/output equalities and differences.
+- Checked fixture rows for F01–F14 on every path/arm.
+- Checked SEED DIFFS against the SPEC-seeded changes.
+- Checked SOURCE VARIANTS notes against the declared variant files.
+- Evaluated P1 strictly against the frozen predicate: P1 satisfied iff H ⊆ D_abl.
+
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+
+Preflight / frozen identity:
+
+- `src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` matches SPEC and PREFLIGHT.
+- `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58` matches SPEC and PREFLIGHT.
+- `R-A\run_RA.R` SHA-256 `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587` matches SPEC and PREFLIGHT.
+- `R-B\R\00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b` matches SPEC and PREFLIGHT.
+- `R-B\R\20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99` matches SPEC and PREFLIGHT.
+- Seed hashes in PREFLIGHT match SPEC for `RA_COMMENT` `51a47bd1...`, `RA_K25` `7b3e23dc...`, `RA_TF24` `4694d22d...`, `RB_COMMENT` `bdf1f3cb...`, `RB_K25` `401d894c...`, `RB_TF24` `3484c86e...`.
+- MySQL read-only counts: `src_open_candidates` 245193; `src_peer_stats` 104.
+- R version 4.6.1 recorded in PREFLIGHT.
+
+Arm B:
+
+- H1: R-A exit 0, R-B exit 0. Fixtures R-A 14/14, R-B 14/14. Confirmed from RUN LOG and FIXTURE RESULTS.
+- H2 reproduction vs frozen pack: B R-A vs frozen RA_classifications has `n_only_x=0, n_only_truth=0, n_label_diff=0, n_dormant_diff=0, n_open_age_diff=0`; B R-B vs frozen RB_classifications has all zeros. Confirmed.
+- B recon R-A vs R-B: `n_ra=222002`, `n_rb=222002`, `n_inner=222002`, `n_only_ra=0`, `n_only_rb=0`, `n_disagree=0`, `n_dormant_mismatch=1`, `n_open_age_mismatch=2`. Confirmed from B recon table.
+- Note: the H2 wording “B recon is 0/0/0” is true for only_ra/only_rb/disagree, but not for full-field dormant/open_age mismatch counts. The SPEC defines exact recon as key set + classification, so the 0/0/0 reading is consistent with the SPEC definition, but the wording is ambiguous.
+
+Seeded arms:
+
+- H3: 5 seeded arms, all runs recorded. All RA/RB exits are 0 for L_STALE24, L_PEER10, L_TF24, L_K25, L_COMMENT. Confirmed.
+- H4 harm set H: recomputed from RA_vs_B/RB_vs_B deltas.
+
+  - L_STALE24: `only_B=773` on RA and RB. Locked-field changes = 773*2 = 1546; decision changes = 1546.
+  - L_PEER10: `label=269` on RA and RB. Locked-field changes = 269*2 = 538; decision changes = 538.
+  - L_TF24: `label=573`, `dormant=222002`, `open_age=222002` on RA and RB. Locked-field changes per path = 573 + 222002 + 222002 = 444577; both paths = 889154. Decision changes = 573*2 = 1146.
+  - L_K25: `label=6893` on RA and RB. Locked-field changes = 6893*2 = 13786; decision changes = 13786.
+  - L_COMMENT: all locked deltas 0.
+  - Therefore H = {L_STALE24, L_PEER10, L_TF24, L_K25}. This matches H4.
+- H5 / D_abl: caught without control = crash, recon key/label mismatch, or fixture failure on any path. All seeded arms have exits 0, `recon_only_ra=0`, `recon_only_rb=0`, `recon_disagree=0`, and all fixtures 14/14. Therefore D_abl = {}.
+- H6: H minus D_abl = {L_STALE24, L_PEER10, L_TF24, L_K25}. Confirmed.
+- H7: arms with no locked-field change = {L_COMMENT}. Confirmed.
+- H8: caught with control = {L_STALE24, L_PEER10, L_TF24, L_K25, L_COMMENT}. Confirmed by input hash differences from B.
+- H9: caught with control but no locked-field change = {L_COMMENT}. Confirmed.
+
+Cross-arm hash equalities:
+
+- L_COMMENT outputs are byte-identical to arm B:
+
+  - `R-A\outputs\RA_classifications.csv` `c099e092...` 22271481 bytes.
+  - `R-A\outputs\RA_fixture_results.csv` `33696cd1...` 985 bytes.
+  - `R-B\outputs\RB_classifications.csv` `a0e42b86...` 41963733 bytes.
+  - `R-B\outputs\RB_fixture_results.csv` `0d72245c...` 1792 bytes.
+- Other seeded arms have output hashes differing from B.
+- Inputs differing from B:
+
+  - L_STALE24: `data\source\src_open_candidates.csv` `8268fb54...` vs B `ba089fcc...`.
+  - L_PEER10: `data\source\src_peer_stats.csv` `573b4132...` vs B `cb78ae21...`.
+  - L_TF24: `R-A\run_RA.R` `4694d22d...` vs B `f4e8993c...`; `R-B\R\00_config.R` `3484c86e...` vs B `6c9b0e31...`.
+  - L_K25: `R-A\run_RA.R` `7b3e23dc...` vs B `f4e8993c...`; `R-B\R\00_config.R` `401d894c...` vs B `6c9b0e31...`.
+  - L_COMMENT: `R-A\run_RA.R` `51a47bd1...` vs B `f4e8993c...`; `R-B\R\00_config.R` `bdf1f3cb...` vs B `6c9b0e31...`.
+
+Fixture results:
+
+- Every arm/path has 14 fixture rows, F01–F14, and every `pass` value is TRUE.
+- F14 expected/observed differs by path across all arms:
+
+  - R-A F14: expected `TWO_INDEPENDENT_LABELS`, observed `TWO_INDEPENDENT_LABELS`.
+  - R-B F14: expected `STANDARD|STANDARD`, observed `STANDARD|STANDARD`.
+- This means the fixture suite is not presenting a single common expected value for F14 across R-A and R-B.
+
+Internal inconsistencies flagged:
+
+- SOURCE VARIANTS line for `V_STALE24/src_peer_stats.csv` reports `rows dropped: 848 (created_ts >= 2026-09-11 23:59:59)`, but the same line and manifest state the file is unchanged, SHA-256 equals the frozen `cb78ae21...`, and PREFLIGHT gives `src_peer_stats` count 104. A 104-row unchanged peer-stats file cannot have 848 rows dropped.
+- F14 has different expected values on R-A vs R-B in all arms.
+- L_K25 `R-B\outputs\RB_fixture_results.csv` manifest hash/size is `f777621e...` 1820 bytes, while arm B is `0d72245c...` 1792 bytes. The provided raw fixture rows for L_K25 RB are identical to B’s raw fixture rows for all 14 fixtures. If the provided rows are the full file, this is inconsistent; if there are additional columns/bytes, the packet does not show them.
+- H2 says “B recon is 0/0/0” while also reporting full-field recon mismatches `dormant_h 1`, `open_age_h 2`. This is not necessarily a contradiction under the SPEC’s exact-recon definition, but it is an ambiguity in the runner output.
+- B reproduces frozen RA/RB with 0 dormant/open_age differences, yet B R-A vs R-B recon has 1 dormant and 2 open_age mismatches. This implies the frozen RA/RB files themselves may differ by 1 dormant and 2 open_age mismatches, but the packet does not include frozen RA/RB inter-path recon to confirm.
+
+4. Facts that cannot be recomputed from this packet.
+
+- Actual raw file bytes and independently recomputed SHA-256 hashes; only provided hashes and sizes are available.
+- Frozen RA/RB classification contents and whether they already contain the 1 dormant / 2 open_age inter-path mismatches implied by B recon.
+- Full `ARM_MANIFESTS.txt`; the packet says key files only, so the full manifest list cannot be recomputed.
+- `SEEDS_b1.sha256` contents; only PREFLIGHT seed hash checks are shown.
+- `_variants/VARIANTS.tsv` contents; only SOURCE VARIANTS summary lines are shown.
+- Full source-variant construction details and row-level counts beyond the notes.
+- Full fixture expected files; cannot determine whether the F14 R-A/R-B expected difference is intentional or a harness defect.
+- Full `RB_fixture_results.csv` file bytes for L_K25; cannot determine why its hash/size differs from B while the provided raw rows match.
+- Builder output and Builder/Validator hard-number agreement; Builder is not in this packet.
+
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+- Frozen predicate: P1 satisfied iff H ⊆ D_abl. P1 failed iff H \ D_abl is non-empty.
+- Reconstructed H = {L_STALE24, L_PEER10, L_TF24, L_K25}.
+- Reconstructed D_abl = {}.
+- H \ D_abl = {L_STALE24, L_PEER10, L_TF24, L_K25}, which is non-empty.
+- Therefore the frozen predicate’s failure condition is met: P1 is not satisfied.
+- L_COMMENT has no locked-field change and is reported separately; it does not count for or against P1.
+- L_COMMENT is caught with the control only because its code bytes differ from the frozen record.
+
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state “none”.  
+   The following evidence defects should block a verdict until resolved:
+
+- The SOURCE VARIANTS line for `V_STALE24/src_peer_stats.csv` reports 848 rows dropped even though that file is unchanged, matches the frozen SHA-256, and is only 104 rows by preflight count. This is a direct seed/variant evidence inconsistency.
+- F14 has different expected values on R-A (`TWO_INDEPENDENT_LABELS`) and R-B (`STANDARD|STANDARD`) across all arms. The SPEC describes a fixture suite `fixtures-v1-tcd-ig` F01–F14 on every path; a path-dependent expected value for the same fixture ID undermines the fixture evidence as a common locked behavioral suite.
+- L_K25 `R-B\outputs\RB_fixture_results.csv` differs from arm B in hash and byte size (`f777621e...` 1820 vs `0d72245c...` 1792) while the provided raw fixture rows are identical to B for all 14 fixtures. If the provided rows are complete, this is an internal inconsistency; if not, the packet lacks the additional bytes/columns needed to explain it.
+- The H2 wording “B recon is 0/0/0” coexists with full-field recon mismatches `dormant_h 1` and `open_age_h 2`. The SPEC defines exact recon as key set + classification, so this may be only a wording ambiguity, but it should be clarified because it touches the B reconciliation hard gate.
+- B reproduces frozen RA/RB with 0 dormant/open_age differences, but B R-A vs R-B recon has 1 dormant and 2 open_age mismatches. The packet does not include frozen RA/RB inter-path recon, so the source of those mismatches cannot be independently verified.
+
+7. Claim → evidence map.
+
+- Validator role and ablation ID: SPEC “Roles” line; SPEC “Ablation ID” line.
+- Baseline framework hashes: BASELINE FRAMEWORK HASHES section.
+- Frozen source/code hashes: SPEC frozen data/code list; PREFLIGHT “frozen OK” lines.
+- Seed hashes: SPEC seeded changes; PREFLIGHT “seed OK” lines.
+- MySQL counts: PREFLIGHT `mysql` line.
+- Arm B exits and fixtures: RUN LOG B RA/RB lines; FIXTURE RESULTS B RA/RB rows.
+- Arm B reproduction vs frozen: “Arm B repro vs frozen pack” table.
+- Arm B recon: “Arm B recon” table.
+- H set: C31_RESULTS H4; C31_arms rows for L_STALE24, L_PEER10, L_TF24, L_K25; recomputed RA_vs_B/RB_vs_B deltas.
+- D_abl empty: C31_RESULTS H5; C31_arms exit, recon_only_ra/rb, recon_disagree, fixture columns.
+- H6 = H \ D_abl: C31_RESULTS H6; recomputed H and D_abl.
+- Caught with control: C31_RESULTS H8; ARM MANIFESTS input differences for each seeded arm.
+- L_COMMENT benign: C31_RESULTS H7/H9; C31_arms L_COMMENT locked deltas all 0; ARM MANIFESTS L_COMMENT outputs equal B.
+- Input hash differences: ARM MANIFESTS “in” lines for each arm vs B.
+- Seed diffs: SEED DIFFS section.
+- Source variant inconsistency: SOURCE VARIANTS `V_STALE24/src_peer_stats.csv` line vs SPEC variant note and PREFLIGHT count.
+- F14 expected difference: FIXTURE RESULTS B RA F14 vs B RB F14 and all seeded RA/RB F14 rows.
+- L_K25 RB fixture manifest mismatch: ARM MANIFESTS L_K25 out `RB_fixture_results.csv` vs B out `RB_fixture_results.csv`; FIXTURE RESULTS L_K25 RB rows.
+- P1 failure: SPEC P1 definitions; C31_RESULTS H4, H5, H6; recomputed H \ D_abl.
+
+END C31 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C31 ADJUDICATION'.

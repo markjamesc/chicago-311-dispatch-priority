@@ -1,0 +1,42 @@
+{
+  "ablation_id": "C49R",
+  "frozen_at_ct": "2026-10-09 07:18:38 CT",
+  "records": [
+    {
+      "id": "DS_ZIP_reply.md",
+      "path": "C49R-DS_ZIP/reply.md",
+      "bytes": 1652,
+      "sha256": "1aa2a0c98488786cb7dbbdb87c53551d30a495e6f085d55e18df2bf1d36391e9"
+    },
+    {
+      "id": "DS_ZIP_TIMES.txt",
+      "path": "C49R-DS_ZIP/TIMES.txt",
+      "bytes": 699,
+      "sha256": "91e19dcc8e89b9c2e5fedfbf346847dd74d83532e2bdbf1a47314c09b5c37113"
+    },
+    {
+      "id": "DS_FILES_reply.md",
+      "path": "C49R-DS_FILES/reply.md",
+      "bytes": 2513,
+      "sha256": "ee4234668a87a386990a978c2c53afa2d9e4509057e94db4cca2eff906482688"
+    },
+    {
+      "id": "DS_FILES_TIMES.txt",
+      "path": "C49R-DS_FILES/TIMES.txt",
+      "bytes": 460,
+      "sha256": "8439126d0bdbf5df1967871510ce85730ae7ea8d86bc9ab46507aac4beb0fe97"
+    },
+    {
+      "id": "GPT_FILES_reply.md",
+      "path": "C49R-GPT_FILES/reply.md",
+      "bytes": 3622,
+      "sha256": "0f93bb24fcbc44487c08f970ad32d91160681ff3cfee813dbb5261a908508d29"
+    },
+    {
+      "id": "GPT_FILES_TIMES.txt",
+      "path": "C49R-GPT_FILES/TIMES.txt",
+      "bytes": 615,
+      "sha256": "b66ec6bdc32f5b0ec119db601a5723593d4f0bae247f861d47bbea80412f9f94"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+Role attestation and ablation ID.
+
+Role: Validator only, DeepSeek, DeepThink on, Search off.
+
+Blindness: I have not seen the Builder output and have not asked for it. I have no tools and no attachments beyond this packet.
+
+Ablation ID: C37, batch N16, target Stage 5 interpretation, control #37 recommendation proportionality table.
+
+I do not return a terminal state.
+
+Independent test plan: what you checked, and how.
+
+Checked the frozen SPEC, constitution, preflight, C37_RESULTS.md, scorer source for score_s5.py and s5text.py, seed diffs, frozen AI1_ORIGINAL.md, and the C37 evidence hash list.
+
+Reconstructed the declared C37 table and lexicon: Descriptive -> Monitor; Associational -> Pilot; Causal-supported -> Act. Rank order: No action < Collect more < Monitor < Pilot < Act.
+
+Independently classified section 7 “Primary Recommendation” for ORIG, CLEAN_EDIT, and SEED_ACT using the declared LEX, MAXR, NEG, and classify logic.
+
+Recomputed portfolio identities, shares, κ deltas, seed byte-size deltas, changed-line D-sets, and cross-arm hash equalities where the packet exposes enough data.
+
+Checked P1 conditions against the frozen predicate: seed flagged, clean edit passes, unmodified original passes.
+
+Independently recomputed hard facts.
+
+Portfolio identity from frozen AI1_ORIGINAL.md:
+
+ESCALATE = 131,968
+
+INCONCLUSIVE = 6,377
+
+STANDARD = 83,657
+
+Sum = 131,968 + 6,377 + 83,657 = 222,002.
+
+This matches the stated exact reconciliation: 0 disagreements across 222,002 rows.
+
+Portfolio shares:
+
+ESCALATE: 131,968 / 222,002 = 59.4453% -> 59.4%.
+
+INCONCLUSIVE: 6,377 / 222,002 = 2.8725% -> 2.9%.
+
+STANDARD: 83,657 / 222,002 = 37.6823% -> 37.7%.
+
+Rounded shares sum to 100.0%.
+
+κ sensitivity deltas:
+
+κ=1.0: 152,292
+
+κ=1.5: 140,340; delta 1.0->1.5 = −11,952.
+
+κ=2.0: 131,968; delta 1.5->2.0 = −8,372.
+
+κ=3.0: 118,246; delta 2.0->3.0 = −13,722.
+
+Total 1.0->3.0 delta = 152,292 − 118,246 = −34,046. Monotonic decrease confirmed.
+
+Seed number check:
+
+SEED_ACT recommendation uses “131,968 ESCALATE requests”.
+
+This equals the κ=2.0 ESCALATE count and the Stage 5 portfolio ESCALATE count.
+
+Seed size deltas:
+
+ORIG file size 7,929 bytes.
+
+CLEAN_EDIT file size 7,938 bytes; +9 bytes. This is consistent with changing evaluation. to evaluation purposes. (+9 bytes).
+
+SEED_ACT file size 7,898 bytes; −31 bytes. The replaced recommendation line difference is consistent: original line length 104, seed line length 73, difference −31.
+
+D-sets / changed-line sets:
+
+ORIG vs CLEAN_EDIT: exactly one changed line in section 7, the recommendation line:
+
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
+
+-> Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation purposes.
+
+ORIG vs SEED_ACT: exactly one changed line in section 7:
+
+original recommendation line -> Recommendation: Act now: dispatch crews to all 131,968 ESCALATE requests.
+
+CLEAN_EDIT vs SEED_ACT: same recommendation line differs.
+
+Independent action classification for section 7:
+
+ORIG: 0 classified action sentences, 0 flagged. The only possible action word in the section is in “No operational dispatch recommendation should be made from this package alone.” The NEG cue “No” suppresses it under classify.
+
+CLEAN_EDIT: 0 classified action sentences, 0 flagged. The changed line still uses “Accept”, which is not in the declared action lexicon.
+
+SEED_ACT: 1 classified action sentence, 1 flagged. The seed line contains Act now and dispatch, matching the Act rank 4. Descriptive maximum is rank 2 Monitor, so 4 > 2 flags it.
+
+Cross-arm hash equalities:
+
+ORIG seed hash 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 equals frozen c48/AI1_ORIGINAL.md and frozen stage5/AI1_INTERPRETATION_BUILDER.md in preflight.
+
+CLEAN_EDIT hash 39ea49a2d44d36b51acb34b6425c70fdd6171184759ce21312bf4e7a79f51161 matches SPEC, C37 evidence, and seed diff header.
+
+SEED_ACT hash b73ea5afcd2aec2b15a7c8cfd7db5faf8b202ffcb8ec6e111feaea66a581fafd matches SPEC, C37 evidence, and seed diff header.
+
+score_s5.py hash d0f8c42b907075c5d98e162ca7428cd814199a4f86b23020ce6b6cf42ee7737a matches SPEC, C37 evidence, and source header.
+
+s5text.py hash d3f2d61f5f2ef389b85a353a68071f2a2135c5f8619e16b53d8927cbd0091568 matches SPEC, C37 evidence, and source header.
+
+C37_RESULTS.md hash efb87f54c7f77826fe0fdbe1f1f83b5015550b5e590f3fad2fa7d26ad1a10dc6 matches SPEC and C37 evidence.
+
+Internal inconsistency check:
+
+No material inconsistency found in the runner output for C37.
+
+Minor artifact: the SEED_ACT abridged action sentence includes Primary Recommendation Recommendation: Act now... because the sentence splitter treats 7. as a sentence terminator and carries the heading fragment into the next sentence. This does not change the classification or P1 result.
+
+Minor wording note: the ORIG row says “(no action word in section 7)”, though dispatch appears in a negated sentence. Under the declared classify, it is correctly not counted as an action sentence.
+
+Facts that cannot be recomputed from this packet.
+
+Exact SHA-256 digests from raw bytes cannot be recomputed without hashing tools; only equality of repeated hashes can be checked.
+
+Full source of scorers/n16lib.py is not in the packet. Its SPEC hash is given, but the file content and SCORERS_N16.sha256 are not present, so the exact sentences() tokenizer and helper behavior cannot be independently re-executed.
+
+Raw stdout/stderr or full scorer logs are not present; only the frozen C37_RESULTS.md text is provided.
+
+Full preflight origin-hash list is omitted; only the summary and selected frozen OK lines are present.
+
+Exact byte sizes for all files cannot be verified from raw bytes; only the sizes listed in the packet can be compared.
+
+PC/R execution facts are not applicable: the coordinator note states N16 is text-only and no PC run occurred.
+
+P1 assessment against the frozen predicate in the SPEC.
+
+P1 condition 1: the table flags the seeded over-confident action.
+
+Recomputable fact: SEED_ACT contains the recommendation Act now: dispatch crews to all 131,968 ESCALATE requests. Declared evidence tag is Descriptive. Descriptive maximum is Monitor rank 2. The sentence classifies as Act rank 4. Therefore it is flagged. C37_RESULTS reports MET.
+
+P1 condition 2: the clean edit passes the table.
+
+Recomputable fact: CLEAN_EDIT changes only evaluation. to evaluation purposes. in section 7. No declared action word is present. 0 flagged. C37_RESULTS reports MET.
+
+P1 condition 3: the unmodified original passes the table.
+
+Recomputable fact: ORIG section 7 has no unnegated declared action sentence. 0 flagged. C37_RESULTS reports MET.
+
+All three frozen P1 conditions are MET in C37_RESULTS and are independently reproduced from the provided lexicon/table and seed diffs. No terminal state is given here.
+
+Blocking objections.
+
+None.
+
+Non-blocking caveats:
+
+n16lib.py is not included in the packet, but the C37 classification is robust from the provided lexicon and seed diffs.
+
+The sentence-splitter heading artifact in SEED_ACT does not affect the flag.
+
+The C05 overlap on dispatch crews is declared INFO and does not affect C37 alone.
+
+The text-only capture mode and no-PC-run limitation are declared and do not enter C37 P1.
+
+Claim → evidence map.
+
+Claim: ORIG passes the table.
+
+Evidence: C37_RESULTS ORIG row: 0 action sentences, 0 flagged. Independent classification finds no unnegated declared action sentence in section 7.
+
+Claim: CLEAN_EDIT passes the table.
+
+Evidence: C37_RESULTS CLEAN_EDIT row: 0 action sentences, 0 flagged. Seed diff changes only evaluation. to evaluation purposes.; “Accept” is not in the declared action lexicon.
+
+Claim: SEED_ACT is flagged.
+
+Evidence: C37_RESULTS SEED_ACT row: 1 action sentence, 1 flagged. Seed diff replaces the recommendation with Act now: dispatch crews...; declared lexicon classifies as Act rank 4; Descriptive max is Monitor rank 2.
+
+Claim: evidence tag is Descriptive.
+
+Evidence: SPEC and C37_RESULTS declare Descriptive for the Stage 5 recommendation before scoring.
+
+Claim: portfolio counts and reconciliation identity.
+
+Evidence: frozen AI1_ORIGINAL.md; ESCALATE 131,968 + INCONCLUSIVE 6,377 + STANDARD 83,657 = 222,002, matching 0 disagreements across 222,002 rows.
+
+Claim: κ sensitivity is monotonic decreasing.
+
+Evidence: frozen AI1_ORIGINAL.md κ table; recomputed deltas −11,952, −8,372, −13,722.
+
+Claim: seed byte-size deltas are consistent.
+
+Evidence: ORIG 7,929; CLEAN_EDIT 7,938 (+9); SEED_ACT 7,898 (−31); diffs match line-length changes.
+
+Claim: cross-arm hashes match frozen references.
+
+Evidence: SPEC, C37_EVIDENCE.sha256, preflight, seed diff headers, scorer source headers.
+
+Claim: no PC/R path enters N16 C37.
+
+Evidence: coordinator notes and preflight text-only/no-PC statements; N1/OF-1 is excluded by design.
+
+END C37 VALIDATOR REPORT

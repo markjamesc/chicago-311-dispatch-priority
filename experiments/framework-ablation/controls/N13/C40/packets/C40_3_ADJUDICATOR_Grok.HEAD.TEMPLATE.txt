@@ -1,0 +1,1348 @@
+# C40 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the repair-round cap is adopted: after 2 failed rounds a fresh builder takes over with the gate reports (no code), with its own cap of 2, then escalation to the owner.
+- REVERT: repair rounds stay unlimited for one builder.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4 = byte equality of the 4 R-B key outputs (the gate); condition 5 = fixtures 14/14 (inside the gate). Gate validity (P1 condition 0) failing is a HALT. Conditions 1–3 are decided from the frozen rounds (ROUNDS_FREEZE section) by the frozen evaluator.
+- Items the SPEC marks "not measured" or "not tested" (e.g. the C44 unchanged-file seed, the C49 Grok and ChatGPT-zip arms, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Repair-round cap (Addendum 01b #40)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C40 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. In C40 N1 is in scope: the gate compares with the frozen R-B outputs, which embed R-B's first-occurrence reading, so a build that reads the repeated hour as CST (the R-A reading) fails the gate on exactly these 3 rows (validation arm SEED_CLOCKLATE: 1 dormant_h + 2 open_age_h rows differ), which is correct under ruling 53A. The note was in every builder packet.
+---
+# SPEC
+# C40 — Ablation specification (FROZEN)
+
+**Ablation ID:** C40 (Addendum 01b, candidate #40 "Repair-round cap")
+**Batch:** N13 batch 6 (controls C43, C49, C44, C40; owner approval 2026-10-03 10:52 CT; built the way batch b5 was built)
+**Definitions and approval (operational definitions, constitution §9):** Definitions: `ablation_plan/ADDENDUM_01_control_39.md` SHA-256 `a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f` (#40, #43) and `ablation_plan/ADDENDUM_02_pricepoint_candidates.md` SHA-256 `5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6` (#44, #49; #40 evidence). Owner approval of #43, #49, #44, #40: 2026-10-03 10:52 CT (blockers in `N13/SELECTION_N13.md` SHA-256 `f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f`). Owner rulings batch 01 (`OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba`) apply where cited (41A depth gate, 48A, 53A clock rule).
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Extra chats: 1 or 2** — builder chats on ChatGPT: **INC** (incumbent builder, one chat, rounds are messages) always; **FRESH** (a new ChatGPT chat) only if INC's first two builds both fail the gate. No Grok chat. The builder chats are blind to this ablation and are frozen round by round.
+**Usage priority (owner):** SuperGrok usage is the scarcest resource; extra chats are kept to the smallest number the test validly allows, and no extra chat uses Grok.
+**Target stage:** Stage 4 build repair rounds (hardening)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b6/run_batch_v6.ps1`, evaluator `runner_b6/eval_b6.R`; R only, no MySQL, no git)
+
+## Control under test (Addendum 01b #40)
+Rule as it stands: unlimited repair rounds for one builder (PricePoint R-B reached r10; evidence table in Addendum 02). Variant: after 2 failed rounds, swap in a fresh builder (or escalate to the owner after the fresh builder's own cap).
+
+## Verdict convention (Addendum 01b)
+**KEEP = adopt the cap (a valid build arrives no later and no defect escapes). REVERT otherwise. HALT if evidence is incomplete.**
+
+## Exact change being tested
+- **Build task (identical for every builder):** write `R-B/R/10_io_parse.R` (I/O and clock/type parsing helpers) for the frozen R-B path; every other R-B file, the locked design documents, the source sample lines, the function contracts (including the America/Chicago wall clock and ruling 53A, repeated hour = first occurrence) and the reference output hashes are in the packet verbatim. The frozen module itself is never shown.
+- **Gate (valid build), `c40_gate.R`:** the frozen R-B tree with only `10_io_parse.R` replaced; `Rscript R-B/run_RB.R all` on the frozen extract exits 0, fixtures 14/14, and the 4 R-B key outputs are byte-identical to the frozen ones. A failed gate produces `GATE_REPORT.md` (exit status, failing fixtures, which outputs differ, per column how many rows differ, up to 5 example rows; no frozen code), sent to the builder as the next repair message.
+- **Hidden escape check:** on every gate-passing build, the b5 C41 depth gate (`fixdepth.R depth`, ruling 41A; hash below), never shown to builders. "No defect escapes" = the variant's valid build passes it.
+- **Regimes (`c40_next.R` state machine):** INC r1 → gate. If PASS at r1 or r2: the cap never triggers and the two regimes are identical → outcome **NOT_TRIGGERED** (no verdict; no Builder/Validator/Adjudicator chats; disclosed). If INC r1 and r2 both FAIL, the regimes diverge: **variant** = FRESH chat with the original packet plus INC's r1–r2 gate reports (no code), cap 2 failed rounds, then escalation; **baseline** = INC continues repairing, experiment stop at r6 (usage). If neither arm reaches a valid build → **BOTH_CENSORED** (HALT-incomplete; no B/V/G chats).
+- **Time:** active minutes from divergence = Σ over rounds after r2 of (reply minutes from `TIMES.txt` + runner-measured gate minutes); a baseline with no valid build by r6 counts as infinite. Timing records: the operator writes `TIMES.txt` beside each saved reply, two lines `sent=YYYY-mm-dd HH:MM:SS` (when the message was sent) and `reply_complete=YYYY-mm-dd HH:MM:SS` (when the reply finished streaming), America/Chicago wall clock, from the operator's clock. Minutes are operator-logged, not tool-measured (disclosed).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C40 is the module that decides N1. The gate compares with the frozen R-B outputs, which embed R-B's first-occurrence reading; a build that reads the repeated hour as CST (the R-A reading) fails the gate on the 3 N1 rows, which is correct under ruling 53A (validation arm SEED_CLOCKLATE checks this). The N1 note is in every builder packet.
+
+## Arms
+- Runner v6 (`seeds/C40/REPAIRCAP`), gate validation before any chat (expected): **REF** = frozen module (gate PASS, hidden PASS); **SEED_TZUTC** = wall clocks read as UTC (b5 C41 seed; FAIL); **SEED_CLOCKLATE** = repeated hour read as CST (b5 C53 seed; FAIL); **SEED_DUPINT** = DUPLICATE flag read as a number (b5 C41 seed; FAIL).
+- Builder rounds (operator; `seeds/C40/c40_round.ps1 -Arm INC|FRESH -Round k` after saving `C40/C40-<arm>/r<k>/reply.md` and `TIMES.txt`; it extracts the code (refuses without the END line), runs the gate and the hidden check, logs `C40/ROUNDS_LOG.tsv`, and writes the next message or the FRESH packet):
+- `C40/packets/C40_1_INC_BUILDER_ChatGPT.txt` SHA-256 `e140717693b1bf86a0ab1cad9f0575a40b8289e291145de8ce7e5772765021a4` (62095 bytes)
+- `C40/packets/C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt` SHA-256 `6a7c477a0d034c992bbcb3544600e455b7e0b217c9d77a125a6acdf575c86bfc` (62195 bytes)
+- Post-protocol evaluator: `seeds/C40/c40_eval.R <N13 root>` → `C40/post/`.
+
+## Operational benefit predicate P1 (made mechanical before execution)
+Evaluated only if the regimes diverged. **P1 satisfied (KEEP side)** when all hold:
+0. (validity) gate validation: REF PASS with hidden PASS; every seeded module FAIL;
+1. the variant (FRESH) reaches a valid build within its cap (2 failed rounds);
+2. no later: the variant's active minutes from divergence ≤ the baseline's (baseline without a valid build by r6 = infinite);
+3. no defect escapes: the variant's valid build passes the hidden check.
+REVERT side: 1, 2 or 3 fails. HALT if 0 fails or a round record is missing. NOT_TRIGGERED and BOTH_CENSORED are reported as such (no verdict).
+Disclosed limits: n = 1 build task and one builder model; a FRESH builder that passes may simply have benefited from the handover reports (that is the variant as defined); the hidden check is not shown to discriminate between gate-passing modules (all seeded modules already fail the gate).
+
+## Regression / HALT rules
+- HALT if a gate run or exit record is missing, if gate validation fails, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4 = byte equality of the 4 R-B key outputs (the gate itself); condition 5 = fixtures 14/14 (inside the gate).
+
+## Allowed source/data scope
+Frozen PC pack, read only, copied into each arm folder. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+**Runner-side files for this control (frozen list `runner_b6/SEEDS_b6.sha256`; preflight gating):**
+- `runner_b6/seeds/C40/ARMS.tsv` SHA-256 `529eebeaf5c493085d0f53ba71b218f62e6e6c82d47a793a14d2187c81c987a1`
+- `runner_b6/seeds/C40/REPAIRCAP` SHA-256 `66f8fb4044f5c18a3c1a5c1e45a90bd15d6c9cb0e97677fb1594164e9e54ac2d`
+- `runner_b6/seeds/C40/SEED_CLOCKLATE__10_io_parse.R` SHA-256 `e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528`
+- `runner_b6/seeds/C40/SEED_DUPINT__10_io_parse.R` SHA-256 `e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3`
+- `runner_b6/seeds/C40/SEED_TZUTC__10_io_parse.R` SHA-256 `33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c`
+- `runner_b6/seeds/C40/c40_eval.R` SHA-256 `90d459884d4656990db7f2bba0efd0977de203d82aec693f76eca126ecc9f2a7`
+- `runner_b6/seeds/C40/c40_extract.R` SHA-256 `b77f0adbfafefeab5209bd4327894814452c1184c9bd2d2264cabf860ee37132`
+- `runner_b6/seeds/C40/c40_gate.R` SHA-256 `d7e3bb70cbdf7ecb2ce835cf39b6c3cb1c08238f9317fbdaa2d1f8034fe8f602`
+- `runner_b6/seeds/C40/c40_next.R` SHA-256 `9fbc37ab02eded4e6658a85040733d5ff82c32592b5c23b053a7ec8dc7813847`
+- `runner_b6/seeds/C40/c40_round.ps1` SHA-256 `4ec194c8d2b82d81fa16c24aaa014e3dfec3c81ea67ab8b104ecd56788de10dc`
+- `runner_b6/seeds/C40/fixdepth.R` SHA-256 `5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd`
+- `runner_b6/eval_b6.R` SHA-256 `6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a`
+- `runner_b6/run_batch_v6.ps1` SHA-256 `5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb` (the runner; carries the preflight list above)
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; definitions files as above. This spec is hashed in `SPEC_FREEZE_b6.sha256` before the reporting run.
+**Gate references:** the 4 frozen R-B key outputs listed above under `RB_`. **Hidden check:** `seeds/C40/fixdepth.R` (byte-identical to `runner_b5/seeds/C41/fixdepth.R`).
+## Pre-execution check (disclosed)
+The predicate text (`eval_b6.R`) and every harness script were hashed in `SEEDS_b6.sha256` before any PC execution. The complete runner was exercised on the PC in scratch folders (non-reporting, NON_REPORTING.txt in each): `N13\_preflight_b6` (runner tar v1) stopped at the preflight because the C49 marker file `seeds/C49/DELIVERY` collided with the folder `seeds/C49/delivery/` on Windows (case-insensitive paths); nothing executed. The marker was renamed `DELIVCHK` (runner and evaluator updated; first builds kept in `runner_b6/_superseded_v0` and `_superseded_v1` with README). `N13\_preflight_b6_2` (runner tar v2) was killed during the C43 audit when the remote session dropped (no result). `N13\_preflight_b6_3` (runner tar v2, SHA-256 7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc, started detached) ran to completion at 11:27:46 PC time (4.18 min, preflight PASS). Before that, the R scripts were dry-run on the box (R 4.5) with synthetic replies for the post-chat scorers; a Q-answer parsing bug in c49_score.R was fixed then. C40 in the scratch run: REF gate PASS (14/14, 4/4 outputs byte-identical) and hidden depth check PASS; SEED_TZUTC, SEED_CLOCKLATE and SEED_DUPINT gate FAIL (SEED_CLOCKLATE differs on exactly 1 dormant_h and 2 open_age_h rows, the N1 rows). No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   529eebeaf5c493085d0f53ba71b218f62e6e6c82d47a793a14d2187c81c987a1 seeds/C40/ARMS.tsv
+seed   OK   66f8fb4044f5c18a3c1a5c1e45a90bd15d6c9cb0e97677fb1594164e9e54ac2d seeds/C40/REPAIRCAP
+seed   OK   e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528 seeds/C40/SEED_CLOCKLATE__10_io_parse.R
+seed   OK   e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3 seeds/C40/SEED_DUPINT__10_io_parse.R
+seed   OK   33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c seeds/C40/SEED_TZUTC__10_io_parse.R
+seed   OK   90d459884d4656990db7f2bba0efd0977de203d82aec693f76eca126ecc9f2a7 seeds/C40/c40_eval.R
+seed   OK   b77f0adbfafefeab5209bd4327894814452c1184c9bd2d2264cabf860ee37132 seeds/C40/c40_extract.R
+seed   OK   d7e3bb70cbdf7ecb2ce835cf39b6c3cb1c08238f9317fbdaa2d1f8034fe8f602 seeds/C40/c40_gate.R
+seed   OK   9fbc37ab02eded4e6658a85040733d5ff82c32592b5c23b053a7ec8dc7813847 seeds/C40/c40_next.R
+seed   OK   4ec194c8d2b82d81fa16c24aaa014e3dfec3c81ea67ab8b104ecd56788de10dc seeds/C40/c40_round.ps1
+seed   OK   5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd seeds/C40/fixdepth.R
+seed   OK   6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a eval_b6.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b6 (R-only; batches C52 and C24 hold the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 14871 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+529eebeaf5c493085d0f53ba71b218f62e6e6c82d47a793a14d2187c81c987a1  487  runner_b6/seeds/C40/ARMS.tsv
+66f8fb4044f5c18a3c1a5c1e45a90bd15d6c9cb0e97677fb1594164e9e54ac2d  92  runner_b6/seeds/C40/REPAIRCAP
+e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528  6826  runner_b6/seeds/C40/SEED_CLOCKLATE__10_io_parse.R
+e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3  6748  runner_b6/seeds/C40/SEED_DUPINT__10_io_parse.R
+33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c  6645  runner_b6/seeds/C40/SEED_TZUTC__10_io_parse.R
+90d459884d4656990db7f2bba0efd0977de203d82aec693f76eca126ecc9f2a7  5967  runner_b6/seeds/C40/c40_eval.R
+b77f0adbfafefeab5209bd4327894814452c1184c9bd2d2264cabf860ee37132  1605  runner_b6/seeds/C40/c40_extract.R
+d7e3bb70cbdf7ecb2ce835cf39b6c3cb1c08238f9317fbdaa2d1f8034fe8f602  4759  runner_b6/seeds/C40/c40_gate.R
+9fbc37ab02eded4e6658a85040733d5ff82c32592b5c23b053a7ec8dc7813847  4124  runner_b6/seeds/C40/c40_next.R
+4ec194c8d2b82d81fa16c24aaa014e3dfec3c81ea67ab8b104ecd56788de10dc  6265  runner_b6/seeds/C40/c40_round.ps1
+5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd  6775  runner_b6/seeds/C40/fixdepth.R
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  10336  runner_b6/eval_b6.R
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  11125  runner_b6/run_batch_v6.ps1 (runner; hashed in SPEC_FREEZE_b6.sha256)
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b6.sha256` (written before the reporting run):
+# N13 batch b6 spec freeze, written 2026-10-03 11:30 CDT before the reporting run (scratch checks in N13/_preflight_b6, _preflight_b6_2, _preflight_b6_3 disclosed in each spec)
+eb91577bac56117d32a4f95a6370831b1521ee54d24cababe36c318654207c2c  C43/ABLATION_SPEC.md
+5630d48511557ac288f689595f649122037c31442c776f1aab7dcabda05f87ab  C49/ABLATION_SPEC.md
+a4811cdf2b2632515964e7f0e826fae70e040c7c8595d05dc7abe112ff0760d9  C44/ABLATION_SPEC.md
+7c1edd58a89b9b7b35faea14ce7bc84a1ede6cf67919cba2296eaf348fd2c663  C40/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C40/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C43/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C44/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C49/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C40/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C43/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C44/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C49/BASELINE_FRAMEWORK.sha256
+3a201b23c77ac5bd9ddc747ae276a7223d5cb05e6e1ed861ec5849595c681327  runner_b6/SEEDS_b6.sha256
+729ed8cad382ae82805499d493bf7eb8fa38687665286649bb3746330f0b1e2d  runner_b6/SEED_DIFFS_b6.txt
+5822febe57e51e8ef04afdbbcf6e610c79cb9fc95c34560250300c75b5f985c8  runner_b6/PRECHECK_b6.json
+bae228cbf71a25b6b68c9863e4a68f88ca89fa4647ac81acb0ff14332d89bd84  runner_b6/make_seeds_b6.py
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  runner_b6/run_batch_v6.ps1
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  runner_b6/eval_b6.R
+a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb  C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1  C49/packets/C49_R_DS_ZIP.txt
+9fa6cc58745d144a5c53a371f0b41db69d0503b212c2b1ce08a33eb84998f7a2  C49/packets/C49_R_DS_FILES.txt
+bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2  C49/packets/C49_R_GPT_FILES.txt
+e140717693b1bf86a0ab1cad9f0575a40b8289e291145de8ce7e5772765021a4  C40/packets/C40_1_INC_BUILDER_ChatGPT.txt
+6a7c477a0d034c992bbcb3544600e455b7e0b217c9d77a125a6acdf575c86bfc  C40/packets/C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+eeed4af084b2630f1a6c4a0fc30a87923043631942b50c185409c622849f0c3e  tools_build_extra_b6.py
+8640118c731510dee2dddbe24d8c0f3693f58d22c8406a37135ecbc6b53a0494  tools_make_specs_b6.py
+f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f  SELECTION_N13.md
+7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc  N13_runner_b6_v2.tar
+a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f  ablation_plan/ADDENDUM_01_control_39.md
+5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6  ablation_plan/ADDENDUM_02_pricepoint_candidates.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+
+---
+# RUN LOG (this control)
+11:32:07 C40 arms
+11:32:08 C40 round REF r0 candidate=C:\Users\Mark\Documents\R Working Directory\chicago311\R-B\R\10_io_parse.R sha256=40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a
+11:32:34   C40 REF_r0 RB exit=0 secs=25.6 timeout=0
+11:32:36   C40 REF_r0 GATE exit=0 secs=1.8 timeout=0
+11:32:37   C40 REF_r0 HIDDEN exit=0 secs=1.2 timeout=0
+11:32:37 C40 REF r0 : gate=PASS rb_exit=0 rb_secs=25.6 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=TRUE portfolio_equal=TRUE kappa_grid_equal=TRUE | hidden: gate=PASS n_pass=14 n=14 stubs=none poison_probe=ran error=
+11:32:38 C40 round SEED_TZUTC r0 candidate=C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\runner_b6\seeds\C40\SEED_TZUTC__10_io_parse.R sha256=33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c
+11:33:01   C40 SEED_TZUTC_r0 RB exit=0 secs=22.4 timeout=0
+11:33:07   C40 SEED_TZUTC_r0 GATE exit=0 secs=5.2 timeout=0
+11:33:07 C40 SEED_TZUTC r0 : gate=FAIL rb_exit=0 rb_secs=22.4 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=FALSE kappa_grid_equal=FALSE | hidden: not run (gate FAIL)
+11:33:08 C40 round SEED_CLOCKLATE r0 candidate=C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\runner_b6\seeds\C40\SEED_CLOCKLATE__10_io_parse.R sha256=e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528
+11:33:43   C40 SEED_CLOCKLATE_r0 RB exit=0 secs=32.4 timeout=0
+11:33:47   C40 SEED_CLOCKLATE_r0 GATE exit=0 secs=4.2 timeout=0
+11:33:47 C40 SEED_CLOCKLATE r0 : gate=FAIL rb_exit=0 rb_secs=32.4 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=TRUE kappa_grid_equal=TRUE | hidden: not run (gate FAIL)
+11:33:48 C40 round SEED_DUPINT r0 candidate=C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\runner_b6\seeds\C40\SEED_DUPINT__10_io_parse.R sha256=e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3
+11:34:14   C40 SEED_DUPINT_r0 RB exit=0 secs=24.7 timeout=0
+11:34:21   C40 SEED_DUPINT_r0 GATE exit=0 secs=6.3 timeout=0
+11:34:21 C40 SEED_DUPINT r0 : gate=FAIL rb_exit=0 rb_secs=24.7 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=FALSE kappa_grid_equal=FALSE | hidden: not run (gate FAIL)
+
+---
+# C40_RESULTS.md (runner output, pre-chat part)
+# C40 RESULTS (mechanical; generated 2026-10-03 11:34:22 CDT)
+
+**Mechanical predicate result: PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 0. gate validity (pre-chat): the frozen module passes the gate and the hidden depth check; every seeded module fails the gate | MET |
+| 1. variant valid build within the cap | PENDING |
+| 2. variant valid build no later than baseline (active minutes from divergence) | PENDING |
+| 3. no defect escapes (hidden depth check on the variant's valid build) | PENDING |
+
+## Arms
+| arm | expected_gate | rb_exit | gate | fixtures | classifications_equal | hidden_depth_gate |
+|---|---|---|---|---|---|---|
+| REF | PASS | 0 | PASS | 14/14 | TRUE | PASS |
+| SEED_TZUTC | FAIL | 0 | FAIL | 14/14 | FALSE | not run |
+| SEED_CLOCKLATE | FAIL | 0 | FAIL | 14/14 | FALSE | not run |
+| SEED_DUPINT | FAIL | 0 | FAIL | 14/14 | FALSE | not run |
+
+## REF: GATE_REPORT.md (what a builder would receive)
+# C40 gate report — REF r0 — PASS
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (25.6 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+
+## SEED_TZUTC: GATE_REPORT.md (what a builder would receive)
+# C40 gate report — SEED_TZUTC r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (22.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | NO |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 104 |
+| evidence_reason | 215625 |
+| dormant_h | 222002 |
+| open_age_h | 222002 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR21-00793000 | classification | STANDARD | ESCALATE |
+| SR21-00917343 | classification | STANDARD | ESCALATE |
+| SR21-00957712 | classification | STANDARD | ESCALATE |
+| SR21-01134530 | classification | STANDARD | ESCALATE |
+| SR21-01144917 | classification | STANDARD | ESCALATE |
+| SR18-00191995 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192008 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192021 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192151 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2689, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192236 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2689, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00191995 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192008 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192021 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192151 | dormant_h | 57677.26888888889 | 57683.26888888889 |
+| SR18-00192236 | dormant_h | 57677.26888888889 | 57683.26888888889 |
+| SR18-00191995 | open_age_h | 67813.21722222223 | 67819.21722222223 |
+| SR18-00192008 | open_age_h | 67813.1725 | 67819.1725 |
+| SR18-00192021 | open_age_h | 67813.1236111111 | 67819.1236111111 |
+| SR18-00192151 | open_age_h | 67812.64888888889 | 67818.64888888889 |
+| SR18-00192236 | open_age_h | 67812.3938888889 | 67818.3938888889 |
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,132072,6377,83553,23191
+```
+
+RB_kappa_grid_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152503,6377,63122
+1.5,222002,140512,6377,75113
+2,222002,132072,6377,83553
+3,222002,118328,6377,97297
+```
+
+
+## SEED_CLOCKLATE: GATE_REPORT.md (what a builder would receive)
+# C40 gate report — SEED_CLOCKLATE r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (32.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 1 |
+| dormant_h | 1 |
+| open_age_h | 2 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR22-01936870 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=33766.9997, kappa=2.00, peer_p75_h=42.0000) | E_dormant_ge_kappa_p75 (dormant_h=33765.9997, kappa=2.00, peer_p75_h=42.0000) |
+| SR22-01936870 | dormant_h | 33766.99972222222 | 33765.99972222222 |
+| SR25-02017553 | open_age_h | 7558.669722222222 | 7557.669722222222 |
+| SR25-02017556 | open_age_h | 7558.637222222223 | 7557.637222222223 |
+
+
+## SEED_DUPINT: GATE_REPORT.md (what a builder would receive)
+# C40 gate report — SEED_DUPINT r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (24.7 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | NO |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 245014 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 23012.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 0 |
+| dormant_h | 0 |
+| open_age_h | 0 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,245014,131968,29389,83657,179
+```
+
+RB_kappa_grid_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,245014,152292,29389,63333
+1.5,245014,140340,29389,75285
+2,245014,131968,29389,83657
+3,245014,118246,29389,97379
+```
+
+
+
+---
+# C40_arms.csv (raw, full file)
+arm,expected_gate,rb_exit,gate,fixtures,classifications_equal,hidden_depth_gate
+REF,PASS,0,PASS,14/14,TRUE,PASS
+SEED_TZUTC,FAIL,0,FAIL,14/14,FALSE,not run
+SEED_CLOCKLATE,FAIL,0,FAIL,14/14,FALSE,not run
+SEED_DUPINT,FAIL,0,FAIL,14/14,FALSE,not run
+
+---
+# RAW PER-ARM FILES (verbatim; bulky files summarized with their SHA-256)
+## arms/REF_r0/GATE_REPORT.md
+# C40 gate report — REF r0 — PASS
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (25.6 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+## arms/REF_r0/GATE_RESULT.txt
+gate=PASS rb_exit=0 rb_secs=25.6 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=TRUE portfolio_equal=TRUE kappa_grid_equal=TRUE
+
+## arms/REF_r0/RUN_GATE.exit
+0,1.8,2026-10-03T11:32:36-05:00,0,900
+
+## arms/REF_r0/RUN_HIDDEN.exit
+0,1.2,2026-10-03T11:32:37-05:00,0,600
+
+## arms/REF_r0/RUN_RB.exit
+0,25.6,2026-10-03T11:32:34-05:00,0,1800
+
+## arms/REF_r0/outputs/FIX_depth.csv
+"fixture_id","SR_NUMBER","expected","observed","pass","stub"
+"F01","SYN-F01","ESCALATE","ESCALATE",TRUE,FALSE
+"F02","SYN-F02","STANDARD","STANDARD",TRUE,FALSE
+"F03","SYN-F03","STANDARD","STANDARD",TRUE,FALSE
+"F04","SYN-F04","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F05","SYN-F05","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F06","SYN-F06","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F07","SYN-F07","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F08","SYN-F08","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F09","SYN-F09","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F10","SYN-F10","STANDARD","STANDARD",TRUE,FALSE
+"F11","SYN-F11","ESCALATE","ESCALATE",TRUE,FALSE
+"F12","SYN-F12","OUT_OF_SET","OUT_OF_SET",TRUE,FALSE
+"F13","SYN-F13","INCONCLUSIVE","INCONCLUSIVE",TRUE,FALSE
+"F14","SYN-F14A|SYN-F14B","STANDARD|STANDARD","STANDARD|STANDARD",TRUE,FALSE
+
+## arms/REF_r0/outputs/GATE_depth.txt
+gate=PASS n_pass=14 n=14 stubs=none poison_probe=ran error=
+
+## arms/SEED_CLOCKLATE_r0/GATE_REPORT.md
+# C40 gate report — SEED_CLOCKLATE r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (32.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 1 |
+| dormant_h | 1 |
+| open_age_h | 2 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR22-01936870 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=33766.9997, kappa=2.00, peer_p75_h=42.0000) | E_dormant_ge_kappa_p75 (dormant_h=33765.9997, kappa=2.00, peer_p75_h=42.0000) |
+| SR22-01936870 | dormant_h | 33766.99972222222 | 33765.99972222222 |
+| SR25-02017553 | open_age_h | 7558.669722222222 | 7557.669722222222 |
+| SR25-02017556 | open_age_h | 7558.637222222223 | 7557.637222222223 |
+
+## arms/SEED_CLOCKLATE_r0/GATE_RESULT.txt
+gate=FAIL rb_exit=0 rb_secs=32.4 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=TRUE kappa_grid_equal=TRUE
+
+## arms/SEED_CLOCKLATE_r0/RUN_GATE.exit
+0,4.2,2026-10-03T11:33:47-05:00,0,900
+
+## arms/SEED_CLOCKLATE_r0/RUN_RB.exit
+0,32.4,2026-10-03T11:33:43-05:00,0,1800
+
+## arms/SEED_DUPINT_r0/GATE_REPORT.md
+# C40 gate report — SEED_DUPINT r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (24.7 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | NO |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 245014 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 23012.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 0 |
+| dormant_h | 0 |
+| open_age_h | 0 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,245014,131968,29389,83657,179
+```
+
+RB_kappa_grid_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,245014,152292,29389,63333
+1.5,245014,140340,29389,75285
+2,245014,131968,29389,83657
+3,245014,118246,29389,97379
+```
+
+## arms/SEED_DUPINT_r0/GATE_RESULT.txt
+gate=FAIL rb_exit=0 rb_secs=24.7 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=FALSE kappa_grid_equal=FALSE
+
+## arms/SEED_DUPINT_r0/RUN_GATE.exit
+0,6.3,2026-10-03T11:34:21-05:00,0,900
+
+## arms/SEED_DUPINT_r0/RUN_RB.exit
+0,24.7,2026-10-03T11:34:14-05:00,0,1800
+
+## arms/SEED_TZUTC_r0/GATE_REPORT.md
+# C40 gate report — SEED_TZUTC r0 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (22.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | YES |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | NO |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 104 |
+| evidence_reason | 215625 |
+| dormant_h | 222002 |
+| open_age_h | 222002 |
+| peer_n | 0 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 0 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR21-00793000 | classification | STANDARD | ESCALATE |
+| SR21-00917343 | classification | STANDARD | ESCALATE |
+| SR21-00957712 | classification | STANDARD | ESCALATE |
+| SR21-01134530 | classification | STANDARD | ESCALATE |
+| SR21-01144917 | classification | STANDARD | ESCALATE |
+| SR18-00191995 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192008 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192021 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2694, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192151 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2689, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00192236 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | E_dormant_ge_kappa_p75 (dormant_h=57683.2689, kappa=2.00, peer_p75_h=2250.0000) |
+| SR18-00191995 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192008 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192021 | dormant_h | 57677.26944444444 | 57683.26944444444 |
+| SR18-00192151 | dormant_h | 57677.26888888889 | 57683.26888888889 |
+| SR18-00192236 | dormant_h | 57677.26888888889 | 57683.26888888889 |
+| SR18-00191995 | open_age_h | 67813.21722222223 | 67819.21722222223 |
+| SR18-00192008 | open_age_h | 67813.1725 | 67819.1725 |
+| SR18-00192021 | open_age_h | 67813.1236111111 | 67819.1236111111 |
+| SR18-00192151 | open_age_h | 67812.64888888889 | 67818.64888888889 |
+| SR18-00192236 | open_age_h | 67812.3938888889 | 67818.3938888889 |
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,132072,6377,83553,23191
+```
+
+RB_kappa_grid_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152503,6377,63122
+1.5,222002,140512,6377,75113
+2,222002,132072,6377,83553
+3,222002,118328,6377,97297
+```
+
+## arms/SEED_TZUTC_r0/GATE_RESULT.txt
+gate=FAIL rb_exit=0 rb_secs=22.4 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=TRUE portfolio_equal=FALSE kappa_grid_equal=FALSE
+
+## arms/SEED_TZUTC_r0/RUN_GATE.exit
+0,5.2,2026-10-03T11:33:07-05:00,0,900
+
+## arms/SEED_TZUTC_r0/RUN_RB.exit
+0,22.4,2026-10-03T11:33:01-05:00,0,1800
+
+## arms/REF_r0/RUN_HIDDEN.stderr.txt (last 6 non-empty lines of 2)
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+
+## arms/REF_r0/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/REF_r0/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/SEED_CLOCKLATE_r0/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/SEED_CLOCKLATE_r0/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/SEED_DUPINT_r0/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=245014 ESCALATE=131968 INCONCLUSIVE=29389 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/SEED_DUPINT_r0/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+## arms/SEED_TZUTC_r0/RUN_RB.stderr.txt (last 6 non-empty lines of 18)
+[R-B] portfolio: decision=222002 ESCALATE=132072 INCONCLUSIVE=6377 STANDARD=83553
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C40/arms/SEED_TZUTC_r0/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+
+
+---
+# C40_EVIDENCE.sha256
+56a4c8dfd33aa4b8e267e37c198c605515c6b3837c25cb6105354543d3b5c237  C40_ARM_MANIFESTS.txt
+e2c90a1c52bb4655188164b80dc8c4b67472ff0f96b5988c5ef14a91b30b632f  C40_arms.csv
+56cfef304c54407d73f12fa91ed03de0ff7f76e691ecb265e4fee2d1275ecbd7  C40_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files, the C43 trail index and its unpacked copy) are listed by hash and size only.
+arms/REF_r0 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/REF_r0 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/REF_r0 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/REF_r0 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/REF_r0 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+arms/REF_r0 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/REF_r0 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/REF_r0 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/REF_r0 out :: b4cf0299a3d19d1db7942520dc426f39b0c98bdddadcff63c6b86193d549a84b  332  GATE_REPORT.md
+arms/REF_r0 out :: afc36f09881deb4d86d6032ff6485ba418b8816e3978999f74a76c6ff9ce402d  146  GATE_RESULT.txt
+arms/REF_r0 out :: 721067c0d3baeb5332b03b15230ed6776944d4c3976b863f5172831e0298c016  842  outputs\FIX_depth.csv
+arms/REF_r0 out :: 399a7f183e867dbbc5b7ffdf07c7c29dfa97ae361fd0c68f368076450976bcf6  4153  outputs\FIXTURE_src_open_candidates.tsv
+arms/REF_r0 out :: 127fee5dc697134b9992690b41e48da748ead6698c857e8a914023b8c958bee0  386  outputs\FIXTURE_src_peer_stats.tsv
+arms/REF_r0 out :: e3464b6b1f88fd874dfbbf7bb159fe15ed229f70fa6cd21497d7c5ad239131ec  61  outputs\GATE_depth.txt
+arms/REF_r0 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+arms/REF_r0 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/REF_r0 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/REF_r0 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/REF_r0 out :: 4c69fbd1b94172ff35932e527c7a4d81fee6ad7818427b757cbc692a2012a9f0  39  RUN_GATE.exit
+arms/REF_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+arms/REF_r0 out :: d6752fe95ba0165e47bc049cb17907f65a6e5b9c0ba5c5405d4d11ec5ce05b84  147  RUN_GATE.stdout.txt
+arms/REF_r0 out :: 3d9254624f3a8e0a742816414f5f0e8d253930bd61dca888bc6b6986e9a5191b  39  RUN_HIDDEN.exit
+arms/REF_r0 out :: 8dbb5d1d16ea40e266083e1f5e8cb80892425b25f1c45a49ca8f79059b2d6141  155  RUN_HIDDEN.stderr.txt
+arms/REF_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_HIDDEN.stdout.txt
+arms/REF_r0 out :: 9b072a65ef14e8e777a1a0a6db0e0c45259f0d708f4c021f6e344635372a6666  41  RUN_RB.exit
+arms/REF_r0 out :: 76573f7a6e24f78456a8106cb6f45da080fde2ed856329171b612db0def58a99  1285  RUN_RB.stderr.txt
+arms/REF_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SEED_CLOCKLATE_r0 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SEED_CLOCKLATE_r0 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SEED_CLOCKLATE_r0 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SEED_CLOCKLATE_r0 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SEED_CLOCKLATE_r0 in  :: e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528  6826  R-B\R\10_io_parse.R
+arms/SEED_CLOCKLATE_r0 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SEED_CLOCKLATE_r0 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SEED_CLOCKLATE_r0 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/SEED_CLOCKLATE_r0 out :: eb2f0610d1e6425e31b75719f134d530f50b48be1f82f6b947263676469ebcc9  1324  GATE_REPORT.md
+arms/SEED_CLOCKLATE_r0 out :: 64ecef88a90b3c6397891987e48d7b75a82dfc75ca65555e6350eaaaad5c80bd  147  GATE_RESULT.txt
+arms/SEED_CLOCKLATE_r0 out :: f490a0e66b6488756b2bad4d3f9b3e9ab6dd76d2b85e44ed2bda444aa076d164  41963733  R-B\outputs\RB_classifications.csv
+arms/SEED_CLOCKLATE_r0 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SEED_CLOCKLATE_r0 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/SEED_CLOCKLATE_r0 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+arms/SEED_CLOCKLATE_r0 out :: 6fb18a51c0c7b5ac16dd54f748d887da4c4cb44c9bf3c1d8d30c683ad3522fe4  39  RUN_GATE.exit
+arms/SEED_CLOCKLATE_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+arms/SEED_CLOCKLATE_r0 out :: 2dfbef237e158cf657e2d94801090eb26db33704302d1c0dcb5f12c38bf51b0e  148  RUN_GATE.stdout.txt
+arms/SEED_CLOCKLATE_r0 out :: 525a351d57386bef673254240a87b6eb6bd7bfeec41dc0dab60fdc6a1a438243  41  RUN_RB.exit
+arms/SEED_CLOCKLATE_r0 out :: f2b8739122be49b9ca7c3e7be5c93294d8c1756eba0d2636acc7acd55273bf0f  1340  RUN_RB.stderr.txt
+arms/SEED_CLOCKLATE_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SEED_DUPINT_r0 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SEED_DUPINT_r0 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SEED_DUPINT_r0 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SEED_DUPINT_r0 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SEED_DUPINT_r0 in  :: e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3  6748  R-B\R\10_io_parse.R
+arms/SEED_DUPINT_r0 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SEED_DUPINT_r0 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SEED_DUPINT_r0 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/SEED_DUPINT_r0 out :: c20487542a78919165fcdef103b11d4afd8e40787515d600751eeecab3f13752  1167  GATE_REPORT.md
+arms/SEED_DUPINT_r0 out :: d3bb49954902aeea0e83c848d26143627a7a606b11e533cd731ebea1b0c4813e  149  GATE_RESULT.txt
+arms/SEED_DUPINT_r0 out :: ca411fca7a509c468b4d2854e8002adeeb6a9127a008012ea03a8599ffbb8fab  45552786  R-B\outputs\RB_classifications.csv
+arms/SEED_DUPINT_r0 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SEED_DUPINT_r0 out :: 1214c489a21fa3b7d16c88637a84c2af5387327d46a373203205cc4997efa80e  168  R-B\outputs\RB_kappa_grid_counts.csv
+arms/SEED_DUPINT_r0 out :: af0711a26f1a460b5f271fa0842bb1fd2f9f2c90d46e8d45da54bce4c18c6ddb  99  R-B\outputs\RB_portfolio_counts.csv
+arms/SEED_DUPINT_r0 out :: f0cf9a1649ae65fc5cfdd6b60c161b9c09c2297068b924923b416979075936b1  39  RUN_GATE.exit
+arms/SEED_DUPINT_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+arms/SEED_DUPINT_r0 out :: d4baf7bcf5fb44c658712eda5c173066e4f90327dad43ff1e2ecc3d7ab0021b6  150  RUN_GATE.stdout.txt
+arms/SEED_DUPINT_r0 out :: 8bcd1f8dee8bc600951141f70a645623aab1fc64221f3b4f5fa8960ce374a676  41  RUN_RB.exit
+arms/SEED_DUPINT_r0 out :: 4b3c8b54b5bde2b6935daa2986d133d423a086e4fadd6fb41be8640fcdcba6a8  1326  RUN_RB.stderr.txt
+arms/SEED_DUPINT_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+arms/SEED_TZUTC_r0 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+arms/SEED_TZUTC_r0 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+arms/SEED_TZUTC_r0 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+arms/SEED_TZUTC_r0 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+arms/SEED_TZUTC_r0 in  :: 33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c  6645  R-B\R\10_io_parse.R
+arms/SEED_TZUTC_r0 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+arms/SEED_TZUTC_r0 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+arms/SEED_TZUTC_r0 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+arms/SEED_TZUTC_r0 out :: 0fa3dc84252904d65a892b19f3395b99ddc0823c98563979c03328c55b9c6d4b  3279  GATE_REPORT.md
+arms/SEED_TZUTC_r0 out :: 81554dd4fa3b830cfad9a26badd0dea4e870da424083d5e4a8aaba9882329c27  149  GATE_RESULT.txt
+arms/SEED_TZUTC_r0 out :: 87c15c8815935166f55a53417461e7e9eb34f2caa39c502b150b2ea80074f00e  41963341  R-B\outputs\RB_classifications.csv
+arms/SEED_TZUTC_r0 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+arms/SEED_TZUTC_r0 out :: a19f4bedf3367ff9928849fa5146c93a4283528a5390b6e4b6b949027b4d4139  164  R-B\outputs\RB_kappa_grid_counts.csv
+arms/SEED_TZUTC_r0 out :: 0f796663eee07d82dd45e907224d36e4358ee38fdcce76951fcdd4a3a08f4ef4  100  R-B\outputs\RB_portfolio_counts.csv
+arms/SEED_TZUTC_r0 out :: cb5b7950effa6b41dd622f279371e7c0d9dd89779fee6a9ad9ad7609d4f06f59  39  RUN_GATE.exit
+arms/SEED_TZUTC_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_GATE.stderr.txt
+arms/SEED_TZUTC_r0 out :: 453839e3f2de085d7abe7a9e88d1c604abeddfb935f756a769224e076c6dfc9b  150  RUN_GATE.stdout.txt
+arms/SEED_TZUTC_r0 out :: e7101f4dc147b4e76be6ec3db01b2822b2bda7357a6383c77886e0df7d2c281f  41  RUN_RB.exit
+arms/SEED_TZUTC_r0 out :: b49c609115692ff3bedfe5b3643ab0fb8ecc740cb87ae2da1d8257b12c2a1d14  1320  RUN_RB.stderr.txt
+arms/SEED_TZUTC_r0 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED / HARNESS FILES (full text of new runner-side files; binary or verbatim-copied files by hash)
+### seeds/C40/c40_gate.R (4759 bytes, sha256 d7e3bb70cbdf7ecb2ce835cf39b6c3cb1c08238f9317fbdaa2d1f8034fe8f602)
+#!/usr/bin/env Rscript
+# C40 build gate (N13 b6). Usage: Rscript c40_gate.R <ARM_ROOT> <FROZEN_ROOT> <LABEL>
+# Gate PASS (= valid build) iff RUN_RB.exit is 0, the fixture results are 14/14 pass, and the 4 R-B key outputs are byte-identical to the frozen R-B outputs.
+# Writes <ARM_ROOT>/GATE_RESULT.txt (machine) and <ARM_ROOT>/GATE_REPORT.md (sent to the builder in the next repair round; field-level diff, no frozen code).
+suppressPackageStartupMessages({ library(digest); library(readr) })
+a <- commandArgs(trailingOnly = TRUE); R <- a[[1]]; FZ <- a[[2]]; LAB <- a[[3]]
+sha <- function(p) if (file.exists(p)) digest(file = p, algo = "sha256") else "MISSING"
+FROZEN_RB <- c("RB_classifications.csv" = "a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193", "RB_fixture_results.csv" = "0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9",
+               "RB_portfolio_counts.csv" = "eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c", "RB_kappa_grid_counts.csv" = "7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a")
+ex <- if (file.exists(file.path(R, "RUN_RB.exit"))) strsplit(readLines(file.path(R, "RUN_RB.exit"), warn = FALSE)[1], ",")[[1]] else c("MISSING", NA)
+O <- file.path(R, "R-B", "outputs"); h <- sapply(names(FROZEN_RB), function(f) sha(file.path(O, f))); eq <- h == FROZEN_RB
+fx <- if (file.exists(file.path(O, "RB_fixture_results.csv"))) read.csv(file.path(O, "RB_fixture_results.csv"), colClasses = "character") else NULL
+fx_pass <- if (is.null(fx)) 0L else sum(fx$pass == "TRUE"); fx_n <- if (is.null(fx)) 0L else nrow(fx)
+gate <- ex[1] == "0" && fx_n == 14 && fx_pass == 14 && all(eq)
+rep <- c(paste0("# C40 gate report — ", LAB, " — ", if (gate) "PASS" else "FAILED"), "",
+         sprintf("- Production run `Rscript R-B/run_RB.R all`: exit %s (%s s).", ex[1], ex[2]),
+         sprintf("- Fixtures: %d/%d pass%s.", fx_pass, fx_n, if (!is.null(fx) && fx_pass < fx_n) paste0(" — failing: ", paste(fx$fixture_id[fx$pass != "TRUE"], collapse = ", ")) else ""), "",
+         "| output | byte-identical to frozen reference |", "|---|---|", sprintf("| %s | %s |", names(FROZEN_RB), ifelse(eq, "YES", "NO")), "")
+st <- file.path(R, "RUN_RB.stderr.txt")
+if (ex[1] != "0" && file.exists(st)) { z <- readLines(st, warn = FALSE); z <- z[nzchar(trimws(z))]; rep <- c(rep, "Last 15 lines of stderr:", "```", tail(z, 15), "```", "") }
+if (!eq[["RB_classifications.csv"]] && file.exists(file.path(O, "RB_classifications.csv"))) {
+  rc <- function(p) read_csv(p, col_types = cols(.default = col_character()), progress = FALSE, na = character())
+  fz <- rc(file.path(FZ, "R-B", "outputs", "RB_classifications.csv")); cd <- rc(file.path(O, "RB_classifications.csv"))
+  rep <- c(rep, sprintf("RB_classifications.csv: reference %d rows, %d columns; yours %d rows, %d columns.", nrow(fz), ncol(fz), nrow(cd), ncol(cd)))
+  if (!identical(names(fz), names(cd))) rep <- c(rep, paste0("Column names differ. Reference: ", paste(names(fz), collapse = ","), " | yours: ", paste(names(cd), collapse = ",")))
+  m <- merge(fz, cd, by = "SR_NUMBER", all = TRUE, suffixes = c(".ref", ".yours"))
+  rep <- c(rep, sprintf("SR_NUMBER only in reference: %d; only in yours: %d.", sum(!(fz$SR_NUMBER %in% cd$SR_NUMBER)), sum(!(cd$SR_NUMBER %in% fz$SR_NUMBER))), "", "| column | rows that differ (matched SR_NUMBER) |", "|---|---|")
+  ex_rows <- character(0)
+  for (cn in intersect(setdiff(names(fz), "SR_NUMBER"), names(cd))) { x <- m[[paste0(cn, ".ref")]]; y <- m[[paste0(cn, ".yours")]]; k <- !is.na(x) & !is.na(y) & x != y
+    rep <- c(rep, sprintf("| %s | %d |", cn, sum(k)))
+    if (any(k)) { i <- head(which(k), 5); ex_rows <- c(ex_rows, sprintf("| %s | %s | %s | %s |", m$SR_NUMBER[i], cn, x[i], y[i])) } }
+  if (length(ex_rows)) rep <- c(rep, "", "First differing rows (up to 5 per column):", "", "| SR_NUMBER | column | reference | yours |", "|---|---|---|---|", ex_rows)
+  if (identical(names(fz), names(cd)) && nrow(fz) == nrow(cd) && !length(ex_rows) && all(fz$SR_NUMBER == cd$SR_NUMBER)) rep <- c(rep, "", "All values equal but the bytes differ (row order, quoting, number formatting or line endings).")
+  rep <- c(rep, "") }
+for (f in setdiff(names(FROZEN_RB)[!eq], "RB_classifications.csv")) if (file.exists(file.path(O, f))) rep <- c(rep, paste0(f, " (yours):"), "```", readLines(file.path(O, f), warn = FALSE), "```", "")
+writeLines(rep, file.path(R, "GATE_REPORT.md"))
+writeLines(sprintf("gate=%s rb_exit=%s rb_secs=%s fixtures=%d/%d classifications_equal=%s fixture_results_equal=%s portfolio_equal=%s kappa_grid_equal=%s", if (gate) "PASS" else "FAIL", ex[1], ex[2], fx_pass, fx_n, eq[1], eq[2], eq[3], eq[4]), file.path(R, "GATE_RESULT.txt"))
+cat(readLines(file.path(R, "GATE_RESULT.txt")), "\n")
+### seeds/C40/c40_extract.R (1605 bytes, sha256 b77f0adbfafefeab5209bd4327894814452c1184c9bd2d2264cabf860ee37132)
+#!/usr/bin/env Rscript
+# C40 code extraction (N13 b6). Usage: Rscript c40_extract.R <reply.md> <END line> <out 10_io_parse.R>
+# Refuses (exit 3) if the reply's last non-empty line is not the END line or no fenced code block exists. Takes the LARGEST fenced block. Writes <out> and <out dir>/EXTRACT.txt.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); f <- a[[1]]; endl <- a[[2]]; out <- a[[3]]
+x <- readLines(f, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2)
+nz <- trimws(x); nz <- nz[nzchar(nz)]
+if (!length(nz) || !grepl(endl, nz[length(nz)], fixed = TRUE)) { cat("REFUSED: last non-empty line is not", endl, "\n"); quit(status = 3) }
+fen <- grep("^[[:space:]]*```", x); if (length(fen) < 2) { cat("REFUSED: no fenced code block\n"); quit(status = 3) }
+blocks <- list(); i <- 1
+while (i < length(fen)) { s <- fen[i]; e <- fen[i + 1]; blocks[[length(blocks) + 1]] <- if (e - s > 1) x[(s + 1):(e - 1)] else character(0); i <- i + 2 }
+sz <- sapply(blocks, function(b) sum(nchar(b))); b <- blocks[[which.max(sz)]]
+dir.create(dirname(out), recursive = TRUE, showWarnings = FALSE); con <- file(out, open = "wb"); writeBin(charToRaw(enc2utf8(paste0(paste(b, collapse = "\n"), "\n"))), con); close(con)
+writeLines(sprintf("reply=%s reply_sha256=%s blocks=%d chosen_block_lines=%d code_sha256=%s", basename(f), digest(file = f, algo = "sha256"), length(blocks), length(b), digest(file = out, algo = "sha256")), file.path(dirname(out), "EXTRACT.txt"))
+cat(readLines(file.path(dirname(out), "EXTRACT.txt")), "\n")
+### seeds/C40/c40_next.R (4124 bytes, sha256 9fbc37ab02eded4e6658a85040733d5ff82c32592b5c23b053a7ec8dc7813847)
+#!/usr/bin/env Rscript
+# C40 state machine (N13 b6). Usage: Rscript c40_next.R <N13_ROOT> <INC|FRESH> <k>
+# Cap regime (variant): after 2 failed incumbent rounds, a fresh builder (new chat) gets the original packet plus the incumbent's gate reports (no code); the fresh builder has the same cap (2 failed rounds), then escalation to the owner.
+# Unlimited regime (baseline): the incumbent keeps repairing; experiment stop at r6 (usage), so a baseline without a valid build by r6 is censored.
+# Writes the next message (C40/C40-<arm>/r<k+1>/MESSAGE.txt), the fresh-builder packet at divergence, and appends C40/STATE_LOG.txt and C40/ROUND_PACKETS.sha256.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE); arm <- a[[2]]; k <- as.integer(a[[3]])
+C <- file.path(W, "C40"); RMAX <- c(INC = 6L, FRESH = 2L); CAP <- 2L
+gr <- function(arm, k) { p <- file.path(C, "arms", sprintf("%s_r%d", arm, k), "GATE_RESULT.txt"); if (!file.exists(p)) stop("missing ", p); sub("^gate=([A-Z]+).*$", "\\1", readLines(p, warn = FALSE)[1]) }
+rep_of <- function(arm, k) readLines(file.path(C, "arms", sprintf("%s_r%d", arm, k), "GATE_REPORT.md"), warn = FALSE, encoding = "UTF-8")
+now <- format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")
+logl <- function(s) { cat(s, "\n"); cat(paste0(now, " ", s, "\n"), file = file.path(C, "STATE_LOG.txt"), append = TRUE) }
+wr <- function(p, x) { dir.create(dirname(p), recursive = TRUE, showWarnings = FALSE); if (file.exists(p)) stop(p, " exists; never overwritten")
+  con <- file(p, open = "wb"); writeBin(charToRaw(enc2utf8(paste0(paste(x, collapse = "\n"), "\n"))), con); close(con)
+  cat(sprintf("%s  %s\n", digest(file = p, algo = "sha256"), sub(paste0("^", W, "/"), "", p)), file = file.path(C, "ROUND_PACKETS.sha256"), append = TRUE); logl(paste("wrote", sub(paste0("^", W, "/"), "", p))) }
+repair <- function(arm, k) c(sprintf("# C40 — repair round r%d (%s builder)", k + 1, if (arm == "INC") "incumbent" else "fresh"), "",
+  sprintf("Your round r%d file `R-B/R/10_io_parse.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.", k), "", rep_of(arm, k), "",
+  "Fix the file. Return the COMPLETE corrected `R-B/R/10_io_parse.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.",
+  "Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:", sprintf("END C40 BUILD %s r%d", arm, k + 1))
+g <- gr(arm, k)
+if (arm == "INC") {
+  if (g == "PASS") { logl(sprintf("INC r%d PASS -> %s", k, if (k <= CAP) "NOT_TRIGGERED (valid build within the cap; regimes identical; no fresh builder; no B/V/G chats)" else "INC_VALID")); quit(status = 0) }
+  if (k == CAP && all(sapply(seq_len(CAP), function(i) gr("INC", i)) == "FAIL")) {
+    tp <- readLines(file.path(C, "packets", "C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt"), warn = FALSE, encoding = "UTF-8"); j <- which(tp == "@@HANDOVER@@"); if (length(j) != 1) stop("placeholder")
+    ho <- c("# HANDOVER FROM THE PREVIOUS BUILDER (cap reached after 2 failed rounds; gate reports only, no code)", unlist(lapply(seq_len(CAP), function(i) c("", sprintf("## Previous builder, round r%d", i), rep_of("INC", i)))))
+    wr(file.path(C, "packets", "C40_2_FRESH_BUILDER_ChatGPT.txt"), c(tp[seq_len(j - 1)], ho, tp[-seq_len(j)]))
+    logl(sprintf("DIVERGED after INC r%d FAIL: variant = fresh builder (packet C40/packets/C40_2_FRESH_BUILDER_ChatGPT.txt, new chat); baseline = INC continues", k)) }
+  if (k < RMAX[["INC"]]) wr(file.path(C, "C40-INC", sprintf("r%d", k + 1), "MESSAGE.txt"), repair("INC", k)) else logl(sprintf("INC r%d FAIL at the experiment stop -> INC_CENSORED (no valid build by r%d)", k, k))
+} else {
+  if (g == "PASS") { logl(sprintf("FRESH r%d PASS -> FRESH_VALID", k)); quit(status = 0) }
+  if (k < RMAX[["FRESH"]]) wr(file.path(C, "C40-FRESH", sprintf("r%d", k + 1), "MESSAGE.txt"), repair("FRESH", k)) else logl(sprintf("FRESH r%d FAIL -> FRESH_ESCALATED (cap reached again; escalate to the owner)", k))
+}
+### seeds/C40/c40_eval.R (5967 bytes, sha256 90d459884d4656990db7f2bba0efd0977de203d82aec693f76eca126ecc9f2a7)
+#!/usr/bin/env Rscript
+# C40 post-protocol evaluator (N13 b6). Usage: Rscript c40_eval.R <N13_ROOT>
+# Reads C40/arms/<INC|FRESH>_r<k>/ (gate, hidden depth check, exit records) and C40/C40-<arm>/r<k>/TIMES.txt; writes C40/post/.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE); C <- file.path(W, "C40"); OUT <- file.path(C, "post"); dir.create(OUT, showWarnings = FALSE)
+md <- function(df) c(paste0("| ", paste(names(df), collapse = " | "), " |"), paste0("|", paste(rep("---", ncol(df)), collapse = "|"), "|"), apply(df, 1, function(r) paste0("| ", paste(gsub("\\|", "/", r), collapse = " | "), " |")))
+kv <- function(line, k) { m <- regmatches(line, regexpr(paste0(k, "=[^ ]*"), line)); if (length(m)) sub(paste0(k, "="), "", m) else NA_character_ }
+rl <- function(p) if (file.exists(p)) readLines(p, warn = FALSE)[1] else NA_character_
+tmin <- function(p) { if (!file.exists(p)) return(NA_real_); x <- readLines(p, warn = FALSE); g <- function(k) { z <- grep(paste0("^", k, "="), x, value = TRUE); if (length(z)) as.POSIXct(sub(paste0("^", k, "="), "", z[1]), tz = "America/Chicago", format = "%Y-%m-%d %H:%M:%S") else as.POSIXct(NA) }
+  s <- g("sent"); d <- g("reply_complete"); if (is.na(s) || is.na(d)) NA_real_ else as.numeric(difftime(d, s, units = "mins")) }
+ex <- function(p) { z <- rl(p); if (is.na(z)) NA_real_ else as.numeric(strsplit(z, ",")[[1]][2]) }
+rows <- list()
+for (arm in c("INC", "FRESH")) for (k in 1:6) { d <- file.path(C, "arms", sprintf("%s_r%d", arm, k)); if (!dir.exists(d)) next
+  g <- rl(file.path(d, "GATE_RESULT.txt")); hd <- rl(file.path(d, "outputs", "GATE_depth.txt"))
+  rm <- tmin(file.path(C, paste0("C40-", arm), sprintf("r%d", k), "TIMES.txt")); gs <- sum(ex(file.path(d, "RUN_RB.exit")), ex(file.path(d, "RUN_GATE.exit")), ex(file.path(d, "RUN_HIDDEN.exit")), na.rm = TRUE) / 60
+  rows[[length(rows) + 1]] <- data.frame(arm = arm, round = k, gate = kv(g, "gate"), rb_exit = kv(g, "rb_exit"), fixtures = kv(g, "fixtures"), classifications_equal = kv(g, "classifications_equal"),
+    hidden_depth_gate = if (is.na(hd)) "not run (gate FAIL)" else kv(hd, "gate"), reply_min = round(rm, 2), gate_min = round(gs, 2), round_active_min = round(rm + gs, 2),
+    code_sha256 = { p <- file.path(d, "R-B", "R", "10_io_parse.R"); if (file.exists(p)) substr(digest(file = p, algo = "sha256"), 1, 16) else "MISSING" }, stringsAsFactors = FALSE) }
+tab <- if (length(rows)) do.call(rbind, rows) else NULL
+inc <- if (is.null(tab)) NULL else tab[tab$arm == "INC", ]; fr <- if (is.null(tab)) NULL else tab[tab$arm == "FRESH", ]
+first_pass <- function(t) { i <- which(t$gate == "PASS"); if (length(i)) t$round[i[1]] else NA_integer_ }
+ip <- if (is.null(inc)) NA else first_pass(inc); fp <- if (is.null(fr) || !nrow(fr)) NA else first_pass(fr)
+halt <- character(0); outcome <- "PENDING"
+if (is.null(inc) || !nrow(inc)) halt <- c(halt, "no incumbent round recorded")
+if (!is.na(ip) && ip <= 2) outcome <- "NOT_TRIGGERED"
+diverged <- !is.null(inc) && nrow(inc) >= 2 && all(inc$gate[inc$round <= 2] == "FAIL")
+if (diverged) {
+  base_t <- if (is.na(ip)) Inf else sum(inc$round_active_min[inc$round >= 3 & inc$round <= ip]); var_t <- if (is.na(fp)) Inf else sum(fr$round_active_min[fr$round <= fp])
+  inc_done <- !is.na(ip) || max(inc$round) >= 6; fr_done <- !is.na(fp) || (nrow(fr) && max(fr$round) >= 2)
+  if (!inc_done || !fr_done) outcome <- "PENDING (protocol not finished)" else if (is.na(ip) && is.na(fp)) outcome <- "BOTH_CENSORED" else outcome <- "EVALUATED"
+  if (any(is.na(c(inc$round_active_min[inc$round >= 3], fr$round_active_min)))) halt <- c(halt, "a TIMES.txt record is missing for a post-divergence round") }
+esc_v <- if (!is.na(fp)) fr$hidden_depth_gate[fr$round == fp] else NA; esc_b <- if (!is.na(ip)) inc$hidden_depth_gate[inc$round == ip] else NA
+conds <- data.frame(condition = c("1. variant valid build: the fresh builder passes the gate within its cap (2 failed rounds)",
+                                  "2. no later: variant active time from divergence <= baseline active time from divergence (baseline without a valid build by r6 = infinite)",
+                                  "3. no defect escapes: the variant's valid build passes the hidden depth check (ruling-41A depth gate, never shown to builders)"),
+                    met = if (outcome == "EVALUATED") c(!is.na(fp), isTRUE(var_t <= base_t), isTRUE(esc_v == "PASS")) else rep(NA, 3))
+verdict <- if (length(halt)) "HALT" else switch(sub(" .*$", "", outcome), NOT_TRIGGERED = "NOT TRIGGERED (cap never reached; no verdict; no Builder/Validator/Adjudicator chats)",
+  BOTH_CENSORED = "HALT-INCOMPLETE (neither regime produced a valid build; no Builder/Validator/Adjudicator chats)", EVALUATED = if (all(conds$met)) "P1 MET" else "P1 NOT MET", "PENDING")
+L <- c(paste0("# C40 POST-PROTOCOL RESULTS (mechanical; generated ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), ")"), "", paste0("**Mechanical predicate result: ", verdict, "**"), "",
+       if (length(halt)) c("HALT reasons:", paste0("- ", halt), ""), sprintf("Outcome class: %s. Incumbent first PASS: %s. Fresh first PASS: %s. Diverged: %s.", outcome, ip, fp, diverged),
+       if (diverged && outcome == "EVALUATED") sprintf("Active minutes from divergence: baseline (INC r3..) = %s; variant (FRESH) = %s. Hidden check on the valid builds: variant %s, baseline %s.", base_t, var_t, esc_v, esc_b) else "", "",
+       "## Predicate conditions", md(transform(conds, met = ifelse(is.na(conds$met), "n/a", ifelse(conds$met, "MET", "NOT MET")))), "", "## Rounds", if (is.null(tab)) "(none)" else md(tab), "")
+sl <- file.path(C, "STATE_LOG.txt"); if (file.exists(sl)) L <- c(L, "## STATE_LOG.txt", "```", readLines(sl, warn = FALSE), "```", "")
+writeLines(L, file.path(OUT, "C40_POST_RESULTS.md")); if (!is.null(tab)) write.csv(tab, file.path(OUT, "C40_POST_rounds.csv"), row.names = FALSE)
+cat("C40:", verdict, "\n")
+### seeds/C40/c40_round.ps1 (6265 bytes, sha256 4ec194c8d2b82d81fa16c24aaa014e3dfec3c81ea67ab8b104ecd56788de10dc)
+# C40 one gate round (N13 b6). R only; no MySQL, no network, no git. Windows PowerShell 5.1.
+# Builder round : powershell -ExecutionPolicy Bypass -File "<WORK>\runner_b6\seeds\C40\c40_round.ps1" -Arm INC -Round 1
+#                 (expects <WORK>\C40\C40-<Arm>\r<Round>\reply.md = extracted reply text, and TIMES.txt with sent= / reply_complete=)
+# Validation arm: ... -Arm REF -Round 0 -Candidate <path to a module file> -Validation
+# Writes ONLY under <WORK>\C40 (arms\<Arm>_r<Round>\, C40-<Arm>\r<k>\, ROUNDS_LOG.tsv, STATE_LOG.txt, ROUND_PACKETS.sha256). Never overwrites an arm.
+param(
+  [Parameter(Mandatory=$true)][string]$Arm,
+  [Parameter(Mandatory=$true)][int]$Round,
+  [string]$Candidate = '',
+  [switch]$Validation,
+  [string]$Rscript = 'C:\Program Files\R\R-4.6.1\bin\Rscript.exe',
+  [string]$Frozen  = 'C:\Users\Mark\Documents\R Working Directory\chicago311'
+)
+$ErrorActionPreference = 'Stop'
+$SD = Split-Path -Parent $MyInvocation.MyCommand.Path          # runner_b6\seeds\C40
+$W = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $SD))
+$C = Join-Path $W 'C40'; New-Item -ItemType Directory -Force -Path $C | Out-Null
+$LogF = Join-Path $W 'RUNNER_LOG_b6.txt'
+function Log($s) { $line = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' ' + $s; Write-Host $line; Add-Content -Path $LogF -Value $line -Encoding UTF8 }
+function Get-Sha($p) { (Get-FileHash -Algorithm SHA256 -LiteralPath $p).Hash.ToLower() }
+function Q([string]$s) { "`"$s`"" }
+function Manifest([string]$root, [string]$name, [scriptblock]$filter) {
+  $files = Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object $filter
+  $lines = $files | Sort-Object FullName | ForEach-Object { "{0}  {1}  {2}" -f (Get-Sha $_.FullName), $_.Length, $_.FullName.Substring($root.Length + 1) }
+  Set-Content -Path (Join-Path $root $name) -Value $lines -Encoding UTF8 }
+$InF  = { $_.Name -cnotlike 'RUN_*' -and $_.Name -notlike 'MANIFEST_*' -and $_.FullName -notlike '*\outputs\*' -and $_.Name -notlike 'GATE_*' }
+$OutF = { $_.FullName -like '*\outputs\*' -or $_.Name -clike 'RUN_*' -or $_.Name -like 'GATE_*' }
+function Run-Timed([string]$root, [string]$tag, [string]$exe, [string[]]$al, [int]$capSec, [string]$envRoot) {
+  if ($envRoot) { $env:CHICAGO311_ROOT = $envRoot }
+  $s = Get-Date
+  $p = Start-Process -FilePath $exe -ArgumentList $al -NoNewWindow -PassThru -RedirectStandardOutput (Join-Path $root "RUN_$tag.stdout.txt") -RedirectStandardError (Join-Path $root "RUN_$tag.stderr.txt")
+  $null = $p.Handle; $to = 0
+  if (-not $p.WaitForExit($capSec * 1000)) { $to = 1; & taskkill.exe /PID $p.Id /T /F | Out-Null; $p.WaitForExit() }
+  $secs = [math]::Round(((Get-Date) - $s).TotalSeconds, 1); $code = if ($to) { 'TIMEOUT' } else { $p.ExitCode }
+  Set-Content -Path (Join-Path $root "RUN_$tag.exit") -Value ("{0},{1},{2},{3},{4}" -f $code, $secs, (Get-Date -Format 'yyyy-MM-ddTHH:mm:sszzz'), $to, $capSec) -Encoding ASCII
+  Log ("  C40 {0} {1} exit={2} secs={3} timeout={4}" -f (Split-Path $root -Leaf), $tag, $code, $secs, $to)
+  if ($envRoot) { Remove-Item Env:\CHICAGO311_ROOT -ErrorAction SilentlyContinue }
+  return $code }
+if (-not $Validation) {
+  if ($Arm -notin @('INC','FRESH')) { throw "builder rounds use -Arm INC or FRESH" }
+  $rd = Join-Path $C ("C40-{0}\r{1}" -f $Arm, $Round); $reply = Join-Path $rd 'reply.md'
+  if (-not (Test-Path -LiteralPath $reply)) { throw "missing $reply (save the extracted reply text there first)" }
+  if (-not (Test-Path -LiteralPath (Join-Path $rd 'TIMES.txt'))) { throw "missing $rd\TIMES.txt (sent= / reply_complete=)" }
+  $Candidate = Join-Path $rd '10_io_parse.R'
+  if (Test-Path -LiteralPath $Candidate) { throw "$Candidate exists; extraction never overwrites" }
+  & $Rscript (Join-Path $SD 'c40_extract.R') $reply ("END C40 BUILD {0} r{1}" -f $Arm, $Round) $Candidate
+  if ($LASTEXITCODE -ne 0) { Log "C40 $Arm r$Round extraction REFUSED"; exit 3 }
+}
+if (-not (Test-Path -LiteralPath $Candidate)) { throw "candidate module not found: $Candidate" }
+$root = Join-Path $C ("arms\{0}_r{1}" -f $Arm, $Round)
+if (Test-Path -LiteralPath $root) { throw "$root exists - never overwritten" }
+Log "C40 round $Arm r$Round candidate=$Candidate sha256=$(Get-Sha $Candidate)"
+New-Item -ItemType Directory -Force -Path (Join-Path $root 'R-B\R'), (Join-Path $root 'data\source') | Out-Null
+Copy-Item -LiteralPath (Join-Path $Frozen 'R-B\run_RB.R') -Destination (Join-Path $root 'R-B\run_RB.R')
+foreach ($f in '00_config.R','20_integrity_and_classify.R','40_fixtures.R') { Copy-Item -LiteralPath (Join-Path $Frozen "R-B\R\$f") -Destination (Join-Path $root "R-B\R\$f") }
+Copy-Item -LiteralPath $Candidate -Destination (Join-Path $root 'R-B\R\10_io_parse.R')
+foreach ($f in 'src_open_candidates.csv','src_peer_stats.csv','src_extract_lineage.csv') { Copy-Item -LiteralPath (Join-Path $Frozen "data\source\$f") -Destination (Join-Path $root "data\source\$f") }
+Manifest $root 'MANIFEST_inputs.sha256' $InF
+$null = Run-Timed $root 'RB' $Rscript @((Q (Join-Path $root 'R-B\run_RB.R')), 'all') 1800 $root
+$null = Run-Timed $root 'GATE' $Rscript @((Q (Join-Path $SD 'c40_gate.R')), (Q $root), (Q $Frozen), (Q ("{0} r{1}" -f $Arm, $Round))) 900 $null
+$g = (Get-Content (Join-Path $root 'GATE_RESULT.txt') -TotalCount 1)
+$hid = 'not run (gate FAIL)'
+if ($g -like 'gate=PASS*') {
+  Copy-Item -LiteralPath (Join-Path $SD 'fixdepth.R') -Destination (Join-Path $root 'fixdepth.R')
+  $null = Run-Timed $root 'HIDDEN' $Rscript @((Q (Join-Path $root 'fixdepth.R')), (Q $root), 'depth', (Q (Join-Path $Frozen 'data\source'))) 600 $null
+  $hp = Join-Path $root 'outputs\GATE_depth.txt'; $hid = if (Test-Path $hp) { (Get-Content $hp -TotalCount 1) } else { 'MISSING' } }
+Manifest $root 'MANIFEST_outputs.sha256' $OutF
+$lf = Join-Path $C 'ROUNDS_LOG.tsv'; if (-not (Test-Path $lf)) { Set-Content -Path $lf -Value "time`tarm`tround`tvalidation`tcandidate_sha256`tgate`thidden" -Encoding UTF8 }
+Add-Content -Path $lf -Value ("{0}`t{1}`t{2}`t{3}`t{4}`t{5}`t{6}" -f (Get-Date -Format 'yyyy-MM-ddTHH:mm:sszzz'), $Arm, $Round, [bool]$Validation, (Get-Sha $Candidate), $g, $hid) -Encoding UTF8
+Log "C40 $Arm r$Round : $g | hidden: $hid"
+if (-not $Validation) {
+  & $Rscript (Join-Path $SD 'c40_next.R') $W $Arm $Round
+  if ($LASTEXITCODE -ne 0) { throw "c40_next.R failed" }
+}
+### seeds/C40/fixdepth.R (6775 bytes, sha256 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd) — hidden escape check = b5 C41 depth gate (verbatim; never shown to builders)
+### seeds/C40/SEED_TZUTC__10_io_parse.R (6645 bytes, sha256 33065838749ddf7013753deffe08963dc7aaffeb70bc3cd8cb5760e86f51263c) — b5 C41 P_TZUTC (wall clock read as UTC)
+### seeds/C40/SEED_CLOCKLATE__10_io_parse.R (6826 bytes, sha256 e2233fb7d7bafb03e788c25f0bcf75327eaf19561d794a7edf5a96a84e627528) — b5 C53 U_CLOCKLATE (repeated hour read as CST = the R-A reading of OF-1/N1)
+### seeds/C40/SEED_DUPINT__10_io_parse.R (6748 bytes, sha256 e55902b4bb29a77bc1a96bd405a64406ae043584f82ddece3675ca70029ab3e3) — b5 C41 P_DUPINT (DUPLICATE flag read as a number)
+### seeds/C40/ARMS.tsv (487 bytes, sha256 529eebeaf5c493085d0f53ba71b218f62e6e6c82d47a793a14d2187c81c987a1)
+arm	candidate	expected_gate	desc
+REF	FROZEN:R-B\R\10_io_parse.R	PASS	frozen module: the gate must pass it and the hidden check must pass it
+SEED_TZUTC	seeds\C40\SEED_TZUTC__10_io_parse.R	FAIL	wall clocks read as UTC: gate must fail
+SEED_CLOCKLATE	seeds\C40\SEED_CLOCKLATE__10_io_parse.R	FAIL	repeated fall-back hour read as CST (R-A reading, against ruling 53A): gate must fail
+SEED_DUPINT	seeds\C40\SEED_DUPINT__10_io_parse.R	FAIL	DUPLICATE yes/no flag read as a number: gate must fail
+### seeds/C40/REPAIRCAP (92 bytes, sha256 66f8fb4044f5c18a3c1a5c1e45a90bd15d6c9cb0e97677fb1594164e9e54ac2d)
+C40 gate validation arms (runner v6); builder rounds run later with seeds\C40\c40_round.ps1
+
+
+# b5 SOURCES OF THE COPIED C40 FILES (unified diffs vs frozen code / full text, from runner_b5/SEED_DIFFS_b5.txt)
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C41/RB_P_DUPINT__10_io_parse.R
+@@ -149,7 +149,7 @@
+     created_ts = created_ts,
+     mod_ts = mod_ts,
+     closed_ts = closed_ts,
+-    DUPLICATE = getc(col_dup),
++    DUPLICATE = suppressWarnings(as.character(as.integer(getc(col_dup)))),  # [seed C41 P_DUPINT] yes/no flag read as a number (PricePoint integer trust-flag pattern)
+     LEGACY_RECORD = getc(col_leg),
+     PARENT_SR_NUMBER = getc(col_parent),
+     stringsAsFactors = FALSE,
+
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C41/RB_P_TZUTC__10_io_parse.R
+@@ -42,7 +42,7 @@
+   for (fmt in formats) {
+     still <- ok & is.na(out)
+     if (!any(still)) break
+-    parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "America/Chicago"))
++    parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "UTC"))  # [seed C41 P_TZUTC] wall clock read as UTC
+     out[still] <- parsed
+   }
+   out
+
+### seeds/C41/fixdepth.R (new file, 6775 bytes)
+#!/usr/bin/env Rscript
+# N13 b5 C41 fixture-gate harness (owner ruling 41A, 2026-10-03 09:58 CT).
+# Usage: Rscript fixdepth.R <ARM_ROOT> <count|depth> <FROZEN_SOURCE_DIR>
+#   count = the frozen gate: rb_score_fixtures() on the locked synthetic pack; gate PASS iff every row passes (N/N).
+#   depth = ruling 41A: the SAME rows of rb_build_fixture_pack() are written as text in the production source layout
+#           (tab-separated, the frozen src_open_candidates.csv / src_peer_stats.csv header lines, MySQL-style *_ts columns,
+#           raw-style *_DATE columns) and read back through 10_io_parse (rb_read_csv_flex -> rb_normalize_open /
+#           rb_normalize_peers) before rb_judge_rows; expectations are the locked ones, unchanged.
+#           Plus a stub probe: rb_score_fixtures() is re-run with rb_judge_rows replaced by a poison judge
+#           (every label 'POISON', every row in the decision set); any fixture that still passes is a stub.
+#           Depth gate PASS iff every row passes through the loader AND no stub AND no error.
+# Writes <ARM_ROOT>/outputs/FIX_<mode>.csv and <ARM_ROOT>/outputs/GATE_<mode>.txt. Reads the frozen source dir only for header lines.
+a <- commandArgs(trailingOnly = TRUE); root <- a[[1]]; mode <- a[[2]]; src <- a[[3]]
+stopifnot(mode %in% c("count", "depth"))
+for (f in c("00_config.R", "10_io_parse.R", "20_integrity_and_classify.R", "40_fixtures.R")) source(file.path(root, "R-B", "R", f))
+od <- file.path(root, "outputs"); dir.create(od, showWarnings = FALSE, recursive = TRUE)
+gate_line <- function(...) writeLines(paste0(...), file.path(od, paste0("GATE_", mode, ".txt")))
+score <- function(j, pack) {
+  got <- j$classification; got[!j$in_decision_set] <- "OUT_OF_SET"
+  e <- pack$expected
+  d <- data.frame(fixture_id = e$fixture_id, SR_NUMBER = e$SR_NUMBER, expected = e$expected_classification,
+                  observed = got[match(e$SR_NUMBER, j$SR_NUMBER)], stringsAsFactors = FALSE)
+  d$pass <- !is.na(d$observed) & d$expected == d$observed
+  f14 <- d[d$fixture_id %in% c("F14A", "F14B"), ]
+  rbind(d[!d$fixture_id %in% c("F14A", "F14B"), ],
+        data.frame(fixture_id = "F14", SR_NUMBER = "SYN-F14A|SYN-F14B", expected = "STANDARD|STANDARD",
+                   observed = paste(f14$observed, collapse = "|"), pass = all(f14$pass), stringsAsFactors = FALSE))
+}
+if (mode == "count") {
+  res <- tryCatch({ fx <- rb_score_fixtures(kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+    data.frame(fixture_id = fx$fixture_id, expected = fx$expected_classification, observed = fx$observed_classification, pass = fx$pass %in% TRUE, stringsAsFactors = FALSE) },
+    error = function(e) structure(list(msg = conditionMessage(e)), class = "err"))
+  if (inherits(res, "err")) { gate_line("gate=FAIL n_pass=0 n=0 stubs=NA error=", gsub("[\r\n]+", " ", res$msg)); quit(status = 0) }
+  write.csv(res, file.path(od, "FIX_count.csv"), row.names = FALSE)
+  gate_line("gate=", if (nrow(res) == 14 && all(res$pass)) "PASS" else "FAIL", " n_pass=", sum(res$pass), " n=", nrow(res), " stubs=NA error=")
+  quit(status = 0)
+}
+# ---------------- depth ----------------
+harness_ts <- function(x) suppressWarnings(as.POSIXct(x, format = "%Y-%m-%d %H:%M:%S", tz = "America/Chicago"))  # harness-own parse of the pack's ISO strings
+mdy <- function(ts) ifelse(is.na(ts), NA_character_, format(ts, "%m/%d/%Y %I:%M:%S %p"))
+iso <- function(ts) ifelse(is.na(ts), "NULL", paste0(format(ts, "%Y-%m-%d %H:%M:%S"), ".000000"))
+err <- ""; res <- NULL
+pack <- rb_build_fixture_pack(t_freeze = RB_T_FREEZE)
+res <- tryCatch({
+  hdr_o <- strsplit(readLines(file.path(src, "src_open_candidates.csv"), n = 1, warn = FALSE), "\t")[[1]]
+  hdr_p <- strsplit(readLines(file.path(src, "src_peer_stats.csv"), n = 1, warn = FALSE), "\t")[[1]]
+  o <- pack$open; n <- nrow(o)
+  O <- as.data.frame(matrix("", nrow = n, ncol = length(hdr_o), dimnames = list(NULL, hdr_o)), stringsAsFactors = FALSE)
+  rawdate <- function(s) { t <- harness_ts(s); ifelse(is.na(t), ifelse(is.na(s), "", s), mdy(t)) }
+  O$SR_NUMBER <- o$SR_NUMBER; O$SR_TYPE <- o$SR_TYPE; O$SR_SHORT_CODE <- o$SR_SHORT_CODE; O$STATUS <- o$STATUS
+  O$CREATED_DATE <- rawdate(o$CREATED_DATE); O$LAST_MODIFIED_DATE <- rawdate(o$LAST_MODIFIED_DATE)
+  O$CLOSED_DATE <- ifelse(nzchar(o$CLOSED_DATE), rawdate(o$CLOSED_DATE), "")
+  O$created_ts <- iso(harness_ts(o$CREATED_DATE)); O$mod_ts <- iso(harness_ts(o$LAST_MODIFIED_DATE))
+  O$closed_ts <- ifelse(nzchar(o$CLOSED_DATE), iso(harness_ts(o$CLOSED_DATE)), "NULL")
+  O$DUPLICATE <- o$DUPLICATE; O$LEGACY_RECORD <- o$LEGACY_RECORD; O$PARENT_SR_NUMBER <- o$PARENT_SR_NUMBER
+  O$type_key <- o$type_key; O$t_freeze <- "2026-09-12 23:59:59"; O$mechanical_envelope <- "fixture"; O$snapshot_id <- RB_FIXTURE_VERSION
+  P <- as.data.frame(matrix("", nrow = nrow(pack$peers), ncol = length(hdr_p), dimnames = list(NULL, hdr_p)), stringsAsFactors = FALSE)
+  P$type_key <- pack$peers$type_key; P$peer_n <- as.character(pack$peers$peer_n)
+  P$peer_p50_h <- format(pack$peers$peer_p50_h, scientific = FALSE, trim = TRUE); P$peer_p75_h <- format(pack$peers$peer_p75_h, scientific = FALSE, trim = TRUE)
+  P$t_freeze <- "2026-09-12 23:59:59"; P$lookback_w_days <- "365"; P$peer_def <- "fixture"; P$peer_label_note <- "fixture"
+  fo <- file.path(od, "FIXTURE_src_open_candidates.tsv"); fp <- file.path(od, "FIXTURE_src_peer_stats.tsv")
+  write.table(O, fo, sep = "\t", quote = FALSE, row.names = FALSE, na = ""); write.table(P, fp, sep = "\t", quote = FALSE, row.names = FALSE, na = "")
+  j <- rb_judge_rows(rb_normalize_open(rb_read_csv_flex(fo)), rb_normalize_peers(rb_read_csv_flex(fp)), kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE)
+  score(j, pack) }, error = function(e) { err <<- gsub("[\r\n]+", " ", conditionMessage(e)); NULL })
+real <- rb_judge_rows
+assign("rb_judge_rows", function(open_df, peer_df, kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE) {
+  r <- real(open_df, peer_df, kappa = kappa, t_freeze = t_freeze); r$classification <- "POISON"; r$in_decision_set <- TRUE; r }, envir = globalenv())
+fxp <- tryCatch(rb_score_fixtures(kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE), error = function(e) NULL)
+assign("rb_judge_rows", real, envir = globalenv())
+stubs <- if (is.null(fxp)) character(0) else fxp$fixture_id[fxp$pass %in% TRUE]
+if (!is.null(res)) { res$stub <- res$fixture_id %in% stubs; write.csv(res, file.path(od, "FIX_depth.csv"), row.names = FALSE) }
+ok <- !is.null(res) && nrow(res) == 14 && all(res$pass) && !length(stubs) && !nzchar(err)
+gate_line("gate=", if (ok) "PASS" else "FAIL", " n_pass=", if (is.null(res)) 0 else sum(res$pass), " n=", if (is.null(res)) 0 else nrow(res),
+          " stubs=", if (length(stubs)) paste(stubs, collapse = "|") else "none", " poison_probe=", if (is.null(fxp)) "error" else "ran", " error=", err)
+
+--- frozen/R-B/R/10_io_parse.R
++++ seeds/C53/RB_U_CLOCKLATE__10_io_parse.R
+@@ -45,6 +45,7 @@
+     parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "America/Chicago"))
+     out[still] <- parsed
+   }
++  amb <- !is.na(out) & format(out + 3600, "%Y-%m-%d %H:%M:%S") == format(out, "%Y-%m-%d %H:%M:%S"); out[amb] <- out[amb] + 3600  # [seed C53 U_CLOCKLATE] repeated fall-back hour read as the second occurrence (CST)
+   out
+ }
+ 
+
+
+---
+@@C40_ROUNDS@@
+
+

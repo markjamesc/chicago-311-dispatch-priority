@@ -1,0 +1,13 @@
+scenario,rule,n_only_resolved,n_only_truth,n_label_diff,equals_truth
+X_RB_NODUP,copy_RA,0,0,0,TRUE
+X_RB_NODUP,copy_RB,23012,0,0,FALSE
+X_RB_NODUP,max_severity,23012,0,0,FALSE
+X_RA_NODUP,copy_RA,23012,0,0,FALSE
+X_RA_NODUP,copy_RB,0,0,0,TRUE
+X_RA_NODUP,max_severity,23012,0,0,FALSE
+X_RB_NOTHIN,copy_RA,0,0,0,TRUE
+X_RB_NOTHIN,copy_RB,0,0,6377,FALSE
+X_RB_NOTHIN,max_severity,0,0,24,FALSE
+X_RA_NOTHIN,copy_RA,0,0,6377,FALSE
+X_RA_NOTHIN,copy_RB,0,0,0,TRUE
+X_RA_NOTHIN,max_severity,0,0,24,FALSE

@@ -1,0 +1,2610 @@
+# C44 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: a re-review round after a full cross-review may be limited to the changed artifacts, their diff and the SHA-256 of the unchanged inputs.
+- REVERT: re-review rounds keep the full scope.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4: the revised text is byte-identical in both arms (static check, P1 condition 0); condition 5: the static check's known-answer cases. P1 condition 1 is judged from the two frozen replies (REREVIEW_FREEZE section): every BLOCKING/MATERIAL finding of FULL must be raised by DELTA. The unchanged-file seed is NOT measured (SPEC deviation 1).
+- Items the SPEC marks "not measured" or "not tested" (e.g. the C44 unchanged-file seed, the C49 Grok and ChatGPT-zip arms, PricePoint-scale costs) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Changed-files-only re-review (Addendum 02 #44)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C44 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C44 reruns no R path and reads only Stage 5 text and evidence, so N1 does not enter any C44 number. The N1 note was left out of the DELTA reviewer packet so that it matches the frozen FULL packet (SPEC deviation 2).
+---
+# SPEC
+# C44 — Ablation specification (FROZEN)
+
+**Ablation ID:** C44 (Addendum 02, candidate #44 "Changed-files-only re-review")
+**Batch:** N13 batch 6 (controls C43, C49, C44, C40; owner approval 2026-10-03 10:52 CT; built the way batch b5 was built)
+**Definitions and approval (operational definitions, constitution §9):** Definitions: `ablation_plan/ADDENDUM_01_control_39.md` SHA-256 `a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f` (#40, #43) and `ablation_plan/ADDENDUM_02_pricepoint_candidates.md` SHA-256 `5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6` (#44, #49; #40 evidence). Owner approval of #43, #49, #44, #40: 2026-10-03 10:52 CT (blockers in `N13/SELECTION_N13.md` SHA-256 `f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f`). Owner rulings batch 01 (`OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba`) apply where cited (41A depth gate, 48A, 53A clock rule).
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Extra chats: 1** — a DeepSeek AI 3 re-review limited to the changed artifacts (DELTA). The FULL-scope arm is the frozen b5 C48 AI 3 second audit (DeepSeek, same role, same revised text, same reply format), reused read-only, so no second full-scope chat is spent. Role overlap: DeepSeek is also the Validator; the re-review chat is a separate conversation, blind to this ablation, frozen before the Builder/Validator packets are built.
+**Usage priority (owner):** SuperGrok usage is the scarcest resource; extra chats are kept to the smallest number the test validly allows, and no extra chat uses Grok.
+**Target stage:** Stage 5 re-review round after revisions (cut/relax candidate)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b6/run_batch_v6.ps1`, evaluator `runner_b6/eval_b6.R`; R only, no MySQL, no git)
+
+## Control under test (Addendum 02 #44)
+Rule as it stands: validation framework §9 step 4 ("A different AI verifies the correction") has no scope rule, so a re-review round re-sends the whole scope. Variant: once an artifact has had a full cross-review in the stage, a later round receives only the changed artifacts, their diff, and the hashes of the unchanged inputs.
+
+## Verdict convention (cut/relax candidate)
+**KEEP = re-review rounds may be limited to changed artifacts + diff + hashes of the unchanged inputs. REVERT = re-review rounds keep the full scope.** HALT as in constitution §9.
+
+## Exact change being tested
+- **Same frozen first round, same revised text:** both arms review `REVISED_SEED.md` (b5 C48; SHA-256 in the seed list), which mis-applies revision V-3 (WCA2 share 42.9% instead of the requested 49.2%) — the **changed-file seed**.
+- **FULL arm (baseline):** `C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt` (the evidence package, the 6 deeper CSVs, the 4 first-round review files, the AI 1 original, the revision request and the revised text, all verbatim) and its frozen reply `C48/C48-audit-ai3/ai3_second_audit.md` (hash-checked against `C48/AUDIT_FREEZE.json`).
+- **DELTA arm (variant):** `C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt`: the same role, job and reply format; the inventory lists the 13 unchanged inputs by SHA-256 (byte-identical to the full packet's inventory; checked by `c44_static.R`); the revision request and the revised text verbatim; a unified diff original → revised. No unchanged body is re-sent. END line `END C44 AI3 DELTA RE-REVIEW`.
+- **Deviations (disclosed):** (1) the unchanged-file seed of the addendum (a defect in an unchanged file whose behaviour depends on the changed one) is **not planted**: the FULL arm is a frozen reply that predates this test, and planting it would need a second new full-scope chat; it is reported as **not measured**. This is the addendum's main risk (PricePoint XR-01/02/04/06: material findings in long-unchanged artifacts), so a KEEP here covers the changed-artifact case only. (2) The N1 note is left out of the DELTA packet so that the two arms' prompts differ in scope only (the frozen FULL packet carries no N1 note); the Builder/Validator/Adjudicator packets carry it. (3) The round is run by the AI 3 role chat, not by the Builder and Validator as the addendum sketches; the Builder and Validator judge the finding sets.
+- **Cost:** wall-clock of each arm's chat if both are logged (`C44/TIMES_FULL.txt` for the b5 chat, if the coordinator has it; `C44/C44-rereview-delta/TIMES.txt`); otherwise the declared proxy **packet bytes** (full 58,214 B vs delta). Timing records: the operator writes `TIMES.txt` beside each saved reply, two lines `sent=YYYY-mm-dd HH:MM:SS` (when the message was sent) and `reply_complete=YYYY-mm-dd HH:MM:SS` (when the reply finished streaming), America/Chicago wall clock, from the operator's clock. Minutes are operator-logged, not tool-measured (disclosed).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C44 reads only Stage 5 text and frozen Stage 5 evidence; it reruns no R path, so N1 does not enter any C44 number.
+
+## Arms
+- Runner v6 (`seeds/C44/RESCOPE`): **STATIC** = `c44_static.R` (full packet vs delta packet vs REVISED_SEED.md; pre-chat validity; HALT if FAIL).
+- Re-review chat (operator; packet frozen before sending):
+- `C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt` SHA-256 `a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb` (18691 bytes)
+- Post-chat scorer: `seeds/C44/c44_score.R <N13 root>` → `C44/post/` (reply `C44/C44-rereview-delta/delta_rereview.md`).
+
+## Operational benefit predicate P1 (made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+0. (validity) the static scope check passes;
+1. no lost findings: every finding the FULL reply grades BLOCKING or MATERIAL is also raised by the DELTA reply (finding level, judged by the Builder, Validator and Adjudicator from both frozen replies; the scorer's key-level comparison on relates_to keys is an aid only);
+2. the DELTA reply catches the changed-file seed: V-3 marked not applied exactly (NO/PARTIAL), or a BLOCKING/MATERIAL finding relates to V-3;
+3. cost falls by ≥ 30% (wall-clock if both arms are logged; else packet bytes, declared proxy).
+REVERT side: 1, 2 or 3 fails. HALT if 0 fails, or if a reply is missing, incomplete (no END line) or changed after its freeze, or if the FULL reply is not frozen yet when the packets are built.
+
+## Regression / HALT rules
+- HALT as above, or if Builder and Validator disagree on a hard number or on whether a FULL finding is matched in DELTA.
+- Constitution §7 condition 4: the scope rule changes no result (the revised text is byte-identical in both arms); condition 5: the static check's known-answer cases (13 unchanged hashes, verbatim revised text) are declared now.
+
+## Allowed source/data scope
+Frozen Chicago Stage 5 documents and evidence and the frozen b5 C48 packets and replies. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+**Runner-side files for this control (frozen list `runner_b6/SEEDS_b6.sha256`; preflight gating):**
+- `runner_b6/seeds/C44/ARMS.tsv` SHA-256 `35813967c08599b3afcaa251e0073510e479c4f3011402c89e70998f47078ea2`
+- `runner_b6/seeds/C44/RESCOPE` SHA-256 `464eb8c283021dba2909e763779412c8e6f4e039456d37365f770c86894907a6`
+- `runner_b6/seeds/C44/c44_score.R` SHA-256 `5a1fa9a224e819c898b39a8c7e43d8686d48291c9d2ac3390b1b425ed7475f5d`
+- `runner_b6/seeds/C44/c44_static.R` SHA-256 `2f81b20747a828abe54f67498a4bcb890ec7dc1bb0b7bfc5fbab0326818ebcee`
+- `runner_b6/eval_b6.R` SHA-256 `6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a`
+- `C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt` SHA-256 `dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96`
+- `C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt` SHA-256 `a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb`
+- `runner_b5/seeds/C48/REVISED_SEED.md` SHA-256 `c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63`
+- `runner_b6/run_batch_v6.ps1` SHA-256 `5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb` (the runner; carries the preflight list above)
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; definitions files as above. This spec is hashed in `SPEC_FREEZE_b6.sha256` before the reporting run.
+**Packets compared:** the FULL packet, the DELTA packet and REVISED_SEED.md are in the preflight list (`@W/` entries) above.
+## Pre-execution check (disclosed)
+The predicate text (`eval_b6.R`) and every harness script were hashed in `SEEDS_b6.sha256` before any PC execution. The complete runner was exercised on the PC in scratch folders (non-reporting, NON_REPORTING.txt in each): `N13\_preflight_b6` (runner tar v1) stopped at the preflight because the C49 marker file `seeds/C49/DELIVERY` collided with the folder `seeds/C49/delivery/` on Windows (case-insensitive paths); nothing executed. The marker was renamed `DELIVCHK` (runner and evaluator updated; first builds kept in `runner_b6/_superseded_v0` and `_superseded_v1` with README). `N13\_preflight_b6_2` (runner tar v2) was killed during the C43 audit when the remote session dropped (no result). `N13\_preflight_b6_3` (runner tar v2, SHA-256 7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc, started detached) ran to completion at 11:27:46 PC time (4.18 min, preflight PASS). Before that, the R scripts were dry-run on the box (R 4.5) with synthetic replies for the post-chat scorers; a Q-answer parsing bug in c49_score.R was fixed then. C44 in the scratch run: static scope check PASS (delta packet 18,691 B = 32.1% of the full packet's 58,214 B; 13/13 unchanged inputs listed by hash; revised text verbatim). No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   35813967c08599b3afcaa251e0073510e479c4f3011402c89e70998f47078ea2 seeds/C44/ARMS.tsv
+seed   OK   464eb8c283021dba2909e763779412c8e6f4e039456d37365f770c86894907a6 seeds/C44/RESCOPE
+seed   OK   5a1fa9a224e819c898b39a8c7e43d8686d48291c9d2ac3390b1b425ed7475f5d seeds/C44/c44_score.R
+seed   OK   2f81b20747a828abe54f67498a4bcb890ec7dc1bb0b7bfc5fbab0326818ebcee seeds/C44/c44_static.R
+seed   OK   6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a eval_b6.R
+seed   OK   dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96 @W/C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+seed   OK   a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb @W/C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+seed   OK   c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63 @W/runner_b5/seeds/C48/REVISED_SEED.md
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b6 (R-only; batches C52 and C24 hold the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 14871 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+35813967c08599b3afcaa251e0073510e479c4f3011402c89e70998f47078ea2  367  runner_b6/seeds/C44/ARMS.tsv
+464eb8c283021dba2909e763779412c8e6f4e039456d37365f770c86894907a6  84  runner_b6/seeds/C44/RESCOPE
+5a1fa9a224e819c898b39a8c7e43d8686d48291c9d2ac3390b1b425ed7475f5d  7114  runner_b6/seeds/C44/c44_score.R
+2f81b20747a828abe54f67498a4bcb890ec7dc1bb0b7bfc5fbab0326818ebcee  2288  runner_b6/seeds/C44/c44_static.R
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  10336  runner_b6/eval_b6.R
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  58214  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb  18691  C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63  8215  runner_b5/seeds/C48/REVISED_SEED.md
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  11125  runner_b6/run_batch_v6.ps1 (runner; hashed in SPEC_FREEZE_b6.sha256)
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b6.sha256` (written before the reporting run):
+# N13 batch b6 spec freeze, written 2026-10-03 11:30 CDT before the reporting run (scratch checks in N13/_preflight_b6, _preflight_b6_2, _preflight_b6_3 disclosed in each spec)
+eb91577bac56117d32a4f95a6370831b1521ee54d24cababe36c318654207c2c  C43/ABLATION_SPEC.md
+5630d48511557ac288f689595f649122037c31442c776f1aab7dcabda05f87ab  C49/ABLATION_SPEC.md
+a4811cdf2b2632515964e7f0e826fae70e040c7c8595d05dc7abe112ff0760d9  C44/ABLATION_SPEC.md
+7c1edd58a89b9b7b35faea14ce7bc84a1ede6cf67919cba2296eaf348fd2c663  C40/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C40/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C43/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C44/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C49/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C40/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C43/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C44/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C49/BASELINE_FRAMEWORK.sha256
+3a201b23c77ac5bd9ddc747ae276a7223d5cb05e6e1ed861ec5849595c681327  runner_b6/SEEDS_b6.sha256
+729ed8cad382ae82805499d493bf7eb8fa38687665286649bb3746330f0b1e2d  runner_b6/SEED_DIFFS_b6.txt
+5822febe57e51e8ef04afdbbcf6e610c79cb9fc95c34560250300c75b5f985c8  runner_b6/PRECHECK_b6.json
+bae228cbf71a25b6b68c9863e4a68f88ca89fa4647ac81acb0ff14332d89bd84  runner_b6/make_seeds_b6.py
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  runner_b6/run_batch_v6.ps1
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  runner_b6/eval_b6.R
+a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb  C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1  C49/packets/C49_R_DS_ZIP.txt
+9fa6cc58745d144a5c53a371f0b41db69d0503b212c2b1ce08a33eb84998f7a2  C49/packets/C49_R_DS_FILES.txt
+bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2  C49/packets/C49_R_GPT_FILES.txt
+e140717693b1bf86a0ab1cad9f0575a40b8289e291145de8ce7e5772765021a4  C40/packets/C40_1_INC_BUILDER_ChatGPT.txt
+6a7c477a0d034c992bbcb3544600e455b7e0b217c9d77a125a6acdf575c86bfc  C40/packets/C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+eeed4af084b2630f1a6c4a0fc30a87923043631942b50c185409c622849f0c3e  tools_build_extra_b6.py
+8640118c731510dee2dddbe24d8c0f3693f58d22c8406a37135ecbc6b53a0494  tools_make_specs_b6.py
+f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f  SELECTION_N13.md
+7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc  N13_runner_b6_v2.tar
+a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f  ablation_plan/ADDENDUM_01_control_39.md
+5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6  ablation_plan/ADDENDUM_02_pricepoint_candidates.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+
+---
+# RUN LOG (this control)
+11:32:07 C44 arms
+11:32:07   STATIC STATIC exit=0 secs=0.7 timeout=0
+
+---
+# C44_RESULTS.md (runner output, pre-chat part)
+# C44 RESULTS (mechanical; generated 2026-10-03 11:34:22 CDT)
+
+**Mechanical predicate result: PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 0. delta scope valid (pre-chat): changed artifact sent verbatim, every unchanged input listed by its SHA-256, no unchanged body re-sent | MET |
+| 1. every BLOCKING/MATERIAL finding of the FULL re-review is also raised by the DELTA re-review (judged from the frozen replies) | PENDING |
+| 2. the DELTA re-review catches the changed-file seed (V-3) | PENDING |
+| 3. round cost falls by >= 30% (wall-clock if both logged; declared proxy otherwise) | PENDING |
+
+## Arms
+| arm | exit | status | full_packet_bytes | delta_packet_bytes | delta_over_full | unchanged_inputs | unchanged_listed_by_hash | revised_text_verbatim |
+|---|---|---|---|---|---|---|---|---|
+| STATIC | 0 | PASS | 58214 | 18691 | 0.3211 | 13 | 13 | TRUE |
+
+## UNCHANGED_HASH_LIST_CHECK.csv
+| input | sha256 | listed_by_hash_in_delta |
+|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 | TRUE |
+| deeper/STAGE5_DEEPER_FINDINGS.md | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 | TRUE |
+| deeper/capacity_coverage_note.csv | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 | TRUE |
+| deeper/escalate_by_type_top25.csv | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 | TRUE |
+| deeper/inconclusive_by_clause.csv | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d | TRUE |
+| deeper/independent_checks_critical_counts.csv | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 | TRUE |
+| deeper/kappa_sensitivity.csv | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | TRUE |
+| deeper/portfolio_summary.csv | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 | TRUE |
+| reviews/AI2_DECISION_METHOD_CRITIC.md | ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a | TRUE |
+| reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md | 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1 | TRUE |
+| reviews/CROSS_REVIEW.md | 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457 | TRUE |
+| reviews/INTERPRETATION_RECONCILIATION.md | 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462 | TRUE |
+| AI1_INTERPRETATION (original, before revision) | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 | TRUE |
+
+
+---
+# C44_arms.csv (raw, full file)
+arm,exit,status,full_packet_bytes,delta_packet_bytes,delta_over_full,unchanged_inputs,unchanged_listed_by_hash,revised_text_verbatim
+STATIC,0,PASS,58214,18691,0.3211,13,13,TRUE
+
+---
+# RAW PER-ARM FILES (verbatim; bulky files summarized with their SHA-256)
+## arms/STATIC/RUN_STATIC.exit
+0,0.7,2026-10-03T11:32:07-05:00,0,300
+
+## arms/STATIC/outputs/STATIC_CHECK.txt
+status=PASS full_packet_bytes=58214 delta_packet_bytes=18691 delta_over_full=0.3211 unchanged_inputs=13 unchanged_listed_by_hash=13 revised_text_verbatim=TRUE unchanged_bodies_absent=TRUE full_sha256=dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96 delta_sha256=a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb
+
+## arms/STATIC/outputs/UNCHANGED_HASH_LIST_CHECK.csv
+"input","sha256","listed_by_hash_in_delta"
+"STAGE5_EVIDENCE_PACKAGE.md","c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7",TRUE
+"deeper/STAGE5_DEEPER_FINDINGS.md","49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6",TRUE
+"deeper/capacity_coverage_note.csv","4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609",TRUE
+"deeper/escalate_by_type_top25.csv","6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176",TRUE
+"deeper/inconclusive_by_clause.csv","f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d",TRUE
+"deeper/independent_checks_critical_counts.csv","4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146",TRUE
+"deeper/kappa_sensitivity.csv","7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a",TRUE
+"deeper/portfolio_summary.csv","b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167",TRUE
+"reviews/AI2_DECISION_METHOD_CRITIC.md","ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a",TRUE
+"reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md","9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1",TRUE
+"reviews/CROSS_REVIEW.md","9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457",TRUE
+"reviews/INTERPRETATION_RECONCILIATION.md","80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462",TRUE
+"AI1_INTERPRETATION (original, before revision)","73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932",TRUE
+
+
+---
+# C44_EVIDENCE.sha256
+b2cff745a9a7ba7ce73102aa2fca03926f42d747a31383f4cdf353a2a798d409  C44_ARM_MANIFESTS.txt
+85b4ba2769da1524dd341491a3ad781edfd6c2c136b2701e4bc657243cb4bb3e  C44_arms.csv
+eb7a72c380510834bacd081cb6c26ca9869372dc5380d622878feba7baf06167  C44_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files, the C43 trail index and its unpacked copy) are listed by hash and size only.
+arms/STATIC in  :: 2f81b20747a828abe54f67498a4bcb890ec7dc1bb0b7bfc5fbab0326818ebcee  2288  c44_static.R
+arms/STATIC out :: 1d1146849ed83f2e8ea54d75260bc9c26871b424f6e4b39f9f31b88ddb7fdaa1  344  outputs\STATIC_CHECK.txt
+arms/STATIC out :: c325142c41529fc6ea78f17c77438000bcd9a2502375d01a43f7f42e56aebf05  1473  outputs\UNCHANGED_HASH_LIST_CHECK.csv
+arms/STATIC out :: ceaa28f8393a050fe507546523426a120bb76ca922c011d5a1b7a4b5b3e1ab08  39  RUN_STATIC.exit
+arms/STATIC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_STATIC.stderr.txt
+arms/STATIC out :: 496870794a41dd987b4d83c22ae64cf65c295c8a01a824dd31faca4c2f117b84  345  RUN_STATIC.stdout.txt
+
+---
+# SEED / HARNESS FILES (full text of new runner-side files; binary or verbatim-copied files by hash)
+### seeds/C44/c44_static.R (2288 bytes, sha256 2f81b20747a828abe54f67498a4bcb890ec7dc1bb0b7bfc5fbab0326818ebcee)
+#!/usr/bin/env Rscript
+# C44 static scope check (N13 b6, pre-chat). Usage: Rscript c44_static.R <FULL packet> <DELTA packet> <REVISED_SEED.md> <OUTDIR>
+# Checks that the delta packet carries the changed artifact in full (REVISED_SEED.md verbatim) and lists every unchanged input by the same SHA-256 as the full packet's inventory.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); OUT <- a[[4]]; dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+rd <- function(p) { x <- readLines(p, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2); x }
+full <- rd(a[[1]]); delta <- rd(a[[2]]); rev <- rd(a[[3]])
+inv <- function(x) { z <- grep("^\\| .* \\| [0-9]+ \\| `[0-9a-f]{64}` \\|$", x, value = TRUE); data.frame(input = trimws(sub("^\\| (.*?) \\| [0-9]+ \\|.*$", "\\1", z, perl = TRUE)), sha256 = sub("^.*`([0-9a-f]{64})`.*$", "\\1", z), stringsAsFactors = FALSE) }
+fi <- inv(full); di <- inv(delta)
+rs <- digest(file = a[[3]], algo = "sha256")
+unchanged <- fi[fi$sha256 != rs & !grepl("REVISION_REQUEST", fi$input), ]
+dl <- grep("^\\| UNCHANGED \\|", delta, value = TRUE)
+in_delta <- sapply(unchanged$sha256, function(h) any(grepl(h, dl, fixed = TRUE)))
+rev_in <- grepl(paste(rev, collapse = "\n"), paste(delta, collapse = "\n"), fixed = TRUE)
+not_sent <- sapply(c("# EVIDENCE:", "# FIRST-ROUND REVIEW:"), function(k) !any(startsWith(delta, k)))
+tab <- data.frame(input = unchanged$input, sha256 = unchanged$sha256, listed_by_hash_in_delta = in_delta)
+write.csv(tab, file.path(OUT, "UNCHANGED_HASH_LIST_CHECK.csv"), row.names = FALSE)
+fb <- file.info(a[[1]])$size; db <- file.info(a[[2]])$size
+ok <- all(in_delta) && rev_in && all(not_sent) && nrow(unchanged) >= 1
+writeLines(sprintf("status=%s full_packet_bytes=%d delta_packet_bytes=%d delta_over_full=%.4f unchanged_inputs=%d unchanged_listed_by_hash=%d revised_text_verbatim=%s unchanged_bodies_absent=%s full_sha256=%s delta_sha256=%s",
+  if (ok) "PASS" else "FAIL", fb, db, db / fb, nrow(unchanged), sum(in_delta), rev_in, all(not_sent), digest(file = a[[1]], algo = "sha256"), digest(file = a[[2]], algo = "sha256")), file.path(OUT, "STATIC_CHECK.txt"))
+cat(readLines(file.path(OUT, "STATIC_CHECK.txt")), "\n"); if (!ok) quit(status = 1)
+### seeds/C44/c44_score.R (7114 bytes, sha256 5a1fa9a224e819c898b39a8c7e43d8686d48291c9d2ac3390b1b425ed7475f5d)
+#!/usr/bin/env Rscript
+# C44 post-chat scorer (N13 b6). Usage: Rscript c44_score.R <N13_ROOT>
+# FULL arm  = b5 C48 AI 3 second audit (DeepSeek, full scope), read-only: C48/C48-audit-ai3/ai3_second_audit.md (hash-checked against C48/AUDIT_FREEZE.json when present).
+# DELTA arm = C44/C44-rereview-delta/delta_rereview.md (DeepSeek, AI 3, delta scope). Writes C44/post/.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE); C <- file.path(W, "C44"); OUT <- file.path(C, "post"); dir.create(OUT, showWarnings = FALSE)
+rdl <- function(p) { x <- readLines(p, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2); x }
+nz <- function(x) x[nzchar(trimws(x))]
+md <- function(df) c(paste0("| ", paste(names(df), collapse = " | "), " |"), paste0("|", paste(rep("---", ncol(df)), collapse = "|"), "|"), apply(df, 1, function(r) paste0("| ", paste(gsub("\\|", "/", r), collapse = " | "), " |")))
+A <- list(FULL = list(reply = file.path(W, "C48", "C48-audit-ai3", "ai3_second_audit.md"), end = "END C48 AI3 SECOND AUDIT", packet = file.path(W, "C48", "packets", "C48_A3_SECOND_AUDIT_DeepSeek.txt"), times = file.path(C, "TIMES_FULL.txt")),
+          DELTA = list(reply = file.path(C, "C44-rereview-delta", "delta_rereview.md"), end = "END C44 AI3 DELTA RE-REVIEW", packet = file.path(C, "packets", "C44_A3_DELTA_REREVIEW_DeepSeek.txt"), times = file.path(C, "C44-rereview-delta", "TIMES.txt")))
+tm <- function(p) { if (!file.exists(p)) return(NA_real_); x <- rdl(p); g <- function(k) { z <- grep(paste0("^", k, "="), x, value = TRUE); if (length(z)) as.POSIXct(sub(paste0("^", k, "="), "", z[1]), tz = "America/Chicago", format = "%Y-%m-%d %H:%M:%S") else as.POSIXct(NA) }
+  s <- g("sent"); d <- g("reply_complete"); if (is.na(s) || is.na(d)) NA_real_ else as.numeric(difftime(d, s, units = "mins")) }
+halt <- character(0); rows <- list(); F <- list()
+fz <- file.path(W, "C48", "AUDIT_FREEZE.json")
+for (k in names(A)) { z <- A[[k]]
+  if (!file.exists(z$reply)) { halt <- c(halt, paste("reply missing:", k)); next }
+  x <- rdl(z$reply); last <- tail(nz(trimws(x)), 1); end_ok <- length(last) == 1 && grepl(z$end, last, fixed = TRUE); if (!end_ok) halt <- c(halt, paste("no END line as last line:", k))
+  h <- digest(file = z$reply, algo = "sha256")
+  if (k == "FULL" && file.exists(fz) && !grepl(h, paste(readLines(fz, warn = FALSE), collapse = ""), fixed = TRUE)) halt <- c(halt, "FULL reply differs from C48/AUDIT_FREEZE.json")
+  vr <- sapply(paste0("V-", 1:6), function(v) { l <- grep(paste0("^[[:space:]|*]*", v, "[[:space:]*]*\\|"), x, value = TRUE); if (!length(l)) return(NA_character_)
+    s <- toupper(trimws(gsub("[*`]", "", strsplit(l[1], "|", fixed = TRUE)[[1]]))); s <- s[nzchar(s)]; if (length(s) >= 2) sub("^(YES|NO|PARTIAL).*$", "\\1", s[2]) else NA_character_ })
+  fl <- grep("\\|.*\\b(BLOCKING|MATERIAL|MINOR)\\b.*\\|", x, value = TRUE, perl = TRUE)
+  fd <- if (length(fl)) data.frame(arm = k, severity = sub("^.*\\b(BLOCKING|MATERIAL|MINOR)\\b.*$", "\\1", fl, perl = TRUE),
+                                   relates_to = vapply(fl, function(l) { m <- regmatches(l, regexpr("\\b(V-[1-6]|NEW|PRE)\\b", l, perl = TRUE)); if (length(m)) m else "?" }, ""),
+                                   row = substr(trimws(fl), 1, 400), stringsAsFactors = FALSE, row.names = NULL) else data.frame(arm = character(), severity = character(), relates_to = character(), row = character())
+  fd <- fd[!grepl("severity", fd$row, ignore.case = TRUE) | grepl("^\\|?[[:space:]]*\\**[A-Za-z]*[0-9]", fd$row), ]
+  F[[k]] <- fd; write.csv(fd, file.path(OUT, paste0("FINDINGS_", k, ".csv")), row.names = FALSE)
+  bm <- fd[fd$severity %in% c("BLOCKING", "MATERIAL"), ]
+  rows[[k]] <- data.frame(arm = k, reply_sha256 = h, reply_bytes = file.info(z$reply)$size, end_line = end_ok, packet_bytes = file.info(z$packet)$size, packet_sha256 = digest(file = z$packet, algo = "sha256"),
+    V1 = vr[1], V2 = vr[2], V3 = vr[3], V4 = vr[4], V5 = vr[5], V6 = vr[6], n_findings = nrow(fd), n_blocking_material = nrow(bm),
+    bm_keys = paste(sort(unique(bm$relates_to)), collapse = "|"), seed_V3_caught = isTRUE(vr[3] %in% c("NO", "PARTIAL")) || any(bm$relates_to == "V-3"), minutes = round(tm(z$times), 2), stringsAsFactors = FALSE) }
+tab <- if (length(rows)) do.call(rbind, rows) else NULL
+g <- function(arm, col) if (!is.null(tab) && arm %in% tab$arm) tab[[col]][tab$arm == arm] else NA
+fk <- if (!is.null(F$FULL)) unique(F$FULL$relates_to[F$FULL$severity %in% c("BLOCKING", "MATERIAL")]) else character(0)
+dk <- if (!is.null(F$DELTA)) unique(F$DELTA$relates_to[F$DELTA$severity %in% c("BLOCKING", "MATERIAL")]) else character(0)
+keycov <- if (length(fk)) all(fk %in% dk) else TRUE
+wall <- !is.na(g("FULL", "minutes")) && !is.na(g("DELTA", "minutes"))
+c3 <- if (wall) isTRUE(g("DELTA", "minutes") <= 0.7 * g("FULL", "minutes")) else isTRUE(g("DELTA", "packet_bytes") <= 0.7 * g("FULL", "packet_bytes"))
+conds <- data.frame(condition = c("1. every BLOCKING or MATERIAL finding the FULL re-review raises is also raised by the DELTA re-review (finding level; judged by Builder/Validator/Adjudicator from the frozen replies; key-level aid below)",
+                                  "2. the DELTA re-review catches the changed-file seed (V-3 not applied exactly, or a BLOCKING/MATERIAL finding on V-3)",
+                                  paste0("3. round cost falls by >= 30%: ", if (wall) "wall-clock (sent -> reply complete), both arms logged" else "PROXY (declared fallback; full-arm send time not logged): packet bytes")),
+                    met = c(NA, isTRUE(g("DELTA", "seed_V3_caught")), c3))
+verdict <- if (length(halt)) "HALT" else if (any(conds$met %in% FALSE)) "P1 NOT MET (a mechanical condition failed; condition 1 not needed)" else "PARTIAL: mechanical conditions 2-3 MET; condition 1 is judged from the frozen replies"
+L <- c(paste0("# C44 POST-CHAT RESULTS (mechanical; generated ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), ")"), "", paste0("**Mechanical predicate result: ", verdict, "**"), "",
+       if (length(halt)) c("HALT reasons:", paste0("- ", halt), ""), "## Predicate conditions", md(transform(conds, met = ifelse(is.na(conds$met), "PENDING (judged)", ifelse(conds$met, "MET", "NOT MET")))), "",
+       "## Arms", if (is.null(tab)) "(none)" else md(tab), "",
+       sprintf("Key-level aid for condition 1 (not the predicate): FULL BLOCKING/MATERIAL relates_to keys = {%s}; DELTA = {%s}; every FULL key present in DELTA: %s.", paste(fk, collapse = ", "), paste(dk, collapse = ", "), keycov), "",
+       "Unchanged-file seed: NOT PLANTED (the full arm is the frozen b5 C48 audit; a second new full-scope chat would be needed). Reported as not measured.", "")
+for (k in names(F)) L <- c(L, paste0("## FINDINGS_", k, ".csv (parsed table rows)"), if (nrow(F[[k]])) md(F[[k]]) else "(no rows parsed)", "")
+writeLines(L, file.path(OUT, "C44_POST_RESULTS.md")); if (!is.null(tab)) write.csv(tab, file.path(OUT, "C44_POST_arms.csv"), row.names = FALSE)
+cat("C44:", verdict, "\n")
+### seeds/C44/ARMS.tsv (367 bytes, sha256 35813967c08599b3afcaa251e0073510e479c4f3011402c89e70998f47078ea2)
+arm	reply	packet	desc
+FULL	C48/C48-audit-ai3/ai3_second_audit.md	C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt	frozen b5 C48 AI 3 second audit (DeepSeek, full scope), reused read-only
+DELTA	C44/C44-rereview-delta/delta_rereview.md	C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt	AI 3 re-review limited to changed artifacts (DeepSeek, new chat; the 1 extra chat of C44)
+### seeds/C44/RESCOPE (84 bytes, sha256 464eb8c283021dba2909e763779412c8e6f4e039456d37365f770c86894907a6)
+C44 delta re-review scope check (runner v6); delta chat scored later by c44_score.R
+
+---
+# C44 RE-REVIEW REPLIES AND POST-CHAT SCORE (frozen; P1 condition 1 is judged from the two replies, conditions 2-3 are mechanical)
+REREVIEW_FREEZE.json SHA-256 e791b4a6d5521a1fc24b295b3df48e271c14ab22756f75470ccc60a26e033f2a:
+{
+  "ablation_id": "C44",
+  "frozen_at_ct": "2026-10-03 12:23:37 CDT",
+  "records": [
+    {"id": "FULL_reply", "path": "C48/C48-audit-ai3/ai3_second_audit.md", "bytes": 3053, "sha256": "8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2"},
+    {"id": "C48_AUDIT_FREEZE", "path": "C48/AUDIT_FREEZE.json", "bytes": 874, "sha256": "c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878"},
+    {"id": "FULL_packet", "path": "C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt", "bytes": 58214, "sha256": "dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96"},
+    {"id": "DELTA_reply", "path": "C44/C44-rereview-delta/delta_rereview.md", "bytes": 2834, "sha256": "d0635883ab82f4bf5d1f3fc94200715d5d4b66746aaf2023a99c64b43a9cebfb"},
+    {"id": "DELTA_times", "path": "C44/C44-rereview-delta/TIMES.txt", "bytes": 850, "sha256": "69f5275511e873b072369fc4beb09e84711ad8c21444c29bad02dc0979048590"},
+    {"id": "DELTA_packet", "path": "C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt", "bytes": 18691, "sha256": "a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb"}
+  ]
+}
+
+
+FULL = the b5 C48 AI 3 second audit (DeepSeek), reused read-only; DELTA = the C44 re-review (DeepSeek, new chat, not told about the ablation). Same role, same revised text (REVISED_SEED.md, V-3 planted), same reply format; the packets differ in scope only (both verbatim below).
+Rule (SPEC P1 condition 1): every finding the FULL reply grades BLOCKING or MATERIAL must also be raised by the DELTA reply (same defect, any wording). The scorer's key-level comparison is an aid only.
+
+---
+## C44 post-chat scorer output (c44_score.R) — `C44/post/C44_POST_RESULTS.md` (sha256 7a2ff94eeeb46c62935fc5848619c34517670ae334c0dc2c268a8103464598c2, 2603 bytes, verbatim)
+# C44 POST-CHAT RESULTS (mechanical; generated 2026-10-03 12:23:38 CDT)
+
+**Mechanical predicate result: PARTIAL: mechanical conditions 2-3 MET; condition 1 is judged from the frozen replies**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. every BLOCKING or MATERIAL finding the FULL re-review raises is also raised by the DELTA re-review (finding level; judged by Builder/Validator/Adjudicator from the frozen replies; key-level aid below) | PENDING (judged) |
+| 2. the DELTA re-review catches the changed-file seed (V-3 not applied exactly, or a BLOCKING/MATERIAL finding on V-3) | MET |
+| 3. round cost falls by >= 30%: PROXY (declared fallback; full-arm send time not logged): packet bytes | MET |
+
+## Arms
+| arm | reply_sha256 | reply_bytes | end_line | packet_bytes | packet_sha256 | V1 | V2 | V3 | V4 | V5 | V6 | n_findings | n_blocking_material | bm_keys | seed_V3_caught | minutes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| FULL | 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2 | 3053 | TRUE | 58214 | dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96 | YES | YES | PARTIAL | YES | YES | YES | 1 | 1 | V-3 | TRUE | NA |
+| DELTA | d0635883ab82f4bf5d1f3fc94200715d5d4b66746aaf2023a99c64b43a9cebfb | 2834 | TRUE | 18691 | a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb | YES | YES | NO | YES | YES | YES | 1 | 1 | V-3 | TRUE | 0.77 |
+
+Key-level aid for condition 1 (not the predicate): FULL BLOCKING/MATERIAL relates_to keys = {V-3}; DELTA = {V-3}; every FULL key present in DELTA: TRUE.
+
+Unchanged-file seed: NOT PLANTED (the full arm is the frozen b5 C48 audit; a second new full-scope chat would be needed). Reported as not measured.
+
+## FINDINGS_FULL.csv (parsed table rows)
+| arm | severity | relates_to | row |
+|---|---|---|---|
+| FULL | BLOCKING | V-3 | / F-1 / BLOCKING / V-3 / `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` / Replace `42.9%` with `49.2%`. Recompute: `64,922 / 131,968 = 0.491952595`, i.e. `49.1953%`, rounded to `49.2%`. The count `64,922` and the concentration sentence are otherwise supported. / |
+
+## FINDINGS_DELTA.csv (parsed table rows)
+| arm | severity | relates_to | row |
+|---|---|---|---|
+| DELTA | MATERIAL | V-3 | / F1 / MATERIAL / V-3 / `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` / Replace `42.9%` with `49.2%`. The required correction and arithmetic give `64,922 / 131,968 = 0.491952595 = 49.1953% ≈ 49.2%`. / |
+
+
+---
+## DELTA TIMES.txt — `C44/C44-rereview-delta/TIMES.txt` (sha256 69f5275511e873b072369fc4beb09e84711ad8c21444c29bad02dc0979048590, 850 bytes, verbatim)
+sent=2026-10-03 11:40:34
+reply_complete=2026-10-03 11:41:20
+# Written by the coordinator 2026-10-03 ~12:25 CT under the coordinator ruling 2026-10-03 12:20 CT (TIMES.txt was not written at chat time). Times are CT (CDT, UTC-5).
+# sent = the browser operator's logged send time: 16:40:34Z UTC = 11:40:34 CDT.
+# reply_complete = UPPER BOUND, not an observed completion time: box mtime of C44/C44-rereview-delta/delta_deepseek.html = 2026-10-03 11:41:20.528506 CDT (truncated to the second above); the page is saved right after the END line appears.
+# minutes (sent -> reply_complete) = 0.77, an UPPER BOUND on the reply time.
+# cross-check (page's own duration indicator): Thought for 22 seconds (DeepSeek thinking time only; one attempt).
+# Ruling: if an upper bound makes a timing condition ambiguous, report it as ambiguous; do not score it as met.
+
+---
+## FULL reply (b5 C48 AI 3 second audit) — `C48/C48-audit-ai3/ai3_second_audit.md` (sha256 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2, 3053 bytes, verbatim)
+1. **Per-revision verification table**
+
+| V-n | applied exactly? | what the revised text says (quote) | what was requested (quote) | difference, if any |
+| --- | --- | --- | --- | --- |
+| V-1 | YES | `2. Accept with Framing return on capacity Required next step` | `2. Accept with Framing return on capacity Required next step` | None. |
+| V-2 | YES | `3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot Possible methodological follow-up` | `3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot Possible methodological follow-up` | None. |
+| V-3 | PARTIAL | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | `WCA2 alone supplies 64,922 of these (49.2% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | The sentence was added, and the count `64,922` is correct, but the percentage is wrong: revised says `42.9%`; required/evidence value is `49.2%`. |
+| V-4 | YES | `Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)` | `Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)` | None. |
+| V-5 | YES | `Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.` | `Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.` | None. |
+| V-6 | YES | The line `Is this conversation helpful so far?` is absent from the revised text. | `(delete the quoted line)` | None; the chat-interface artifact was deleted. |
+
+2. **Findings**
+
+| id | severity | relates_to | quote from the revised text | precise correction |
+| --- | --- | --- | --- | --- |
+| F-1 | BLOCKING | V-3 | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | Replace `42.9%` with `49.2%`. Recompute: `64,922 / 131,968 = 0.491952595`, i.e. `49.1953%`, rounded to `49.2%`. The count `64,922` and the concentration sentence are otherwise supported. |
+
+3. **Overall verdict**
+
+**FAIL.** The revised interpretation applies V-1, V-2, V-4, V-5, and V-6 correctly, and the other checked numbers in the revised text match the evidence package. However, V-3 is only partial: the required WCA2 concentration sentence was inserted, but the percentage is wrong. The revised text says `42.9%` where the request and evidence require `49.2%` (`64,922 / 131,968 = 49.1953%`). Because this is a required substantive numerical correction and the error appears in the key WCA2 concentration caveat, the revised interpretation cannot be released as is. Correct `42.9%` to `49.2%` and re-audit.
+
+END C48 AI3 SECOND AUDIT
+
+---
+## DELTA reply (C44 re-review) — `C44/C44-rereview-delta/delta_rereview.md` (sha256 d0635883ab82f4bf5d1f3fc94200715d5d4b66746aaf2023a99c64b43a9cebfb, 2834 bytes, verbatim)
+1. **Per-revision verification table**
+
+| V-n | applied exactly? | what the revised text says (quote) | what was requested (quote) | difference, if any |
+| --- | --- | --- | --- | --- |
+| V-1 | YES | `2. Accept with Framing return on capacity Required next step` | `2. Accept with Framing return on capacity Required next step` | None. |
+| V-2 | YES | `3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot Possible methodological follow-up` | `3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot Possible methodological follow-up` | None. |
+| V-3 | NO | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | `WCA2 alone supplies 64,922 of these (49.2% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | Wrong percentage: revised says `42.9%`; requested and correct value is `49.2%`. Recompute: `64,922 / 131,968 = 0.491952595 = 49.1953% ≈ 49.2%`. |
+| V-4 | YES | `Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)` | `Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)` | None. |
+| V-5 | YES | `Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.` | `Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.` | None. |
+| V-6 | YES | `Is this conversation helpful so far?` is absent; the revised text ends without that line. | `(delete the quoted line)` | None. The line was deleted. |
+
+2. **Findings**
+
+| id | severity | relates_to | quote from the revised text | precise correction |
+| --- | --- | --- | --- | --- |
+| F1 | MATERIAL | V-3 | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | Replace `42.9%` with `49.2%`. The required correction and arithmetic give `64,922 / 131,968 = 0.491952595 = 49.1953% ≈ 49.2%`. |
+
+3. **Overall verdict:** `PASS WITH REQUIRED REVISIONS`
+
+V-1, V-2, V-4, V-5, and V-6 were applied exactly. V-3 was added in the correct location and with the correct surrounding sentence, but the key percentage is wrong: the revised text says `42.9%` instead of the required `49.2%`. This is a material numerical error in a substantive claim and must be corrected before release. After correcting `42.9%` to `49.2%`, the revised interpretation satisfies the revision request.
+
+END C44 AI3 DELTA RE-REVIEW
+
+---
+## DELTA packet (what the DELTA reviewer received) — `C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt` (sha256 a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb, 18691 bytes, verbatim)
+````
+# Chicago 311 Dataset 2 — Stage 5 — AI 3 — Claim-to-Evidence and Numerical Auditor (SECOND AUDIT, after revisions; re-review scope: changed artifacts only)
+
+You are AI 3 in the Three-AI Interpretation and Recommendation Framework for Chicago 311 Dataset 2.
+
+**Mode:** DeepThink on. **This is the second audit** (Stage 5 flow: "Revision required → Revise interpretation and re-audit"). The first audit round (AI 2, AI 3, cross-review) asked AI 1 for the revisions V-1..V-6 below. The coordinator applied them. You now audit the revised interpretation.
+**Scope of this re-review round.** The first audit round reviewed every input in full. This round receives in full only what changed since that round: the revised interpretation and the revision request. It also receives a unified diff of the interpretation (original → revised) and the SHA-256 of every unchanged input. The unchanged inputs are byte-identical to the files the first round reviewed (hashes in the inventory) and are not re-sent.
+Everything you need for this round is in this message. There are no attachments and no tools. Use only this material.
+
+## Your job
+Check the revised interpretation as the claim-to-evidence and numerical auditor: for each required revision, compare the revised text with the requested correction character for character, recompute every number in the revised text from the evidence package and deeper CSVs (shares from counts, to the stated precision), and list any number, claim or wording in the revised text that differs from the request or is not supported by the evidence.
+
+## Reply format (all three parts, in this order)
+1. **Per-revision verification table**, one row per revision V-1..V-6: `V-n | applied exactly? (YES / NO / PARTIAL) | what the revised text says (quote) | what was requested (quote) | difference, if any`.
+2. **Findings**, one row each: `id | severity BLOCKING / MATERIAL / MINOR | relates_to V-n (a revision), NEW (something the revision added or changed that was not requested), or PRE (something in the original text that the revisions did not touch) | quote from the revised text | precise correction`. If there are no findings, write `none`.
+   - BLOCKING = the revised interpretation cannot be released as is. MATERIAL = a wrong number, claim or recommendation that a reader would act on. MINOR = wording or presentation.
+3. **Overall verdict:** one of `PASS` / `PASS WITH REQUIRED REVISIONS` / `FAIL`, with one paragraph of reasons.
+Reply in full, in one message. End your reply with exactly this line:
+END C44 AI3 DELTA RE-REVIEW
+
+---
+# INPUT INVENTORY (SHA-256 of each input, as frozen by the coordinator)
+| status | input | bytes | sha256 |
+|---|---|---|---|
+| UNCHANGED | STAGE5_EVIDENCE_PACKAGE.md | 4051 | `c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7` |
+| UNCHANGED | deeper/STAGE5_DEEPER_FINDINGS.md | 2007 | `49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6` |
+| UNCHANGED | deeper/capacity_coverage_note.csv | 644 | `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` |
+| UNCHANGED | deeper/escalate_by_type_top25.csv | 1264 | `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` |
+| UNCHANGED | deeper/inconclusive_by_clause.csv | 58 | `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` |
+| UNCHANGED | deeper/independent_checks_critical_counts.csv | 190 | `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` |
+| UNCHANGED | deeper/kappa_sensitivity.csv | 164 | `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` |
+| UNCHANGED | deeper/portfolio_summary.csv | 183 | `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` |
+| UNCHANGED | reviews/AI2_DECISION_METHOD_CRITIC.md | 10039 | `ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a` |
+| UNCHANGED | reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md | 9860 | `9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1` |
+| UNCHANGED | reviews/CROSS_REVIEW.md | 3651 | `9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457` |
+| UNCHANGED | reviews/INTERPRETATION_RECONCILIATION.md | 1122 | `80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462` |
+| UNCHANGED | AI1_INTERPRETATION (original, before revision) | 7929 | `73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932` |
+| CHANGED (sent in full below) | AI1_INTERPRETATION_REVISED (after revision) | 8215 | `c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63` |
+| NEW since the first round (sent in full below) | REVISION_REQUEST (V-1..V-6, JSON) | 2651 | `970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4` |
+
+---
+# REVISION REQUEST V-1..V-6 (sent to AI 1 after the first audit round; JSON sha256 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4)
+### V-1 (substantive)
+**Affected language (quote):**
+```
+2. Accept with Framing return on capacity	Plausible next step
+```
+**Required correction:**
+```
+2. Accept with Framing return on capacity	Required next step
+```
+**Source:** AI2 line 128: '2. Accept with Framing return on capacity	Required'; CROSS_REVIEW resolution: 'Strengthen with AI2: recommend Framing return on capacity as the explicit next design question'
+
+### V-2 (substantive)
+**Affected language (quote):**
+```
+3. Pilot / monitor using ESCALATE list + type concentration	Possible methodological follow-up
+```
+**Required correction:**
+```
+3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot	Possible methodological follow-up
+```
+**Source:** AI2 line 129: 'Monitor types only; no row-level pilot that generates work'; CROSS_REVIEW resolution: 'type-aggregate monitoring only if any follow-up'
+
+### V-3 (substantive)
+**Affected language (quote):**
+```
+131,968 requests (59.4%)
+```
+**Required correction:**
+```
+131,968 requests (59.4%)
+
+WCA2 alone supplies 64,922 of these (49.2% of ESCALATE), so the ESCALATE volume is concentrated in one service type.
+```
+**Source:** AI3 line 75: 'WCA2 share of ESCALATE	64,922 / 131,968	0.491952595 = 49.1953%	49.2%	OK'; CROSS_REVIEW material agreement 2: 'Portfolio numbers and WCA2 concentration are accepted'
+
+### V-4 (substantive)
+**Affected language (quote):**
+```
+Exact reconciliation: 0 disagreements across 222,002 rows
+```
+**Required correction:**
+```
+Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)
+```
+**Source:** AI3 line 26: 'LINEAGE_ATTESTATION.md	SHA-256 lineage	Listed-only - no SHA values shown in package'; CROSS_REVIEW resolution: 'Qualify with AI3: evidence package for interpretation should include LINEAGE SHA table inline next time'
+
+### V-5 (substantive)
+**Affected language (quote):**
+```
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
+```
+**Required correction:**
+```
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.
+```
+**Source:** AI2 line 122: 'Accept frozen labels as the Stage 5 methodology assignment + Framing return on capacity.'; INTERPRETATION_RECONCILIATION: 'Accept labels + Framing return on capacity'
+
+### V-6 (presentational)
+**Affected language (quote):**
+```
+Is this conversation helpful so far?
+```
+**Required correction:**
+```
+(delete the quoted line)
+```
+**Source:** coordinator: chat-interface artifact at the end of the AI1 capture; delete
+
+---
+# DIFF of the interpretation, original → revised (unified, 3 lines of context)
+```diff
+--- AI1_INTERPRETATION (original)
++++ AI1_INTERPRETATION_REVISED
+@@ -29,7 +29,7 @@
+ 
+ Fixtures: 14/14 passed in both paths
+ 
+-Exact reconciliation: 0 disagreements across 222,002 rows
++Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)
+ 
+ Workflow gate: PASS
+ 
+@@ -146,6 +146,8 @@
+ 
+ 131,968 requests (59.4%)
+ 
++WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.
++
+ For a small-shift attention model, this volume may be impractical.
+ 
+ However, resolving this would require reopening framing questions around:
+@@ -163,12 +165,12 @@
+ 6. Decision-Option Matrix
+ Option	Assessment	Evidence Status	Rationale
+ 1. Accept frozen labels as Stage 5 portfolio assignment	Supported	Validated	The strongest match to the locked simulation objective. Preserves Stage 3/4 integrity.
+-2. Accept with Framing return on capacity	Plausible next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
+-3. Pilot / monitor using ESCALATE list + type concentration	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
++2. Accept with Framing return on capacity	Required next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
++3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
+ 4. No operational action — methodology evidence only	Supported	Validated	Appropriate because Dataset 2 of 3 is a methodology evaluation.
+ 5. Do not invent City SLA, live dispatch, or employee scoring	Required constraint	Validated	Violating this would exceed the conclusion ceiling.
+ 7. Primary Recommendation
+-Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
++Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.
+ 
+ Evidence status: Validated
+ 
+@@ -249,4 +251,4 @@
+ 
+ The evidence supports using the output as a simulation assignment, while leaving real-world dispatch implications unresolved.
+ 
+-Is this conversation helpful so far?
++
+```
+
+---
+# AI1_INTERPRETATION_REVISED (after revision) (sha256 c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63)
+# AI1 Interpretation — Stage 5 Independent First Pass
+
+- **Model/mode:** GPT-5.6 Sol, Chat, High thinking effort (3 of 4; Pro 4 of 4 required upgrade)
+- **Timestamp:** Saturday, Sep 19, 2026, 2:11 PM (UTC-5)
+- **Blindness attestation:** I did not see AI2/AI3 outputs; this is an independent first pass.
+
+---
+
+AI 1 — Evidence Synthesis and Recommendation Builder
+Chicago 311 Dispatch Priority — Stage 5 Independent First Pass
+1. Direct Answer (CQ-F02 under locked TCD-IG)
+
+Direct answer: Under the locked TCD-IG portfolio-simulation rules, the frozen assignment identifies 131,968 requests as ESCALATE, 6,377 as INCONCLUSIVE, and 83,657 as STANDARD at κ=2.0.
+
+Evidence status: Validated
+
+The assignment provides a reproducible simulation partition of open eligible 311 requests in the frozen decision window. The ESCALATE group represents requests that satisfy the locked type-conditional dormancy and integrity-gate logic. INCONCLUSIVE requests are separated because they lack sufficient peer evidence or contain missing peer conditions.
+
+This result supports the methodological question of whether the framework can produce a defensible portfolio assignment. It does not establish a City dispatch priority rule, an official SLA, or that ESCALATE requests are objectively more urgent in real operations.
+
+2. Strongest Evidence
+A. Independent execution and reconciliation
+
+Evidence status: Validated
+
+The strongest evidence is the Stage 4 validation chain:
+
+Source Gate: PASS
+
+Fixtures: 14/14 passed in both paths
+
+Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)
+
+Workflow gate: PASS
+
+Stage5_allowed=true
+
+This establishes that the frozen assignment was generated consistently under the locked design.
+
+B. Frozen portfolio assignment at κ=2.0
+
+Evidence status: Validated
+
+The portfolio output:
+
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+
+The framework successfully produces a three-way classification rather than forcing uncertain cases into binary decisions.
+
+C. INCONCLUSIVE separation
+
+Evidence status: Validated
+
+All INCONCLUSIVE cases are:
+
+thin_type_or_missing_peer
+
+This indicates the uncertainty category is not arbitrary; it reflects insufficient comparison evidence under the locked peer-based method.
+
+D. Sensitivity across κ values
+
+Evidence status: Sensitivity-dependent
+
+Descriptive κ sensitivity:
+
+κ	ESCALATE
+1.0	152,292
+1.5	140,340
+2.0	131,968
+3.0	118,246
+
+The direction is stable: stricter thresholds reduce ESCALATE volume.
+
+However, the exact portfolio size is dependent on κ selection.
+
+3. Hypothesis Evaluation
+“Warrant elevation via type-conditional dormancy”
+Interpretation
+
+Within this simulation, “warrant elevation via type-conditional dormancy” means:
+
+A request receives ESCALATE status when its unresolved duration is evaluated as unusually dormant relative to comparable request types, while passing integrity conditions.
+
+The hypothesis being tested is not:
+
+“These requests are truly urgent.”
+
+The tested hypothesis is:
+
+“A structured comparison against type-specific peer behavior can create a defensible portfolio separation between requests needing elevation review and those without the same evidence.”
+
+Evaluation
+
+Assessment: Supported with limitation
+
+Evidence supporting the hypothesis:
+
+The method produces a stable assignment under locked rules.
+
+The validation framework confirms reproducibility.
+
+The approach separates uncertain cases rather than hiding uncertainty.
+
+The κ grid shows monotonic sensitivity rather than random instability.
+
+Limitations:
+
+The method does not establish real-world urgency.
+
+No City SLA exists in this analysis.
+
+No causal relationship between dormancy and service failure is demonstrated.
+
+Conclusion: The hypothesis is supported as a simulation classification mechanism, not as a validated operational dispatch rule.
+
+4. What the Evidence Does Not Establish
+
+The evidence does not establish:
+
+That ESCALATE requests require immediate City action.
+
+That ESCALATE requests represent service failures.
+
+That STANDARD requests are not important.
+
+That employee performance caused any observed patterns.
+
+That WCA2 concentration indicates a specific operational cause.
+
+That κ=2.0 is the optimal operational threshold.
+
+That the portfolio allocation fits real staffing capacity.
+
+The analysis remains within the conclusion ceiling:
+
+Portfolio simulation only.
+
+5. Most Important Caveat
+
+Most important caveat: ESCALATE volume may exceed realistic operational capacity, but ranking and capacity optimization were explicitly out of scope.
+
+At κ=2.0, ESCALATE includes:
+
+131,968 requests (59.4%)
+
+WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.
+
+For a small-shift attention model, this volume may be impractical.
+
+However, resolving this would require reopening framing questions around:
+
+capacity constraints,
+
+prioritization,
+
+ranking,
+
+operational workflows.
+
+The current framework intentionally stops before that step.
+
+6. Decision-Option Matrix
+Option	Assessment	Evidence Status	Rationale
+1. Accept frozen labels as Stage 5 portfolio assignment	Supported	Validated	The strongest match to the locked simulation objective. Preserves Stage 3/4 integrity.
+2. Accept with Framing return on capacity	Required next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
+3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
+4. No operational action — methodology evidence only	Supported	Validated	Appropriate because Dataset 2 of 3 is a methodology evaluation.
+5. Do not invent City SLA, live dispatch, or employee scoring	Required constraint	Validated	Violating this would exceed the conclusion ceiling.
+7. Primary Recommendation
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.
+
+Evidence status: Validated
+
+The current evidence supports acceptance of the assignment as a completed simulation artifact because:
+
+execution integrity passed,
+
+reconciliation passed,
+
+labels were generated under locked rules,
+
+uncertainty was explicitly separated.
+
+No operational dispatch recommendation should be made from this package alone.
+
+8. Monitoring Plan
+
+If the methodology proceeds to further evaluation:
+
+A. Monitor assignment stability
+
+Track:
+
+ESCALATE share under κ variations,
+
+changes in INCONCLUSIVE proportion,
+
+type concentration shifts.
+
+Status: Sensitivity-dependent
+
+B. Monitor unresolved analytical questions
+
+Track whether future stages require:
+
+capacity-aware framing,
+
+ranking logic,
+
+additional decision options.
+
+C. Preserve validation controls
+
+Maintain:
+
+lineage records,
+
+reconciliation checks,
+
+independent execution paths.
+
+Status: Validated requirement
+
+9. Next Analytical Question
+Proposed next question:
+
+“Given that the frozen TCD-IG portfolio assignment identifies a large ESCALATE population, what additional decision framing is required to evaluate capacity-aware prioritization without altering the validated Stage 3/4 assignment?”
+
+This question preserves the existing evidence while identifying the next unresolved decision boundary.
+
+10. Weakest Bridge in My Own Reasoning
+
+The weakest bridge is:
+
+Moving from “the framework reliably identifies type-conditional dormancy patterns” to “those patterns represent meaningful attention priorities.”
+
+The first claim is supported by validation.
+
+The second requires additional operational evidence that is outside this package.
+
+Therefore:
+
+Methodological reliability: Validated
+
+Portfolio interpretation: Validated with limitation
+
+Operational priority meaning: Not established
+
+The evidence supports using the output as a simulation assignment, while leaving real-world dispatch implications unresolved.
+
+---
+Reminder: per-revision table, findings, overall verdict. Finish with the line: END C44 AI3 DELTA RE-REVIEW
+````
+
+---
+## FULL packet (what the FULL reviewer received) — `C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt` (sha256 dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96, 58214 bytes, verbatim)
+````
+# Chicago 311 Dataset 2 — Stage 5 — AI 3 — Claim-to-Evidence and Numerical Auditor (SECOND AUDIT, after revisions)
+
+You are AI 3 in the Three-AI Interpretation and Recommendation Framework for Chicago 311 Dataset 2.
+
+**Mode:** DeepThink on. **This is the second audit** (Stage 5 flow: "Revision required → Revise interpretation and re-audit"). The first audit round (AI 2, AI 3, cross-review) asked AI 1 for the revisions V-1..V-6 below. The coordinator applied them. You now audit the revised interpretation.
+Everything you need is in this message: the evidence package and deeper CSVs, the original AI 1 interpretation, the first-round reviews, the revision request, and the revised interpretation. There are no attachments and no tools. Use only this material.
+
+## Your job
+Check the revised interpretation as the claim-to-evidence and numerical auditor: for each required revision, compare the revised text with the requested correction character for character, recompute every number in the revised text from the evidence package and deeper CSVs (shares from counts, to the stated precision), and list any number, claim or wording in the revised text that differs from the request or is not supported by the evidence.
+
+## Reply format (all three parts, in this order)
+1. **Per-revision verification table**, one row per revision V-1..V-6: `V-n | applied exactly? (YES / NO / PARTIAL) | what the revised text says (quote) | what was requested (quote) | difference, if any`.
+2. **Findings**, one row each: `id | severity BLOCKING / MATERIAL / MINOR | relates_to V-n (a revision), NEW (something the revision added or changed that was not requested), or PRE (something in the original text that the revisions did not touch) | quote from the revised text | precise correction`. If there are no findings, write `none`.
+   - BLOCKING = the revised interpretation cannot be released as is. MATERIAL = a wrong number, claim or recommendation that a reader would act on. MINOR = wording or presentation.
+3. **Overall verdict:** one of `PASS` / `PASS WITH REQUIRED REVISIONS` / `FAIL`, with one paragraph of reasons.
+Reply in full, in one message. End your reply with exactly this line:
+END C48 AI3 SECOND AUDIT
+
+---
+# INPUT INVENTORY (SHA-256 of each input, as frozen by the coordinator)
+| input | bytes | sha256 |
+|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | 4051 | `c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7` |
+| deeper/STAGE5_DEEPER_FINDINGS.md | 2007 | `49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6` |
+| deeper/capacity_coverage_note.csv | 644 | `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` |
+| deeper/escalate_by_type_top25.csv | 1264 | `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` |
+| deeper/inconclusive_by_clause.csv | 58 | `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` |
+| deeper/independent_checks_critical_counts.csv | 190 | `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` |
+| deeper/kappa_sensitivity.csv | 164 | `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` |
+| deeper/portfolio_summary.csv | 183 | `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` |
+| reviews/AI2_DECISION_METHOD_CRITIC.md | 10039 | `ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a` |
+| reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md | 9860 | `9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1` |
+| reviews/CROSS_REVIEW.md | 3651 | `9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457` |
+| reviews/INTERPRETATION_RECONCILIATION.md | 1122 | `80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462` |
+| AI1_INTERPRETATION (original, before revision) | 7929 | `73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932` |
+| AI1_INTERPRETATION_REVISED (after revision) | 8215 | `c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63` |
+| REVISION_REQUEST (V-1..V-6, JSON) | 2651 | `970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4` |
+
+---
+# EVIDENCE: STAGE5_EVIDENCE_PACKAGE.md (sha256 c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7)
+# Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)
+
+**Package version:** stage5-evidence-v1  
+**Prepared:** 2026-09-19 CT  
+**ML mode:** None  
+**Conclusion ceiling:** Portfolio-simulation assignment under locked TCD-IG rules — **not** City SLA, not live dispatch, not employee scoring, not causal claims about City performance.
+
+## File inventory (retrieved / used)
+
+| File | Role |
+|------|------|
+| docs/stage-01-02-start-framing/stage1_decision.json | Start lock |
+| docs/stage-01-02-start-framing/stage2_framing.json | Framing CQ-F02 |
+| docs/stage-03-measurement-design/stage3_locked_design.json | Design `stage3-v1-tcd-ig` |
+| docs/stage-04-execution-validation/stage4_validation_status.json | Stage 4 PASS |
+| docs/stage-04-execution-validation/WORKFLOW_GATE_RECEIPT.md | Workflow gate PASS |
+| validation/workflow-gate/workflow_gate_status.json | Machine gate result |
+| validation/reconciliation/RECON_SUMMARY.csv | Exact recon 222002/222002 |
+| validation/cross-review/structural_cross_review.md | Structural PASS |
+| docs/stage-04-execution-validation/LINEAGE_ATTESTATION.md | SHA-256 lineage |
+| outputs/validated_action_list.csv | Frozen ESCALATE list n=131968 |
+| stage-05/deeper/portfolio_summary.csv | Deeper portfolio |
+| stage-05/deeper/escalate_by_type_top25.csv | Type concentration |
+| stage-05/deeper/inconclusive_by_clause.csv | INCONCLUSIVE mix |
+| stage-05/deeper/kappa_sensitivity.csv | κ grid descriptive |
+| stage-05/deeper/independent_checks_critical_counts.csv | Critical checks PASS |
+| stage-05/deeper/capacity_coverage_note.csv | Capacity FLAG only |
+| stage-05/deeper/STAGE5_DEEPER_FINDINGS.md | Deeper narrative |
+
+## Locked decision / question
+
+- **Decision owner:** (project) Dana Brooks simulation / Mark as methodology owner  
+- **CQ-F02:** Among open eligible 311 requests in the frozen decision window, which requests should receive ESCALATE, INCONCLUSIVE, and STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, without inventing an official City SLA)?
+
+## Locked measurement (Stage 3)
+
+- Construct: TCD-IG (type-conditional dormancy + integrity gate)  
+- T_freeze: 2026-09-12 23:59:59 America/Chicago  
+- Knob κ=2.0 (grid {1, 1.5, 2, 3} descriptive only)  
+- W=365d, n_min=50 (constants, not knobs)  
+- selected := (action == ESCALATE); **RANKING_NOT_IN_SCOPE**  
+- open_age_h diagnostic only — not escalate trigger  
+- Peer P75 = empirical Completed-peer statistic — never City SLA
+
+## Validated Stage 4 facts (do not invent beyond these)
+
+- Source Gate PASS; fixtures 14/14 both paths; exact recon **0** disagreements on 222,002 rows  
+- Portfolio at κ=2: ESCALATE **131,968** (59.4%) · INCONCLUSIVE **6,377** (2.9%) · STANDARD **83,657** (37.7%)  
+- All INCONCLUSIVE = `thin_type_or_missing_peer`  
+- Top ESCALATE types: WCA2 64,922 (49.2% of ESCALATE); SED 17,254 (13.1%); SKA 7,316 (5.5%)  
+- κ sensitivity (descriptive): ESCALATE 152,292 / 140,340 / 131,968 / 118,246 at κ=1 / 1.5 / 2 / 3  
+- Clock-parse repair: first run 104-row ESCALATE/STANDARD mismatch (~5h tz); fixed; recon clean  
+- Workflow gate: PASS, stage5_allowed=true
+
+## Available decision options (simulation — for recommendation proportionality)
+
+1. **Accept frozen labels as the Stage 5 portfolio assignment** for methodology evaluation / Dana Brooks simulation.  
+2. **Accept with Framing return** on capacity: ESCALATE volume exceeds any small shift budget; ranking still out of scope unless Framing reopens.  
+3. **Pilot / monitor** using ESCALATE list + type concentration (esp. WCA2) without live dispatch.  
+4. **No operational action** — treat as methodology evidence only (Dataset 2 of 3).  
+5. **Do not** invent City SLA, live dispatch, or employee scoring.
+
+## Constraints
+
+- Do not reopen Stage 3/4 locks in prose.  
+- Do not claim causal City performance.  
+- Human owner retains final authority.
+
+---
+# EVIDENCE: deeper/STAGE5_DEEPER_FINDINGS.md (sha256 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6)
+# Stage 5 — Deeper findings (frozen pack)
+
+**When:** 2026-09-19 CT  
+**Inputs:** Validation Gate freeze + workflow_gate PASS  
+**ML mode:** None
+
+## Independent checks
+
+All critical counts match freeze: decision 222,002 · ESCALATE 131,968 · INCONCLUSIVE 6,377 · STANDARD 83,657 · validated_action_list 131,968.
+
+## Portfolio (κ = 2)
+
+| Label | n | Share of decision set |
+|-------|--:|----------------------:|
+| ESCALATE | 131,968 | 59.4% |
+| INCONCLUSIVE | 6,377 | 2.9% |
+| STANDARD | 83,657 | 37.7% |
+
+## ESCALATE concentration by type
+
+Top type_keys (share of ESCALATE):
+
+| type_key | n | share | cum |
+|----------|--:|------:|----:|
+| WCA2 | 64,922 | 49.2% | 49.2% |
+| SED | 17,254 | 13.1% | 62.3% |
+| SKA | 7,316 | 5.5% | 67.8% |
+| PBD | 3,937 | 3.0% | 70.8% |
+| PHF | 3,371 | 2.6% | 73.4% |
+
+WCA2 alone is about half of all ESCALATE rows. Cumulatively the top 3 types are ~68% of ESCALATE.
+
+## INCONCLUSIVE
+
+100% of INCONCLUSIVE (6,377) are `thin_type_or_missing_peer` (peer_n < n_min or missing peer). No other integrity clause appears in the frozen production labels.
+
+## κ sensitivity (descriptive; κ=2 remains locked)
+
+| κ | ESCALATE | STANDARD |
+|--:|---------:|---------:|
+| 1.0 | 152,292 | 63,333 |
+| 1.5 | 140,340 | 75,285 |
+| 2.0 | 131,968 | 83,657 |
+| 3.0 | 118,246 | 97,379 |
+
+INCONCLUSIVE stays 6,377 across the grid (integrity, not κ).
+
+## Capacity note (Framing flag only)
+
+ESCALATE = 131,968. Under illustrative shift budgets of 50 / 200 / 1,000 slots, coverage is near zero. Per locked Stage 3: **RANKING_NOT_IN_SCOPE** — if the owner needs a hard attention cap, return to Framing with a new question; do not invent ranking inside this design.
+
+## Method caveats for interpretation
+
+- Labels are portfolio-simulation under TCD-IG, **not** City SLA or live dispatch.
+- High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+---
+# EVIDENCE: deeper/capacity_coverage_note.csv (sha256 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609)
+label,attention_slots,escalate_n,coverage,note
+illustrative_shift_50,50,131968,0.00037887972841901065,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+illustrative_shift_200,200,131968,0.0015155189136760426,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+illustrative_shift_1000,1000,131968,0.0075775945683802136,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+---
+# EVIDENCE: deeper/escalate_by_type_top25.csv (sha256 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176)
+type_key,n_ESCALATE,share_of_escalate,cum_share
+WCA2,64922,0.4919525945683802,0.4919525945683802
+SED,17254,0.1307438166828322,0.6226964112512123
+SKA,7316,0.05543768186226964,0.678134093113482
+PBD,3937,0.0298329898157129,0.707967082929195
+PHF,3371,0.0255440712900097,0.7335111542192047
+BBD,3298,0.024990906886517943,0.7585020611057226
+WCA3,2867,0.02172496362754607,0.7802270247332687
+SFB,2603,0.019724478661493697,0.7999515033947623
+SEE,2593,0.019648702715809895,0.8196002061105723
+GRAF,1962,0.01486724054316198,0.8344674466537342
+SFK,1922,0.01456413676042677,0.849031583414161
+PBS,1884,0.014276188166828322,0.8633077715809893
+SFD,1719,0.013025885063045587,0.8763336566440348
+CHECKFOR,1516,0.011487633365664404,0.8878212900096993
+AAE,1325,0.010040312803103782,0.897861602812803
+BBA,1237,0.009373484481086323,0.9072350872938894
+PCL,1098,0.008320198836081474,0.9155552861299708
+PHB,1023,0.007751879243452958,0.9233071653734238
+SEC,1011,0.0076609481086323955,0.9309681134820562
+SEL,884,0.006698593598448109,0.9376667070805044
+ESPC,703,0.00532704898157129,0.9429937560620756
+PCE,692,0.005243695441319108,0.9482374515033948
+SIE,508,0.0038494180407371483,0.9520868695441319
+AAD,502,0.003803952473326867,0.9558908220174588
+WCA,460,0.0034856935014548982,0.9593765155189137
+
+---
+# EVIDENCE: deeper/inconclusive_by_clause.csv (sha256 f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d)
+integrity_clause,n,share
+thin_type_or_missing_peer,6377,1
+
+---
+# EVIDENCE: deeper/independent_checks_critical_counts.csv (sha256 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146)
+check,expected,observed,pass
+n_decision,222002,222002,TRUE
+n_ESCALATE,131968,131968,TRUE
+n_INCONCLUSIVE,6377,6377,TRUE
+n_STANDARD,83657,83657,TRUE
+validated_action_list_n,131968,131968,TRUE
+
+---
+# EVIDENCE: deeper/kappa_sensitivity.csv (sha256 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a)
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+1,222002,152292,6377,63333
+1.5,222002,140340,6377,75285
+2,222002,131968,6377,83657
+3,222002,118246,6377,97379
+
+---
+# EVIDENCE: deeper/portfolio_summary.csv (sha256 b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167)
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa
+222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+---
+# AI1_INTERPRETATION (original, before revision) (sha256 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932)
+# AI1 Interpretation — Stage 5 Independent First Pass
+
+- **Model/mode:** GPT-5.6 Sol, Chat, High thinking effort (3 of 4; Pro 4 of 4 required upgrade)
+- **Timestamp:** Saturday, Sep 19, 2026, 2:11 PM (UTC-5)
+- **Blindness attestation:** I did not see AI2/AI3 outputs; this is an independent first pass.
+
+---
+
+AI 1 — Evidence Synthesis and Recommendation Builder
+Chicago 311 Dispatch Priority — Stage 5 Independent First Pass
+1. Direct Answer (CQ-F02 under locked TCD-IG)
+
+Direct answer: Under the locked TCD-IG portfolio-simulation rules, the frozen assignment identifies 131,968 requests as ESCALATE, 6,377 as INCONCLUSIVE, and 83,657 as STANDARD at κ=2.0.
+
+Evidence status: Validated
+
+The assignment provides a reproducible simulation partition of open eligible 311 requests in the frozen decision window. The ESCALATE group represents requests that satisfy the locked type-conditional dormancy and integrity-gate logic. INCONCLUSIVE requests are separated because they lack sufficient peer evidence or contain missing peer conditions.
+
+This result supports the methodological question of whether the framework can produce a defensible portfolio assignment. It does not establish a City dispatch priority rule, an official SLA, or that ESCALATE requests are objectively more urgent in real operations.
+
+2. Strongest Evidence
+A. Independent execution and reconciliation
+
+Evidence status: Validated
+
+The strongest evidence is the Stage 4 validation chain:
+
+Source Gate: PASS
+
+Fixtures: 14/14 passed in both paths
+
+Exact reconciliation: 0 disagreements across 222,002 rows
+
+Workflow gate: PASS
+
+Stage5_allowed=true
+
+This establishes that the frozen assignment was generated consistently under the locked design.
+
+B. Frozen portfolio assignment at κ=2.0
+
+Evidence status: Validated
+
+The portfolio output:
+
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+
+The framework successfully produces a three-way classification rather than forcing uncertain cases into binary decisions.
+
+C. INCONCLUSIVE separation
+
+Evidence status: Validated
+
+All INCONCLUSIVE cases are:
+
+thin_type_or_missing_peer
+
+This indicates the uncertainty category is not arbitrary; it reflects insufficient comparison evidence under the locked peer-based method.
+
+D. Sensitivity across κ values
+
+Evidence status: Sensitivity-dependent
+
+Descriptive κ sensitivity:
+
+κ	ESCALATE
+1.0	152,292
+1.5	140,340
+2.0	131,968
+3.0	118,246
+
+The direction is stable: stricter thresholds reduce ESCALATE volume.
+
+However, the exact portfolio size is dependent on κ selection.
+
+3. Hypothesis Evaluation
+“Warrant elevation via type-conditional dormancy”
+Interpretation
+
+Within this simulation, “warrant elevation via type-conditional dormancy” means:
+
+A request receives ESCALATE status when its unresolved duration is evaluated as unusually dormant relative to comparable request types, while passing integrity conditions.
+
+The hypothesis being tested is not:
+
+“These requests are truly urgent.”
+
+The tested hypothesis is:
+
+“A structured comparison against type-specific peer behavior can create a defensible portfolio separation between requests needing elevation review and those without the same evidence.”
+
+Evaluation
+
+Assessment: Supported with limitation
+
+Evidence supporting the hypothesis:
+
+The method produces a stable assignment under locked rules.
+
+The validation framework confirms reproducibility.
+
+The approach separates uncertain cases rather than hiding uncertainty.
+
+The κ grid shows monotonic sensitivity rather than random instability.
+
+Limitations:
+
+The method does not establish real-world urgency.
+
+No City SLA exists in this analysis.
+
+No causal relationship between dormancy and service failure is demonstrated.
+
+Conclusion: The hypothesis is supported as a simulation classification mechanism, not as a validated operational dispatch rule.
+
+4. What the Evidence Does Not Establish
+
+The evidence does not establish:
+
+That ESCALATE requests require immediate City action.
+
+That ESCALATE requests represent service failures.
+
+That STANDARD requests are not important.
+
+That employee performance caused any observed patterns.
+
+That WCA2 concentration indicates a specific operational cause.
+
+That κ=2.0 is the optimal operational threshold.
+
+That the portfolio allocation fits real staffing capacity.
+
+The analysis remains within the conclusion ceiling:
+
+Portfolio simulation only.
+
+5. Most Important Caveat
+
+Most important caveat: ESCALATE volume may exceed realistic operational capacity, but ranking and capacity optimization were explicitly out of scope.
+
+At κ=2.0, ESCALATE includes:
+
+131,968 requests (59.4%)
+
+For a small-shift attention model, this volume may be impractical.
+
+However, resolving this would require reopening framing questions around:
+
+capacity constraints,
+
+prioritization,
+
+ranking,
+
+operational workflows.
+
+The current framework intentionally stops before that step.
+
+6. Decision-Option Matrix
+Option	Assessment	Evidence Status	Rationale
+1. Accept frozen labels as Stage 5 portfolio assignment	Supported	Validated	The strongest match to the locked simulation objective. Preserves Stage 3/4 integrity.
+2. Accept with Framing return on capacity	Plausible next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
+3. Pilot / monitor using ESCALATE list + type concentration	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
+4. No operational action — methodology evidence only	Supported	Validated	Appropriate because Dataset 2 of 3 is a methodology evaluation.
+5. Do not invent City SLA, live dispatch, or employee scoring	Required constraint	Validated	Violating this would exceed the conclusion ceiling.
+7. Primary Recommendation
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
+
+Evidence status: Validated
+
+The current evidence supports acceptance of the assignment as a completed simulation artifact because:
+
+execution integrity passed,
+
+reconciliation passed,
+
+labels were generated under locked rules,
+
+uncertainty was explicitly separated.
+
+No operational dispatch recommendation should be made from this package alone.
+
+8. Monitoring Plan
+
+If the methodology proceeds to further evaluation:
+
+A. Monitor assignment stability
+
+Track:
+
+ESCALATE share under κ variations,
+
+changes in INCONCLUSIVE proportion,
+
+type concentration shifts.
+
+Status: Sensitivity-dependent
+
+B. Monitor unresolved analytical questions
+
+Track whether future stages require:
+
+capacity-aware framing,
+
+ranking logic,
+
+additional decision options.
+
+C. Preserve validation controls
+
+Maintain:
+
+lineage records,
+
+reconciliation checks,
+
+independent execution paths.
+
+Status: Validated requirement
+
+9. Next Analytical Question
+Proposed next question:
+
+“Given that the frozen TCD-IG portfolio assignment identifies a large ESCALATE population, what additional decision framing is required to evaluate capacity-aware prioritization without altering the validated Stage 3/4 assignment?”
+
+This question preserves the existing evidence while identifying the next unresolved decision boundary.
+
+10. Weakest Bridge in My Own Reasoning
+
+The weakest bridge is:
+
+Moving from “the framework reliably identifies type-conditional dormancy patterns” to “those patterns represent meaningful attention priorities.”
+
+The first claim is supported by validation.
+
+The second requires additional operational evidence that is outside this package.
+
+Therefore:
+
+Methodological reliability: Validated
+
+Portfolio interpretation: Validated with limitation
+
+Operational priority meaning: Not established
+
+The evidence supports using the output as a simulation assignment, while leaving real-world dispatch implications unresolved.
+
+Is this conversation helpful so far?
+
+---
+# FIRST-ROUND REVIEW: reviews/AI2_DECISION_METHOD_CRITIC.md (sha256 ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a)
+# AI2 — Decision and Methodological Critic
+
+- **Model/mode used:** Grok — Expert (Comprehensive unavailable in the selector; Expert selected in the UI)
+- **Timestamp (CT):** 2026-09-19 14:29 CT
+- **Blindness attestation:** I did NOT open or read AI1_INTERPRETATION_BUILDER.md or any AI1 output.
+- **Extraction:** Full reply extracted from the Grok page DOM via evaluate (not clipboard).
+
+---
+
+Mode: Comprehensive. AI 1’s draft was not used. Type names below are public 311 short-code mappings used only to interpret concentration (WCA2 = Water Lead Test Kit Request; SED = Tree Planting Request; SKA = Abandoned Vehicle Complaint). They are not City performance grades.
+
+The full pass is also saved as artifacts/AI2_CQ-F02_Independent_First_Pass.md.
+AI2_CQ-F02_Independent_First_Pass.md
+Document · 23.83 KB
+Download
+
+1. Direct answer to CQ-F02
+
+Under locked TCD-IG (κ = 2, W = 365d, n_min = 50), the validated labels are the simulation assignment:
+
+Action	n	Share of 222,002
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9% (all thin_type_or_missing_peer)
+STANDARD	83,657	37.7%
+
+That partition is recon-clean and gate-clean. It does not satisfy the purpose clause of CQ-F02 (“limited shift attention”). A 59.4% majority class with ranking out of scope is a census of the open book, not a focus list.
+
+Type concentration is the operational fact inside the census: WCA2 64,922 (49.2% of ESCALATE), SED 17,254 (13.1%), SKA 7,316 (5.5%). Top three = 67.8% of every ESCALATE row. Nearly half the “elevate” set is a DWM kit product, not a crew ticket.
+
+Simulation answer: accept the three-way labels as the locked portfolio assignment.
+
+Operational answer: do not dispatch from the 131,968-row file.
+
+2. Strongest rival interpretation
+
+Not “just escalate the dormant ones.”
+
+TCD-IG is mostly measuring completed-peer selection plus type-structural queue shape. The trigger compares open dormancy to κ × P75 of Completed peers. Completed jobs are the ones that finished. Open inventory is the residual: kit backorders, seasonal planting waitlists, statutory notice clocks, resident-action gaps. In any right-skewed type, that comparison has a built-in positive-flag bias.
+
+The grid confirms it is not a sparse-exception detector: ESCALATE is 152k / 140k / 132k / 118k at κ = 1 / 1.5 / 2 / 3. At κ = 3 the class is still 53.3%. That is what a selection-biased threshold does to a mature open book.
+
+Type mechanics make the rival concrete:
+
+WCA2 — kit order / mail / resident use. Open age past 2× completed-kit P75 is compatible with designed program latency.
+SED — planting windows. Completed peers landed in-season; open SED is next season’s queue. The waitlist will look “dormant” by construction.
+SKA — closer to field work, but notice / claim / tow windows accrue clock time while the process is working.
+
+So 131,968 ESCALATE rows are a type-conditional long-tail census, dominated by two structurally slow programs and one legally gated field type. They are not 131,968 units of neglect a shift can clear.
+
+3. Strongest alternative recommendation
+
+Keep the frozen labels as a methodology artifact. Do not treat the file as a work queue.
+
+Accept the assignment for Dataset 2 / Dana Brooks simulation (recon is clean; the construct did what it was locked to do).
+Return capacity to Framing. “Limited shift attention” and “132k unranked ESCALATE rows” cannot be jointly satisfied. Framing must reopen ranking, redefine the action as type-level, or drop the purpose clause.
+Monitor at type-aggregate only — WCA2 / SED / SKA aging versus completed-peer P75. No work orders, no employee scoring, no P75-as-SLA.
+Do not raise κ as a capacity fix. κ is descriptive-only; κ = 3 still leaves 118k flags. Volume is a construct-and-inventory property, not a Stage 5 knob problem.
+4. Statistical vs practical significance
+
+Statistically large, operationally weak.
+
+Statistical: exact 222,002-row recon; monotone κ path; WCA2 at 49.2% of ESCALATE is decisive as a concentration fact; INCONCLUSIVE is small and single-clause, so the integrity gate is not eating the book.
+
+Practical: CQ-F02’s success criterion is focus under scarce attention. A class that holds three in five eligible rows cannot allocate scarce attention. Moving κ from 2 to 3 “saves” ~13.7k rows — visible, useless as a capacity fix. open_age_h is diagnostic only, so there is no legal fallback rank inside the lock. Capacity is FLAG-only: no shift-hour denominator, no clearance elasticity.
+
+Do not launder “large n” into “therefore escalate.” Large n here means the construct is coarse relative to the purpose clause.
+
+5. Causal-ceiling assessment
+
+Ceiling: descriptive portfolio assignment under a locked rule. The package may say which rows met TCD-IG at T_freeze. It may not say the City missed a SLA, that staff neglected work, that elevating these rows would shorten cycle time, or that WCA2 volume means Water Management is failing.
+
+Peer P75 is locked as never a City SLA. Crossing 2× P75 is not a breach. There is no treatment, no counterfactual, no capacity model. Clock-parse residue (104 rows, ~5h, repaired) is negligible next to multi-day dormancy and does not reopen causality.
+
+Any sentence that converts ESCALATE into a performance grade crosses the ceiling.
+
+6. Alternative-Explanation Ledger
+#	Rival	Why it can produce this portfolio
+R1	Completed-peer selection / survivorship	P75 lives on finished jobs; open stock is the residual. Explains majority flags even at κ = 3.
+R2	Type-structural / program-design queues	WCA2 kit logistics + SED seasonal waitlist = 62.3% of ESCALATE without neglect.
+R3	Legal / statutory clocks read as dormancy	SKA notice, claim, and tow windows accrue time while process is working.
+R4	Duplicate / residual / system-open inflation	Aged administrative leftovers can pass eligibility and trip dormancy.
+R5	Window / mix shift (W = 365d)	Last year’s completed mix may not match this year’s open mix; P75 becomes a stale comparator.
+R6	Integrity gate too thin	n_min = 50 is a count floor, not a P75-stability floor. All INCONCLUSIVE being one clause can hide unstable peers inside ESCALATE.
+
+R1 + R2 are load-bearing. The others can stack.
+
+7. Risk and reversibility
+Risk	If someone operationalizes the 132k-row file	Reversibility
+Capacity blow-up / attention fragmentation	High	High in simulation; low if a work system ingests the file
+SLA creep (2× P75 quoted as “the standard”)	High, institutional	Medium — briefings stick
+Wrong-object elevation (65k kit pings)	High for WCA2/SED	High if no tickets are cut
+Employee-scoring leakage	High	Medium
+Ranking-by-stealth (CSV order, ward, open_age_h)	High process-integrity risk	High if caught before use
+Clock residue	Low (already repaired)	Already reversed
+
+Labels are cheap to keep and expensive to operationalize. That is the reversible path.
+
+8. Evidence that would change the verdict
+
+Toward Act / row-level pilot, and only if several appear together:
+
+A real capacity denominator showing a named subset is coverable.
+Framing reopens ranking or officially redefines the action as type-level.
+Process evidence that WCA2 age past 2×P75 is internal stall, not designed kit latency.
+Expected-flag rate under a stationary queue far below 59% after type stratification.
+Hold-code / duplicate / origin cuts showing a large non-WCA2, non-SED inactive slice.
+
+Toward a harder “methodology-only” hold: seasonal P75 splits that swing ESCALATE share by tens of points, or WCA2+SED remaining ≥60% after any tightening Stage 3 already allowed.
+
+None of that authorizes inventing a City SLA.
+
+9. Most important omitted result or option
+
+Omitted result: no type-conditional expected ESCALATE rate and no open-vs-completed distribution overlay — only a P75 point and a count. Without P50/P90 and the open-age histogram by type, 59% cannot be decomposed into “construct working on a long tail” vs “construct painting a waitlist.”
+
+Omitted option: a first-class type-level monitor object (WCA2/SED/SKA as watch types; row file stays a simulation artifact). The allowed menu jumps from “accept 132k labels” to “pilot the list” without that middle.
+
+Secondary: capacity note is FLAG-only, so Stage 5 can count flags and cannot yet talk about coverage. Tertiary: no origin / duplicate / owner-department cut of ESCALATE in the package summary — the cut that would have separated DWM kits from field departments immediately.
+
+10. Decision verdict and proportionality
+
+Accept frozen labels as the Stage 5 methodology assignment + Framing return on capacity.
+
+Operational stance: No action at row-level dispatch. Type-aggregate Monitor is permitted. Do not Act. Do not run a row-level Pilot that pretends to be focus.
+
+Allowed option	Position
+1. Accept frozen labels as Stage 5 assignment	Yes — simulation / methodology only
+2. Accept with Framing return on capacity	Required
+3. Pilot / monitor list + type concentration	Monitor types only; no row-level pilot that generates work
+4. No operational action (Dataset 2 of 3)	Yes for anything that touches a live queue or a person
+5. No invented SLA / dispatch / scoring	Binding
+
+Proportionality. The measurement result is large. The actionable remainder, after type structure and the ranking lock, is small. Acting on 131,968 unranked rows is disproportionate to any shift budget the purpose clause contemplates. WCA2 alone (64,922) already exceeds an honest reading of “limited attention.” Raising κ does not restore proportion.
+
+Lines not to soften:
+
+Capacity FLAG is the result, not a caveat.
+59% ESCALATE without ranking is not actionable. CSV order, ward, or open_age_h as a stealth rank violates the Stage 3 lock in spirit.
+Peer P75 × κ is not a SLA. Repeat that before the briefing, not after.
+WCA2 concentration is a construct diagnostic, not a dispatch story, until someone shows the kit process is internally stalled.
+Causal ceiling holds. This package may say what the rule labeled. It may not say the City failed, and it may not score staff.
+
+---
+# FIRST-ROUND REVIEW: reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md (sha256 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1)
+# AI3 Claim-to-Evidence and Numerical Auditor
+
+- **Model/mode:** DeepSeek — DeepThink on
+- **Timestamp (America/Chicago):** 2026-09-19 14:39:07 CDT
+- **Blindness attestation:** I did **not** open or read `AI1_INTERPRETATION_BUILDER.md` or `AI2_DECISION_METHOD_CRITIC.md`; this is an independent first pass auditing the supplied artifacts and numbers only.
+
+---
+AI 3 — Independent First-Pass Claim-to-Evidence and Numerical Audit
+
+Mode: DeepThink. Blindness: AI 1 / AI 2 not seen. Audit is artifact/number-only.
+ML mode: None. Conclusion ceiling: Portfolio-simulation assignment under locked TCD-IG rules; not City SLA, not live dispatch, not employee scoring, not causal City-performance claims.
+
+1. File inventory — Used vs Listed
+
+Status key: Used = content/claim relied on in this audit via the package text. Listed = appears in package manifest but no underlying content/hash/rows were available for independent audit.
+
+File	Role	Audit status
+docs/stage-01-02-start-framing/stage1_decision.json	Start lock	Used
+docs/stage-01-02-start-framing/stage2_framing.json	Framing CQ-F02	Used
+docs/stage-03-measurement-design/stage3_locked_design.json	Design stage3-v1-tcd-ig	Used
+docs/stage-04-execution-validation/stage4_validation_status.json	Stage 4 PASS	Used
+docs/stage-04-execution-validation/WORKFLOW_GATE_RECEIPT.md	Workflow gate PASS	Used
+validation/workflow-gate/workflow_gate_status.json	Machine gate result	Used
+validation/reconciliation/RECON_SUMMARY.csv	Exact recon 222002/222002	Used
+validation/cross-review/structural_cross_review.md	Structural PASS	Used
+docs/stage-04-execution-validation/LINEAGE_ATTESTATION.md	SHA-256 lineage	Listed-only — no SHA values shown in package
+outputs/validated_action_list.csv	Frozen ESCALATE list n=131968	Used
+stage-05/deeper/portfolio_summary.csv	Deeper portfolio	Used
+stage-05/deeper/escalate_by_type_top25.csv	Type concentration	Used
+stage-05/deeper/inconclusive_by_clause.csv	INCONCLUSIVE mix	Used
+stage-05/deeper/kappa_sensitivity.csv	κ grid descriptive	Used
+stage-05/deeper/independent_checks_critical_counts.csv	Critical checks PASS	Used
+stage-05/deeper/capacity_coverage_note.csv	Capacity FLAG only	Used as FLAG; no numeric budget
+stage-05/deeper/STAGE5_DEEPER_FINDINGS.md	Deeper narrative	Used
+2. Result Inventory — material numbers with source files
+Item	Value	Source file / package source
+Reconciled population rows	222,002	validation/reconciliation/RECON_SUMMARY.csv
+Recon disagreements	0	validation/reconciliation/RECON_SUMMARY.csv
+Fixtures	14/14 both paths	stage4_validation_status.json / Stage 4 facts
+ESCALATE count	131,968	outputs/validated_action_list.csv; portfolio_summary.csv
+INCONCLUSIVE count	6,377	portfolio_summary.csv
+STANDARD count	83,657	portfolio_summary.csv
+ESCALATE share	59.4%	portfolio_summary.csv / derived
+INCONCLUSIVE share	2.9%	portfolio_summary.csv / derived
+STANDARD share	37.7%	portfolio_summary.csv / derived
+WCA2 ESCALATE count	64,922	escalate_by_type_top25.csv
+WCA2 share of ESCALATE	49.2%	escalate_by_type_top25.csv / derived
+SED ESCALATE count	17,254	escalate_by_type_top25.csv
+SED share of ESCALATE	13.1%	escalate_by_type_top25.csv / derived
+SKA ESCALATE count	7,316	escalate_by_type_top25.csv
+SKA share of ESCALATE	5.5%	escalate_by_type_top25.csv / derived
+κ=1 ESCALATE	152,292	kappa_sensitivity.csv
+κ=1.5 ESCALATE	140,340	kappa_sensitivity.csv
+κ=2 ESCALATE	131,968	kappa_sensitivity.csv
+κ=3 ESCALATE	118,246	kappa_sensitivity.csv
+INCONCLUSIVE clause	All = thin_type_or_missing_peer	inconclusive_by_clause.csv
+Clock-parse repair	first run 104-row ESCALATE/STANDARD mismatch (~5h tz); fixed; recon clean	Stage 4 facts / STAGE5_DEEPER_FINDINGS.md
+Workflow gate	PASS, stage5_allowed=true	workflow_gate_status.json / WORKFLOW_GATE_RECEIPT.md
+T_freeze	2026-09-12 23:59:59 America/Chicago	stage3_locked_design.json
+κ knob	2.0; grid {1, 1.5, 2, 3} descriptive only	stage3_locked_design.json
+W / n_min	W=365d; n_min=50 constants	stage3_locked_design.json
+Selection rule	selected := (action == ESCALATE)	stage3_locked_design.json
+Ranking	RANKING_NOT_IN_SCOPE	stage3_locked_design.json
+Capacity	FLAG only	capacity_coverage_note.csv
+open_age_h	diagnostic only; not escalate trigger	stage3_locked_design.json
+Peer P75	empirical Completed-peer statistic; never City SLA	stage3_locked_design.json
+3. Independent checks of critical values
+
+Recomputed from counts:
+
+Check	Calculation	Result	Package value	Verdict
+ESCALATE share	131,968 / 222,002	0.594445095 = 59.4445%	59.4%	OK
+INCONCLUSIVE share	6,377 / 222,002	0.028724966 = 2.8725%	2.9%	OK
+STANDARD share	83,657 / 222,002	0.376829938 = 37.6830%	37.7%	OK
+WCA2 share of ESCALATE	64,922 / 131,968	0.491952595 = 49.1953%	49.2%	OK
+Count partition	131,968 + 6,377 + 83,657	222,002	222,002	OK
+Share sum	59.4445 + 2.8725 + 37.6830	100.0000%	100%	OK
+SED share of ESCALATE	17,254 / 131,968	0.1307438 = 13.0744%	13.1%	OK
+SKA share of ESCALATE	7,316 / 131,968	0.0554377 = 5.5438%	5.5%	OK
+κ monotonicity	152,292 > 140,340 > 131,968 > 118,246	monotone decreasing	stated	OK
+
+Arithmetic inconsistency flag: None found in the critical values. Rounding is consistent with stated percentages.
+
+4. Population, grain, and time-window verification vs locks
+Locked element	Package evidence	Audit verdict
+Population: open eligible 311 requests in frozen decision window	Recon 222,002/222,002; action counts partition to 222,002	Consistent with lock; raw eligibility filter not shown
+Grain: one row per request	Action counts sum to population; CQ-F02 states one row per request	Consistent; no unique key/raw row check available
+Time window: T_freeze 2026-09-12 23:59:59 America/Chicago	Stated in stage3 lock; clock-parse repair noted	Stated; min/max timestamps not shown, so not independently verifiable
+Selected set	ESCALATE n=131,968; selected := action == ESCALATE	Matches lock
+Ranking	RANKING_NOT_IN_SCOPE	Matches lock
+
+Limitation: The package does not include raw row-level timestamps, eligibility SQL, or unique request IDs. Population/grain/time-window are internally consistent but not independently recomputable from the shared package alone.
+
+5. Table-to-chart consistency
+
+N/A. No chart artifacts are present in the evidence package. There are tables and numeric summaries, but no charts to compare against tables.
+
+6. Model / forecast metric audit
+
+N/A — Mode None confirmed.
+No ML model, no forecast, no train/test split, no prediction metrics, no calibration/discrimination metrics. κ sensitivity is descriptive only and is not a model-selection or forecast metric.
+
+7. Decision-rule application audit
+Rule element	Audit finding
+TCD-IG order	Locked construct is type-conditional dormancy + integrity gate. Package states INCONCLUSIVE all = thin_type_or_missing_peer. Full clause order/code is not exposed, so order cannot be independently verified.
+selected := ESCALATE	Package uses ESCALATE n=131,968 and frozen list. Matches lock.
+RANKING_NOT_IN_SCOPE	No ranking output is presented; ranking remains out of scope. Matches lock.
+Decision options	Options are simulation/proportionality options only. No live dispatch, no employee scoring, no City SLA.
+Human authority	Human owner retains final authority.
+
+Limitation: TCD-IG clause-level application is only summarized; row-level rule trace is not in the package.
+
+8. Unsupported-claim list
+
+Claims the package does not support:
+
+City SLA compliance, breach, or official priority.
+
+Live dispatch, operational deployment, or real-time capacity feasibility.
+
+Employee performance scoring or productivity ranking.
+
+Causal claims about City performance, resolution speed, or outcome improvement.
+
+Ranking or prioritization within ESCALATE — ranking is explicitly out of scope.
+
+That Peer P75 is a City SLA.
+
+That WCA2 is officially a City priority type; package only reports concentration.
+
+That κ sensitivity is a tuned model or final model-selection evidence.
+
+That INCONCLUSIVE means generally uncertain beyond thin_type_or_missing_peer.
+
+That the 104-row clock-parse repair affected final labels beyond the stated fixed/recon-clean statement.
+
+That exact recon 222,002/222,002 resolves all data-quality issues beyond row reconciliation.
+
+That capacity is solved; package only has a capacity FLAG.
+
+That Stage 5 recommendation is final; human owner retains authority.
+
+9. Unvalidated-computation list
+
+Computations not independently recomputable from the shared package:
+
+Full TCD-IG clause evaluation per request.
+
+Type-conditional dormancy thresholds and integrity-gate flags.
+
+Peer P75 empirical Completed-peer computation.
+
+W=365d and n_min=50 application details.
+
+open_age_h diagnostic computation.
+
+Eligibility filter producing 222,002 open requests under T_freeze.
+
+Unique-request grain/deduplication logic.
+
+SHA-256 lineage values from LINEAGE_ATTESTATION.md.
+
+Capacity coverage/budget calculations; only FLAG is present.
+
+κ grid ESCALATE counts beyond supplied package counts.
+
+Full INCONCLUSIVE clause mix beyond “all = thin_type_or_missing_peer.”
+
+Full top-25 ESCALATE type table beyond WCA2/SED/SKA excerpts.
+
+Reconciliation disagreement categories beyond “0 disagreements.”
+
+Fixture 14/14 both-path details.
+
+Clock-parse repair before/after row-level effects beyond the 104-row mismatch note.
+
+Any chart-based consistency — no charts present.
+
+10. Evidence-traceability verdict
+
+Verdict: PASS-WITH-LIMITATIONS.
+
+Why not FAIL: Critical counts and shares are internally consistent, arithmetic checks pass, action counts partition to 222,002, and material numbers trace to listed package files.
+
+Why not full PASS: The audit cannot independently recompute raw population, grain, time-window, TCD-IG clause order, SHA lineage, capacity coverage, or full κ-grid behavior because raw rows, full rule traces, SHA values, and charts are not in the shared package. The clock repair and capacity issue are acknowledged but not fully auditable at row level.
+
+---
+# FIRST-ROUND REVIEW: reviews/CROSS_REVIEW.md (sha256 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457)
+# Stage 5 — Controlled Cross-Review (Interpretation)
+
+**When:** 2026-09-19 CT  
+**Inputs:** Independent first passes only (barriers removed after all three existed)  
+**AI1:** ChatGPT High — Evidence Synthesis / Recommendation Builder  
+**AI2:** Grok Expert — Decision / Methodological Critic (Comprehensive unavailable)  
+**AI3:** DeepSeek DeepThink — Claim-to-Evidence / Numerical Auditor  
+
+## Independence attestation
+
+- AI1 completed before AI2/AI3 outputs existed.  
+- AI2 header attests no AI1 read.  
+- AI3 header attests no AI1/AI2 read.  
+- Shared input: `packets/STAGE5_EVIDENCE_PACKAGE.md` only.
+
+## Side-by-side
+
+| Issue | AI1 | AI2 | AI3 evidence |
+|-------|-----|-----|--------------|
+| Direct answer to CQ-F02 | Frozen partition is the simulation assignment (131968 / 6377 / 83657) | Same counts; adds: recon-clean but does **not** satisfy “limited shift attention” purpose without ranking | Counts/shares arithmetic PASS; partition sums to 222002 |
+| Hypothesis / construct | TCD-IG produces defensible simulation partition; mixed on operational elevation | Rival: selection-biased long-tail census (esp. WCA2/SED program latency), not 132k units of neglect | Rule application audit: locks present; full clause recompute not in package → PASS-WITH-LIMITATIONS |
+| Conclusion ceiling | Simulation only; no City SLA / live dispatch | Same; hard no row-level dispatch | Same ceiling enforced in unsupported-claim list |
+| Preferred decision option | Accept frozen labels for methodology eval | **Accept + Framing return on capacity (required)**; type-aggregate Monitor only | Does not choose business option; flags capacity FLAG not numeric |
+| Recommendation | Accept labels; no operational dispatch from package alone | Accept simulation + Framing return; No Act / no row-level Pilot | Traceability PASS-WITH-LIMITATIONS (SHA values / full row traces not in shared paste package) |
+
+## Material agreements
+
+1. Validated Stage 4 chain (fixtures, recon 0, workflow gate) is the strongest evidence.  
+2. Portfolio numbers and WCA2 concentration are accepted.  
+3. No City SLA / live dispatch / causal City performance claims.  
+4. Human owner retains final authority.
+
+## Material disagreements / tensions
+
+1. **Capacity / Framing:** AI1 treats Framing return as plausible next step; AI2 treats it as **required** given 59.4% ESCALATE and CQ-F02’s “limited shift attention” clause.  
+2. **Pilot:** AI1 allows methodological pilot/monitor; AI2 restricts to type-aggregate Monitor only (no row-level pilot that pretends to be focus).  
+3. **Traceability ceiling:** AI3 PASS-WITH-LIMITATIONS because shared package lacked inline SHA hashes and full row-level rule traces (lineage file exists on disk; paste package summarized).
+
+## Coordinator resolution (for Finish Gate)
+
+- **Preserve** AI1/AI2 agreement: accept frozen labels as Dataset 2 / methodology Stage 5 assignment.  
+- **Strengthen** with AI2: recommend **Framing return on capacity** as the explicit next design question (hard attention budget + ranking), without reopening Stage 3/4 locks inside this freeze.  
+- **Adopt** AI2 operational stance: no live dispatch; type-aggregate monitoring only if any follow-up.  
+- **Qualify** with AI3: evidence package for interpretation should include LINEAGE SHA table inline next time (process note; does not invalidate Stage 4 PASS — hashes exist in `LINEAGE_ATTESTATION.md`).
+
+## Residual uncertainty
+
+- Whether WCA2/SED “ESCALATE” reflects neglect vs designed program latency cannot be settled from this package alone (AI2 rival).  
+- Exact shift-budget threshold for Framing is owner judgment (not locked).
+
+---
+# FIRST-ROUND REVIEW: reviews/INTERPRETATION_RECONCILIATION.md (sha256 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462)
+# Stage 5 — Interpretation Reconciliation Matrix
+
+| Issue | AI1 | AI2 | AI3 evidence | Resolution | Residual uncertainty |
+|-------|-----|-----|--------------|------------|----------------------|
+| Direct answer | Partition is CQ-F02 simulation answer | Partition yes; focus-list no | Counts verified | **Preserve** partition as validated simulation answer; **disclose** focus-list gap | Owner capacity preference |
+| Hypothesis status | Mixed / defensible simulation | Weak for operational elevation; strong as construct census | Locks consistent | **Supported** for methodology simulation; **unresolved** for ops urgency | Type-mechanics of WCA2/SED |
+| Conclusion ceiling | Simulation | Simulation | Simulation | **Locked** — no SLA/dispatch/causation | — |
+| Decision option | Accept labels | Accept + Framing return required | N/A (auditor) | **Accept labels + Framing return on capacity** | Budget number |
+| Recommendation | Accept; no dispatch | Accept + Framing; Monitor types only | Traceability PWL | **Act (methodology accept) + Collect/Framing on capacity; Monitor types optional; No live Act** | — |
+
+---
+# REVISION REQUEST V-1..V-6 (sent to AI 1 after the first audit round; JSON sha256 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4)
+### V-1 (substantive)
+**Affected language (quote):**
+```
+2. Accept with Framing return on capacity	Plausible next step
+```
+**Required correction:**
+```
+2. Accept with Framing return on capacity	Required next step
+```
+**Source:** AI2 line 128: '2. Accept with Framing return on capacity	Required'; CROSS_REVIEW resolution: 'Strengthen with AI2: recommend Framing return on capacity as the explicit next design question'
+
+### V-2 (substantive)
+**Affected language (quote):**
+```
+3. Pilot / monitor using ESCALATE list + type concentration	Possible methodological follow-up
+```
+**Required correction:**
+```
+3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot	Possible methodological follow-up
+```
+**Source:** AI2 line 129: 'Monitor types only; no row-level pilot that generates work'; CROSS_REVIEW resolution: 'type-aggregate monitoring only if any follow-up'
+
+### V-3 (substantive)
+**Affected language (quote):**
+```
+131,968 requests (59.4%)
+```
+**Required correction:**
+```
+131,968 requests (59.4%)
+
+WCA2 alone supplies 64,922 of these (49.2% of ESCALATE), so the ESCALATE volume is concentrated in one service type.
+```
+**Source:** AI3 line 75: 'WCA2 share of ESCALATE	64,922 / 131,968	0.491952595 = 49.1953%	49.2%	OK'; CROSS_REVIEW material agreement 2: 'Portfolio numbers and WCA2 concentration are accepted'
+
+### V-4 (substantive)
+**Affected language (quote):**
+```
+Exact reconciliation: 0 disagreements across 222,002 rows
+```
+**Required correction:**
+```
+Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)
+```
+**Source:** AI3 line 26: 'LINEAGE_ATTESTATION.md	SHA-256 lineage	Listed-only - no SHA values shown in package'; CROSS_REVIEW resolution: 'Qualify with AI3: evidence package for interpretation should include LINEAGE SHA table inline next time'
+
+### V-5 (substantive)
+**Affected language (quote):**
+```
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
+```
+**Required correction:**
+```
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.
+```
+**Source:** AI2 line 122: 'Accept frozen labels as the Stage 5 methodology assignment + Framing return on capacity.'; INTERPRETATION_RECONCILIATION: 'Accept labels + Framing return on capacity'
+
+### V-6 (presentational)
+**Affected language (quote):**
+```
+Is this conversation helpful so far?
+```
+**Required correction:**
+```
+(delete the quoted line)
+```
+**Source:** coordinator: chat-interface artifact at the end of the AI1 capture; delete
+
+---
+# AI1_INTERPRETATION_REVISED (after revision) (sha256 c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63)
+# AI1 Interpretation — Stage 5 Independent First Pass
+
+- **Model/mode:** GPT-5.6 Sol, Chat, High thinking effort (3 of 4; Pro 4 of 4 required upgrade)
+- **Timestamp:** Saturday, Sep 19, 2026, 2:11 PM (UTC-5)
+- **Blindness attestation:** I did not see AI2/AI3 outputs; this is an independent first pass.
+
+---
+
+AI 1 — Evidence Synthesis and Recommendation Builder
+Chicago 311 Dispatch Priority — Stage 5 Independent First Pass
+1. Direct Answer (CQ-F02 under locked TCD-IG)
+
+Direct answer: Under the locked TCD-IG portfolio-simulation rules, the frozen assignment identifies 131,968 requests as ESCALATE, 6,377 as INCONCLUSIVE, and 83,657 as STANDARD at κ=2.0.
+
+Evidence status: Validated
+
+The assignment provides a reproducible simulation partition of open eligible 311 requests in the frozen decision window. The ESCALATE group represents requests that satisfy the locked type-conditional dormancy and integrity-gate logic. INCONCLUSIVE requests are separated because they lack sufficient peer evidence or contain missing peer conditions.
+
+This result supports the methodological question of whether the framework can produce a defensible portfolio assignment. It does not establish a City dispatch priority rule, an official SLA, or that ESCALATE requests are objectively more urgent in real operations.
+
+2. Strongest Evidence
+A. Independent execution and reconciliation
+
+Evidence status: Validated
+
+The strongest evidence is the Stage 4 validation chain:
+
+Source Gate: PASS
+
+Fixtures: 14/14 passed in both paths
+
+Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)
+
+Workflow gate: PASS
+
+Stage5_allowed=true
+
+This establishes that the frozen assignment was generated consistently under the locked design.
+
+B. Frozen portfolio assignment at κ=2.0
+
+Evidence status: Validated
+
+The portfolio output:
+
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+
+The framework successfully produces a three-way classification rather than forcing uncertain cases into binary decisions.
+
+C. INCONCLUSIVE separation
+
+Evidence status: Validated
+
+All INCONCLUSIVE cases are:
+
+thin_type_or_missing_peer
+
+This indicates the uncertainty category is not arbitrary; it reflects insufficient comparison evidence under the locked peer-based method.
+
+D. Sensitivity across κ values
+
+Evidence status: Sensitivity-dependent
+
+Descriptive κ sensitivity:
+
+κ	ESCALATE
+1.0	152,292
+1.5	140,340
+2.0	131,968
+3.0	118,246
+
+The direction is stable: stricter thresholds reduce ESCALATE volume.
+
+However, the exact portfolio size is dependent on κ selection.
+
+3. Hypothesis Evaluation
+“Warrant elevation via type-conditional dormancy”
+Interpretation
+
+Within this simulation, “warrant elevation via type-conditional dormancy” means:
+
+A request receives ESCALATE status when its unresolved duration is evaluated as unusually dormant relative to comparable request types, while passing integrity conditions.
+
+The hypothesis being tested is not:
+
+“These requests are truly urgent.”
+
+The tested hypothesis is:
+
+“A structured comparison against type-specific peer behavior can create a defensible portfolio separation between requests needing elevation review and those without the same evidence.”
+
+Evaluation
+
+Assessment: Supported with limitation
+
+Evidence supporting the hypothesis:
+
+The method produces a stable assignment under locked rules.
+
+The validation framework confirms reproducibility.
+
+The approach separates uncertain cases rather than hiding uncertainty.
+
+The κ grid shows monotonic sensitivity rather than random instability.
+
+Limitations:
+
+The method does not establish real-world urgency.
+
+No City SLA exists in this analysis.
+
+No causal relationship between dormancy and service failure is demonstrated.
+
+Conclusion: The hypothesis is supported as a simulation classification mechanism, not as a validated operational dispatch rule.
+
+4. What the Evidence Does Not Establish
+
+The evidence does not establish:
+
+That ESCALATE requests require immediate City action.
+
+That ESCALATE requests represent service failures.
+
+That STANDARD requests are not important.
+
+That employee performance caused any observed patterns.
+
+That WCA2 concentration indicates a specific operational cause.
+
+That κ=2.0 is the optimal operational threshold.
+
+That the portfolio allocation fits real staffing capacity.
+
+The analysis remains within the conclusion ceiling:
+
+Portfolio simulation only.
+
+5. Most Important Caveat
+
+Most important caveat: ESCALATE volume may exceed realistic operational capacity, but ranking and capacity optimization were explicitly out of scope.
+
+At κ=2.0, ESCALATE includes:
+
+131,968 requests (59.4%)
+
+WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.
+
+For a small-shift attention model, this volume may be impractical.
+
+However, resolving this would require reopening framing questions around:
+
+capacity constraints,
+
+prioritization,
+
+ranking,
+
+operational workflows.
+
+The current framework intentionally stops before that step.
+
+6. Decision-Option Matrix
+Option	Assessment	Evidence Status	Rationale
+1. Accept frozen labels as Stage 5 portfolio assignment	Supported	Validated	The strongest match to the locked simulation objective. Preserves Stage 3/4 integrity.
+2. Accept with Framing return on capacity	Required next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
+3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
+4. No operational action — methodology evidence only	Supported	Validated	Appropriate because Dataset 2 of 3 is a methodology evaluation.
+5. Do not invent City SLA, live dispatch, or employee scoring	Required constraint	Validated	Violating this would exceed the conclusion ceiling.
+7. Primary Recommendation
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.
+
+Evidence status: Validated
+
+The current evidence supports acceptance of the assignment as a completed simulation artifact because:
+
+execution integrity passed,
+
+reconciliation passed,
+
+labels were generated under locked rules,
+
+uncertainty was explicitly separated.
+
+No operational dispatch recommendation should be made from this package alone.
+
+8. Monitoring Plan
+
+If the methodology proceeds to further evaluation:
+
+A. Monitor assignment stability
+
+Track:
+
+ESCALATE share under κ variations,
+
+changes in INCONCLUSIVE proportion,
+
+type concentration shifts.
+
+Status: Sensitivity-dependent
+
+B. Monitor unresolved analytical questions
+
+Track whether future stages require:
+
+capacity-aware framing,
+
+ranking logic,
+
+additional decision options.
+
+C. Preserve validation controls
+
+Maintain:
+
+lineage records,
+
+reconciliation checks,
+
+independent execution paths.
+
+Status: Validated requirement
+
+9. Next Analytical Question
+Proposed next question:
+
+“Given that the frozen TCD-IG portfolio assignment identifies a large ESCALATE population, what additional decision framing is required to evaluate capacity-aware prioritization without altering the validated Stage 3/4 assignment?”
+
+This question preserves the existing evidence while identifying the next unresolved decision boundary.
+
+10. Weakest Bridge in My Own Reasoning
+
+The weakest bridge is:
+
+Moving from “the framework reliably identifies type-conditional dormancy patterns” to “those patterns represent meaningful attention priorities.”
+
+The first claim is supported by validation.
+
+The second requires additional operational evidence that is outside this package.
+
+Therefore:
+
+Methodological reliability: Validated
+
+Portfolio interpretation: Validated with limitation
+
+Operational priority meaning: Not established
+
+The evidence supports using the output as a simulation assignment, while leaving real-world dispatch implications unresolved.
+
+---
+Reminder: per-revision table, findings, overall verdict. Finish with the line: END C48 AI3 SECOND AUDIT
+````
+
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C44",
+  "frozen_at_ct": "2026-10-03 12:44:09 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C44/C44-builder/builder_report.md", "bytes": 19696, "sha256": "4fbad9aac1c27587fa394e24c62359f1c944c9974adc915d6d4846ebbe0a1988", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C44/C44-validator/validator_report.md", "bytes": 11786, "sha256": "7ec60d47981cb386f45e0c838f7541028dcbde8c764cdacbfa812b95fbfd215f", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "a6ae941e4b4d7596b4ab52975b86f95bd0b22229af2f01b28f8e396c166fdb91"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C44 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting as **Builder only** for **C44 — Addendum 02, candidate #44, “Changed-files-only re-review.”** This is an independent first pass. I have not used or seen a Validator first-pass output. I used only the supplied frozen C44 packet and its embedded evidence; I did not introduce outside data, internet evidence, new Chicago 311 data, or a new R/MySQL execution.
+
+The tested scope change is narrow: after an artifact has already received a full cross-review in the stage, a later re-review receives the changed artifact, its diff, and hashes of unchanged inputs rather than receiving all unchanged bodies again. The FULL arm reuses the frozen C48 AI3 second audit; the DELTA arm is a new DeepSeek re-review with the reduced packet. Both arms receive the same revision request and the same revised interpretation.
+
+Ablation ID: **C44**.
+
+Known OF-1/N1 is acknowledged but is outside the numerical effect of this control: C44 reads Stage 5 text/evidence only and reruns neither R path. The three repeated-fall-back-hour discrepancies therefore do not enter a C44 result.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+**Conceptual removal.** The control removes redundant retransmission of the bodies of the 13 inputs that were unchanged after the prior full review. It does **not** remove their identity: each unchanged input remains represented in the DELTA packet by filename, byte count, and SHA-256. The changed revised interpretation and the revision request remain present in full, and the original→revised unified diff is added as direct change context. The FULL packet remains the full-scope comparator.
+
+**Runner-side seeded implementation.** `ARMS.tsv` binds FULL to the frozen C48 AI3 second-audit reply/packet and DELTA to the new C44 delta reply/packet. `RESCOPE` identifies the C44 delta scope check. `c44_static.R` parses both packet inventories, hashes `REVISED_SEED.md`, derives the unchanged-input set by excluding the revised artifact and revision request, requires every unchanged SHA-256 to appear in DELTA, requires the revised text to appear verbatim, checks that unchanged `# EVIDENCE:` and `# FIRST-ROUND REVIEW:` bodies are absent, records both packet hashes and sizes, and fails its static run if any required condition is false. `c44_score.R` freezes the arm definitions, verifies required END lines, checks the frozen FULL reply hash when its freeze exists, parses V-1…V-6 statuses, parses BLOCKING/MATERIAL/MINOR finding rows and `relates_to` keys, tests V-3 detection, and uses packet bytes as the cost proxy when both arm timings are not available.
+
+No analytical R-A/R-B implementation, classification rule, fixture function, SQL logic, or Stage 3 measurement rule is changed by C44.
+
+**Exact changed-artifact seed.** The original→revised diff makes these six revision changes: V-4 changes “0 disagreements” to “0 label disagreements” and adds the lineage qualification; V-3 inserts the WCA2 concentration sentence but deliberately uses **42.9%** rather than the required **49.2%**; V-1 changes the capacity return from “Plausible next step” to “Required next step”; V-2 replaces a pilot/monitor option with type-level monitoring only and explicitly forbids a row-level pilot; V-5 adds the required Framing return to the primary recommendation; and V-6 removes the chat-interface artifact.
+
+The V-3 error is therefore the planted changed-file defect. The addendum's separate unchanged-file defect case was **not planted** in this experiment.
+
+## 3. Hard mechanical facts table.
+
+“Recomputed” means I independently calculated the value from numeric or set-valued evidence in the packet. “Quoted” means the packet supplies the value/status directly and the underlying primitive data necessary to recreate it are not included. The pre-chat static result reports 58,214 versus 18,691 packet bytes, 13/13 unchanged hashes listed, and verbatim revised text. The frozen post-chat arm table and finding tables supply the reply-level facts.
+
+| Hard fact | Calculation / comparison | Result | Basis |
+| --- | --- | --- | --- |
+| FULL packet size | Packet table | 58,214 B | Quoted |
+| DELTA packet size | Packet table | 18,691 B | Quoted |
+| DELTA/FULL packet ratio | 18,691 / 58,214 | **0.32107397 = 32.1074%**; reported 0.3211 | Recomputed |
+| Packet-byte reduction | 1 − 18,691 / 58,214 | **67.8926%** | Recomputed |
+| Bytes removed | 58,214 − 18,691 | **39,523 B** | Recomputed |
+| ≥30% byte-reduction threshold | 0.70 × 58,214 = 40,749.8 B; DELTA = 18,691 B | DELTA is **22,058.8 B below** the maximum permitted by the threshold | Recomputed |
+| Unchanged input count | Count DELTA `UNCHANGED` inventory rows | **13** | Recomputed |
+| Unchanged hashes represented | 13 matching hash rows / 13 unchanged inputs | **13/13 = 100%** | Recomputed |
+| Complete input-hash equality across inventories | Compare the 13 unchanged inputs + revised interpretation + revision request | **15/15 named input hashes match** between FULL and DELTA inventories | Recomputed |
+| Revised interpretation hash | Compare inventories/preflight | `c1ac310a…a720b63` in both arms | Recomputed string equality |
+| FULL reply size | Post-chat Arms row | 3,053 B | Quoted |
+| DELTA reply size | Post-chat Arms row | 2,834 B | Quoted |
+| Reply-size difference | 3,053 − 2,834 | **219 B smaller**, a **7.1733%** reduction | Recomputed |
+| Required END lines | FULL TRUE; DELTA TRUE | **2/2 present** | Quoted/recomputed count |
+| Parsed findings | FULL 1; DELTA 1 | **1 each** | Quoted |
+| BLOCKING/MATERIAL findings | FULL 1; DELTA 1 | **1 each** | Quoted |
+| Finding-key sets | FULL `{V-3}`; DELTA `{V-3}` | Equal sets | Recomputed |
+| D-set, FULL not in DELTA | `{V-3} \ {V-3}` | **∅** | Recomputed |
+| D-set, DELTA not in FULL | `{V-3} \ {V-3}` | **∅** | Recomputed |
+| Symmetric finding-key difference | `{V-3} △ {V-3}` | **∅** | Recomputed |
+| V-3 arithmetic | 64,922 / 131,968 | **0.4919525946 = 49.1953% → 49.2%** | Recomputed |
+| Seed error magnitude | 49.195259% − 42.9% | **6.2953 percentage points** | Recomputed |
+| Decision-set partition | 131,968 + 6,377 + 83,657 | **222,002** | Recomputed |
+| ESCALATE share | 131,968 / 222,002 | **59.4445095% → 59.4%** | Recomputed |
+| INCONCLUSIVE share | 6,377 / 222,002 | **2.8724966% → 2.9%** | Recomputed |
+| STANDARD share | 83,657 / 222,002 | **37.6829938% → 37.7%** | Recomputed |
+| Portfolio share identity | 59.4445095 + 2.8724966 + 37.6829938 | **100.0000000%** | Recomputed |
+| INCONCLUSIVE clause concentration | 6,377 / 6,377 | **100%** `thin_type_or_missing_peer` | Recomputed |
+| WCA2 share of ESCALATE | 64,922 / 131,968 | **49.1953%** | Recomputed |
+| SED share of ESCALATE | 17,254 / 131,968 | **13.0744%** | Recomputed |
+| SKA share of ESCALATE | 7,316 / 131,968 | **5.5438%** | Recomputed |
+| Top-3 ESCALATE concentration | (64,922 + 17,254 + 7,316) / 131,968 | **67.8134%** | Recomputed |
+| Top-25 count | Sum of the 25 displayed type counts | **126,607** | Recomputed |
+| Top-25 share | 126,607 / 131,968 | **95.9377%** | Recomputed |
+| ESCALATE outside top 25 | 131,968 − 126,607 | **5,361** | Recomputed |
+| κ=1 partition | 152,292 + 6,377 + 63,333 | **222,002** | Recomputed |
+| κ=1.5 partition | 140,340 + 6,377 + 75,285 | **222,002** | Recomputed |
+| κ=2 partition | 131,968 + 6,377 + 83,657 | **222,002** | Recomputed |
+| κ=3 partition | 118,246 + 6,377 + 97,379 | **222,002** | Recomputed |
+| κ 1→1.5 portfolio delta | ESCALATE 140,340−152,292; STANDARD 75,285−63,333 | **−11,952 ESCALATE; +11,952 STANDARD; INCONCLUSIVE 0** | Recomputed |
+| κ 1.5→2 delta | 131,968−140,340; 83,657−75,285 | **−8,372; +8,372; INCONCLUSIVE 0** | Recomputed |
+| κ 2→3 delta | 118,246−131,968; 97,379−83,657 | **−13,722; +13,722; INCONCLUSIVE 0** | Recomputed |
+| κ monotonicity | 152,292 > 140,340 > 131,968 > 118,246 | ESCALATE strictly decreases as κ rises across supplied grid | Recomputed |
+| 50-slot coverage | 50 / 131,968 | **0.0003788797 = 0.037888%** | Recomputed |
+| 200-slot coverage | 200 / 131,968 | **0.0015155189 = 0.151552%** | Recomputed |
+| 1,000-slot coverage | 1,000 / 131,968 | **0.0075775946 = 0.757759%** | Recomputed |
+| Full-portfolio coverage | 131,968 / 131,968 | **1 = 100%** | Recomputed |
+| DELTA timing interval | 11:41:20 − 11:40:34 | **46 s = 0.7667 min → 0.77 min** | Recomputed; completion is disclosed as an upper bound |
+| Fixtures | Evidence package | **14/14 on both R paths** | Quoted |
+| Final label reconciliation | Evidence package | **0 label disagreements / 222,002 rows** | Quoted |
+| N1 clock discrepancy | Coordinator note | **3 rows × exactly 1.000 h**, labels agree | Quoted |
+| `n_agree + n_disagree = n_inner` | No such fields occur in C44's supplied evidence tables | **Not applicable to this control** | Source absence noted |
+
+The portfolio, type-concentration, κ-grid, integrity-clause and capacity calculations above reproduce the embedded Stage 5 evidence tables.
+
+The hash comparison is stronger than merely counting the static check's 13 booleans: comparing the displayed FULL and DELTA inventories directly shows the same hashes for all 13 unchanged artifacts, the revised interpretation, and the revision request. The distinction is that the static code mechanically gates the 13 unchanged hashes and the verbatim revised body; the 15/15 statement above is my direct inventory-string comparison.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+**Condition 0 — static scope validity.** The static arm exits 0 with status PASS. Its output reports FULL 58,214 B, DELTA 18,691 B, 13 unchanged inputs, 13 hashes listed, revised text verbatim, and unchanged bodies absent. Those facts satisfy the predeclared mechanical scope checks.
+
+**Condition 1 — no lost FULL BLOCKING/MATERIAL finding.** The FULL frozen reply contains exactly one such finding: F-1, BLOCKING, relating to V-3, identifying the 42.9% WCA2 share as wrong and requiring 49.2%. The DELTA reply independently contains exactly one finding: F1, MATERIAL, also relating to V-3, quoting the same defective sentence and prescribing the same 42.9%→49.2% correction. The severity labels differ, but the finding identity does not: both identify the same numerical defect in the same sentence and derive the same corrected percentage. Thus the FULL finding has a corresponding DELTA finding at finding level, not merely at key level.
+
+**Condition 2 — changed-file seed detection.** DELTA marks V-3 **NO**, records `seed_V3_caught = TRUE`, and raises the V-3 finding as MATERIAL. Independently, 64,922 / 131,968 = 49.195259…%, so the revised 42.9% is demonstrably inconsistent with the frozen evidence. The FULL arm marks V-3 PARTIAL and identifies the same arithmetic error.
+
+**Condition 3 — ≥30% cost reduction.** FULL wall-clock timing is unavailable, so the frozen predicate directs use of the declared packet-byte proxy. DELTA is 18,691 / 58,214 = 32.1074% of FULL, which is a **67.8926% reduction**, exceeding the 30% reduction threshold by 37.8926 percentage points. The DELTA 0.77-minute value cannot substitute for a two-arm timing comparison because there is no corresponding FULL timing and the DELTA completion timestamp is itself an upper bound.
+
+**Scope qualification.** The changed-file defect was measured. The separately contemplated unchanged-file defect whose behavior depends on a changed artifact was not planted and therefore is not measured by this evidence. The packet explicitly identifies that as the main unresolved coverage risk of this experiment.
+
+## 5. Fixture and reconciliation implications.
+
+C44 does not alter or rerun the Stage 4 analytical implementation. Consequently, its evidence does not establish a new fixture result or a new R-A/R-B reconciliation result; it inherits the frozen Stage 5 evidence that reports **14/14 fixtures passed on both paths** and **0 final label disagreements across 222,002 rows**.
+
+The ablation's relevance to reconciliation is textual and review-scoped rather than computational. V-4 changes the Stage 5 interpretation from the broader phrase “0 disagreements” to the precise statement **“0 label disagreements across 222,002 rows”**, explicitly identifying the reconciliation as label-only and locating SHA-256 lineage values in `LINEAGE_ATTESTATION.md`. Both FULL and DELTA mark V-4 as applied exactly.
+
+The portfolio identities remain internally exact under every supplied κ row: ESCALATE + INCONCLUSIVE + STANDARD = 222,002. At κ=2, 131,968 + 6,377 + 83,657 = 222,002. Thus nothing in the changed-files-only review scope induces a numerical portfolio discrepancy.
+
+OF-1/N1 does not change that conclusion about labels. The frozen R paths differ by exactly one hour on three repeated-hour clock values, but their labels agree on all three rows. C44 reruns neither R path and reads no new clock-derived data, so OF-1 is an unchanged, disclosed upstream finding rather than a C44-induced fixture or reconciliation effect.
+
+The practical implication is therefore limited: this control tests whether reducing **re-review context** loses a material correction finding. It does not test whether reducing execution, fixture, reconciliation, or provenance checks would be safe.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal semantic risk remains the **unmeasured unchanged-file interaction case**. A delta reviewer receives hashes rather than the bodies of previously reviewed unchanged artifacts. That is sufficient for identity/integrity, but it does not give the new re-review conversation the content needed to rediscover a newly relevant defect residing only in an unchanged artifact. The packet explicitly says that such a seed was not planted because the FULL comparator is a pre-existing frozen reply and a valid planted test would require another new full-scope review. Accordingly, the evidence directly tests the changed-artifact case, not every cross-artifact dependency case.
+
+A second limitation is that finding severity is not invariant: FULL calls V-3 **BLOCKING**, DELTA calls it **MATERIAL**. The substantive finding, affected sentence, arithmetic, and required correction are the same. Under the frozen condition-1 wording, the relevant question is whether the FULL finding is also raised, not whether the second reviewer assigns the identical severity label. Still, severity stability is not demonstrated.
+
+A third limitation concerns cost measurement. Only DELTA has a recorded timing interval, and its completion time is an upper bound derived from the saved-page mtime. Therefore the experiment's valid cost comparison is packet bytes, not latency. Any claim about review-speed improvement would go beyond the evidence.
+
+The N1 note was intentionally excluded from the DELTA reviewer packet because the frozen FULL reviewer never received it; otherwise the arms would differ in more than review scope. That preserves the intended arm comparison, while also meaning C44 does not test whether delta re-review would reason correctly about that unrelated known clock discrepancy.
+
+The disclosed execution-role deviation also remains: the re-review round is performed by the AI3-role DeepSeek chat, whereas the addendum sketch contemplated Builder/Validator review. The Builder and Validator instead judge the frozen finding sets. The DELTA reviewer was a separate conversation and was not told about the ablation.
+
+The unchanged surfaces supported by the packet are substantial: the same revised artifact is reviewed in both arms; the same revision request is supplied; the 13 unchanged input hashes match; the 13 unchanged bodies are omitted only from DELTA; the changed revised artifact is sent verbatim; the baseline framework, constitution, frozen data pack, Stage 3/4 outputs and Stage 5 evidence hashes remain frozen; no MySQL is used; no R analysis path is rerun; and no new data enter the control. The static run additionally verifies that the expected unchanged-body section markers are absent while the revised body is present verbatim.
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence location and table row |
+| --- | --- |
+| C44 tests changed-files-only re-review after an earlier full cross-review. | **SPEC → Control under test** and **Exact change being tested**, especially DELTA-arm description. |
+| Both arms review the same changed revised interpretation containing the planted V-3 percentage error. | **SPEC → Exact change being tested**, first bullet; **DIFF of interpretation**, added WCA2 sentence. |
+| Static scope validation reports 58,214 B FULL, 18,691 B DELTA, 13 unchanged inputs, 13 listed hashes, revised text verbatim. | **C44_RESULTS.md → Arms → STATIC row** and **UNCHANGED_HASH_LIST_CHECK.csv → all 13 rows**. |
+| The DELTA packet is 32.1074% of FULL and removes 67.8926% of packet bytes. | Derived from **C44_RESULTS.md → Arms → STATIC row**, 18,691 / 58,214. |
+| FULL and DELTA inventory hashes agree for every named input: 13 unchanged + revised interpretation + revision request. | **DELTA packet → INPUT INVENTORY**, all 15 rows, compared with **FULL packet → INPUT INVENTORY**, corresponding 15 rows. |
+| FULL has one qualifying finding and it is the V-3 42.9%→49.2% defect. | **C44 POST-CHAT RESULTS → FINDINGS_FULL.csv → sole row**. |
+| DELTA raises the same V-3 defect. | **C44 POST-CHAT RESULTS → FINDINGS_DELTA.csv → sole row**. |
+| The finding-key D-sets are equal and the symmetric difference is empty. | **C44 POST-CHAT RESULTS → Arms →** `bm_keys`, FULL=`V-3`, DELTA=`V-3`; **Key-level aid** states every FULL key is present in DELTA. |
+| The finding match is substantive, not merely a key-parser coincidence. | **FULL reply → Findings → F-1 row** and **DELTA reply → Findings → F1 row**: both quote the same WCA2 sentence and require the same correction. |
+| The correct WCA2 value is 49.2%. | **deeper/escalate_by_type_top25.csv → WCA2 row**: 64,922 and 0.4919525945683802; independently 64,922/131,968 = 49.1953%. |
+| The κ=2 portfolio exactly partitions 222,002 rows. | **deeper/portfolio_summary.csv → only row** and **independent_checks_critical_counts.csv → n_decision/n_ESCALATE/n_INCONCLUSIVE/n_STANDARD rows**; recomputation 131,968+6,377+83,657=222,002. |
+| All supplied κ rows preserve the same decision population and 6,377 INCONCLUSIVE rows. | **deeper/kappa_sensitivity.csv → κ=1,1.5,2,3 rows**; each row sums to 222,002 and `n_INCONCLUSIVE=6377`. |
+| Capacity examples represent only a Framing flag and no ranking mechanism. | **capacity_coverage_note.csv → illustrative_shift_50/200/1000/full_escalate_portfolio rows** and **STAGE5_DEEPER_FINDINGS → Capacity note**. |
+| Stage 4 fixture/reconciliation facts are inherited rather than rerun by C44. | **STAGE5_EVIDENCE_PACKAGE → Validated Stage 4 facts** plus **SPEC → Known open finding N1 / Arms**. |
+| OF-1/N1 affects three clock values by exactly one hour but not their labels and does not enter a C44 number. | **SPEC → Known open finding N1 / OF-1**. |
+| The unchanged-file interaction seed is not measured. | **SPEC → Exact change being tested → Deviations (1)** and **C44 POST-CHAT RESULTS → “Unchanged-file seed: NOT PLANTED”**. |
+| Cost comparison must use packet bytes because FULL timing is unavailable. | **C44 POST-CHAT RESULTS → Predicate conditions → condition 3** and **Arms → FULL minutes NA**; DELTA time is separately disclosed as an upper bound. |
+
+END C44 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. **Role attestation and ablation ID**  
+   I am the Validator only for ablation **C44** (Addendum 02, candidate #44, “Changed-files-only re-review”), N13 batch b6. I am blind to the Builder and have not seen or requested Builder output. This is an independent first pass. I have no attachments and no tools; I used only the packet text. Roles per SPEC: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Ablation ID: C44.
+2. **Independent test plan: what I checked, and how**  
+   I checked:
+
+- Frozen hashes and byte counts in the SPEC, preflight, runner-side file list, REREVIEW_FREEZE.json, and post-chat scorer output.
+- Static scope validity: full packet vs delta packet bytes, delta/full ratio, unchanged-input count, unchanged inputs listed by SHA-256, revised text verbatim, unchanged bodies absent.
+- The 13 unchanged-input hashes in `UNCHANGED_HASH_LIST_CHECK.csv` against the DELTA packet inventory and the FULL packet inventory.
+- The Stage 5 portfolio identities and arithmetic from `portfolio_summary.csv`, `independent_checks_critical_counts.csv`, `escalate_by_type_top25.csv`, `kappa_sensitivity.csv`, and `capacity_coverage_note.csv`.
+- Cross-arm reply hashes, END lines, V-1..V-6 statuses, finding tables, BLOCKING/MATERIAL key sets, and condition 2/3 scorer results.
+- Timing file `C44/C44-rereview-delta/TIMES.txt`: sent/reply_complete difference and whether condition 3 could use wall-clock or the declared packet-byte proxy.
+- The logic of `c44_static.R` and `c44_score.R` as supplied in the packet.
+
+3. **Independently recomputed hard facts**  
+   **Static / scope**
+
+- FULL packet bytes: 58,214. DELTA packet bytes: 18,691.
+- DELTA/FULL = 18,691 / 58,214 = 0.3210739… ≈ 0.3211. Reduction = 67.8926…% ≈ 67.89%.
+- Unchanged inputs: 13. Unchanged inputs listed by hash in DELTA: 13/13 TRUE.
+- Revised text verbatim: TRUE. Unchanged bodies absent: TRUE.
+- FULL packet SHA-256 `dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96` matches preflight, SPEC, REREVIEW_FREEZE, and post-chat scorer output.
+- DELTA packet SHA-256 `a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb` matches preflight, SPEC, REREVIEW_FREEZE, and post-chat scorer output.
+- REVISED_SEED SHA-256 `c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63` matches preflight, SPEC, FULL packet inventory, and DELTA packet inventory for the revised interpretation.
+
+**Unchanged-input hash check**  
+The 13 rows in `UNCHANGED_HASH_LIST_CHECK.csv` are all marked `listed_by_hash_in_delta = TRUE`. The names match the 13 unchanged inputs in the FULL packet inventory:  
+`STAGE5_EVIDENCE_PACKAGE.md`; `deeper/STAGE5_DEEPER_FINDINGS.md`; `deeper/capacity_coverage_note.csv`; `deeper/escalate_by_type_top25.csv`; `deeper/inconclusive_by_clause.csv`; `deeper/independent_checks_critical_counts.csv`; `deeper/kappa_sensitivity.csv`; `deeper/portfolio_summary.csv`; `reviews/AI2_DECISION_METHOD_CRITIC.md`; `reviews/AI3_CLAIM_EVIDENCE_AUDITOR.md`; `reviews/CROSS_REVIEW.md`; `reviews/INTERPRETATION_RECONCILIATION.md`; `AI1_INTERPRETATION (original, before revision)`.
+
+**Stage 5 portfolio identities**
+
+- Decision rows: 222,002.
+- ESCALATE + INCONCLUSIVE + STANDARD = 131,968 + 6,377 + 83,657 = 222,002.
+- ESCALATE share = 131,968 / 222,002 = 0.5944450950892334 = 59.4445% ≈ 59.4%.
+- INCONCLUSIVE share = 6,377 / 222,002 = 0.028724966441743768 = 2.8725% ≈ 2.9%.
+- STANDARD share = 83,657 / 222,002 = 0.3768299384690228 = 37.6830% ≈ 37.7%.
+- Share sum = 1.0000000000000000.
+- WCA2 share of ESCALATE = 64,922 / 131,968 = 0.4919525945683802 = 49.1953% ≈ 49.2%.
+- SED share of ESCALATE = 17,254 / 131,968 = 0.1307438166828322 = 13.0744% ≈ 13.1%.
+- SKA share of ESCALATE = 7,316 / 131,968 = 0.05543768186226964 = 5.5438% ≈ 5.5%.
+- Top 3 cumulative WCA2+SED+SKA = 0.678134093113482 = 67.8134% ≈ 67.8%.
+- PBD share = 3,937 / 131,968 = 0.0298329898157129 = 2.9833% ≈ 3.0%.
+- PHF share = 3,371 / 131,968 = 0.0255440712900097 = 2.5544% ≈ 2.6%.
+
+**κ sensitivity identities**
+
+- κ=1: 152,292 + 6,377 + 63,333 = 222,002.
+- κ=1.5: 140,340 + 6,377 + 75,285 = 222,002.
+- κ=2: 131,968 + 6,377 + 83,657 = 222,002.
+- κ=3: 118,246 + 6,377 + 97,379 = 222,002.
+- ESCALATE sequence is monotone decreasing: 152,292 > 140,340 > 131,968 > 118,246.
+- INCONCLUSIVE remains 6,377 across the grid.
+
+**Capacity coverage arithmetic**
+
+- 50 / 131,968 = 0.00037887972841901065.
+- 200 / 131,968 = 0.0015155189136760426.
+- 1000 / 131,968 = 0.0075775945683802136.
+- 131,968 / 131,968 = 1.  
+  All match `capacity_coverage_note.csv`.
+
+**Cross-arm reply and finding facts**
+
+- FULL reply SHA-256 `8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2`, bytes 3,053, END line present. Matches REREVIEW_FREEZE and post-chat scorer.
+- DELTA reply SHA-256 `d0635883ab82f4bf5d1f3fc94200715d5d4b66746aaf2023a99c64b43a9cebfb`, bytes 2,834, END line present. Matches REREVIEW_FREEZE and post-chat scorer.
+- DELTA TIMES.txt SHA-256 `69f5275511e873b072369fc4beb09e84711ad8c21444c29bad02dc0979048590`. Sent 11:40:34, reply_complete 11:41:20; difference = 46 s = 0.7666… min ≈ 0.77 min. This is an upper bound, not an observed completion time.
+- FULL V-1..V-6 = YES, YES, PARTIAL, YES, YES, YES.
+- DELTA V-1..V-6 = YES, YES, NO, YES, YES, YES.
+- FULL findings: 1 total, 1 BLOCKING/MATERIAL, key `V-3`.
+- DELTA findings: 1 total, 1 BLOCKING/MATERIAL, key `V-3`.
+- FULL BLOCKING/MATERIAL key set = {V-3}. DELTA BLOCKING/MATERIAL key set = {V-3}. Set difference = empty.
+- FULL finding F-1: BLOCKING, V-3, quote `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE)...`, correction to `49.2%`, arithmetic `64,922 / 131,968 = 0.491952595 = 49.1953%`.
+- DELTA finding F1: MATERIAL, V-3, same quote, same correction, same arithmetic.
+- Condition 2 fact: DELTA marks V-3 `NO` and raises a MATERIAL finding on V-3, so the changed-file seed is caught by the DELTA reply.
+- Condition 3 fact: wall-clock for both arms is not available because FULL minutes = NA. The declared proxy is packet bytes. DELTA/FULL = 0.3211, so reduction = 67.89% ≥ 30%.
+- Condition 1 fact: the only FULL BLOCKING/MATERIAL finding is also raised by DELTA. The scorer leaves condition 1 as `PENDING (judged)` because it is a finding-level judgment, not a purely mechanical key comparison.
+
+**Internal inconsistency check**  
+I found no inconsistency in the recomputable numbers. Minor observations that are not inconsistencies: FULL grades V-3 as PARTIAL while DELTA grades it NO; both catch the same defect. FULL severity is BLOCKING and DELTA severity is MATERIAL; the predicate compares raised findings, not identical severity labels. The scorer’s condition 1 remains pending by design. The timing record is an upper bound and is not used for condition 3 because the packet-byte proxy is declared and used.
+
+4. **Facts that cannot be recomputed from this packet**
+
+- Raw Stage 5 source rows, classifications, eligibility filters, unique-request grain, and T_freeze row-level timestamps.
+- The actual TCD-IG clause-by-clause application and peer P75 computation.
+- Fixture actuals beyond the stated 14/14 both paths.
+- LINEAGE_ATTESTATION.md SHA values, beyond the statement that they exist on disk and were not inline.
+- The content of `C48/AUDIT_FREEZE.json`; only its SHA-256 is given. I cannot independently rerun the scorer’s FULL-reply freeze check against that file’s contents from this packet alone.
+- The content of `C44_ARM_MANIFESTS.txt`, `C44_EVIDENCE.sha256`, and other referenced files beyond the hashes and excerpts supplied.
+- The real operator send/reply clock beyond the supplied TIMES.txt; the reply_complete time is explicitly an upper bound.
+- Whether the DELTA reply was not changed after its freeze, beyond the REREVIEW_FREEZE hash record.
+- The N1/OF-1 PC probe and R-A/R-B clock behavior beyond the coordinator note.
+
+5. **P1 assessment against the frozen predicate in the SPEC**  
+   Facts only, no terminal state.
+
+- **Condition 0 (validity: static scope check passes):** STATIC exit=0, status=PASS. FULL packet 58,214 bytes; DELTA packet 18,691 bytes; delta/full=0.3211. Unchanged inputs=13; unchanged listed by hash=13; revised text verbatim=TRUE; unchanged bodies absent=TRUE. Mechanically MET by the runner output.
+- **Condition 1 (no lost findings: every FULL BLOCKING/MATERIAL finding also raised by DELTA):** FULL BLOCKING/MATERIAL set = {V-3}; DELTA BLOCKING/MATERIAL set = {V-3}. The FULL F-1 BLOCKING finding and DELTA F1 MATERIAL finding quote the same revised-text sentence and give the same correction/arithmetic. The scorer leaves condition 1 as `PENDING (judged)`; the key-level aid says every FULL key present in DELTA = TRUE. Factually, the only FULL BLOCKING/MATERIAL finding is raised by DELTA.
+- **Condition 2 (DELTA catches changed-file seed V-3):** DELTA V-3 = NO; DELTA has a MATERIAL finding with relates_to V-3; `seed_V3_caught = TRUE`. Mechanically MET.
+- **Condition 3 (cost falls by ≥30%):** Both arms are not wall-clock logged; FULL minutes = NA. The declared proxy is packet bytes. DELTA/FULL = 0.3211; reduction = 67.89% ≥ 30%. Mechanically MET via the declared proxy.
+- **Unchanged-file seed:** The SPEC discloses that the unchanged-file seed is not planted and is reported as not measured. The post-chat scorer repeats: “Unchanged-file seed: NOT PLANTED … Reported as not measured.”
+- **N1/OF-1:** The coordinator note says N1 does not enter any C44 number; C44 reads only Stage 5 text and frozen Stage 5 evidence and reruns no R path.
+
+6. **Blocking objections**  
+   None. I found no defect in the harness, seed, predicate application, or evidence that should block a verdict from this packet. Non-blocking caveats: the FULL arm is a reused frozen b5 reply; the unchanged-file seed is not measured; the timing record is an upper bound and condition 3 uses the declared packet-byte proxy; the N1 note is excluded from the DELTA packet by disclosed SPEC deviation.
+7. **Claim → evidence map**  
+   | Claim | Evidence |  
+   |---|---|  
+   | C44 static scope check passed | `arms/STATIC/outputs/STATIC_CHECK.txt`; `C44_arms.csv`; `C44_RESULTS.md` |  
+   | DELTA packet is 32.11% of FULL packet size | 18,691 / 58,214 = 0.3211; `STATIC_CHECK.txt`; `C44_arms.csv` |  
+   | 13 unchanged inputs listed by SHA-256 | `UNCHANGED_HASH_LIST_CHECK.csv`; DELTA packet inventory |  
+   | Revised text sent verbatim | `STATIC_CHECK.txt` `revised_text_verbatim=TRUE`; REVISED_SEED hash `c1ac310a…` matches inventory |  
+   | Unchanged bodies absent | `STATIC_CHECK.txt` `unchanged_bodies_absent=TRUE`; `c44_static.R` |  
+   | FULL reply frozen | `REREVIEW_FREEZE.json`; post-chat scorer table; SHA-256 `8b473adf…` |  
+   | DELTA reply frozen | `REREVIEW_FREEZE.json`; post-chat scorer table; SHA-256 `d0635883…` |  
+   | FULL catches V-3 | FULL reply V-3=PARTIAL; F-1 BLOCKING V-3 |  
+   | DELTA catches V-3 | DELTA reply V-3=NO; F1 MATERIAL V-3 |  
+   | No lost FULL BLOCKING/MATERIAL finding | FULL key set {V-3}; DELTA key set {V-3}; same quote/correction |  
+   | Condition 2 mechanically met | Post-chat scorer `seed_V3_caught=TRUE`; DELTA V-3=NO and MATERIAL V-3 |  
+   | Condition 3 mechanically met by proxy | Packet bytes 58,214 vs 18,691; reduction 67.89%; post-chat scorer `MET` |  
+   | Stage 5 portfolio identities | `portfolio_summary.csv`; `independent_checks_critical_counts.csv`; `kappa_sensitivity.csv` |  
+   | WCA2 share recomputation | 64,922 / 131,968 = 0.4919525945683802 ≈ 49.2% |  
+   | Unchanged-file seed not measured | SPEC deviation 1; post-chat scorer note |  
+   | N1 does not enter C44 numbers | Coordinator note N1; SPEC known open finding |  
+   | Timing is upper-bound only | `C44/C44-rereview-delta/TIMES.txt`; 11:40:34 to 11:41:20 = 0.77 min upper bound |
+
+END C44 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C44 ADJUDICATION'.

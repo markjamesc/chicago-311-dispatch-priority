@@ -1,0 +1,18 @@
+{
+  "ablation_id": "C49R",
+  "frozen_at_ct": "2026-10-09 07:47:04 CT",
+  "records": [
+    {
+      "id": "builder_report",
+      "path": "C49R-builder/builder_report.md",
+      "bytes": 15950,
+      "sha256": "0581f1588ba4ad38021e4a51e99af4f53d081a63aeeaefe793e0392ccb2ce0e7"
+    },
+    {
+      "id": "validator_report",
+      "path": "C49R-validator/validator_report.md",
+      "bytes": 12745,
+      "sha256": "4cc94b99f26c1885b5ac8f068cb566631d479d2f070a5b5b7ff23008dd2fb210"
+    }
+  ]
+}

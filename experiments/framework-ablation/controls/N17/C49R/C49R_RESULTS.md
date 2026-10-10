@@ -1,0 +1,3 @@
+# C49R RESULTS (2026-10-09)
+Terminal state: **KEEP** (Grok, text-only capture; `TERMINAL_STATE.txt` = KEEP). Adopts individual-file evidence delivery + `SHA256SUMS.txt` + mandatory first-section inventory. Supersedes N13 C49 HALT for the tally (old HALT kept on record in `runs/N13/RESULTS_N13.md`).
+Scorer (python port): P1 MET. DS_ZIP: 0/9 opened (upload rejected by DeepSeek), unusable; DS_FILES 9/9, 1.93 min; GPT_FILES 9/9, 1.70 min. Validator: no blocking objection (non-blocking: 9 vs 10 files inventoried; chat-UI artifact in AI1 LAST line). Unmeasured arms (Grok; ChatGPT zip) stay unmeasured.

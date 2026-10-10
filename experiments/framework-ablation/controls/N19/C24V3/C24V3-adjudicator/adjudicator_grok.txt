@@ -1,0 +1,105 @@
+1. Role attestation.
+
+Role: Adjudicator — Grok (Expert mode).  
+Ablation: C24 v3 (catalog #24 “Mechanical vs Judged Population”), batch N19.  
+Constitution: 1.0 (SHA-256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9).  
+Builder = ChatGPT; Validator = DeepSeek; Adjudicator = Grok.  
+Independent terminal adjudication on the frozen packet only. No reruns, no repairs, no new criteria, no relaxation of gates, no selection between conflicting mechanical results.  
+This message constitutes the complete adjudication.
+
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+
+FREEZE RECORD (EVIDENCE_FREEZE.json) records:  
+- Builder pack: C24V3/C24V3-builder/builder_report.md, bytes 20882, SHA-256 138ebfa746be0e85c00c1e4579e0fafcd40be68e133cdcabdb0f3bc0763a832a, verdict_token_leak false.  
+- Validator pack: C24V3/C24V3-validator/validator_report.md, bytes 11063, SHA-256 3419d15e5222a6591e31f0b2ba211ee8ac0f611a6b8275346f84b3d8069a2717, verdict_token_leak false.  
+- Frozen at 2026-10-10 12:25:17 CT; roles and constitution version match the spec.  
+
+The reports supplied in this packet are the complete frozen first-pass reports. Each ends with its required END line (END C24 BUILDER REPORT; END C24 VALIDATOR REPORT). Preflight gating result PASS; seed hashes, frozen-pack hashes, and extract hashes match the quoted frozen lists. No hash or frozen-version mismatch is recorded against the FREEZE RECORD or FROZEN REFERENCE HASHES.
+
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+
+| Mechanical fact | Builder | Validator | Runner RESULTS | Agreement |
+|---|---|---|---|---|
+| SQL total rows | 14,635,395 | 14,635,395 | 14,635,395 | agree |
+| Status sum = total | 14,635,395 | 14,635,395 | 14,635,395 | agree |
+| Open / envelope_open / B extract rows | 245,193 | 245,193 | 245,193 | agree |
+| COLLAPSED extract rows | 14,635,395 | 14,635,395 | 14,635,395 | agree |
+| Decision rows (all 4 arm/path) | 222,002 | 222,002 | 222,002 | agree |
+| Classification counts (ESCALATE / INCONCLUSIVE / STANDARD) | 131968 / 6377 / 83657 | same | same | agree |
+| B n_out_of_set | 23,191 | 23,191 | (implied by hash match to frozen) | agree |
+| COLLAPSED n_out_of_set | 14,413,393 | 14,413,393 | 14,413,393 (file content) | agree |
+| Delta n_out_of_set = non-Open rows | 14,390,202 | 14,390,202 | arithmetic identity | agree |
+| 7 key outputs COLLAPSED == B | 6 of 7 (RB_portfolio_counts.csv differs) | 6 of 7 (same file differs) | NOT MET (same) | agree |
+| Differing field | n_out_of_set only | n_out_of_set only | n_out_of_set only | agree |
+| COLLAPSED R-A / R-B exit | 0 / 0 | 0 / 0 | 0 / 0 | agree |
+| Fixtures (all paths) | 14/14 | 14/14 | 14/14 | agree |
+| P1 overall | NOT MET | NOT MET | P1 NOT MET | agree |
+| CHECKSUM PRE = POST | match | match | match | agree |
+| T1 / T2 equivalence | 7/7 equal | 7/7 equal | hashes equal | agree |
+
+No hard mechanical disagreement exists between Builder and Validator on any predeclared hard fact. Both independently recompute the same identities and both locate the sole mismatch in RB_portfolio_counts.csv / n_out_of_set. Runner RESULTS confirms the same mechanical outcome.
+
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+
+1. Evidence packs are complete and frozen.  
+   PASS. FREEZE RECORD lists the exact builder_report.md and validator_report.md with matching byte counts and SHA-256; both reports are present and complete; preflight PASS; coordinator note and runner evidence present. (FREEZE RECORD; PREFLIGHT C24V3; both reports)
+
+2. Role separation is valid.  
+   PASS. Roles fixed as Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; first-pass reports are independent and contain no verdict tokens. (FREEZE RECORD; SPEC roles; both reports’ role attestations)
+
+3. Builder and Validator agree on hard mechanical facts.  
+   PASS. See agreement table in section 3; both state P1 NOT MET solely on the same file and field; no conflicting numbers. (Builder hard-facts table; Validator independently recomputed hard facts; C24V3_RESULTS.md)
+
+4. Exact reconciliation passes where required.  
+   FAIL. Constitution instruction for this ablation: conditions 4–7 apply to arm B; condition 4 = COLLAPSED vs B byte equality per path. Six of seven key outputs match; RB_portfolio_counts.csv does not (hashes eb677bc1… vs 9f0f050a…; sole field difference n_out_of_set 23,191 vs 14,413,393). (C24V3_RESULTS.md “7 key outputs” table; COLLAPSED RB_portfolio_counts.csv; COORDINATOR NOTE)
+
+5. Every mandatory fixture passes.  
+   PASS. Arm B: 14/14 both paths. COLLAPSED: 14/14 both paths. Fixture-result file hashes identical to B and to frozen. (C24V3_RESULTS.md R-runs table; arm manifests; fixture hashes)
+
+6. No undeclared semantic change is detected.  
+   FAIL. The output field n_out_of_set changes because it counts rows outside the decision set relative to the supplied extract. In arm B it equals the Open-only exclusions (23,191); in COLLAPSED it equals full-table exclusions (14,413,393). This is a change in a required key-output count. (SPEC P1 condition 3; C24V3_RESULTS.md; COLLAPSED RB_portfolio_counts.csv; both reports)
+
+7. No locked regression is introduced.  
+   FAIL. The frozen key-output set includes RB_portfolio_counts.csv; its byte identity fails. The program statement treats incorrect counts as Fail. (SPEC “Program Fail: loss of separation yields incorrect counts”; P1 condition 3; C24V3_RESULTS.md)
+
+8. The predeclared benefit predicate is satisfied.  
+   FAIL. P1 condition 3 requires all seven key outputs byte-identical to arm B. It is NOT MET. Evaluator prints “P1 NOT MET”. Predicate was frozen before execution and is not altered. (SPEC “Operational benefit predicate P1”; C24V3_RESULTS.md predicate table and mechanical result; COORDINATOR NOTE)
+
+9. No blocking objection remains supported by the frozen evidence.  
+   FAIL. Validator raises a predicate-application objection that is supported by the evidence: the frozen byte-equality gate fails on an envelope-dependent count. Other evidence objections do not alter the mechanical failure of P1. (Validator “Blocking objections”; C24V3_RESULTS.md)
+
+All nine conditions are conjunctive. Conditions 4, 6, 7, 8 and 9 fail.
+
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+
+- Hard mechanical results conflict: absent. Builder and Validator agree on every hard number and on P1 NOT MET. (section 3 table; both reports)
+- Required raw evidence is missing: absent. Runner results, manifests, logs, exit files, extract hashes, frozen reference hashes, and the differing portfolio file content are present. Instruction: raw evidence is present; do not HALT only because historical stdout is missing. (C24V3_RESULTS.md; arm manifests; EVIDENCE SHA256; RUN LOG; COLLAPSED RUN EXIT FILES; COORDINATOR NOTE)
+- Hashes or frozen-version mismatch against FREEZE RECORD or FROZEN REFERENCE HASHES: absent. Preflight PASS; seed and frozen-file hashes match. (PREFLIGHT C24V3; FREEZE RECORD; SEEDS_C24V3.sha256)
+- Baseline or constitution changed mid-run: absent. (SPEC governance hashes; FREEZE RECORD)
+- Role separation was violated: absent. (FREEZE RECORD; report attestations)
+- Information barriers were breached before first-pass freeze: absent. Reports are independent first-pass outputs. (FREEZE RECORD; both reports)
+- Benefit predicate was not operationally defined before execution: absent. P1 is stated in the original frozen SPEC and carried unchanged into v3. (SPEC “Operational benefit predicate P1”; SPEC ADDENDUM v3)
+- Adjudicator cannot determine which frozen evidence pack is authoritative: absent. Single freeze record and matching reports. (FREEZE RECORD)
+
+No HALT condition of §9 is present.
+
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+
+Validator lists:
+- Predicate-application objection (P1 condition 3 fails on n_out_of_set, an input-envelope-dependent count). Evidence supports the factual claim: the file differs exactly as stated and P1 requires byte identity of all seven files. The constitution forbids relaxing the predeclared gate. The objection correctly identifies the failure; it does not create a HALT condition.
+- Harness/frozen-input objection (run_c24v3_resume.ps1 not in SEEDS_C24V3.sha256). Coordinator note discloses the interruption after COLLAPSED R-A exit 0 and the resume of R-B only with the same Run-R code, guard and chunk size. RUN LOG records the resume. No mechanical result differs from the recorded R-B exit 0 and output hashes. This is a provenance disclosure, not a hard mechanical disagreement or missing required raw evidence that triggers HALT.
+- Evidence objections (raw fixture actuals/expecteds not fully recomputeable from the packet; C24V2 checksum files not re-supplied; full chunked scripts not byte-inspectable beyond diffs and seed hashes). Fixture result hashes are identical and pass counts are 14/14; CHECKSUM bracket is carried as MATCH and CK_PRE.tsv / CK_POST.tsv share the same evidence SHA-256; seed hashes and preflight confirm the chunked scripts. Instruction states raw evidence is present and forbids HALT solely for missing historical stdout. These gaps do not produce a hard-fact conflict or a frozen-hash mismatch.
+- Logging inconsistency (elapsed_min=18.97 reflects post-resume interval). Noted by both reports; does not affect any P1 count or hash.
+
+None of the objections establishes a §9 HALT condition. The supported objection is the predicate failure itself, which under §8 and the ablation instruction produces REVERT.
+
+7. Verdict rationale: did collapsing the SQL envelope into R (catalog #24) materially change the outcome on the frozen pack?
+
+Yes. Collapsing the SQL mechanical envelope (removal of WHERE r.STATUS = 'Open') supplies the full 14,635,395-row table to R. The frozen judgment functions, applied chunk-wise, produce byte-identical classification files, fixture results, RA portfolio counts, and RB kappa-grid counts, and identical decision and classification counts (222,002 / 131,968 / 6,377 / 83,657). The sole material change on the frozen key-output set is RB_portfolio_counts.csv: n_out_of_set becomes 14,413,393 (full-table exclusions) instead of 23,191 (Open-only exclusions). The difference equals the non-Open population (14,390,202).  
+
+P1 condition 3 (all seven key outputs byte-identical) therefore fails. The predeclared program Fail condition (“loss of separation yields incorrect counts”) is met. Resource use is higher but is not gated. Equivalence tests T1/T2 and the classification-file identity show that the final judged population is preserved; the portfolio accounting field that depends on the input envelope is not. Because P1 is not satisfied, the ablation does not meet the KEEP rule.  
+
+No HALT condition holds. Under constitution §8 and the explicit instruction for this packet (“If P1 fails and no HALT condition holds, return REVERT”), the separation of the SQL mechanical envelope from the judged population in R stays.
+
+TERMINAL_STATE: REVERT
+END C24 ADJUDICATION

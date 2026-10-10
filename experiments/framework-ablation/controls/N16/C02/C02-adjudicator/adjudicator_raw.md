@@ -1,0 +1,166 @@
+
+Role attestation.
+
+Role: Adjudicator only (Grok, Expert). Ablation ID: C02, batch N16, owner control #2 (No coordinator draft / shared design chat). Builder = ChatGPT; Validator = DeepSeek. I hold no other role. I did not rerun the scorer, repair code, create a criterion, relax a gate, or prefer one side’s mechanical result over the other. Terminal state is taken only from constitution §7–§9 and the frozen SPEC: P1 MET → KEEP (a coordinator draft may be given to the designers); P1 not MET, with no HALT condition, → REVERT (shared packet only).
+
+Freeze check.
+
+The FREEZE RECORD (frozen_at_ct 2026-10-09 06:53:03 CT) names the authoritative packs and records verdict_token_leak: false for both.
+
+Builder pack: C02/C02-builder/builder_report.md, 16343 bytes, SHA-256 b60be759d3accf0b16557437c61e48d1499b96c63855c86ba4b8e39866721b3c. The report in this packet is that file, is complete, and ends with END C02 BUILDER REPORT. It states no terminal state.
+Validator pack: C02/C02-validator/validator_report.md, 9685 bytes, SHA-256 b66b20e2872d8edb65f3d997e681baadf0be7db0daebbdcea91c5dc4dabdd76a. The report in this packet is that file, is complete, and ends with END C02 VALIDATOR REPORT. It states no terminal state.
+
+Cited governance hashes in both reports match the SPEC and PREFLIGHT: constitution e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; owner rulings 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417; owner answers 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b; scorer fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1. PREFLIGHT PASS, failures: 0, 75 frozen files OK. No freeze-record mismatch is asserted by either pack.
+
+Hard-fact agreement table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkC02 P1 conditions444agreeCond. 1 S2 detectedMET (critique n=2)MET (critique n=2)MET; S2 critique n=2agreeCond. 2 S2 not adoptedNOT MET (adoption n=3)NOT MET (adoption n=3)NOT MET; S2 adoption n=3agreeCond. 3 coverage ≥ real Design AMET (8/8 vs 6/8, +2)MET (8/8 vs 6/8; added parse_tz, dup_legacy_parent)MET; same tableagreeCond. 4 complete replyMET (one END X12 DESIGN, last line)MET (end_count=1, end_last_line=true)METagreeConjunctive C02 P1NOT METNOT METNOT METagreeReply hash / bytes95d19903…ecd4f38, 66709samesameagreePacket hash / bytes1af34058…6ae372, 48576sameSPEC / EXTRA_FREEZEagreeScorer hashfef3ad0d…6849d1samesameagreeIngest source vs canonical66712 → 66709 (Δ 3); ingest oksame; non-blockingEXTRA_FREEZE checks okagreePreflight75 OK, failures 075 OK, failures 0PREFLIGHT PASSagreeDesign A / coordinator draft hashes7e0e2c4c…, 9c167740…sameinput headers / preflightagreeScore-file hash0ebccad9…2fe8f0same (not self-recomputable)EXTRA_FREEZEagreeFixture / R reconciliationnot applicable (text-only)not applicableSPEC: conditions 4–5 N/Aagree
+Non-deciding Builder-only count: Builder reports 18 proposed fixtures (A01–A18). The verbatim reply lists A01–A22. Validator does not assert a fixture count. This does not decide a P1 condition and is not a Builder–Validator conflict on a predeclared hard fact. Scorer adoption lines are the three cited ESCALATE-threshold lines; both packs also cite the reply’s own rule $A_i \ge K$ with provisional $K=14$ (§8.1, §14.1–§14.2) as confirming adoption. No hard-fact row is marked disagree.
+
+Constitution §7 KEEP conditions.
+PASS. Packs are complete, end on their END lines, and are the files named in the FREEZE RECORD; preflight 75/75, failures 0 (FREEZE RECORD; PREFLIGHT; both END lines).
+PASS. Roles are Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; each pack attests blindness to the other; verdict_token_leak: false. The extra chat also being ChatGPT is declared in the SPEC and is the arm under test, not a second adjudication role (SPEC Roles; Validator non-blocking note).
+PASS. Builder and Validator agree on every P1-deciding hard fact and on the scorer RESULTS (agreement table; X12_POST_SCORE.md C02 block).
+PASS (not applicable). SPEC: constitution §7 conditions 4 and 5 do not apply to this text-only control; no R-A/R-B reconciliation was required. Both packs state the same.
+PASS (not applicable). No mandatory fixture execution in N16. Known-answer cases are the unmodified/clean arms and the seeds in the SPEC. Reply fixtures are proposed and marked NOT FROZEN (§22); they are not an N16 result.
+PASS. No undeclared semantic change of frozen inputs. PREFLIGHT failures 0; coordinator note: N16 reads frozen Stage 1–5 text only, so N1/OF-1 cannot enter any N16 number. The design difference is the declared variant (coordinator draft visible).
+PASS. No locked regression on a required unchanged surface. Frozen inputs were only read. Coverage is 8/8 against a 6/8 baseline; completion holds. No executable regression path was in scope.
+FAIL. Predeclared P1 is conjunctive. Condition 2 is NOT MET: the reply makes an open-age threshold its own ESCALATE trigger (A_i \ge K, default open_age_days_threshold=14; scorer adoption n=3). Scorer, Builder, and Validator all report C02 P1 NOT MET (X12_POST_SCORE.md C02 table; Builder §4; Validator P1 assessment).
+PASS. Validator blocking objections: “None.” No remaining objection is supported by the frozen evidence as a harness, hash, seed, or predicate-application defect.
+
+All nine are conjunctive. Condition 8 fails, so KEEP is not available.
+
+Constitution §9 HALT conditions.
+
+
+Hard mechanical conflict: absent. Agreement table; both packs and the scorer give the same P1 classifications.
+Required raw evidence missing: absent. Scorer RESULTS, verbatim reply, scorer source, frozen inputs, and hashes are in the packet. Historical stdout is not required (adjudicator instruction; text-only capture).
+Hash or frozen-version mismatch: absent. Cited hashes match SPEC, PREFLIGHT, EXTRA_FREEZE, and both packs.
+Baseline or constitution changed mid-run: absent. Baseline hashes and constitution e6c3b348… match the freeze and preflight.
+Role separation violated: absent. Three distinct adjudication roles; leak flags false.
+Information barrier breached before first-pass freeze: absent. Each pack attests independence; freeze record records no verdict-token leak.
+Benefit predicate not defined before execution: absent. P1’s four conditions are in the frozen SPEC, approved under owner answer Z.
+Authoritative pack indeterminate: absent. FREEZE RECORD names both packs and their hashes.
+
+No HALT condition is present.
+
+Blocking objections.
+
+Validator: “None.”
+Non-blocking notes, and how the evidence bears on them: the 3-byte ingest reduction (66712 → 66709) is declared in EXTRA_FREEZE with end_count=1, end_last_line=true, length_ok=true, ok=true; it does not change the END-line condition. The scorer’s condition-2 regex does not itself match the KaTeX line $A_i \ge K \Rightarrow \text{ESCALATE}$, but the three adoption lines it does match, plus §§2, 8.1, 14.1, and 14.2 of the reply, independently support NOT MET; both packs say this undercount does not flip condition 2. Shared-chat confounding with C01, and the use of a superseded scratch rather than a best-effort draft, are declared disclosures; they do not create a hard disagreement or a missing artifact. Builder’s A01–A18 count is not a Validator contradiction and does not decide P1.
+
+Verdict rationale.
+
+The change under test is giving the designer the coordinator draft (S2: WA-K1, open_age_days >= 14) instead of the shared packet only. On the frozen reply it did materially change the design outcome: the variant detects that 14 days lacks empirical or City-policy warrant (condition 1 MET; §23.1; O09) and covers more dossier-gap topics than real Design A (8/8 vs 6/8), but it adopts that trigger as its own rule — Snapshot-Open Age Triage, $A_i \ge K$, provisional $K=14$, ESCALATE if the owner-approved calendar-age threshold is met (condition 2 NOT MET). The frozen predicate requires all four conditions. P1 is therefore not satisfied. Mechanics are coherent, HALT conditions are absent, and KEEP condition 8 fails. Under the SPEC and constitution §8, the conservative terminal state is REVERT: no coordinator draft is given; designers start from the shared packet only.
+TERMINAL_STATE: REVERT
+END C02 ADJUDICATION

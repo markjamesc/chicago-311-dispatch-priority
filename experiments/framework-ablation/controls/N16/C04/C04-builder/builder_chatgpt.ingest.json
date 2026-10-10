@@ -1,0 +1,38 @@
+{
+ "cid": "C04",
+ "role": "builder",
+ "source": "C04/C04-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 22310,
+ "source_sha256": "2ac11099dccfaea102cb3d156e09e72a9bf27d6911da6f98290ddce014719e67",
+ "output": "C04/C04-builder/builder_report.md",
+ "output_bytes": 22310,
+ "output_sha256": "2ac11099dccfaea102cb3d156e09e72a9bf27d6911da6f98290ddce014719e67",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 2,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 06:07:10\nreply_complete=2026-10-09 06:15:45\n# reply_complete = first-seen (upper bound; still generating at ~06:11:15 poll, true finish not observed). Packet sent as file attachment (C04_1_BUILDER_ChatGPT.txt), reasoning High. Note: UI showed \"Analyzed\" x3 (ChatGPT ran its built-in analysis on the attached file) although no tools were enabled. URL https://chatgpt.com/c/6ac8cab3-ce24-83ea-9b87-2c98ca21ba12"
+}

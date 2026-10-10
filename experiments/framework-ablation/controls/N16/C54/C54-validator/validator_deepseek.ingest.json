@@ -1,0 +1,38 @@
+{
+ "cid": "C54",
+ "role": "validator",
+ "source": "C54/C54-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 8260,
+ "source_sha256": "af15107d959ff3962f352e5ff931c70ed689815553ab3c550adc61fe8bee1045",
+ "output": "C54/C54-validator/validator_report.md",
+ "output_bytes": 8257,
+ "output_sha256": "57fd6d38f95fcfb04a7932d1efc3a4323ce583e175499dc1d35bd918bbdc481f",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 3,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 03:47:52\nreply_complete=2026-10-09 03:59:47"
+}

@@ -1,0 +1,39 @@
+{
+ "cid": "C24V3",
+ "role": "adjudicator",
+ "source": "C24V3/C24V3-adjudicator/adjudicator_grok_TEXTONLY.txt",
+ "source_bytes": 11253,
+ "source_sha256": "a5e1b7cbf5cbf4f0da00db694ab783f035eb6c805ee179d354c277f8bb0b0c7e",
+ "output": "C24V3/C24V3-adjudicator/adjudicator_raw.md",
+ "output_bytes": 11254,
+ "output_sha256": "2b7eeda89d98a3b29c7df65fabf24622232be3912c59dde8ebfc73bbebc97574",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "terminal_state_lines": 1,
+  "second_last_is_terminal": true,
+  "leak": false,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Freeze check",
+   "Hard-fact agreement",
+   "KEEP conditions",
+   "HALT conditions",
+   "Blocking objections",
+   "Verdict rationale"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-10 12:26:05\nreply_complete=2026-10-10 12:27:12\n# reply_complete = first-seen (upper bound; still generating at 12:27:05 poll, END seen at ~12:27:12 poll). Mode Expert (default, no custom mode). Packet sent as file attachment (C24V3_3_ADJUDICATOR_Grok.txt), no extra text. Captured via reply Copy button (text-only, no trailing newline in clipboard). URL https://grok.com/c/22022c52-c93c-4e63-9d85-3f99d33bd943"
+}

@@ -1,0 +1,38 @@
+{
+ "cid": "C49R",
+ "role": "builder",
+ "source": "C49R/C49R-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 15950,
+ "source_sha256": "0581f1588ba4ad38021e4a51e99af4f53d081a63aeeaefe793e0392ccb2ce0e7",
+ "output": "C49R/C49R-builder/builder_report.md",
+ "output_bytes": 15950,
+ "output_sha256": "0581f1588ba4ad38021e4a51e99af4f53d081a63aeeaefe793e0392ccb2ce0e7",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "url=https://chatgpt.com/c/6ac8dbcc-b148-83ea-bc85-cfb655054721\nsent=2026-10-09 07:19:41 CDT\nreply_complete=2026-10-09 07:23:30 CDT (approx; UI \"Worked for 3m 48s\")\nnotes: New chat, ChatGPT reasoning = High, no tools. Packet packets/C49R_1_BUILDER_ChatGPT.txt (61226 B, ends \"Finish with the line: END C49R BUILDER REPORT\") sent as a single file attachment with no message text. Reply showed \"This response couldn't load\" right after completion; page reload rendered it fully (not regenerated). Reply contains inline file-citation chips; copied as rendered. Capture: select rendered reply, copy, clipget; unchanged + final newline."
+}

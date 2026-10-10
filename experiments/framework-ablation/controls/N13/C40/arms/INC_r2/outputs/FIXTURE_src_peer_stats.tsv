@@ -1,0 +1,6 @@
+type_key	peer_n	peer_p50_h	peer_p75_h	t_freeze	lookback_w_days	peer_def	peer_label_note
+POTHOLE	500	72	168	2026-09-12 23:59:59	365	fixture	fixture
+BUILDING	200	1080	2160	2026-09-12 23:59:59	365	fixture	fixture
+FAST	120	36	72	2026-09-12 23:59:59	365	fixture	fixture
+RARETYPE	8	48	96	2026-09-12 23:59:59	365	fixture	fixture
+ADDRTYPE	80	48	72	2026-09-12 23:59:59	365	fixture	fixture

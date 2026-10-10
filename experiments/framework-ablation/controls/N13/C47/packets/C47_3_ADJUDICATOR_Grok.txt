@@ -1,0 +1,1199 @@
+# C47 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the dominance check (owner ruling 47A) is adopted at Stage 4: a service type supplying more than 1/3 of ESCALATE rows (total >= 1,000, type >= 30) is flagged in the Stage 4 report and routed to the owner; nothing is dropped.
+- REVERT: the addition is not adopted; the framework stays as is.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw per-arm files, manifests, logs, frozen reference hashes). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 condition 4: the check writes nothing into the pipeline; the locked results are the frozen classifications, hash-checked before and after (arm INPUT_HASH files). Condition 5: no fixture is added to the locked pack; the planted tables are the known-answer cases declared in the SPEC.
+- Items the SPEC marks "not measured" (e.g. design minutes for C53, PricePoint-scale costs, the C48 audit wall-clock) are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (Single-unit dominance check (Addendum 02 #47)) materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C47 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C47 counts labels only; the 3 rows carry the same label on both paths, so N1 cannot change a C47 number.
+---
+# SPEC
+# C47 — Ablation specification (FROZEN)
+
+**Ablation ID:** C47 (Addendum 02, candidate #47 "Small-denominator and single-unit dominance check on gating accuracy metrics")
+**Batch:** N13 batch 5 (controls C41, C47, C53, C48; the four of the owner's batch-01 rulings that run on the frozen pack without a design chat; #42 waits for the owner's answer sheet `OWNER_42_SHEET.md`)
+**Owner rulings (operational definitions, constitution §9):** Owner rulings batch 01: `ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba` (questions file `OWNER_RULINGS_BATCH_01.md` SHA-256 `bcd23877be27e047c49bb0fbd0e4bda15031dad9e85b1df3b523badf0ee1b6dc`, not edited). Ruled 2026-10-03 09:58 CT: `41A 42A 47A 48A 53A`.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 report (hardening; accuracy-adding)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b5/run_batch_v5.ps1`, evaluator `runner_b5/eval_b5.R`; R only, no MySQL)
+
+## Control under test (hardening; accuracy-adding, Addendum 02 #47)
+Rule as it stands: no minimum denominator and no single-unit share limit is declared for the headline metric. PricePoint evidence: FOODS_3_092 contributed 0.1872 of A2 0.2697 (n = 345), found only at Stage 5 (HC-1, R11). The Chicago pack has no accuracy gate, so ruling 47A fixes the metric: the share of ESCALATE rows by service type (`type_key`) in the headline result (ESCALATE 131,968 of decision set 222,002).
+
+## Verdict convention (hardening/addition, Addendum 02)
+**KEEP = the dominance check (ruling 47A) is adopted at Stage 4. REVERT = the addition is not shown to help.** HALT as in constitution §9. Time is not the predicate (Addendum 02: accuracy-adding candidates are judged on detection and no regression).
+
+## Exact change being tested (ruling 47A)
+`dom_check.R` on a classifications file: count ESCALATE rows by `type_key`; the check applies only if total ESCALATE ≥ 1,000; a type is eligible if it has ≥ 30 ESCALATE rows; **FLAG** = an eligible type with share > 1/3; status FLAG / NO_FLAG / NOT_APPLICABLE_BELOW_MIN_TOTAL. A flag never drops or changes a row: the result stays as computed, the flag is written to the Stage 4 report and routed to the owner. Baseline = no check (nothing is flagged, by construction).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, now confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C47 counts labels only; the 3 N1 rows have the same label on both paths, so N1 cannot change any C47 number.
+
+## Arms (runner v5, `seeds/C47/DOMCHK`)
+- **REAL_RB**: frozen `R-B/outputs/RB_classifications.csv` (WCA2 = 64,922 of 131,968 = 49.2%; ruled a true flag).
+- **REAL_RA**: frozen `R-A/outputs/RA_classifications.csv` (same labels; must give the same table).
+- **SEED_DOM60**: planted table, 10,000 ESCALATE rows, T01 = 60% (must flag T01 only).
+- **CLEAN_BAL**: planted table, 10,000 ESCALATE rows, no type above 20% (max 19%; must not flag).
+- **SMALL_N**: planted table, 900 ESCALATE rows, T01 = 60% (below the minimum: the check must not apply).
+Planted tables are generated by `make_seeds_b5.py` (full text in the packet; hashes in SEEDS_b5).
+
+## Operational benefit predicate P1 (ruling 47A, made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. SEED_DOM60: status FLAG with flagged types exactly T01;
+2. CLEAN_BAL: status NO_FLAG;
+3. SMALL_N: status NOT_APPLICABLE_BELOW_MIN_TOTAL;
+4. REAL_RB and REAL_RA: both FLAG exactly WCA2, with identical DOM_TABLE.csv;
+5. no change to any locked result: every input hash is unchanged across the check, and the real inputs equal the frozen hashes.
+REVERT side: any of 1–5 fails.
+
+## Regression / HALT rules
+- HALT if a check run fails or its result is missing, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4: the check writes nothing into the pipeline; the locked results are the frozen classifications (hash-checked before and after). Condition 5: the check adds no fixture to the locked pack; the planted tables are its known-answer cases (declared now, before execution).
+
+## Allowed source/data scope
+Frozen PC pack, read only. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+**Runner-side files for this control (frozen list `runner_b5/SEEDS_b5.sha256`; preflight gating):**
+- `runner_b5/seeds/C47/ARMS.tsv` SHA-256 `b887a2d4fa959e8185f9620711312fd6b9d6ff4ad4bda42c25c17f876c6b4b0c`
+- `runner_b5/seeds/C47/DOMCHK` SHA-256 `047e783a9c351ef1db14a3b1f4acd572d88d79498b0627b1d208a6ce9c53ee78`
+- `runner_b5/seeds/C47/SYN_BAL.csv` SHA-256 `89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54`
+- `runner_b5/seeds/C47/SYN_DOM60.csv` SHA-256 `eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5`
+- `runner_b5/seeds/C47/SYN_SMALLN.csv` SHA-256 `d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61`
+- `runner_b5/seeds/C47/dom_check.R` SHA-256 `582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145`
+- `runner_b5/run_batch_v5.ps1` SHA-256 `e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810`
+- `runner_b5/eval_b5.R` SHA-256 `49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; owner rulings file as above. This spec is hashed in `SPEC_FREEZE_b5.sha256` before the reporting run.
+**Inputs actually read:** the two frozen classifications files above and the three planted tables (SEEDS_b5).
+## Pre-execution check (disclosed)
+The predicate text (`eval_b5.R`, SHA-256 in `SEEDS_b5.sha256`) was hashed before any execution. The complete runner was then exercised once on the PC in a scratch folder (`N13\_preflight_b5`, non-reporting, `NON_REPORTING.txt`): 2026-10-03 10:17–10:27 CT, runner tar `N13_runner_b5_v1.tar` SHA-256 0add2b9b37fc0d7af48c20eb2c5ebda550b3f0e2d2b5904fa82be3970e3d6e6e; preflight PASS; every run exit 0; summarize exit 0. Scratch outcome: REAL_RB and REAL_RA FLAG WCA2 (0.491953, identical tables), SEED_DOM60 FLAG T01, CLEAN_BAL NO_FLAG, SMALL_N NOT_APPLICABLE; mechanical result P1 MET. The scratch result was known before this spec was frozen. No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   b887a2d4fa959e8185f9620711312fd6b9d6ff4ad4bda42c25c17f876c6b4b0c seeds/C47/ARMS.tsv
+seed   OK   047e783a9c351ef1db14a3b1f4acd572d88d79498b0627b1d208a6ce9c53ee78 seeds/C47/DOMCHK
+seed   OK   89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54 seeds/C47/SYN_BAL.csv
+seed   OK   eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5 seeds/C47/SYN_DOM60.csv
+seed   OK   d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61 seeds/C47/SYN_SMALLN.csv
+seed   OK   582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145 seeds/C47/dom_check.R
+seed   OK   e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810 run_batch_v5.ps1
+seed   OK   49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966 eval_b5.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b5 (R-only; another batch holds the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 15541 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+b887a2d4fa959e8185f9620711312fd6b9d6ff4ad4bda42c25c17f876c6b4b0c  619  runner_b5/seeds/C47/ARMS.tsv
+047e783a9c351ef1db14a3b1f4acd572d88d79498b0627b1d208a6ce9c53ee78  37  runner_b5/seeds/C47/DOMCHK
+89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54  390034  runner_b5/seeds/C47/SYN_BAL.csv
+eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5  416034  runner_b5/seeds/C47/SYN_DOM60.csv
+d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61  39634  runner_b5/seeds/C47/SYN_SMALLN.csv
+582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  runner_b5/seeds/C47/dom_check.R
+e51e70e8050aa5582dca497d799c0b0c9fa1db7f3c6a2c1dc797d915970cd810  13838  runner_b5/run_batch_v5.ps1
+49742ad3ead70fe6b73121e61b0c774b1f94c4edc36f7241ef99456ef0cb3966  17686  runner_b5/eval_b5.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b5.sha256` (written before the reporting run):
+# N13 batch b5 spec freeze, written 2026-10-03 10:28 CDT before the reporting run (scratch check in N13/_preflight_b5 disclosed in each spec)
+037865587d9d8c6de369c230486c99bfcf6e8ba6f9f1198756ed5ced4def368d  C41/ABLATION_SPEC.md
+d1582be670cf3d4721b7f0f710a00b5bc090bed6a2d0a62cc507dce2c1901aa8  C47/ABLATION_SPEC.md
+ad4a904625793fc093d127eac6ffc4796059ae98ad0e43a961237870e96819e7  C53/ABLATION_SPEC.md
+5f0cd243cbf0a8093eb119ea4f4d97464c36064f4d15f437bb2501ff91499e18  C48/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C41/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C47/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C53/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C48/CONSTITUTION_v1.md
+7998d8f4d182936100d26d2c1465ea46637b63a377d1329f9e12f4664bbdd5b2  runner_b5/SEEDS_b5.sha256
+1a84dd5f586e36f28caa0244dca54f8682d8c5d59944a13db1d3a40c10386916  runner_b5/SEED_DIFFS_b5.txt
+d502a0e642b596e9cb4db1ebfa07c3718198fe6d91fd3f6a76e6f2a7cbb10e66  runner_b5/PRECHECK_b5.json
+e8854242ec1b7e8d6ac7e81550fb8b68dbdb00e514db70db3cdf6a0774624fc0  runner_b5/assemble_c48_bv.R
+9b21f81cfc99c4cc391a362d841b83d48a1dfe8a9463598f59cc3f3b2a868e1e  C48/packets/C48_A2_SECOND_AUDIT_Grok.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+bcd23877be27e047c49bb0fbd0e4bda15031dad9e85b1df3b523badf0ee1b6dc  ablation_plan/OWNER_RULINGS_BATCH_01.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+37acd34e2a76793bb5942c100f703b2a4045b6161c5ba4f76295b4322bd642c9  ablation_plan/OWNER_42_SHEET.md
+
+---
+# RUN LOG (this control)
+10:32:15 C47 arms
+10:32:16   REAL_RB DOM exit=0 secs=1.4 timeout=0
+10:32:22   REAL_RA DOM exit=0 secs=5.2 timeout=0
+10:32:26   SEED_DOM60 DOM exit=0 secs=3.6 timeout=0
+10:32:30   CLEAN_BAL DOM exit=0 secs=3.4 timeout=0
+10:32:34   SMALL_N DOM exit=0 secs=3.9 timeout=0
+
+---
+# C47_RESULTS.md (runner output)
+# C47 RESULTS (mechanical; generated 2026-10-03 10:39:08 CDT)
+
+**Mechanical predicate result: P1 MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. planted dominant unit: SEED_DOM60 status FLAG with flagged types exactly T01 | MET |
+| 2. clean case: CLEAN_BAL status NO_FLAG (no false flag) | MET |
+| 3. minimum denominator: SMALL_N status NOT_APPLICABLE_BELOW_MIN_TOTAL (no flag below 1,000 ESCALATE rows) | MET |
+| 4. real data: REAL_RB and REAL_RA both FLAG exactly WCA2 (ruled a true flag) with identical DOM_TABLE.csv | MET |
+| 5. nothing changed: every input hash unchanged across the check, and the real inputs equal the frozen hashes (routing = report only) | MET |
+
+## Arms
+| arm | exit | input_sha | input_unchanged | n_escalate_total | top_type | top_share | flagged_types | status | dom_table_sha |
+|---|---|---|---|---|---|---|---|---|---|
+| REAL_RB | 0 | a0e42b8667b38baf | TRUE | 131968 | WCA2 | 0.491953 | WCA2 | FLAG | b5a46c63d017be7e |
+| REAL_RA | 0 | c099e092feb237c8 | TRUE | 131968 | WCA2 | 0.491953 | WCA2 | FLAG | b5a46c63d017be7e |
+| SEED_DOM60 | 0 | eba07ed92dc93966 | TRUE | 10000 | T01 | 0.600000 | T01 | FLAG | 04f12e81e2396540 |
+| CLEAN_BAL | 0 | 89c3d85f6e8c76ef | TRUE | 10000 | T01 | 0.190000 |  | NO_FLAG | c413e66b0bca12cc |
+| SMALL_N | 0 | d846fe7b17694f7a | TRUE | 900 | T01 | 0.600000 |  | NOT_APPLICABLE_BELOW_MIN_TOTAL | d579d57c895cab60 |
+
+Baseline regime (no check): no arm is flagged by construction; the planted dominant unit and the real WCA2 concentration go unreported at Stage 4.
+
+## REAL_RB: DOM_TABLE.csv (top 6 of 81 types)
+| type_key | n_escalate | share | eligible | flag |
+|---|---|---|---|---|
+| WCA2 | 64922 | 0.4919525945683802 | TRUE | TRUE |
+| SED | 17254 | 0.1307438166828322 | TRUE | FALSE |
+| SKA | 7316 | 0.05543768186226964 | TRUE | FALSE |
+| PBD | 3937 | 0.0298329898157129 | TRUE | FALSE |
+| PHF | 3371 | 0.0255440712900097 | TRUE | FALSE |
+| BBD | 3298 | 0.024990906886517943 | TRUE | FALSE |
+
+## REAL_RA: DOM_TABLE.csv (top 6 of 81 types)
+| type_key | n_escalate | share | eligible | flag |
+|---|---|---|---|---|
+| WCA2 | 64922 | 0.4919525945683802 | TRUE | TRUE |
+| SED | 17254 | 0.1307438166828322 | TRUE | FALSE |
+| SKA | 7316 | 0.05543768186226964 | TRUE | FALSE |
+| PBD | 3937 | 0.0298329898157129 | TRUE | FALSE |
+| PHF | 3371 | 0.0255440712900097 | TRUE | FALSE |
+| BBD | 3298 | 0.024990906886517943 | TRUE | FALSE |
+
+## SEED_DOM60: DOM_TABLE.csv (top 6 of 10 types)
+| type_key | n_escalate | share | eligible | flag |
+|---|---|---|---|---|
+| T01 | 6000 | 0.6 | TRUE | TRUE |
+| T02 | 445 | 0.0445 | TRUE | FALSE |
+| T03 | 445 | 0.0445 | TRUE | FALSE |
+| T04 | 445 | 0.0445 | TRUE | FALSE |
+| T05 | 445 | 0.0445 | TRUE | FALSE |
+| T06 | 445 | 0.0445 | TRUE | FALSE |
+
+## CLEAN_BAL: DOM_TABLE.csv (top 6 of 10 types)
+| type_key | n_escalate | share | eligible | flag |
+|---|---|---|---|---|
+| T01 | 1900 | 0.19 | TRUE | FALSE |
+| T02 | 1500 | 0.15 | TRUE | FALSE |
+| T03 | 1200 | 0.12 | TRUE | FALSE |
+| T04 | 1100 | 0.11 | TRUE | FALSE |
+| T05 | 1000 | 0.1 | TRUE | FALSE |
+| T06 | 900 | 0.09 | TRUE | FALSE |
+
+## SMALL_N: DOM_TABLE.csv (top 6 of 10 types)
+| type_key | n_escalate | share | eligible | flag |
+|---|---|---|---|---|
+| T01 | 540 | 0.6 | FALSE | FALSE |
+| T02 | 40 | 0.044444444444444446 | FALSE | FALSE |
+| T03 | 40 | 0.044444444444444446 | FALSE | FALSE |
+| T04 | 40 | 0.044444444444444446 | FALSE | FALSE |
+| T05 | 40 | 0.044444444444444446 | FALSE | FALSE |
+| T06 | 40 | 0.044444444444444446 | FALSE | FALSE |
+
+
+---
+# C47_arms.csv (raw, full file)
+arm,exit,input_sha,input_unchanged,n_escalate_total,top_type,top_share,flagged_types,status,dom_table_sha
+REAL_RB,0,a0e42b8667b38baf,TRUE,131968,WCA2,0.491953,WCA2,FLAG,b5a46c63d017be7e
+REAL_RA,0,c099e092feb237c8,TRUE,131968,WCA2,0.491953,WCA2,FLAG,b5a46c63d017be7e
+SEED_DOM60,0,eba07ed92dc93966,TRUE,10000,T01,0.600000,T01,FLAG,04f12e81e2396540
+CLEAN_BAL,0,89c3d85f6e8c76ef,TRUE,10000,T01,0.190000,,NO_FLAG,c413e66b0bca12cc
+SMALL_N,0,d846fe7b17694f7a,TRUE,900,T01,0.600000,,NOT_APPLICABLE_BELOW_MIN_TOTAL,d579d57c895cab60
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/CLEAN_BAL/INPUT_HASH_after.txt
+89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54  SEED:seeds\C47\SYN_BAL.csv
+
+## arms/CLEAN_BAL/INPUT_HASH_before.txt
+89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54  SEED:seeds\C47\SYN_BAL.csv
+
+## arms/CLEAN_BAL/RUN_DOM.exit
+0,3.4,2026-10-03T10:32:30-05:00,0,600
+
+## arms/CLEAN_BAL/outputs/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+SYN_BAL.csv,13000,10000,1000,30,> 1/3,10,T01,1900,0.190000,,NO_FLAG,none
+
+## arms/CLEAN_BAL/outputs/DOM_TABLE.csv
+type_key,n_escalate,share,eligible,flag
+T01,1900,0.19,TRUE,FALSE
+T02,1500,0.15,TRUE,FALSE
+T03,1200,0.12,TRUE,FALSE
+T04,1100,0.11,TRUE,FALSE
+T05,1000,0.1,TRUE,FALSE
+T06,900,0.09,TRUE,FALSE
+T07,800,0.08,TRUE,FALSE
+T08,700,0.07,TRUE,FALSE
+T09,500,0.05,TRUE,FALSE
+T10,400,0.04,TRUE,FALSE
+
+## arms/REAL_RA/INPUT_HASH_after.txt
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  FROZEN:R-A\outputs\RA_classifications.csv
+
+## arms/REAL_RA/INPUT_HASH_before.txt
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  FROZEN:R-A\outputs\RA_classifications.csv
+
+## arms/REAL_RA/RUN_DOM.exit
+0,5.2,2026-10-03T10:32:22-05:00,0,600
+
+## arms/REAL_RA/outputs/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RA_classifications.csv,222002,131968,1000,30,> 1/3,81,WCA2,64922,0.491953,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/REAL_RA/outputs/DOM_TABLE.csv
+type_key,n_escalate,share,eligible,flag
+WCA2,64922,0.4919525945683802,TRUE,TRUE
+SED,17254,0.1307438166828322,TRUE,FALSE
+SKA,7316,0.05543768186226964,TRUE,FALSE
+PBD,3937,0.0298329898157129,TRUE,FALSE
+PHF,3371,0.0255440712900097,TRUE,FALSE
+BBD,3298,0.024990906886517943,TRUE,FALSE
+WCA3,2867,0.02172496362754607,TRUE,FALSE
+SFB,2603,0.019724478661493697,TRUE,FALSE
+SEE,2593,0.019648702715809895,TRUE,FALSE
+GRAF,1962,0.01486724054316198,TRUE,FALSE
+SFK,1922,0.01456413676042677,TRUE,FALSE
+PBS,1884,0.014276188166828322,TRUE,FALSE
+SFD,1719,0.013025885063045587,TRUE,FALSE
+CHECKFOR,1516,0.011487633365664404,TRUE,FALSE
+AAE,1325,0.010040312803103782,TRUE,FALSE
+BBA,1237,0.009373484481086323,TRUE,FALSE
+PCL,1098,0.008320198836081474,TRUE,FALSE
+PHB,1023,0.007751879243452958,TRUE,FALSE
+SEC,1011,0.0076609481086323955,TRUE,FALSE
+SEL,884,0.006698593598448109,TRUE,FALSE
+ESPC,703,0.00532704898157129,TRUE,FALSE
+PCE,692,0.005243695441319108,TRUE,FALSE
+SIE,508,0.0038494180407371483,TRUE,FALSE
+AAD,502,0.003803952473326867,TRUE,FALSE
+WCA,460,0.0034856935014548982,TRUE,FALSE
+SCB,457,0.0034629607177497574,TRUE,FALSE
+WM3,448,0.0033947623666343357,TRUE,FALSE
+EAE,419,0.0031750121241513095,TRUE,FALSE
+PET,417,0.003159856935014549,TRUE,FALSE
+SDR,268,0.0020307953443258974,TRUE,FALSE
+AAI,242,0.0018337778855480116,TRUE,FALSE
+SCP,241,0.0018262002909796315,TRUE,FALSE
+PCB,224,0.0016973811833171678,TRUE,FALSE
+SFQ,220,0.0016670708050436469,TRUE,FALSE
+EAB,193,0.0014624757516973812,TRUE,FALSE
+MWC,175,0.0013260790494665374,TRUE,FALSE
+BBK,153,0.0011593719689621726,TRUE,FALSE
+SCQ,152,0.0011517943743937925,TRUE,FALSE
+PSL,145,0.0010987512124151309,TRUE,FALSE
+SFA,142,0.0010760184287099902,TRUE,FALSE
+SRRC,134,0.0010153976721629487,TRUE,FALSE
+AAF,122,9.244665373423861e-4,TRUE,FALSE
+CSF,108,8.18380213385063e-4,TRUE,FALSE
+SWSNOREM,102,7.729146459747818e-4,TRUE,FALSE
+SCT,96,7.274490785645005e-4,TRUE,FALSE
+SDP,95,7.198714839961203e-4,TRUE,FALSE
+BBC,91,6.895611057225994e-4,TRUE,FALSE
+RBL,90,6.819835111542193e-4,TRUE,FALSE
+CST,66,5.001212415130941e-4,TRUE,FALSE
+SGQ,63,4.7738845780795347e-4,TRUE,FALSE
+WBK,61,4.6223326867119303e-4,TRUE,FALSE
+WBT,61,4.6223326867119303e-4,TRUE,FALSE
+SCC,41,3.1068137730358875e-4,TRUE,FALSE
+HFB,34,2.5763821532492724e-4,TRUE,FALSE
+SEF,29,2.197502424830262e-4,FALSE,FALSE
+WBJ,29,2.197502424830262e-4,FALSE,FALSE
+CAFE,28,2.1217264791464598e-4,FALSE,FALSE
+SCS,25,1.8943986420950532e-4,FALSE,FALSE
+SFN,25,1.8943986420950532e-4,FALSE,FALSE
+SGA,24,1.8186226964112513e-4,FALSE,FALSE
+CSC,18,1.3639670223084384e-4,FALSE,FALSE
+QAC,18,1.3639670223084384e-4,FALSE,FALSE
+HDF,14,1.0608632395732299e-4,FALSE,FALSE
+SGG,13,9.850872938894277e-5,FALSE,FALSE
+EAF,12,9.093113482056257e-5,FALSE,FALSE
+FAC,9,6.819835111542192e-5,FALSE,FALSE
+SRRP,9,6.819835111542192e-5,FALSE,FALSE
+PCC,7,5.3043161978661495e-5,FALSE,FALSE
+CSP,6,4.546556741028128e-5,FALSE,FALSE
+EAQ,6,4.546556741028128e-5,FALSE,FALSE
+PCD,6,4.546556741028128e-5,FALSE,FALSE
+SHVR,6,4.546556741028128e-5,FALSE,FALSE
+SDW,5,3.788797284190107e-5,FALSE,FALSE
+BPI,2,1.5155189136760427e-5,FALSE,FALSE
+DBPC,2,1.5155189136760427e-5,FALSE,FALSE
+ODM,2,1.5155189136760427e-5,FALSE,FALSE
+TNP,2,1.5155189136760427e-5,FALSE,FALSE
+BUNGALOW,1,7.5775945683802135e-6,FALSE,FALSE
+CORNVEND,1,7.5775945683802135e-6,FALSE,FALSE
+EBD,1,7.5775945683802135e-6,FALSE,FALSE
+PBLDR,1,7.5775945683802135e-6,FALSE,FALSE
+
+## arms/REAL_RB/INPUT_HASH_after.txt
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  FROZEN:R-B\outputs\RB_classifications.csv
+
+## arms/REAL_RB/INPUT_HASH_before.txt
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  FROZEN:R-B\outputs\RB_classifications.csv
+
+## arms/REAL_RB/RUN_DOM.exit
+0,1.4,2026-10-03T10:32:16-05:00,0,600
+
+## arms/REAL_RB/outputs/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+RB_classifications.csv,222002,131968,1000,30,> 1/3,81,WCA2,64922,0.491953,WCA2,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/REAL_RB/outputs/DOM_TABLE.csv
+type_key,n_escalate,share,eligible,flag
+WCA2,64922,0.4919525945683802,TRUE,TRUE
+SED,17254,0.1307438166828322,TRUE,FALSE
+SKA,7316,0.05543768186226964,TRUE,FALSE
+PBD,3937,0.0298329898157129,TRUE,FALSE
+PHF,3371,0.0255440712900097,TRUE,FALSE
+BBD,3298,0.024990906886517943,TRUE,FALSE
+WCA3,2867,0.02172496362754607,TRUE,FALSE
+SFB,2603,0.019724478661493697,TRUE,FALSE
+SEE,2593,0.019648702715809895,TRUE,FALSE
+GRAF,1962,0.01486724054316198,TRUE,FALSE
+SFK,1922,0.01456413676042677,TRUE,FALSE
+PBS,1884,0.014276188166828322,TRUE,FALSE
+SFD,1719,0.013025885063045587,TRUE,FALSE
+CHECKFOR,1516,0.011487633365664404,TRUE,FALSE
+AAE,1325,0.010040312803103782,TRUE,FALSE
+BBA,1237,0.009373484481086323,TRUE,FALSE
+PCL,1098,0.008320198836081474,TRUE,FALSE
+PHB,1023,0.007751879243452958,TRUE,FALSE
+SEC,1011,0.0076609481086323955,TRUE,FALSE
+SEL,884,0.006698593598448109,TRUE,FALSE
+ESPC,703,0.00532704898157129,TRUE,FALSE
+PCE,692,0.005243695441319108,TRUE,FALSE
+SIE,508,0.0038494180407371483,TRUE,FALSE
+AAD,502,0.003803952473326867,TRUE,FALSE
+WCA,460,0.0034856935014548982,TRUE,FALSE
+SCB,457,0.0034629607177497574,TRUE,FALSE
+WM3,448,0.0033947623666343357,TRUE,FALSE
+EAE,419,0.0031750121241513095,TRUE,FALSE
+PET,417,0.003159856935014549,TRUE,FALSE
+SDR,268,0.0020307953443258974,TRUE,FALSE
+AAI,242,0.0018337778855480116,TRUE,FALSE
+SCP,241,0.0018262002909796315,TRUE,FALSE
+PCB,224,0.0016973811833171678,TRUE,FALSE
+SFQ,220,0.0016670708050436469,TRUE,FALSE
+EAB,193,0.0014624757516973812,TRUE,FALSE
+MWC,175,0.0013260790494665374,TRUE,FALSE
+BBK,153,0.0011593719689621726,TRUE,FALSE
+SCQ,152,0.0011517943743937925,TRUE,FALSE
+PSL,145,0.0010987512124151309,TRUE,FALSE
+SFA,142,0.0010760184287099902,TRUE,FALSE
+SRRC,134,0.0010153976721629487,TRUE,FALSE
+AAF,122,9.244665373423861e-4,TRUE,FALSE
+CSF,108,8.18380213385063e-4,TRUE,FALSE
+SWSNOREM,102,7.729146459747818e-4,TRUE,FALSE
+SCT,96,7.274490785645005e-4,TRUE,FALSE
+SDP,95,7.198714839961203e-4,TRUE,FALSE
+BBC,91,6.895611057225994e-4,TRUE,FALSE
+RBL,90,6.819835111542193e-4,TRUE,FALSE
+CST,66,5.001212415130941e-4,TRUE,FALSE
+SGQ,63,4.7738845780795347e-4,TRUE,FALSE
+WBK,61,4.6223326867119303e-4,TRUE,FALSE
+WBT,61,4.6223326867119303e-4,TRUE,FALSE
+SCC,41,3.1068137730358875e-4,TRUE,FALSE
+HFB,34,2.5763821532492724e-4,TRUE,FALSE
+SEF,29,2.197502424830262e-4,FALSE,FALSE
+WBJ,29,2.197502424830262e-4,FALSE,FALSE
+CAFE,28,2.1217264791464598e-4,FALSE,FALSE
+SCS,25,1.8943986420950532e-4,FALSE,FALSE
+SFN,25,1.8943986420950532e-4,FALSE,FALSE
+SGA,24,1.8186226964112513e-4,FALSE,FALSE
+CSC,18,1.3639670223084384e-4,FALSE,FALSE
+QAC,18,1.3639670223084384e-4,FALSE,FALSE
+HDF,14,1.0608632395732299e-4,FALSE,FALSE
+SGG,13,9.850872938894277e-5,FALSE,FALSE
+EAF,12,9.093113482056257e-5,FALSE,FALSE
+FAC,9,6.819835111542192e-5,FALSE,FALSE
+SRRP,9,6.819835111542192e-5,FALSE,FALSE
+PCC,7,5.3043161978661495e-5,FALSE,FALSE
+CSP,6,4.546556741028128e-5,FALSE,FALSE
+EAQ,6,4.546556741028128e-5,FALSE,FALSE
+PCD,6,4.546556741028128e-5,FALSE,FALSE
+SHVR,6,4.546556741028128e-5,FALSE,FALSE
+SDW,5,3.788797284190107e-5,FALSE,FALSE
+BPI,2,1.5155189136760427e-5,FALSE,FALSE
+DBPC,2,1.5155189136760427e-5,FALSE,FALSE
+ODM,2,1.5155189136760427e-5,FALSE,FALSE
+TNP,2,1.5155189136760427e-5,FALSE,FALSE
+BUNGALOW,1,7.5775945683802135e-6,FALSE,FALSE
+CORNVEND,1,7.5775945683802135e-6,FALSE,FALSE
+EBD,1,7.5775945683802135e-6,FALSE,FALSE
+PBLDR,1,7.5775945683802135e-6,FALSE,FALSE
+
+## arms/SEED_DOM60/INPUT_HASH_after.txt
+eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5  SEED:seeds\C47\SYN_DOM60.csv
+
+## arms/SEED_DOM60/INPUT_HASH_before.txt
+eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5  SEED:seeds\C47\SYN_DOM60.csv
+
+## arms/SEED_DOM60/RUN_DOM.exit
+0,3.6,2026-10-03T10:32:26-05:00,0,600
+
+## arms/SEED_DOM60/outputs/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+SYN_DOM60.csv,13000,10000,1000,30,> 1/3,10,T01,6000,0.600000,T01,FLAG,"reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped"
+
+## arms/SEED_DOM60/outputs/DOM_TABLE.csv
+type_key,n_escalate,share,eligible,flag
+T01,6000,0.6,TRUE,TRUE
+T02,445,0.0445,TRUE,FALSE
+T03,445,0.0445,TRUE,FALSE
+T04,445,0.0445,TRUE,FALSE
+T05,445,0.0445,TRUE,FALSE
+T06,445,0.0445,TRUE,FALSE
+T07,445,0.0445,TRUE,FALSE
+T08,445,0.0445,TRUE,FALSE
+T09,445,0.0445,TRUE,FALSE
+T10,440,0.044,TRUE,FALSE
+
+## arms/SMALL_N/INPUT_HASH_after.txt
+d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61  SEED:seeds\C47\SYN_SMALLN.csv
+
+## arms/SMALL_N/INPUT_HASH_before.txt
+d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61  SEED:seeds\C47\SYN_SMALLN.csv
+
+## arms/SMALL_N/RUN_DOM.exit
+0,3.9,2026-10-03T10:32:34-05:00,0,600
+
+## arms/SMALL_N/outputs/DOM_RESULT.csv
+input,n_rows,n_escalate_total,min_total,min_type,max_share_rule,n_types_escalate,top_type,top_n,top_share,flagged_types,status,routing
+SYN_SMALLN.csv,1200,900,1000,30,> 1/3,10,T01,540,0.600000,,NOT_APPLICABLE_BELOW_MIN_TOTAL,none
+
+## arms/SMALL_N/outputs/DOM_TABLE.csv
+type_key,n_escalate,share,eligible,flag
+T01,540,0.6,FALSE,FALSE
+T02,40,0.044444444444444446,FALSE,FALSE
+T03,40,0.044444444444444446,FALSE,FALSE
+T04,40,0.044444444444444446,FALSE,FALSE
+T05,40,0.044444444444444446,FALSE,FALSE
+T06,40,0.044444444444444446,FALSE,FALSE
+T07,40,0.044444444444444446,FALSE,FALSE
+T08,40,0.044444444444444446,FALSE,FALSE
+T09,40,0.044444444444444446,FALSE,FALSE
+T10,40,0.044444444444444446,FALSE,FALSE
+
+
+---
+# C47_EVIDENCE.sha256
+21b03b175467dacf6decdb37dd09d28f12a35c5e1257bb0e69b55bd453a50fce  C47_ARM_MANIFESTS.txt
+2b28f2c5ca5518485a4aa55c0602fada44aaf43f6ec85a0f7776a80d415741c6  C47_arms.csv
+4ab5be2475356ee60bf641c931b884e361c75df4520c23e752ac5857bd8e64b3  C47_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files) are listed by hash and size only.
+arms/CLEAN_BAL in  :: 582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  dom_check.R
+arms/CLEAN_BAL in  :: 89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54  390034  input\SYN_BAL.csv
+arms/CLEAN_BAL out :: f7c05bee29add73d93e3f5cd3b7af8a4f12877e3a7cc1bfd845dd2e826477e90  94  INPUT_HASH_after.txt
+arms/CLEAN_BAL out :: f7c05bee29add73d93e3f5cd3b7af8a4f12877e3a7cc1bfd845dd2e826477e90  94  INPUT_HASH_before.txt
+arms/CLEAN_BAL out :: 064e11a9364cfd45ff1826d59bd9359be37705d8e645e4c015c44a0e6857d593  208  outputs\DOM_RESULT.csv
+arms/CLEAN_BAL out :: c413e66b0bca12cc0ac0fd2d17e6c88072f87f7524ff6f2f591c107063123f52  284  outputs\DOM_TABLE.csv
+arms/CLEAN_BAL out :: 411e267072ec9f866d240287aadefb621d9a83f4501ba3e43a0dfacdcd7ade43  39  RUN_DOM.exit
+arms/CLEAN_BAL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/CLEAN_BAL out :: 3c61ee0e0af2261aca481270770c013a53dc5b9767a9a246e36415f8cb580a9b  296  RUN_DOM.stdout.txt
+arms/REAL_RA in  :: 582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  dom_check.R
+arms/REAL_RA out :: 0189785122c19e7067295a6a0a4d340e87be62cdd3f672139b00ea014e9f0a6f  109  INPUT_HASH_after.txt
+arms/REAL_RA out :: 0189785122c19e7067295a6a0a4d340e87be62cdd3f672139b00ea014e9f0a6f  109  INPUT_HASH_before.txt
+arms/REAL_RA out :: bdb09e93dd76eee4c82e8bf18ea53fb6a0f9cb8ef8835194d6a7f7972d9e79eb  311  outputs\DOM_RESULT.csv
+arms/REAL_RA out :: b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182  3330  outputs\DOM_TABLE.csv
+arms/REAL_RA out :: 6c5923a196bf7b99f209683a680a7a3cf1b83a743f15e77c0bbab8c579cef839  39  RUN_DOM.exit
+arms/REAL_RA out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/REAL_RA out :: 4fa46085a13438b8621b75b329baf5a1625b30efc5d985fa8bdc61053bda8650  486  RUN_DOM.stdout.txt
+arms/REAL_RB in  :: 582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  dom_check.R
+arms/REAL_RB out :: 2eab5fbe13f5cceb45259316e2d6a92698e144ff41738c58e873bb024404e6fc  109  INPUT_HASH_after.txt
+arms/REAL_RB out :: 2eab5fbe13f5cceb45259316e2d6a92698e144ff41738c58e873bb024404e6fc  109  INPUT_HASH_before.txt
+arms/REAL_RB out :: 7bf5c0119085839d66d1a8615662756f3cd2a4b9c0daf72b984f3dc49ca8e570  311  outputs\DOM_RESULT.csv
+arms/REAL_RB out :: b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182  3330  outputs\DOM_TABLE.csv
+arms/REAL_RB out :: cbe5ca7b8d363962bc5fea61a412256ab34631376590a4dbbfe7c0b228618922  39  RUN_DOM.exit
+arms/REAL_RB out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/REAL_RB out :: dcae561b5900f22fbc1dfd918dd8dc299541eadd8de6ff6ffcf8d9140d42b527  486  RUN_DOM.stdout.txt
+arms/SEED_DOM60 in  :: 582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  dom_check.R
+arms/SEED_DOM60 in  :: eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5  416034  input\SYN_DOM60.csv
+arms/SEED_DOM60 out :: a967b28ea8da82dc8ad055b95db2c9740cfb1c179b437280b8e7daf175fb5c07  96  INPUT_HASH_after.txt
+arms/SEED_DOM60 out :: a967b28ea8da82dc8ad055b95db2c9740cfb1c179b437280b8e7daf175fb5c07  96  INPUT_HASH_before.txt
+arms/SEED_DOM60 out :: 34b0dd9576d145ddcc447b35e946d7298f44676c0c239e1774ebaf0f29619ea3  297  outputs\DOM_RESULT.csv
+arms/SEED_DOM60 out :: 04f12e81e239654053c0c2d3bfc3b9856317520543166eacc1b1f2fab94febd0  296  outputs\DOM_TABLE.csv
+arms/SEED_DOM60 out :: 60b431901b7f5e7cc51476876cbd70414e0bfa101e5367d561c8041e4e35537c  39  RUN_DOM.exit
+arms/SEED_DOM60 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/SEED_DOM60 out :: 1f46900e38d79a6dd18c507db2b347cd5ba3ea4d73a35b934145c1e67d7ee988  468  RUN_DOM.stdout.txt
+arms/SMALL_N in  :: 582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145  2017  dom_check.R
+arms/SMALL_N in  :: d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61  39634  input\SYN_SMALLN.csv
+arms/SMALL_N out :: ff33228cc7eda6f2a09ee097c147a2c8aa9c7feb9babd7b69940818587a11917  97  INPUT_HASH_after.txt
+arms/SMALL_N out :: ff33228cc7eda6f2a09ee097c147a2c8aa9c7feb9babd7b69940818587a11917  97  INPUT_HASH_before.txt
+arms/SMALL_N out :: 99ec52f7d1bb82fb3539ef0d052241c2b9c245aa092659542f3f7a0b4cb9f773  230  outputs\DOM_RESULT.csv
+arms/SMALL_N out :: d579d57c895cab605040bc2f8f251c78b295efd3cc16f1fb8b778761aefd5b4e  424  outputs\DOM_TABLE.csv
+arms/SMALL_N out :: 602c8aa5eee248040cb79aae230d725c6c26266f56ddc68889e67844012db564  39  RUN_DOM.exit
+arms/SMALL_N out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_DOM.stderr.txt
+arms/SMALL_N out :: 2eda7a76fc04b2e27150963b31cdc918278a4543756083df38cc721573a5620c  354  RUN_DOM.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+### seeds/C47/SYN_DOM60.csv (new file, 416034 bytes, 13000 data rows; SHA-256 eba07ed92dc93966663a9c0e670518b387c443097a9b0d999983b8ef2ac14df5; summarized here, generated by make_seeds_b5.py whose rule is in its text)
+SR_NUMBER,type_key,classification
+SYN47-DOM60-000001,T01,ESCALATE
+SYN47-DOM60-000002,T01,ESCALATE
+SYN47-DOM60-000003,T01,ESCALATE
+SYN47-DOM60-000004,T01,ESCALATE
+SYN47-DOM60-000005,T01,ESCALATE
+...
+| type_key | classification | rows |
+|---|---|---|
+| T01 | ESCALATE | 6000 |
+| T01 | STANDARD | 300 |
+| T02 | ESCALATE | 445 |
+| T02 | STANDARD | 300 |
+| T03 | ESCALATE | 445 |
+| T03 | STANDARD | 300 |
+| T04 | ESCALATE | 445 |
+| T04 | STANDARD | 300 |
+| T05 | ESCALATE | 445 |
+| T05 | STANDARD | 300 |
+| T06 | ESCALATE | 445 |
+| T06 | STANDARD | 300 |
+| T07 | ESCALATE | 445 |
+| T07 | STANDARD | 300 |
+| T08 | ESCALATE | 445 |
+| T08 | STANDARD | 300 |
+| T09 | ESCALATE | 445 |
+| T09 | STANDARD | 300 |
+| T10 | ESCALATE | 440 |
+| T10 | STANDARD | 300 |
+
+### seeds/C47/SYN_BAL.csv (new file, 390034 bytes, 13000 data rows; SHA-256 89c3d85f6e8c76efb61c3a69aa6d56f126901e49469f4a72c9d9a36d92f43d54; summarized here, generated by make_seeds_b5.py whose rule is in its text)
+SR_NUMBER,type_key,classification
+SYN47-BAL-000001,T01,ESCALATE
+SYN47-BAL-000002,T01,ESCALATE
+SYN47-BAL-000003,T01,ESCALATE
+SYN47-BAL-000004,T01,ESCALATE
+SYN47-BAL-000005,T01,ESCALATE
+...
+| type_key | classification | rows |
+|---|---|---|
+| T01 | ESCALATE | 1900 |
+| T01 | STANDARD | 300 |
+| T02 | ESCALATE | 1500 |
+| T02 | STANDARD | 300 |
+| T03 | ESCALATE | 1200 |
+| T03 | STANDARD | 300 |
+| T04 | ESCALATE | 1100 |
+| T04 | STANDARD | 300 |
+| T05 | ESCALATE | 1000 |
+| T05 | STANDARD | 300 |
+| T06 | ESCALATE | 900 |
+| T06 | STANDARD | 300 |
+| T07 | ESCALATE | 800 |
+| T07 | STANDARD | 300 |
+| T08 | ESCALATE | 700 |
+| T08 | STANDARD | 300 |
+| T09 | ESCALATE | 500 |
+| T09 | STANDARD | 300 |
+| T10 | ESCALATE | 400 |
+| T10 | STANDARD | 300 |
+
+### seeds/C47/SYN_SMALLN.csv (new file, 39634 bytes, 1200 data rows; SHA-256 d846fe7b17694f7aa4a705822567a22b358e36ac4d0484f09b2883b7ee544f61; summarized here, generated by make_seeds_b5.py whose rule is in its text)
+SR_NUMBER,type_key,classification
+SYN47-SMALLN-000001,T01,ESCALATE
+SYN47-SMALLN-000002,T01,ESCALATE
+SYN47-SMALLN-000003,T01,ESCALATE
+SYN47-SMALLN-000004,T01,ESCALATE
+SYN47-SMALLN-000005,T01,ESCALATE
+...
+| type_key | classification | rows |
+|---|---|---|
+| T01 | ESCALATE | 540 |
+| T01 | STANDARD | 30 |
+| T02 | ESCALATE | 40 |
+| T02 | STANDARD | 30 |
+| T03 | ESCALATE | 40 |
+| T03 | STANDARD | 30 |
+| T04 | ESCALATE | 40 |
+| T04 | STANDARD | 30 |
+| T05 | ESCALATE | 40 |
+| T05 | STANDARD | 30 |
+| T06 | ESCALATE | 40 |
+| T06 | STANDARD | 30 |
+| T07 | ESCALATE | 40 |
+| T07 | STANDARD | 30 |
+| T08 | ESCALATE | 40 |
+| T08 | STANDARD | 30 |
+| T09 | ESCALATE | 40 |
+| T09 | STANDARD | 30 |
+| T10 | ESCALATE | 40 |
+| T10 | STANDARD | 30 |
+
+### seeds/C47/dom_check.R (new file, 2017 bytes)
+#!/usr/bin/env Rscript
+# N13 b5 C47 single-unit dominance check (owner ruling 47A, 2026-10-03 09:58 CT). Read-only on its input.
+# Usage: Rscript dom_check.R <CLASSIFICATIONS_CSV> <OUT_DIR>
+# Metric: share of ESCALATE rows by service type (type_key). Applies only if total ESCALATE >= 1000; a type is eligible if it has >= 30
+# ESCALATE rows. FLAG = an eligible type with share > 1/3. A flag never drops or changes a row: it is reported and routed to the owner.
+suppressPackageStartupMessages(library(readr))
+a <- commandArgs(trailingOnly = TRUE); inp <- a[[1]]; od <- a[[2]]; dir.create(od, showWarnings = FALSE, recursive = TRUE)
+MIN_TOTAL <- 1000L; MIN_TYPE <- 30L; MAX_SHARE <- 1/3
+x <- read_csv(inp, col_types = cols(.default = col_character()), col_select = c("SR_NUMBER", "type_key", "classification"), progress = FALSE)
+esc <- x[x$classification %in% "ESCALATE", ]; tot <- nrow(esc)
+tb <- table(esc$type_key); tb <- tb[order(-as.integer(tb), names(tb))]
+d <- data.frame(type_key = names(tb), n_escalate = as.integer(tb), stringsAsFactors = FALSE)
+d$share <- if (tot > 0) d$n_escalate / tot else NA_real_
+d$eligible <- tot >= MIN_TOTAL & d$n_escalate >= MIN_TYPE
+d$flag <- d$eligible & d$share > MAX_SHARE
+write_csv(d, file.path(od, "DOM_TABLE.csv"))
+status <- if (tot < MIN_TOTAL) "NOT_APPLICABLE_BELOW_MIN_TOTAL" else if (any(d$flag)) "FLAG" else "NO_FLAG"
+r <- data.frame(input = basename(inp), n_rows = nrow(x), n_escalate_total = tot, min_total = MIN_TOTAL, min_type = MIN_TYPE, max_share_rule = "> 1/3",
+                n_types_escalate = nrow(d), top_type = if (nrow(d)) d$type_key[1] else "", top_n = if (nrow(d)) d$n_escalate[1] else 0L,
+                top_share = if (nrow(d)) sprintf("%.6f", d$share[1]) else "", flagged_types = paste(d$type_key[d$flag], collapse = "|"), status = status,
+                routing = if (status == "FLAG") "reported in the Stage 4 report and routed to the owner; result unchanged, nothing dropped" else "none")
+write_csv(r, file.path(od, "DOM_RESULT.csv")); print(r)
+
+### seeds/C47/ARMS.tsv (new file, 619 bytes)
+arm	input	desc
+REAL_RB	FROZEN:R-B\outputs\RB_classifications.csv	real frozen R-B output (WCA2 = 49.2% of ESCALATE; ruled a true flag)
+REAL_RA	FROZEN:R-A\outputs\RA_classifications.csv	real frozen R-A output (same labels; must give the same table)
+SEED_DOM60	SEED:seeds\C47\SYN_DOM60.csv	planted table: T01 supplies 60% of 10,000 ESCALATE rows (must flag T01 only)
+CLEAN_BAL	SEED:seeds\C47\SYN_BAL.csv	balanced table: no type above 20% of 10,000 ESCALATE rows (max 19%; must not flag)
+SMALL_N	SEED:seeds\C47\SYN_SMALLN.csv	small denominator: 900 ESCALATE rows, T01 at 60% (check must not apply: below the 1,000 minimum)
+
+### seeds/C47/DOMCHK (new file, 37 bytes)
+C47 dominance-check arms (runner v5)
+
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C47",
+  "frozen_at_ct": "2026-10-03 11:21:10 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C47/C47-builder/builder_report.md", "bytes": 17718, "sha256": "c569dae0b8e6cfbf9b55bff4ae95036f2a926109468f5b9e907a2cac1f413098", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C47/C47-validator/validator_report.md", "bytes": 10593, "sha256": "2ee6ef7643ae1ab5c5ad75f44ecd53754a8311e999423e0748baca8f6c7e3968", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "5a8c0eb9dd8b155552a962d707aafa4740dbd741101060ec91f4e8e9bb11978e"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C47 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as the Builder** for an independent first pass and am blind to the Validator’s first-pass output. The frozen role assignment is Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok. The ablation is **C47, Addendum 02 candidate #47, “Small-denominator and single-unit dominance check on gating accuracy metrics,”** targeting the Stage 4 report as an accuracy-adding hardening control. The frozen Chicago 311 pack is read-only, with R-only execution and no MySQL or external data.
+
+This report uses the frozen specification, raw arm outputs, manifests, hashes, and SEED DIFFS supplied in the packet. I make no terminal disposition.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The baseline has **no declared minimum denominator and no single-unit-share limit** for the headline metric. Conceptually, C47 therefore removes a Stage 4 **diagnostic blind spot**: a result could be based on a small ESCALATE denominator or be dominated by one `type_key` without that concentration being surfaced. It does **not** remove rows, alter classifications, or delete production logic. The new check is reporting-only: a detected concentration is written to the Stage 4 report and routed to the owner while the underlying result remains unchanged.
+
+The SEED DIFFS show an entirely additive runner-side change set; no frozen R-A or R-B source file is patched. The added `dom_check.R` reads only `SR_NUMBER`, `type_key`, and `classification`; restricts the metric to rows whose classification is `ESCALATE`; sets `MIN_TOTAL <- 1000L`, `MIN_TYPE <- 30L`, and `MAX_SHARE <- 1/3`; computes each type’s ESCALATE share; marks a type eligible only when total ESCALATE is at least 1,000 and that type has at least 30 ESCALATE rows; and sets its flag only when the eligible type’s share is **strictly greater than** one third. It writes `DOM_TABLE.csv` plus a one-row `DOM_RESULT.csv`.
+
+Three known-answer data files are added. `SYN_DOM60.csv` contains 13,000 rows: 10,000 ESCALATE and 3,000 STANDARD, with T01 contributing 6,000 ESCALATE rows and the remaining 4,000 distributed across T02–T10. `SYN_BAL.csv` also contains 13,000 rows: 10,000 ESCALATE and 3,000 STANDARD, with T01 the largest contributor at 1,900/10,000 = 19%. `SYN_SMALLN.csv` contains 1,200 rows: 900 ESCALATE and 300 STANDARD, with T01 at 540/900 = 60%.
+
+`ARMS.tsv` adds five executions: the frozen R-B classifications, the frozen R-A classifications, the 60% dominance seed, the balanced seed, and the 900-row small-denominator seed. `DOMCHK` is a 37-byte marker file identifying the C47 runner-v5 dominance-check arms.
+
+I independently reconstructed the exact textual `dom_check.R` shown in the SEED DIFFS and obtained SHA-256 `582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145` over 2,017 bytes, exactly matching the frozen runner hash. I likewise reconstructed `ARMS.tsv` as 619 bytes with SHA-256 `b887a2d4fa959e8185f9620711312fd6b9d6ff4ad4bda42c25c17f876c6b4b0c` and `DOMCHK` as 37 bytes with SHA-256 `047e783a9c351ef1db14a3b1f4acd572d88d79498b0627b1d208a6ce9c53ee78`.
+
+## 3. Hard mechanical facts table.
+
+| Hard mechanical fact | Independent calculation / comparison | Result | Provenance |
+| --- | --- | --- | --- |
+| Number of C47 arms | Count REAL_RB, REAL_RA, SEED_DOM60, CLEAN_BAL, SMALL_N | **5** | Recomputed |
+| Successful arm exits | Five raw `RUN_DOM.exit` records each contain exit `0` | **5/5 exit 0** | Recomputed |
+| Sum of reported arm run times | 1.4 + 5.2 + 3.6 + 3.4 + 3.9 | **17.5 s** | Recomputed |
+| SEED_DOM60 ESCALATE total | 6,000 + (8 × 445) + 440 | **10,000** | Recomputed |
+| SEED_DOM60 total rows | 10,000 ESCALATE + (10 × 300 STANDARD) | **13,000** | Recomputed |
+| SEED_DOM60 T01 share | 6,000 / 10,000 | **0.600000** | Recomputed |
+| SEED_DOM60 other-type maximum | 445 / 10,000 | **0.044500** | Recomputed |
+| SEED_DOM60 flagged-type count | T01 > 1/3; every other share ≤ 0.0445; all counts ≥30 | **1, T01** | Recomputed |
+| CLEAN_BAL ESCALATE total | 1,900+1,500+1,200+1,100+1,000+900+800+700+500+400 | **10,000** | Recomputed |
+| CLEAN_BAL total rows | 10,000 + (10 × 300) | **13,000** | Recomputed |
+| CLEAN_BAL maximum share | 1,900 / 10,000 | **0.190000** | Recomputed |
+| CLEAN_BAL flagged-type count | 0.19 < 1/3 and every remaining share is smaller | **0** | Recomputed |
+| SMALL_N ESCALATE total | 540 + (9 × 40) | **900** | Recomputed |
+| SMALL_N total rows | 900 + (10 × 30) | **1,200** | Recomputed |
+| SMALL_N T01 share | 540 / 900 | **0.600000** | Recomputed |
+| SMALL_N denominator test | 900 < 1,000 | **check not applicable** | Recomputed |
+| REAL_RA number of ESCALATE types | Count of complete raw DOM table rows | **81** | Recomputed |
+| REAL_RA ESCALATE total | Sum of all 81 `n_escalate` entries | **131,968** | Recomputed |
+| REAL_RB ESCALATE total | Complete table is row-for-row identical to REAL_RA | **131,968** | Recomputed |
+| WCA2 ESCALATE count | Raw WCA2 row | **64,922** | Quoted |
+| WCA2 share | 64,922 / 131,968 | **0.4919525945683802** | Recomputed |
+| WCA2 excess above the threshold | 0.4919525945683802 − 1/3 | **0.15861926123504688** | Recomputed |
+| Real eligible-type count | Count full-table types having `n_escalate ≥ 30` | **54** | Recomputed |
+| Real ineligible-type count | 81 − 54 | **27** | Recomputed |
+| Real flagged-type count | WCA2 exceeds 1/3; next type SED = 17,254/131,968 ≈ 0.130744 | **1, WCA2** | Recomputed |
+| REAL_RA vs REAL_RB DOM tables | Compare all 81 raw rows | **81/81 identical** | Recomputed |
+| REAL_RA DOM_TABLE SHA-256 | SHA-256 reconstructed from verbatim 3,330-byte table | `b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182` | Recomputed |
+| REAL_RB DOM_TABLE SHA-256 | SHA-256 reconstructed from verbatim 3,330-byte table | same `b5a46c…a182` | Recomputed |
+| SEED_DOM60 DOM_TABLE SHA-256 | Reconstructed from verbatim 296-byte table | `04f12e81e239654053c0c2d3bfc3b9856317520543166eacc1b1f2fab94febd0` | Recomputed |
+| CLEAN_BAL DOM_TABLE SHA-256 | Reconstructed from verbatim 284-byte table | `c413e66b0bca12cc0ac0fd2d17e6c88072f87f7524ff6f2f591c107063123f52` | Recomputed |
+| SMALL_N DOM_TABLE SHA-256 | Reconstructed from verbatim 424-byte table | `d579d57c895cab605040bc2f8f251c78b295efd3cc16f1fb8b778761aefd5b4e` | Recomputed |
+| REAL_RA DOM_RESULT SHA-256 | Reconstructed from verbatim 311-byte output | `bdb09e93dd76eee4c82e8bf18ea53fb6a0f9cb8ef8835194d6a7f7972d9e79eb` | Recomputed |
+| REAL_RB DOM_RESULT SHA-256 | Reconstructed from verbatim 311-byte output | `7bf5c0119085839d66d1a8615662756f3cd2a4b9c0daf72b984f3dc49ca8e570` | Recomputed |
+| Five input before/after comparisons | Compare the full before and after SHA-256 strings separately for each arm | **5/5 equal** | Recomputed |
+| REAL_RA input vs frozen reference | `c099e092…0d9` before/after equals frozen RA hash | **equal** | Recomputed |
+| REAL_RB input vs frozen reference | `a0e42b86…193` before/after equals frozen RB hash | **equal** | Recomputed |
+| Three planted inputs vs frozen seed hashes | BAL=`89c3…3d54`; DOM60=`eba0…14df5`; SMALL_N=`d846…44f61` | **3/3 equal** | Recomputed |
+| `dom_check.R` hash across arm manifests | Each of five manifests names `582cb782…5145` | **5/5 equal** | Recomputed comparison |
+| Empty stderr | Every arm manifest gives SHA-256 `e3b0c442…b855` and 0 bytes | **5/5 empty** | Recomputed comparison |
+| `C47_arms.csv` evidence-file hash | Reconstructed six-line, 523-byte CSV | `2b28f2c5ca5518485a4aa55c0602fada44aaf43f6ec85a0f7776a80d415741c6` | Recomputed |
+| Baseline flag count | Baseline has no dominance check | **0 by construction** | Quoted |
+| `n_agree + n_disagree = n_inner` identity | No such C47 numerical table appears in the supplied evidence | **not numerically available** | Packet-scope inspection |
+| Portfolio-count deltas | Portfolio artifacts occur as frozen hashes, but their count values are not supplied | **not numerically available** | Packet-scope inspection |
+| D-sets | No C47 D-set table or D-set values are supplied | **not numerically available** | Packet-scope inspection |
+
+The raw per-arm evidence supports the seed arithmetic and statuses directly. The arm manifests independently record the input/check/output hashes used above.
+
+The instruction mentions reconciliation identities, portfolio deltas, and D-sets as examples of quantities to recompute, but C47 supplies no numerical evidence table for those quantities. The only portfolio evidence here is hash-level preflight evidence for the frozen RA/RB portfolio files, so inventing a portfolio delta from those hashes would be unsupported.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen P1 predicate has five conjunctive conditions.
+
+| P1 condition | Independent assessment from raw evidence |
+| --- | --- |
+| 1. SEED_DOM60 must flag exactly T01 | **Satisfied mechanically.** T01 = 6,000/10,000 = 0.600000 and is eligible. The other nine types are at 0.0445 or 0.0440, so none exceeds 1/3. Raw status is `FLAG`, flagged types `T01`. |
+| 2. CLEAN_BAL must produce no flag | **Satisfied mechanically.** The maximum is T01 = 1,900/10,000 = 0.190000, below 1/3. Raw status is `NO_FLAG` and flagged types is empty. |
+| 3. SMALL_N must be below the minimum denominator | **Satisfied mechanically.** Total ESCALATE = 540 + 9×40 = 900, below 1,000. Raw status is `NOT_APPLICABLE_BELOW_MIN_TOTAL`; no type is flagged even though T01's raw share is 0.60. |
+| 4. REAL_RB and REAL_RA must both flag exactly WCA2 and have identical DOM tables | **Satisfied mechanically.** Each table contains 81 types summing to 131,968 ESCALATE rows. WCA2 = 64,922/131,968 = 0.4919525945683802 and is the sole type over 1/3. The complete tables are row-for-row identical and both reconstruct to SHA-256 `b5a46c63…a182`. |
+| 5. Inputs must remain unchanged and real inputs must equal their frozen hashes | **Satisfied mechanically.** All five before/after input hashes are equal. REAL_RA matches frozen `c099e092…0d9`; REAL_RB matches frozen `a0e42b86…193`; the three seed hashes match their frozen SEEDS_b5 values. |
+
+Thus all five P1 conjuncts are supported by the raw evidence and independent arithmetic/hash comparison. This agrees with the runner’s reported mechanical P1 result.
+
+## 5. Fixture and reconciliation implications.
+
+C47 does **not** add a fixture to the locked Chicago fixture pack. Instead, `SYN_DOM60`, `SYN_BAL`, and `SYN_SMALLN` serve as predeclared known-answer cases for the new reporting check. They cover positive dominance detection, a clean negative case, and suppression below the minimum total denominator respectively. The frozen specification explicitly states that the check writes nothing into the pipeline and that the planted tables are check-specific known-answer cases rather than additions to the locked fixture pack.
+
+For the data relevant to C47, R-A and R-B reconcile exactly. Their input files are not byte-identical—their frozen SHA-256 hashes are intentionally different—but the complete resulting 81-row `DOM_TABLE.csv` files are byte-identical and independently reconstruct to the same SHA-256. Their one-row `DOM_RESULT.csv` files have different hashes because the `input` field names differ (`RA_classifications.csv` versus `RB_classifications.csv`); the substantive metric fields, WCA2 count/share, flagged type, status, and routing are the same.
+
+The disclosed OF-1 clock discrepancy does not contaminate this reconciliation. It affects three numeric clock fields by exactly one hour during repeated fall-back-hour timestamps, but the three rows have the same classification label on both paths. C47 consumes the classification labels and `type_key`, not those clock values, so the three OF-1 rows cannot alter the C47 counts.
+
+The preflight confirms frozen hashes for the existing RA/RB fixture-result files, portfolio-count files, classification files, R code, source extracts, and the R-B κ-grid output. C47 itself does not supply a fresh rerun of the locked fixture suite; its direct behavioral evidence consists of the three C47 known-answer tables plus exact reconciliation of the real dominance outputs.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The main residual semantic risk is **boundary-case coverage rather than ambiguity in the implementation**. The code makes the boundaries deterministic: total ESCALATE equal to 1,000 is in scope because the comparison is `>= 1000`; a type with exactly 30 ESCALATE rows is eligible because the comparison is `>= 30`; and a share exactly equal to one third is not flagged because the comparison is strictly `> 1/3`. The provided seeds exercise 10,000 and 900 total rows, type counts well above 30, and shares of 0.60 and 0.19, but they do not independently exercise exactly 1,000, exactly 30, or exactly one third. Consequently the code semantics at those boundaries are inspectable, but direct known-answer regression coverage for the exact boundaries is absent.
+
+Likewise, the three planted tables use populated `type_key` values T01–T10 and standardized `ESCALATE`/`STANDARD` labels. They do not provide known-answer cases for missing or blank `type_key` values or nonstandard classification values. The supplied evidence therefore establishes the declared behavior on the frozen real files and declared seeds, but not arbitrary malformed-input semantics.
+
+The regression surface is deliberately narrow. The C47 script reads one classifications CSV, computes a table, and writes only its own `DOM_TABLE.csv` and `DOM_RESULT.csv`; a flag is reporting/routing information and does not drop or rewrite rows. Direct before/after evidence verifies all five arm inputs unchanged. The runner preflight separately confirms the frozen source extracts, R-A/R-B programs, R-B component files, classifications, fixture outputs, portfolio outputs, and κ-grid output at their declared reference hashes before execution.
+
+One governance exposure is explicitly disclosed rather than hidden: a non-reporting scratch execution occurred before the final specification freeze, and its outcome was known. The packet also states that the predicate/evaluator had been hashed before that execution and that no arm, threshold, seed, or predicate was changed afterward. That history does not alter the C47 arithmetic reported here, but it remains relevant provenance for downstream review.
+
+## 7. Claim → evidence map. Cite the section and the table row for each claim.
+
+| Claim | Frozen/raw evidence |
+| --- | --- |
+| C47 adds a Stage 4 small-denominator/single-unit dominance diagnostic without changing rows | **SPEC § Exact change being tested**, rule defining ≥1,000 total, ≥30 per type, >1/3 share, and report-only routing. |
+| The experiment has five arms | **SPEC § Arms**, REAL_RB, REAL_RA, SEED_DOM60, CLEAN_BAL, SMALL_N rows; independently repeated in **SEED DIFFS § ARMS.tsv**. |
+| All five arm executions returned exit 0 | **RUN LOG**, five C47 arm rows, and each raw `RUN_DOM.exit` artifact. |
+| SEED_DOM60 has 10,000 ESCALATE rows and flags only T01 at 60% | **C47_RESULTS § Arms**, SEED_DOM60 row; **SEED_DOM60 DOM_TABLE**, T01 row plus T02–T10 rows; raw DOM_RESULT corroborates the total/status. |
+| CLEAN_BAL has 10,000 ESCALATE rows, maximum share 19%, and no flag | **C47_RESULTS § Arms**, CLEAN_BAL row; **CLEAN_BAL DOM_TABLE**, T01–T06 rows and complete raw table. |
+| SMALL_N has 900 ESCALATE rows and the check is not applicable despite T01 = 60% | **C47_RESULTS § Arms**, SMALL_N row; **SMALL_N DOM_TABLE**, T01 row and remaining type rows; raw DOM_RESULT. |
+| Real R-A and R-B each contain 131,968 ESCALATE rows and flag WCA2 | **C47_RESULTS § Arms**, REAL_RA and REAL_RB rows; raw **REAL_RA DOM_RESULT** and **REAL_RB DOM_RESULT**. |
+| WCA2 contributes 64,922/131,968 = 0.4919525945683802 | **REAL_RA DOM_TABLE**, WCA2 row; **REAL_RB DOM_TABLE**, WCA2 row. The ratio is independently recomputed from those two integers. |
+| The real R-A and R-B dominance tables reconcile exactly | **C47_RESULTS § Arms**, identical shortened DOM-table hash; complete raw REAL_RA/REAL_RB DOM tables; **ARM MANIFESTS**, both full hashes `b5a46c63…a182`. |
+| Every arm input is unchanged before versus after | Raw `INPUT_HASH_before.txt` / `INPUT_HASH_after.txt` pairs for CLEAN_BAL, REAL_RA, REAL_RB, SEED_DOM60, and SMALL_N; summarized as `input_unchanged=TRUE` in all five `C47_arms.csv` rows. |
+| The real inputs match their frozen reference hashes | **SPEC § FROZEN REFERENCE HASHES** gives RA `c099e092…0d9` and RB `a0e42b86…193`; raw per-arm before/after files contain the same full hashes. |
+| The C47 runner-side code is additive and its frozen `dom_check.R` hash is reproduced | **SEED DIFFS § dom_check.R**, complete 2,017-byte script; **RUNNER-SIDE FILES** lists SHA-256 `582cb782…5145`; independent reconstruction gives the same hash. |
+| OF-1 cannot change the C47 metric | **SPEC § Known open finding N1 / OF-1**: three one-hour clock differences, same labels on both paths, and C47 counts labels only. |
+| C47 does not numerically establish portfolio deltas, D-sets, or an `n_agree+n_disagree=n_inner` identity | Those quantities have no value tables in the C47 evidence; portfolio artifacts appear only as frozen preflight hashes. |
+| All five frozen P1 conjuncts are supported by the raw evidence | **SPEC § Operational benefit predicate P1**, conditions 1–5, compared independently against the raw arm data above; **C47_RESULTS § Predicate conditions** records all five as met. |
+
+END C47 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID.  
+   I am DeepSeek, acting as Validator for this ablation. I attest that I have not seen the Builder output, have not asked for it, and am using only the packet in this message. Ablation ID: C47 (Addendum 02, candidate #47). Batch: N13 batch 5. Frozen spec timestamp: 2026-10-03 10:28 CDT, before the reporting run. Roles: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. I return no terminal state.
+2. Independent test plan: what I checked, and how.
+
+- Checked role separation and frozen IDs against SPEC, constitution, and preflight.
+- Checked preflight PASS and the frozen/seed hash lines against the SPEC reference hashes.
+- Reconstructed each arm’s ESCALATE counts from the per-arm DOM_TABLE.csv files and compared them to DOM_RESULT.csv `n_escalate_total`.
+- Recomputed share, eligibility, flag, and status from the frozen `dom_check.R` logic: total ESCALATE ≥ 1000; eligible type has ≥30 ESCALATE rows; FLAG if eligible and share > 1/3.
+- Compared flagged-type sets against P1 conditions.
+- Checked before/after input hashes for every arm and real-input equality to frozen classification hashes.
+- Checked cross-arm hash equality, especially REAL_RB vs REAL_RA DOM_TABLE.csv.
+- Checked exit codes, stderr emptiness, and manifest hashes/sizes.
+- Checked N1 disclosure against C47’s label-only counting.
+- Checked internal consistency among C47_RESULTS.md, C47_arms.csv, per-arm DOM_RESULT.csv, DOM_TABLE.csv, INPUT_HASH files, RUN_DOM.exit, and manifests.
+
+3. Independently recomputed hard facts.
+
+Frozen identity/hash checks:
+
+- Preflight reports `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`; matches SPEC and REAL_RA INPUT_HASH before/after.
+- Preflight reports `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`; matches SPEC and REAL_RB INPUT_HASH before/after.
+- Seed hashes in preflight match SEEDS_b5 reference hashes for `ARMS.tsv`, `DOMCHK`, `SYN_BAL.csv`, `SYN_DOM60.csv`, `SYN_SMALLN.csv`, `dom_check.R`, `run_batch_v5.ps1`, `eval_b5.R`.
+- Constitution hash in SPEC and preflight matches `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`.
+- Owner rulings file hash in SPEC matches `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba`.
+
+Arm-level recomputation:
+
+| arm | n_rows | recomputed sum of DOM_TABLE n_escalate | DOM_RESULT n_escalate_total | top_type | top_n | recomputed top_share | recomputed flagged set | status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| REAL_RB | 222002 | 131968 | 131968 | WCA2 | 64922 | 64922/131968 = 0.4919525945683802 | {WCA2} | FLAG |
+| REAL_RA | 222002 | 131968 | 131968 | WCA2 | 64922 | 64922/131968 = 0.4919525945683802 | {WCA2} | FLAG |
+| SEED_DOM60 | 13000 | 10000 | 10000 | T01 | 6000 | 6000/10000 = 0.600000 | {T01} | FLAG |
+| CLEAN_BAL | 13000 | 10000 | 10000 | T01 | 1900 | 1900/10000 = 0.190000 | ∅ | NO_FLAG |
+| SMALL_N | 1200 | 900 | 900 | T01 | 540 | 540/900 = 0.600000 | ∅ | NOT_APPLICABLE_BELOW_MIN_TOTAL |
+
+Eligibility recomputation:
+
+- REAL: 81 types total; 54 types have n_escalate ≥ 30; WCA2 is the only eligible type with share > 1/3.
+- SEED_DOM60: 10 types total; all 10 have n_escalate ≥ 30; T01 is the only type with share > 1/3.
+- CLEAN_BAL: 10 types total; all 10 have n_escalate ≥ 30; no type has share > 1/3.
+- SMALL_N: total ESCALATE = 900 < 1000, so the check does not apply; DOM_TABLE marks all `eligible = FALSE`, consistent with `dom_check.R`.
+
+Synthetic n_rows identities from seed summaries:
+
+- SEED_DOM60: T01 6000 ESCALATE + 300 STANDARD; T02–T09 8×445 ESCALATE + 8×300 STANDARD; T10 440 ESCALATE + 300 STANDARD. Total rows = 13000.
+- CLEAN_BAL: ESCALATE counts 1900+1500+1200+1100+1000+900+800+700+500+400 = 10000; plus 10×300 STANDARD = 3000; total rows = 13000.
+- SMALL_N: ESCALATE counts 540 + 9×40 = 900; plus 10×30 STANDARD = 300; total rows = 1200.
+
+Cross-arm hash equalities:
+
+- REAL_RB and REAL_RA DOM_TABLE.csv both have SHA-256 `b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182` and size 3330 bytes. The two tables are identical.
+- REAL_RB and REAL_RA DOM_RESULT.csv differ in `input` basename and therefore file hash; this is expected and does not violate P1 condition 4, which requires identical DOM_TABLE.csv.
+- SEED_DOM60 DOM_TABLE.csv SHA-256 `04f12e81e239654053c0c2d3bfc3b9856317520543166eacc1b1f2fab94febd0`; matches C47_arms.csv truncated hash `04f12e81e2396540` and manifest.
+- CLEAN_BAL DOM_TABLE.csv SHA-256 `c413e66b0bca12cc0ac0fd2d17e6c88072f87f7524ff6f2f591c107063123f52`; matches C47_arms.csv truncated hash `c413e66b0bca12cc` and manifest.
+- SMALL_N DOM_TABLE.csv SHA-256 `d579d57c895cab605040bc2f8f251c78b295efd3cc16f1fb8b778761aefd5b4e`; matches C47_arms.csv truncated hash `d579d57c895cab60` and manifest.
+- Every arm’s INPUT_HASH_before.txt equals its INPUT_HASH_after.txt.
+- `dom_check.R` SHA-256 `582cb7822b44ef187282c981fbd7efa1d4dea8cec9014878e2b98a92a4355145` appears in every arm input manifest and in preflight.
+- Every arm RUN_DOM.stderr.txt has SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, the empty-file hash.
+- Every RUN_DOM.exit shows exit `0`; timestamps and durations match the run log.
+
+D-sets / flagged sets:
+
+- REAL_RB: {WCA2}
+- REAL_RA: {WCA2}
+- SEED_DOM60: {T01}
+- CLEAN_BAL: ∅
+- SMALL_N: ∅
+
+Portfolio deltas:
+
+- No portfolio-count deltas are part of C47 evidence. The only real-data totals are decision set `222002` and ESCALATE `131968`, both matching the SPEC.
+
+Internal inconsistency check:
+
+- No internal inconsistency found among the provided runner outputs.
+- C47_RESULTS.md arm table matches C47_arms.csv for the listed fields.
+- DOM_RESULT top_share rounded to six decimals matches the full-precision DOM_TABLE shares.
+- REAL_RB/REAL_RA DOM_RESULT files differ only by input basename and file hash; DOM_TABLE files are identical. This is expected.
+- Run log timestamps and RUN_DOM.exit timestamps are consistent.
+
+4. Facts that cannot be recomputed from this packet.
+
+- Full SHA-256 preimages cannot be recomputed from excerpts alone; I can only check provided hashes for equality and truncation consistency.
+- Full row-level real classifications and all labels are not present; I cannot independently verify every label agreement between R-A and R-B, only the ESCALATE type counts and the packet’s N1 statement.
+- REAL `n_rows = 222002` cannot be recomputed from DOM_TABLE alone; it is taken from DOM_RESULT and matches SPEC.
+- The N1 repeated-hour clock rows and their exact timestamps/labels are not independently verifiable from this packet beyond the disclosure.
+- `make_seeds_b5.py` is not included in this packet, so seed-generation logic cannot be independently inspected beyond seed summaries and hashes.
+- `eval_b5.R` is not included in this packet, so the full mechanical predicate application code cannot be inspected beyond `dom_check.R` and the reported outputs.
+- Full stdout/stderr contents are not included; only hashes, sizes, exit files, and summaries are available.
+- No portfolio-count files for C47 are used or included; portfolio deltas are not recomputable for this control.
+
+5. P1 assessment against the frozen predicate in the SPEC. Facts only, no terminal state.
+
+- Condition 1: SEED_DOM60 status FLAG with flagged types exactly T01. Evidence: DOM_RESULT status `FLAG`, `flagged_types = T01`; DOM_TABLE shows T01 6000/10000 = 0.6, eligible TRUE, flag TRUE, and all other types flag FALSE. Supported.
+- Condition 2: CLEAN_BAL status NO_FLAG. Evidence: DOM_RESULT status `NO_FLAG`; DOM_TABLE max T01 = 1900/10000 = 0.19, below 1/3; no flags. Supported.
+- Condition 3: SMALL_N status NOT_APPLICABLE_BELOW_MIN_TOTAL. Evidence: DOM_RESULT status `NOT_APPLICABLE_BELOW_MIN_TOTAL`; total ESCALATE = 900 < 1000. Supported.
+- Condition 4: REAL_RB and REAL_RA both FLAG exactly WCA2 with identical DOM_TABLE.csv. Evidence: both DOM_RESULT status `FLAG`, `flagged_types = WCA2`; both DOM_TABLE SHA-256 `b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182`; recomputed WCA2 share = 64922/131968 = 0.4919525945683802 > 1/3; no other type flagged. Supported.
+- Condition 5: no change to any locked result; every input hash unchanged across the check; real inputs equal frozen hashes. Evidence: every INPUT_HASH_before equals INPUT_HASH_after; REAL_RB matches `a0e42b8667b38baf...`, REAL_RA matches `c099e092feb237c8...`; seed hashes match preflight/SEEDS_b5; routing says report only, result unchanged, nothing dropped. Supported.
+- The runner reports `P1 MET`. My independent recomputation from the provided evidence is consistent with all five P1 conditions having supporting facts.
+
+6. Blocking objections.  
+   None supported by this packet. N1/OF-1 is disclosed and cannot change any C47 number because C47 counts labels only, and the packet states the three N1 rows carry the same label on both paths. The scratch preflight is disclosed; no evidence in the packet shows any post-check change to arms, thresholds, seeds, or predicate.
+7. Claim → evidence map.
+
+| Claim | Evidence |
+| --- | --- |
+| Role separation is valid | SPEC roles: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; Validator attestation above. |
+| Frozen real inputs were used | Preflight `frozen OK` lines for RA/RB classifications; REAL_RA/REAL_RB INPUT_HASH before/after match `c099e092...` and `a0e42b8667...`. |
+| SEED_DOM60 flags T01 only | DOM_RESULT status FLAG, flagged_types T01; DOM_TABLE T01 6000/10000 = 0.6, others flag FALSE. |
+| CLEAN_BAL does not flag | DOM_RESULT status NO_FLAG; DOM_TABLE max T01 = 0.19, no flags. |
+| SMALL_N below minimum | DOM_RESULT status NOT_APPLICABLE_BELOW_MIN_TOTAL; n_escalate_total 900 < 1000. |
+| REAL_RB and REAL_RA both flag WCA2 | DOM_RESULT both FLAG, flagged_types WCA2; DOM_TABLE both show WCA2 64922/131968 = 0.4919525945683802. |
+| REAL_RB and REAL_RA DOM_TABLE identical | Both DOM_TABLE SHA-256 `b5a46c63d017be7e8a19162e3fafaac6bdde9082ebd828725bab539eda83a182`. |
+| No input changed across check | Every INPUT_HASH_before equals INPUT_HASH_after; real inputs equal frozen hashes. |
+| No row dropped or changed | Routing text states report only, result unchanged, nothing dropped; statuses only flag/route. |
+| N1 cannot affect C47 | N1 note says three rows have same label on both paths; C47 counts labels only. |
+| P1 conditions 1–5 are supported | Recomputed arm tables, DOM_RESULTs, DOM_TABLEs, input hashes, and cross-arm hash equality above. |
+
+END C47 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C47 ADJUDICATION'.

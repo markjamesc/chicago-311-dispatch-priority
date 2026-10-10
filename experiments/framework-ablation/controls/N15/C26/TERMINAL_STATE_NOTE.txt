@@ -1,0 +1,2 @@
+HALT-INCOMPLETE
+# no END C26 ADJUDICATION line; packet defect PD-1 (Grok packet omitted ARM MANIFESTS); written by coordinator, not by record_terminal.R; queued for re-adjudication next week

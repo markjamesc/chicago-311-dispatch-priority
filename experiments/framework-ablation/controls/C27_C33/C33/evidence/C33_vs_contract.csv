@@ -1,0 +1,5 @@
+cmp,n_x,n_truth,n_only_x,n_only_truth,n_label_diff,n_dormant_diff,max_abs_d_dormant_h,max_abs_d_open_age_h
+B R-A vs frozen RA_classifications (repro check),222002,222002,0,0,0,0,0,0
+B R-B vs frozen RB_classifications (repro check),222002,222002,0,0,0,0,0,0
+X1/X2 R-B(pre-contract) vs B R-B(contract),222002,222002,0,0,104,222002,6,6
+X2 R-A(no-contract) vs B R-A(contract),222002,222002,0,0,104,222002,6,6

@@ -1,0 +1,171 @@
+﻿Role attestation and ablation ID
+I am DeepSeek, acting only as Validator for this packet. DeepThink is on. I am blind to the Builder and have not seen and must not ask for Builder output. Ablation ID: C52 (Addendum 02, candidate #52, batch N13 batch 4). I do not return a terminal state.
+
+Independent test plan: what I checked, and how
+I checked the frozen spec, constitution, preflight hashes, runner log, C52_RESULTS.md, C52_arms.csv, all raw per-arm files, the arm manifests, and the seed diffs. I recomputed exits, empty-error status, wall times, medians, ratio, gate row counts, gate PASS/FAIL/INFO counts, CHECKSUM bracket values, and cross-arm hash equalities from the raw evidence. I cross-checked G output line-by-line across arms. I did not run R, MySQL, or any external tool; this is a packet-only recomputation.
+
+Independently recomputed hard facts
+
+Arm exits and errors
+
+SER_1: exits 0/0/0; err_bytes=0; wall_s=3677.3.
+
+PAR_1: exits 0/0/0; err_bytes=0; wall_s=3246.8.
+
+SER_2: exits 0/0/0; err_bytes=0; wall_s=3137.4.
+
+PAR_2: exits 0/0/0; err_bytes=0; wall_s=2911.8.
+
+All raw .err files for E1, E2, G, CK_PRE, CK_POST across all arms are empty, SHA-256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, size 0.
+
+Wall-clock medians and ratio
+
+SER walls: 3677.3, 3137.4. Median = (3677.3+3137.4)/2 = 3407.35 s. Evaluator reports 3407.4 s (rounding).
+
+PAR walls: 3246.8, 2911.8. Median = (3246.8+2911.8)/2 = 3079.3 s.
+
+Ratio = 3079.3 / 3407.35 = 0.90372… ≈ 0.904. Evaluator reports 0.904.
+
+Predicate threshold: 0.80. 0.904 > 0.80, so condition 4 is not satisfied.
+
+Gate row count and status
+
+G output has 17 rows in every arm.
+
+PASS count = 15: A, B, C_missing, C_extra, D, E, F, G_profile, H, I_present, I_no_null, I_p75, J, K_open, K_t_freeze.
+
+FAIL count = 0.
+
+INFO count = 2: G_null_closed_date_info, L_raw_status_dist_info.
+
+Recomputed gate identities
+
+A: raw Open = 245193; extract Open = 245193.
+
+B: rows = 245193; distinct SR_NUMBER = 245193.
+
+C_id_missing_in_extract = 0.
+
+C_id_extra_in_extract = 0.
+
+D_field_mismatch_critical = 0.
+
+E_status_domain_open_only: distinct STATUS = 1; non-Open = 0.
+
+F_created_date_range: raw min = 01/01/2019 01:06:20 PM; raw max = 12/31/2025 12:59:29 PM; extract min/max string matches.
+
+G_null_profile_created_status: null/blank CREATED_DATE = 0; STATUS = 0; LAST_MODIFIED_DATE = 0.
+
+G_null_closed_date_info: blank CLOSED_DATE count = 245193, INFO.
+
+H_sr_checksum_match: raw = 4226609361; extract = 4226609361.
+
+I_peer_stats_present: src_peer_stats rows = 104; distinct type_key = 104.
+
+I_peer_no_null_type_key: 0.
+
+I_peer_p75_nonneg_when_n: 0.
+
+J_no_judged_columns: 0.
+
+K_lineage_open_matches_raw: open_candidate_n = 245193; raw_open_n = 245193.
+
+K_lineage_t_freeze: 2026-09-12 23:59:59.
+
+L_raw_status_dist_info: Canceled=212654; Closed=1; Completed=14177547; Open=245193. Sum = 212654 + 1 + 14177547 + 245193 = 14635395 raw rows.
+
+Cross-arm hash equalities
+
+E1_sha = 65bf0d9ae5bff494 in all four arms; full manifest hash 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6; size 118671465; E1.err empty.
+
+E2_sha = 95dc8cab2e82009f in all four arms; full manifest hash 95dc8cab2e82009fde69327f1af8921bb039b1ccedeee4668e8873d646342a06; size 16184; E2.err empty.
+
+G_sha = ec26cd171c4617eb in all four arms; full manifest hash ec26cd171c4617eb86d0145cd564662577db37e683c1608009083c2f011807f1; size 1556; G.err empty.
+
+CK_PRE and CK_POST: all arms have SHA-256 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7; size 162; .err empty.
+
+CHECKSUM bracket values, pre and post, all arms: raw_311_requests=727006061, src_open_candidates=1392669554, src_peer_stats=791123155, src_extract_lineage=2028659591. No change detected.
+
+INFO-only extract-vs-frozen checks
+
+E1 vs src_open_candidates.csv: FALSE.
+
+E2 vs src_peer_stats.csv: TRUE.
+
+Gate rows vs frozen stage4_extract_run.log: all non-note fields found on a log line naming the check = FALSE.
+
+Internal inconsistencies / anomalies in runner output
+
+PAR arm run log records “chain E exit=0” at the same timestamp as chain G exit: PAR_1 at 11:41:14, PAR_2 at 13:36:50. Raw RUN_E.exit and times_E.txt show chain E finished earlier: PAR_1 E2 exit at 11:05:35.61; PAR_2 E2 exit at 13:03:21.56. This is a runner-log timestamp/labeling inconsistency. It does not change exit codes, .err emptiness, or wall_s.
+
+C52_RESULTS.md reports median SER wall as 3407.4 s; exact arithmetic gives 3407.35 s. This is rounding.
+
+The chain_E.cmd scripts run E1.sql and E2.sql as two separate MySQL CLI invocations, not one session for the entire E chain, although the SPEC says “one session per chain.” This is a runner/spec adherence discrepancy. It is symmetric across arms and does not alter the recomputed P1 conditions.
+
+Portfolio deltas and D-sets: not present in this C52 packet. The R-A/R-B files appear only as preflight hashes. C52 is SQL-only per the packet and N1 states no R code enters any C52 number.
+
+Facts that cannot be recomputed from this packet
+
+Raw contents of E1.tsv and E2.tsv beyond their SHA-256 hashes and byte sizes. Only G.tsv is provided verbatim.
+
+Exact E1 row-level data and exact E2 row-level data. E1 row count is inferred as 245193 from G’s A/B/K checks; E2 row count is inferred as 104 from I_peer_stats_present and E2-vs-CSV TRUE, but not directly from E1/E2 raw files.
+
+The frozen stage4_extract_run.log peer rows value 1,881,338; it is not present in G.tsv or the INFO table.
+
+R-A/R-B portfolio deltas, D-sets, classification reconciliations, and portfolio count contents. The packet gives only their hashes.
+
+The exact reason E1 vs src_open_candidates.csv is FALSE; only the boolean is reported.
+
+The exact frozen-log lines matching or not matching gate checks; only in_frozen_log booleans are reported.
+
+Any Builder output or Builder hard-fact table; I am blind to it.
+
+Full raw_311_requests data; only aggregates and checksums are available.
+
+P1 assessment against the frozen predicate
+Facts only:
+
+Condition 1: all chain exits 0 in every arm and every .err file empty. Evidence: C52_arms.csv exits 0/0/0 for all arms; err_bytes=0; all raw .err files are empty. MET.
+
+Condition 2: G returns 17 rows with 15 PASS / 0 FAIL / 2 INFO, and G output byte-identical across arms. Evidence: G.tsv has 17 rows; PASS=15, FAIL=0, INFO=2; G_sha ec26cd171c4617eb identical across all arms; G.tsv size 1556 and identical manifest hash. MET.
+
+Condition 3: E1 and E2 outputs byte-identical across arms. Evidence: E1_sha 65bf0d9ae5bff494 identical across all arms; E2_sha 95dc8cab2e82009f identical across all arms. MET.
+
+Condition 4: median PAR wall ≤ 0.80 × median SER wall. Evidence: median PAR = 3079.3 s; median SER = 3407.35 s exact / 3407.4 s rounded by evaluator; ratio = 0.9037 exact / 0.904 reported. Threshold is 0.80. 0.904 > 0.80. NOT MET.
+
+The mechanical predicate result reported in C52_RESULTS.md is P1 NOT MET.
+
+Blocking objections
+None that block a verdict on the C52 mechanical evidence in this packet. Non-blocking defects/notes:
+
+The runner crashed at its evidence step after the evaluator finished and did not log DONE. The coordinator assembled C52_ARM_MANIFESTS.txt and C52_EVIDENCE.sha256 later from finished arm manifests. The arm-level raw files and evaluator output are present and internally hash-consistent; this does not change the recomputed P1 facts.
+
+The PAR arm runner log mislabels chain E exit time as the chain G exit time. Raw RUN_E.exit and times_E.txt resolve the actual E exit; exits remain 0 and .err files empty.
+
+The E chain uses two MySQL CLI invocations for E1 and E2, not one session for the whole E chain as the SPEC wording says. This is symmetric across arms and does not alter the recomputed P1 conditions.
+
+The INFO-only E1-vs-CSV FALSE and in_frozen_log FALSE results are declared non-gating and do not enter P1 conditions 1–4.
+
+The frozen-log peer rows value 1,881,338 cannot be verified from this packet, but P1 condition 2 only requires the 15/0/2 gate result and byte-identical G output, both of which are present.
+
+Claim → evidence map
+
+Claim	Evidence
+Role separation valid for C52	Packet role header: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; C52 spec.
+Preflight gating passed	PREFLIGHT section: all frozen/seed lines OK; preflight gating result: PASS.
+Arms ran in declared interleaved order	RUN LOG: SER_1, PAR_1, SER_2, PAR_2.
+All chain exits 0, all .err empty	C52_arms.csv; raw .err files; RUN_E.exit; RUN_G.exit.
+G output 17 rows, 15 PASS / 0 FAIL / 2 INFO	G.tsv in all arms; C52_arms.csv gate columns.
+G output byte-identical across arms	G_sha ec26cd171c4617eb in C52_arms.csv; manifest G.tsv SHA-256 and size 1556 across arms.
+E1 byte-identical across arms	E1_sha 65bf0d9ae5bff494 in C52_arms.csv; manifest E1.tsv SHA-256 and size 118671465 across arms.
+E2 byte-identical across arms	E2_sha 95dc8cab2e82009f in C52_arms.csv; manifest E2.tsv SHA-256 and size 16184 across arms.
+CHECKSUM bracket static	CK_PRE/CK_POST tsv in all arms; identical values; run log pre/post lines.
+Median SER = 3407.35 s exact	Recomputed from SER_1 3677.3 and SER_2 3137.4.
+Median PAR = 3079.3 s	Recomputed from PAR_1 3246.8 and PAR_2 2911.8.
+Ratio = 0.9037 exact / 0.904 reported	Recomputed; C52_RESULTS.md Timing.
+P1 condition 4 not met	Ratio 0.904 > 0.80 threshold.
+E1 vs frozen CSV INFO FALSE	C52_RESULTS.md INFO: extract outputs vs frozen source CSV.
+E2 vs frozen CSV INFO TRUE	C52_RESULTS.md INFO: extract outputs vs frozen source CSV.
+N1/OF-1 does not enter C52 numbers	Coordinator note N1/OF-1; C52 runs no R code.
+Portfolio deltas/D-sets not recomputable	No portfolio count contents in C52 packet; R-A/R-B only as preflight hashes.
+END C52 VALIDATOR REPORT

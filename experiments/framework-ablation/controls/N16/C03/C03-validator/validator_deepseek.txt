@@ -1,0 +1,212 @@
+﻿1. Role attestation and ablation ID
+I am the Validator for ablation C03, Batch N16, owner control #3 (Design Gate before/after cross-review, pre-gate replay). I am DeepSeek with DeepThink on and Search off. I have not seen the Builder’s output and I do not ask for it. I do not return terminal state labels.
+
+2. Independent test plan: what I checked, and how
+I worked only from the frozen text packet. I did not use MySQL, R, the internet, or a PC run. I checked:
+
+The SPEC, constitution, preflight text, C03 scorer source, C03_RESULTS.md, C03_items.csv, C03_EVIDENCE.sha256, and the verbatim frozen Stage 3 inputs.
+
+Recomputed item classes from C03_items.csv row by row.
+
+Counted the cross-review section-4 numbered material disagreements directly from CROSS_REVIEW.md.
+
+Compared the six C03 input hash prefixes in C03_RESULTS.md against the full hashes in C03_EVIDENCE.sha256 and PREFLIGHT_N16.txt.
+
+Compared scorer and evidence hashes against the SPEC frozen reference hashes.
+
+Re-read the scorer’s declared token regex and spot-checked key locked-design tokens against Design A, Design B, and the AI3 dossier.
+
+Checked status-count arithmetic from the frozen Design B and AI3 dossier text.
+
+Checked timestamp ordering and evidence-list completeness for internal inconsistencies.
+
+Fixture/reconciliation items are not applicable to N16 per the coordinator note: no PC run, no R-A/R-B path, no fixture execution; text-level equivalent is the frozen text/hash comparison above.
+
+3. Independently recomputed hard facts
+Condition table from C03_RESULTS.md
+Condition	Reported	My recomputation
+1. Every design item 1–14 decidable from pre-review	NOT MET	NOT MET
+2. Every distinct locked-design token appears in at least one pre-review document	MET	MET, subject to token-enumeration limitation below
+3. Cross-review section-4 material disagreements empty	NOT MET	NOT MET
+Checklist item classification from C03_items.csv
+Total design items: 14.
+
+Class counts: SYNTHESIS-ONLY = 1 (item 1); pre-review = 13 (items 2–14); neither = 0.
+
+found_in counts:
+
+A: items 4, 5, 6, 13 → 4 items.
+
+B: items 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14 → 12 items.
+
+D: items 4, 5, 6, 7, 8, 9, 13 → 7 items.
+
+-: item 1 → 1 item.
+
+Union in pre-review: yes for 13 items, NO for item 1.
+
+In cross-review: yes for all 14 items.
+
+Item 1 is:
+lock candidate = B-leaning hybrid (TCD-IG), found in - pre-review, in cross-review yes, class SYNTHESIS-ONLY.
+
+Condition 2 token counts
+From C03_RESULTS.md:
+
+Locked-design tokens: 47 distinct.
+
+In Design A: 7.
+
+In Design B: 45.
+
+Locked-design tokens only in CROSS_REVIEW: 0.
+
+Locked-design tokens in no review document at all: 0.
+
+I could not fully re-enumerate the 47-token set from the packet without executing the scorer regex and helper functions. Spot-checks found key locked tokens such as κ, TCD-IG, n_min, peer_p75_h, dormant_h, open_age_h, thin_type, integrity_fail, RANKING_NOT_IN_SCOPE, F01–F14, type_key, peer_n, created_ts, mod_ts, closed_ts, SR_NUMBER, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE, SR_TYPE, SR_SHORT_CODE, COMMUNITY_AREA, DUPLICATE, LEGACY_RECORD, PARENT_SR_NUMBER, and OWNER_DEPARTMENT present in at least one pre-review document. I found no obvious contradiction to the reported zeros.
+
+Condition 3 disagreement count
+Direct count from CROSS_REVIEW.md section 4:
+
+Primary evidence statistic — age/confidence (A) vs type-conditional dormancy (B).
+
+Specificity of the single knob — vague confidence_threshold (A) vs operational κ (B).
+
+INCONCLUSIVE as soft residual (A) vs hard integrity gate (B).
+
+Eligibility surface — minimal fields (A) vs dup/legacy/type/created≤T skeleton (B).
+
+Fixture depth — 4 categories (A) vs F01–F14 with construct litmus (B).
+
+Capacity handling — soft deferral (A) vs hard RANKING_NOT_IN_SCOPE + Framing return (B).
+
+Peer aggregates in SQL (B) vs pure raw columns (A).
+
+Count: 7. Condition 3 requires empty; therefore condition 3 is NOT MET.
+
+Status-count arithmetic
+From frozen Design B / AI3 dossier text:
+
+Total rows: 14,635,395.
+
+STATUS Open: 245,193.
+
+CLOSED_DATE missing: 245,217.
+
+Open vs CLOSED_DATE missing gap: 245,217 − 245,193 = 24.
+
+Completed: stated as ~14.18M.
+
+Canceled: stated as ~212k.
+
+Closed: stated as 1.
+
+Using approximate Completed: 14,180,000 + 212,000 + 245,193 + 1 = 14,637,194, which is 1,799 above total. Using exact subtraction: 14,635,395 − 245,193 − 212,000 − 1 = 14,178,201, consistent with “~14.18M.” The approximate statement is not internally contradictory.
+
+Hash equalities
+C03_RESULTS.md input hash prefixes match C03_EVIDENCE.sha256 and PREFLIGHT_N16.txt full hashes for:
+
+AI1_DESIGN_A.md
+
+AI2_DESIGN_B.md
+
+AI3_DATA_RISK_DOSSIER.md
+
+CROSS_REVIEW.md
+
+MEASUREMENT_DESIGN_LOCKED.md
+
+DESIGN_GATE_PACKAGE.md
+
+score_c03.py SHA-256 in SPEC matches C03_EVIDENCE.sha256: 9cd3dc...4dd4e62.
+
+C03_RESULTS.md SHA-256 in SPEC matches C03_EVIDENCE.sha256: 8cc735...d4af34.
+
+C03_items.csv SHA-256 in SPEC matches C03_EVIDENCE.sha256: d3801c...a600a.
+
+n16lib.py hash is in SPEC (4a6675...bd9e47) but not in C03_EVIDENCE.sha256.
+
+Cross-arm hash equality observed in PREFLIGHT_N16.txt:
+
+frozen/c48/AI1_ORIGINAL.md and frozen/stage5/AI1_INTERPRETATION_BUILDER.md both have SHA-256 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932.
+
+Internal inconsistencies in runner output
+C03_RESULTS.md says generated 2026-10-09 02:21:35 CT.
+
+PREFLIGHT_N16.txt says preflight 2026-10-09 02:21:42 CT.
+
+Therefore the reporting run timestamp precedes the preflight timestamp by 7 seconds. If preflight was required to precede the reporting run, this is an ordering inconsistency. The preflight itself reports PASS and all compared hashes match.
+
+C03_EVIDENCE.sha256 omits scorers/n16lib.py even though scorers/score_c03.py imports it and the SPEC declares its hash.
+
+4. Facts that cannot be recomputed from this packet
+Exact token membership and the full 47/7/45 token counts cannot be independently recomputed from the packet without executing the scorer regex and n16lib helpers.
+
+The source of n16lib.py is not provided; only its declared hash appears in the SPEC. Its helper functions cannot be inspected from the packet.
+
+Raw source counts, exact Completed count, SR_NUMBER uniqueness, duplicate counts, missingness distributions, and status-history facts cannot be recomputed from the packet because the raw Chicago 311 table is not included.
+
+Exact portfolio deltas are not present in the C03 evidence. Stage 5 portfolio summary contents are not provided verbatim; only hashes appear in preflight.
+
+Fixture and reconciliation actuals are not applicable to N16 per the coordinator note. The text-level equivalent is the frozen text/hash comparison.
+
+No seed files are declared; there is no seed content to recompute.
+
+5. P1 assessment against the frozen predicate in the SPEC
+Facts only:
+
+Condition 1 — “every gate checklist design item 1-14 is decidable from the pre-review documents (none synthesis-only, none missing)”:
+
+Item 1, lock candidate = B-leaning hybrid (TCD-IG), is classed SYNTHESIS-ONLY.
+
+13 of 14 items are classed pre-review.
+
+0 items are classed neither.
+
+Therefore condition 1 is not satisfied.
+
+Condition 2 — “every distinct design token of the locked design appears in at least one pre-review document (the cross-review adds no design token)”:
+
+Scorer reports 47 distinct locked-design tokens.
+
+Design A covers 7; Design B covers 45.
+
+Tokens only in CROSS_REVIEW: 0.
+
+Tokens in no review document at all: 0.
+
+Therefore condition 2 is satisfied on the reported and spot-checked evidence.
+
+Condition 3 — “the cross-review's section-4 list of material disagreements between Design A and Design B is empty”:
+
+Section 4 contains 7 numbered material disagreements.
+
+Therefore condition 3 is not satisfied.
+
+Mechanical P1 result from the frozen conditions: NOT MET, because conditions 1 and 3 are not satisfied.
+
+6. Blocking objections
+Blocking objection to full independent scorer reproduction: scorers/n16lib.py source is absent from the packet and from C03_EVIDENCE.sha256, although scorers/score_c03.py imports it and the SPEC declares its hash. The P1-relevant condition counts are visible, but full independent inspection of helper-dependent scorer behavior is not possible from this packet.
+
+Evidence-pack defect: C03_EVIDENCE.sha256 omits scorers/n16lib.py despite its inclusion in the SPEC frozen reference hashes.
+
+Harness timing defect: C03_RESULTS.md generation timestamp is 02:21:35 CT, while PREFLIGHT_N16.txt is 02:21:42 CT. The reporting run precedes the preflight timestamp by 7 seconds.
+
+Seed objection: none declared; seed files are (none).
+
+Fixture/reconciliation objection: not applicable to N16 per the coordinator note: no PC run, no R-A/R-B path, no fixture execution.
+
+7. Claim → evidence map
+Claim	Evidence
+C03 is the N16 control #3 Design Gate pre-gate replay	SPEC header and “Control under test (owner list #3)”
+Condition 1 is NOT MET	C03_items.csv item 1 class SYNTHESIS-ONLY; C03_RESULTS.md condition table
+Condition 2 is MET	C03_RESULTS.md token lines: 47 distinct, A 7, B 45, only CROSS_REVIEW 0, never 0
+Condition 3 is NOT MET	CROSS_REVIEW.md section 4 numbered items 1–7; C03_RESULTS.md condition table
+Mechanical P1 result is NOT MET	Conditions 1 and 3 fail; condition 2 passes
+Six C03 input hashes match	C03_RESULTS.md prefixes; C03_EVIDENCE.sha256; PREFLIGHT_N16.txt
+Scorer and result hashes match SPEC	SPEC frozen reference hashes; C03_EVIDENCE.sha256
+n16lib.py is used but not in C03 evidence	score_c03.py import; SPEC reference hash; absence from C03_EVIDENCE.sha256
+Preflight timestamp follows results timestamp	C03_RESULTS.md generated 02:21:35 CT; PREFLIGHT_N16.txt 02:21:42 CT
+Open vs CLOSED_DATE gap is 24	Design B / AI3 dossier: Open 245,193; CLOSED_DATE missing 245,217
+Cross-arm hash equality exists	PREFLIGHT_N16.txt: c48/AI1_ORIGINAL.md and stage5/AI1_INTERPRETATION_BUILDER.md share 73f448d...
+END C03 VALIDATOR REPORT

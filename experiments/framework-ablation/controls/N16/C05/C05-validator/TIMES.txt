@@ -1,0 +1,3 @@
+sent=2026-10-09 05:02:35
+reply_complete=2026-10-09 05:11:35
+# reply_complete = first-seen (upper bound; page "Thought for 65 seconds" covers thinking only)

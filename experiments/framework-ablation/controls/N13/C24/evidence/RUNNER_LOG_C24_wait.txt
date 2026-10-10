@@ -1,0 +1,2 @@
+﻿2026-10-03 09:56:03 waiting for "DONE batch=b4" in RUNNER_LOG_b4.txt and no mysql.exe process
+2026-10-09 01:29:30 watcher pid 66064 stopped by coordinator (b4 DONE line never written); launching run_c24.ps1 directly

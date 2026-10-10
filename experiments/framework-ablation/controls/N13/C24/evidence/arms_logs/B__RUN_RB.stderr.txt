@@ -1,0 +1,14 @@
+[R-B] project root: C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03→STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+Error in sub(re, "", x, perl = TRUE) : input string 8470 is invalid UTF-8
+Calls: run_production ... trimws -> mysub -> sub -> is.factor -> mysub -> sub
+In addition: Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE 
+Execution halted

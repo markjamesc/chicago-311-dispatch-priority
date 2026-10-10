@@ -1,0 +1,1603 @@
+# C04 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on, Search off). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C04 VALIDATOR REPORT
+
+---
+# COORDINATOR NOTE N1 / OF-1 (read before the RESULTS)
+In the frozen Chicago pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows (SR22-01936870 dormant_h; SR25-02017553 and SR25-02017556 open_age_h); the labels agree. All three clocks fall in the repeated fall-back hour; cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST). It is open finding OF-1 in the coordinator's RESULTS_N15.md and is known and expected. N16 runs no R-A / R-B path and reads only frozen Stage 1-5 text, logs and C48 outputs, so N1 / OF-1 cannot enter any N16 number. Nothing in N16 changes the frozen pack.
+
+# COORDINATOR NOTE: text-only capture; no PC run
+The replies of this control were captured as text (Chrome page saving is broken; owner-approved 2026-10-09 01:52 CT, `runner/ingest_textonly.py`). Every mechanical number in the RESULTS below was produced on the box by the scorer quoted in this packet, from frozen text inputs; nothing was run on the PC (no MySQL, no R). Fixture and reconciliation items (report section 5 / validator test plan) do not apply to N16: keep the heading and write 'not applicable' with one line of reason, plus any text-level equivalent you see.
+
+---
+# SPEC
+# C04 — Ablation specification (FROZEN)
+
+**Ablation ID:** C04 (owner ablation list control #4: Stage-5 three-AI roles vs one interpreter)
+**Batch:** N16 (the 12 controls untested after N13: #1-#7, #9, #37, #38, #50, #54). Built 2026-10-09 on the box, text only.
+**Definitions and approval (operational definitions, constitution §9):** owner rulings sheet `ablation_plan/OWNER_RULINGS_BATCH_02.md` SHA-256 `1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417`; owner answer **Z (all recommended)** at 2026-10-09 01:49 CT, recorded in `OWNER_BATCH_02_ANSWERS.md` SHA-256 `3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b`. Owner answer Z = recommended: 4-C (one single-interpreter chat on the frozen Stage 5 package, plus one seeded unsupported claim and one seeded wrong number inserted into its output). Q0 = A: the real Chicago 311 Stage 1-3 run (`chicago-311-run/stage-01-02`, `stage-03`, Stage 5) is the shared baseline for the design controls; it was run with a coordinator and extra reviews, so it is not a perfectly clean A/B.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data:** the frozen Chicago 311 Dataset 2 run and its Stage 1-5 records; every input is a hashed copy under `N16/frozen/` (`FROZEN_INPUTS.sha256`, origins in `FROZEN_ORIGINS.tsv`, re-verified by `runner/preflight_n16.py`, output `PREFLIGHT_N16.txt`). No MySQL, no fresh pull, no git, no R, nothing on the PC.
+**Roles:** Builder=ChatGPT (High) · Validator=DeepSeek (DeepThink on, Search off) · Adjudicator=Grok (Expert)
+**Extra chats: 1** — `X4/packets/X4_SINGLE_INTERPRETER_ChatGPT.txt` (ChatGPT, High): one chat that plays AI 1, AI 2 and AI 3. A NEW conversation, blind to this ablation.
+**Capture mode:** TEXT-ONLY (owner-approved 2026-10-09 01:52 CT; `N13/TEXTONLY_PROCEDURE.md`, `runner/ingest_textonly.py`); recorded in run notes only, never in anything published.
+**Target stage:** Stage 5 interpretation
+**Frozen at CT:** 2026-10-09, before any chat of this control; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Control under test (owner list #4)
+Stage 5 as it stands: three roles (AI 1 builder, AI 2 decision critic, AI 3 claim-to-evidence auditor) interpret the frozen evidence package.
+Ablation: a single interpreter (one ChatGPT chat) plays all three roles. KEEP would mean the three roles can be replaced by one interpreter plus the mechanical checks.
+
+## Verdict convention
+**KEEP = one interpreter (self-audit + mechanical checks) may replace the three Stage 5 roles. REVERT = the three Stage 5 roles stay.** HALT as in constitution §9.
+
+## Arms
+- BASE (the rule): the real three-role round (AI 1 first pass, AI 2 and AI 3 first-round reviews) whose required revisions are V-1..V-6 (`c48/REVISIONS.json`).
+- VARIANT: extra chat X4 (ChatGPT): one chat with the same evidence the real roles had; sections 1-10 (AI 1), 11 (AI 2 critique), 12 (AI 3 audit), 13 (final text). Scored on its section-13 text.
+
+## Operational benefit predicate P1 (made mechanical before execution)
+1. none of the real first-round required revisions V-1..V-5 is missing from the single interpreter's final text (missed findings = 0);
+2. the final text has no number outside the evidence (recomputable shares allowed) and no claim-ceiling lint hit;
+3. the mechanical checks catch both scorer-inserted seeds (S3 unsupported causal / should-act sentence by the lint, S4 wrong share 42.9% by the number check);
+4. the reply is complete (sections 11-13 present, single END C04 SINGLE INTERPRETER as last line).
+P1 MET -> KEEP. Not MET -> REVERT. Extra chat incomplete or missing -> HALT. #50, #5, #37, #38 assume the roles exist: if C04 is KEEP, the Adjudicators of those controls are told.
+
+## Disclosures and deviations (declared before the chats)
+- V-1..V-5 stand in for 'the real AI 2 / AI 3 findings': they are the coordinator's reconciled revision list (`C48/REVISIONS.json`, each with its source line in the real reviews), not the raw review text; V-6 is a capture artefact and not applicable.
+- The single interpreter sees the same evidence package, deeper findings and CSVs as the real roles (superset of AI 1's pasted package; disclosed).
+- The seeds are inserted into a copy of the final text by the scorer after the chat, so 'caught' means caught by the mechanical checks; the single interpreter's own self-audit is not tested against them.
+- Real-role satisfaction regexes (V-1..V-5) are declared in the scorer; they were validated on the frozen AI 1 original (misses all five) and the frozen revised-clean text (satisfies all five) before the reporting run (X4/selftest, NON_REPORTING).
+- Scratch-run adjustment: the lint counts a causal word only in a sentence about WCA2 / ESCALATE / dormancy / concentration / crews / staff, because definitional 'because' sentences in the real AI 1 text were flagged.
+- Same role overlap as the N13 audits: ChatGPT is also the Builder of the trios; the extra chat is a separate conversation.
+- Known open finding N1 / OF-1 (clock mismatch on 3 rows of the frozen pack): cannot enter N16 (no R path run). See the coordinator note in the packets.
+- Cost: not measured in minutes; the reply and packet byte sizes are the only cost proxy and are not part of P1 unless stated above.
+
+## Regression / HALT rules
+- HALT as in constitution §9, or if Builder and Validator disagree on a hard number or classification that decides a P1 condition, or if a reply is missing, incomplete (no END line) or changed after its freeze, or if a frozen input hash differs from `FROZEN_INPUTS.sha256`.
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity; fixtures) are not applicable: no R run and no fixture. The known-answer cases are the unmodified / clean arms and the seeds declared above. Conditions 6-7: the frozen inputs are only read (preflight).
+
+## Allowed source/data scope
+Frozen Chicago Stage 1-5 documents, frozen N13 logs and C48 outputs under `N16/frozen/`. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on)
+**Frozen input files:** all 75 files in `FROZEN_INPUTS.sha256`; the ones used here are listed in the EVIDENCE list of the packet.
+**Scorer files (hashed in `SCORERS_N16.sha256` before the reporting run):**
+- `scorers/score_c04.py` SHA-256 `0d4b3c56310c5dc4327ee9f703308d5b74078327e8e707011a4e4b46f560525d`
+- `scorers/build_x4.py` SHA-256 `7ea2ee295ae792cd00098f3abac10bf02505cf1445d21977573d7e6b81cca0a8`
+- `scorers/n16lib.py` SHA-256 `4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47`
+**Seed files:**
+(none)
+**Result and evidence files:**
+(the post-chat score file is created after the extra chat; its scorer hash is above; the extra-chat packet hash is below)
+- `X4/packets/X4_SINGLE_INTERPRETER_ChatGPT.txt` SHA-256 `fe2899cb6a99713bd0b9cd653ae1c60d1301c847410a375b18fe20474216cc30` (12981 bytes); END line `END C04 SINGLE INTERPRETER`; reply save: `X4/X4-chat/single_interp_chatgpt_TEXTONLY.txt`.
+**Governance:** constitution and baselines as above; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT. Check each V-1..V-5 satisfaction, the number check and the seeds against the verbatim reply.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (box, text only, CT)
+N16 preflight 2026-10-09 02:21:42 CT root /workspace/ablation_plan/runs/N16
+frozen OK 86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08 frozen/BASELINE_FRAMEWORK.sha256
+frozen OK e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 frozen/CONSTITUTION_v1.md
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/c48/AI1_ORIGINAL.md
+frozen OK c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878 frozen/c48/AUDIT_FREEZE.json
+frozen OK 5df149f9f300620ebab767f7af17a98d078f92e85b7604cce1f5f82480b59c92 frozen/c48/C48_RESULTS.md
+frozen OK d92e480b9531d5018ca02e6dbd116dbaaa3a2df53981e690e48eff13eb00278c frozen/c48/REVISED_CLEAN.md
+frozen OK c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63 frozen/c48/REVISED_SEED.md
+frozen OK 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4 frozen/c48/REVISIONS.json
+frozen OK c7cde8022846cd6aff9b189e32dc3aa4f3eea733835d469093054391490627b2 frozen/c48/TERMINAL_STATE.txt
+frozen OK 06b3e1f75be60142b054ac034cdb78579b9812efb87a1e535d5d0a0530b22e27 frozen/c48/ai2_second_audit.md
+frozen OK 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2 frozen/c48/ai3_second_audit.md
+frozen OK 6cc4ea649d67c1d22a90bfcbcbf3756a69837d900f26943940f0b6bb57297156 frozen/c48/rev_check.R
+frozen OK c07e47c76659247fa6c8306723bb8521210acab99c3c662d58d77480f2614cbf frozen/n13logs/ADJ_GROK_B4_EXTRACTION_LOG.jsonl
+frozen OK 191821397bf2b034398e5f975d398ab9d712df47ca0021d4931f401dc427ac9c frozen/n13logs/ADJ_GROK_B5_EXTRACTION_LOG.jsonl
+frozen OK ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754 frozen/n13logs/ADJ_GROK_C43_EXTRACTION_LOG.jsonl
+frozen OK 50ef99b3af165a7f01bb4173dc61534989ca0acec9009911c7d1159454c8a04f frozen/n13logs/ADJ_GROK_C44_EXTRACTION_LOG.jsonl
+frozen OK 7ba322a361fa672dc3ad5a46157c35b447ee04bf89904ace1c211c4636d7572d frozen/n13logs/ADJ_GROK_C48_EXTRACTION_LOG.jsonl
+frozen OK eba13ed2b6618a1442f70b09c6b84228f59eba4a466b9b8934833bdc5e250759 frozen/n13logs/ADJ_GROK_C49_EXTRACTION_LOG.jsonl
+frozen OK 980651563bbfd1e0ac9bda44c78964e7599a9778e1de49a950386353f2c9b5bf frozen/n13logs/C40_DEVIATION_NOTES_post.md
+frozen OK 8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864 frozen/n13logs/C40_DEVIATION_NOTES_post_2.md
+frozen OK cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149 frozen/n13logs/C43_NOTES.md
+frozen OK 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0 frozen/n13logs/C43_TERMINAL_STATE.txt
+frozen OK b1362205dfe866447961c801230b929e3246e3388bb26a819a4e245d0839fdf2 frozen/n13logs/C49_DEVIATION_NOTES_post.md
+frozen OK 6cd11d74b4cf2f09ebd511d10e3c8fb48d9133765b7b389315db99cd748eb188 frozen/n13logs/C49_DEVIATION_NOTES_post_2.md
+frozen OK 53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4 frozen/n13logs/C49_NOTES.md
+frozen OK 57ed8ed5f7e0fa5cc35bf0c6df03559514d661fcfea24e2116da44cfdab0ad13 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C48BV.jsonl
+frozen OK 2d1fc0b19611da2f299fd86ccaa4db828bf1fabf04fe217c41fec8c52c0f32c3 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49BV.jsonl
+frozen OK 9cfd0afd05a62fb6ee397f32b03ab69ca8b6206ec12bbd66ea66143b5a8d3072 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl
+frozen OK daeb45cbc3ce1cac2cc58c61cb36d4b5578a14902d143fa08066630ab7d105e8 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b4.jsonl
+frozen OK b75dc1aaa168c17064f8a94751e3c649297b01ced91c554de8f126307573729a frozen/n13logs/CAPTURE_EXTRACTION_LOG_b5.jsonl
+frozen OK 4440636595651de8c16b1e39be91529ca0f07c01c050c99a9c900965bb688269 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6.jsonl
+frozen OK b165381637d9729ccf215f9591bc5d962cc85adcfa2d9dcad23916b9c6716de9 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b.jsonl
+frozen OK 89c078e3ca9131a5974604bae69acfe676de1f6ce7aacc5ee56e97c5c708785d frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b_fix.jsonl
+frozen OK 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b frozen/rulings/OWNER_BATCH_02_ANSWERS.md
+frozen OK 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417 frozen/rulings/OWNER_RULINGS_BATCH_02.md
+frozen OK b29b39086a58e9b440f8a1a40651277c05e2b4251e555f16663c13b68ef9e4e1 frozen/stage12/ai2_framing_review_pass1.md
+frozen OK b3492dd9eca8e5ed4d104474fc12f18bfb7edc04ef78b008e123e000aae0d11c frozen/stage12/ai2_start_review_pass1.md
+frozen OK f1f47dedcc04f326c7bfd899e15b9b0fa245f70fdc1ca25f3beaec061fe8bbfc frozen/stage12/ai3_framing_review_pass1.md
+frozen OK 1cd29a865d34879d4f50f6615d70b438d4e454e1b5a771126645ec922842fdbb frozen/stage12/ai3_start_review_pass1.md
+frozen OK f6d856ea328fd379caf964305df6eacacbe975acd98acc0be0cccb61f5de9ba0 frozen/stage12/ambiguity_ledger.md
+frozen OK fefdaab549d9ec27ba3af4d6118faac8cd2bd886875abb7c3394c3cf2eaec7f3 frozen/stage12/candidate_question_ledger.md
+frozen OK 9d704ede8c2031d13d1771a170a8e99c2c3d51d15810f51fc7308acb8a675bca frozen/stage12/decision_ledger.md
+frozen OK aafa32e34b52efa4900993416a0d3ef823717ca15912d55ac1c7153fccb51d2a frozen/stage12/revision_trail.md
+frozen OK a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430 frozen/stage12/stage1_decision.json
+frozen OK 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a frozen/stage12/stage2_framing.json
+frozen OK 63d0915519094b27234c94acf256a2c390fc795d4781b5727b84162d89863af9 frozen/stage12/verbatim_dialogue_ledger.md
+frozen OK 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988 frozen/stage3/AI1_DESIGN_A.md
+frozen OK 083403f49810898f2c2dea96b7608556125c29a9bc59594ab5725721610940cc frozen/stage3/AI1_INDEPENDENT_DESIGN_A.md
+frozen OK bc096a5be4315882a44e6ce227b6bea40c7a5669e0f9f5f875e0ecbb04179895 frozen/stage3/AI1_meta.txt
+frozen OK 8153ad4fb16001c1f217d8112e878f22ca0b299aa5574b9cd318465e845d52a8 frozen/stage3/AI2_DESIGN_B.md
+frozen OK 808fea8d7c3c207949b0aca144e7d5a8785b10ec3ec915f82202ae0acde1c7b1 frozen/stage3/AI2_meta.txt
+frozen OK 7f4fc3ee3995e2d20472be686887d7c3aa97cbbf365d8ee50e685a3fb2fc62b1 frozen/stage3/AI3_DATA_RISK_DOSSIER.md
+frozen OK db9da8dfcdaf1ef192f64e61d5c08ccb2cf922a3aa10fef5edcd24b3e64e2642 frozen/stage3/AI3_meta.txt
+frozen OK 9f3ea0a7f3e92ab4852a0add67c72389c046e5e6c282937ded350bfc0648aa42 frozen/stage3/CROSS_REVIEW.md
+frozen OK 0ec361b591cc33733814766fefb05739fc80ef8571ded2b44e55974b85935dd8 frozen/stage3/DESIGN_GATE_PACKAGE.md
+frozen OK 3a03e139350141baa2b6fef9d065a6075d9248cf53b971ad1bc6c81aa07fa57f frozen/stage3/DESIGN_GATE_RECEIPT.md
+frozen OK 9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243 frozen/stage3/MEASUREMENT_DESIGN.md
+frozen OK 7297cf3ef25bbf12a04a6d88c0a41dac260de5736c71392783d8f8b7d7389594 frozen/stage3/MEASUREMENT_DESIGN_LOCKED.md
+frozen OK 4b4a8ce3aa63a7eb3c62228a087a876591f556694fbf152a3ef79da4e92ac996 frozen/stage3/SHARED_INPUT_PACKET.md
+frozen OK ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114 frozen/stage3/stage3_locked_design.json
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/stage5/AI1_INTERPRETATION_BUILDER.md
+frozen OK d77f55c6b96b87455a60c22907a845f253808d4a466110f87d16825501e8c3a0 frozen/stage5/AI1_PASTE.txt
+frozen OK ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a frozen/stage5/AI2_DECISION_METHOD_CRITIC.md
+frozen OK 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1 frozen/stage5/AI3_CLAIM_EVIDENCE_AUDITOR.md
+frozen OK 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457 frozen/stage5/CROSS_REVIEW.md
+frozen OK 22dc6a94006f83de4e2d741c4de08e0964e6433d08e87d11e98314a0b767c285 frozen/stage5/FINISH_GATE_PACKAGE.md
+frozen OK 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462 frozen/stage5/INTERPRETATION_RECONCILIATION.md
+frozen OK 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 frozen/stage5/STAGE5_DEEPER_FINDINGS.md
+frozen OK c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 frozen/stage5/STAGE5_EVIDENCE_PACKAGE.md
+frozen OK 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 frozen/stage5/deeper/capacity_coverage_note.csv
+frozen OK 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 frozen/stage5/deeper/escalate_by_type_top25.csv
+frozen OK f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d frozen/stage5/deeper/inconclusive_by_clause.csv
+frozen OK 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 frozen/stage5/deeper/independent_checks_critical_counts.csv
+frozen OK 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a frozen/stage5/deeper/kappa_sensitivity.csv
+frozen OK b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 frozen/stage5/deeper/portfolio_summary.csv
+PREFLIGHT PASS failures: 0
+(origin-hash lines omitted here; each frozen file was also compared with its origin path, all OK; full list in FROZEN_ORIGINS.tsv)
+
+---
+# FROZEN REFERENCE HASHES
+Frozen inputs: `FROZEN_INPUTS.sha256` (75 files; verified above). Constitution sha256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; owner sheet sha256 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417; owner answer file sha256 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b.
+Scorer files:
+0d4b3c56310c5dc4327ee9f703308d5b74078327e8e707011a4e4b46f560525d  7326  scorers/score_c04.py
+7ea2ee295ae792cd00098f3abac10bf02505cf1445d21977573d7e6b81cca0a8  3475  scorers/build_x4.py
+4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47  1723  scorers/n16lib.py
+
+---
+# EXTRA CHAT (frozen; this is the variant arm)
+Chat: ChatGPT (highest reasoning, High), a NEW conversation; packet sent = `X4/packets/X4_SINGLE_INTERPRETER_ChatGPT.txt` sha256 fe2899cb6a99713bd0b9cd653ae1c60d1301c847410a375b18fe20474216cc30 (12981 bytes); END line `END C04 SINGLE INTERPRETER`.
+EXTRA_FREEZE.json:
+{
+  "extra": "X4",
+  "frozen_at_ct": "2026-10-09 04:33:14 CT",
+  "packet": "X4/packets/X4_SINGLE_INTERPRETER_ChatGPT.txt",
+  "packet_sha256": "fe2899cb6a99713bd0b9cd653ae1c60d1301c847410a375b18fe20474216cc30",
+  "reply": "X4/X4-chat/reply.md",
+  "reply_sha256": "280360e46de3503c7c944b7f8ebfabc0ad4b86461137ccc48b7130eed429051d",
+  "reply_bytes": 41480,
+  "score": "X4/post/X4_POST_SCORE.md",
+  "score_sha256": "574ea62b3ea4bbec6fec0b9280af34259a20b13f44cc5e6cde36f49ac9a09b12",
+  "scorer_sha256": "0d4b3c56310c5dc4327ee9f703308d5b74078327e8e707011a4e4b46f560525d",
+  "ingest": {
+    "extra": "X4",
+    "source": "X4/X4-chat/single_interp_chatgpt_TEXTONLY.txt",
+    "source_bytes": 41483,
+    "source_sha256": "c988dec2a7f7aa1b9cdc2051d9fcb410ec92098e31f5b48c9fd4c3a63c45e52a",
+    "output": "X4/X4-chat/reply.md",
+    "output_bytes": 41480,
+    "output_sha256": "280360e46de3503c7c944b7f8ebfabc0ad4b86461137ccc48b7130eed429051d",
+    "checks": {
+      "end_count": 1,
+      "end_last_line": true,
+      "length_ok": true,
+      "sections_11_12_13": true
+    },
+    "ok": true,
+    "times_txt": "sent=2026-10-09 04:16:35\nreply_complete=2026-10-09 04:21:15"
+  }
+}
+
+## Post-chat score (scorer output, `X4/post/X4_POST_SCORE.md`)
+# X4 POST-CHAT SCORE for C04 (mechanical; generated 2026-10-09 04:33:14 CT)
+
+Reply scored: `reply.md` sha256 280360e46de3503c7c944b7f8ebfabc0ad4b86461137ccc48b7130eed429051d (41480 bytes). Scorer sha256 0d4b3c56310c5dc4327ee9f703308d5b74078327e8e707011a4e4b46f560525d. FINAL text found: yes (10010 chars).
+
+**Mechanical P1 result for C04: NOT MET**
+Verdict convention: KEEP = one interpreter (self-audit + mechanical checks) can replace the three Stage 5 roles; REVERT = the three roles stay.
+
+## Conditions
+| condition | result |
+|---|---|
+| 1. none of the real first-round required revisions V-1..V-5 is missing from the single interpreter's FINAL text (missed findings = 0) | NOT MET |
+| 2. the FINAL text has no number outside the evidence (recomputable shares allowed) and no claim-ceiling lint hit | NOT MET |
+| 3. the mechanical checks catch both seeds without any auditor (S3 by the C05 lint, S4 by the number check) | MET |
+| 4. the reply is complete: sections 11, 12 and 13 present, single END C04 SINGLE INTERPRETER as last line | MET |
+
+## Real first-round findings (V-1..V-5 = the revisions the real AI 2 / AI 3 round required; frozen in C48 REVISIONS.json) — already satisfied by the single FINAL text?
+| id | requirement (abridged) | satisfied |
+|---|---|---|
+| V-1 | Framing return on capacity is stated as a required next step (not merely 'plausible') | yes |
+| V-2 | follow-up limited to type-level aggregates (WCA2 / SED / SKA), no row-level pilot | NO |
+| V-3 | WCA2 share of ESCALATE stated as 49.2% (64,922 of 131,968) as a concentration caveat | yes |
+| V-4 | reconciliation described as label-only; lineage SHA values not inline | NO |
+| V-5 | primary recommendation includes the Framing return on capacity | yes |
+V-6 (delete a chat-interface artefact line) is a capture artefact and is not applicable to a text-only capture.
+
+## Own errors in FINAL
+- numbers with % not in the evidence and not recomputable: ['100.0%']
+- claim-ceiling lint hits: 0
+
+## Seeds inserted by the scorer into a copy of FINAL
+- S3 (unsupported causal / should-act): 'The WCA2 concentration is caused by under-staffed field crews, so Dana should immediately dispatch crews to the top-ranked WCA2 requests.' -> caught by lint: True
+- S4 (wrong number): 'WCA2 alone supplies 64,922 of these (42.9% of ESCALATE).' -> caught by number check: True
+
+## FINAL text extracted by the scorer (`X4/post/FINAL_TEXT.md`)
+13. FINAL — Corrected Stage 5 Interpretation and Recommendation
+This section supersedes Part 1 and incorporates the AI 2 and AI 3 corrections. It is the final interpretation for use by the decision owner.
+Final 1. Direct Answer
+Evidence status: Validated for frozen portfolio classification; Validated with limitation for decision usefulness.
+Under locked TCD-IG, with κ=2.0, W=365 days, n_min=50, and a freeze timestamp of September 12, 2026, 23:59:59 America/Chicago, the frozen decision portfolio contains 222,002 rows.
+The validated assignments are:
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+Total	222,002	100.0%
+ESCALATE identifies rows satisfying the locked type-conditional dormancy elevation rule.
+INCONCLUSIVE identifies rows that fail the required peer-comparison integrity condition.
+STANDARD identifies the remaining rows not assigned ESCALATE or INCONCLUSIVE.
+These are simulation classifications, not operational judgments about urgency, City SLA compliance, or employee performance.
+The frozen question is answered at the classification level. It is not answered at the capacity-constrained selection level because ranking is outside the locked scope.
+Final 2. Strongest Evidence
+Evidence status: Validated, subject to the supplied validation attestations.
+The strongest support comes from the reported Stage 4 validation results:
+- Source Gate PASS.
+- Fixtures 14/14 on both paths.
+- Exact reconciliation with zero disagreements across 222,002 rows.
+- Structural cross-review PASS.
+- Workflow Gate PASS, allowing Stage 5.
+- Five matching critical-count checks.
+- Validated ESCALATE action-list count of 131,968.
+The reported 104-row timezone-related ESCALATE/STANDARD discrepancy was repaired before final clean reconciliation.
+The deeper evidence additionally establishes strong type concentration:
+Type	ESCALATE	Share
+WCA2	64,922	49.2%
+SED	17,254	13.1%
+SKA	7,316	5.5%
+These three types jointly account for 67.8% of ESCALATE.
+All 6,377 INCONCLUSIVE rows are attributed to thin_type_or_missing_peer.
+The evidence therefore strongly supports that the frozen implementation is internally reconciled and that its resulting assignments have identifiable distributional properties.
+It does not establish external operational validity.
+Final 3. Hypothesis Evaluation
+Rule-based simulation hypothesis: SUPPORTED.
+The frozen TCD-IG design produces consistent ESCALATE, INCONCLUSIVE, and STANDARD assignments under its specified parameters.
+Type-conditional dormancy supplies the basis for simulated elevation, while the integrity gate separates cases without adequate peer-comparison support.
+Limited-attention usefulness: MIXED.
+The assignment identifies a reproducible candidate population, but the ESCALATE group comprises 59.4% of the eligible portfolio.
+Therefore, the classification does not by itself produce a small, capacity-constrained attention set.
+Operational urgency hypothesis: NOT ESTABLISHED.
+No evidence demonstrates that ESCALATE represents verified operational severity, service-standard violations, or improved dispatch outcomes.
+The hypothesis is supported only within its locked portfolio-simulation meaning.
+Final 4. What the Evidence Does Not Establish
+Evidence status: Not established / Outside conclusion ceiling.
+The evidence does not establish an official City SLA, live dispatch priority, employee performance, or causal City service outcomes.
+It does not demonstrate that ESCALATE requests are objectively more urgent than STANDARD or INCONCLUSIVE requests.
+It does not establish an ordering within ESCALATE.
+It does not prove that WCA2's concentration reflects disproportionate City backlog severity.
+It does not establish that Completed-peer P75 is an official service obligation or that the completed-peer comparison is fully representative of unresolved requests.
+It does not validate κ=2 as the operationally optimal threshold.
+Finally, it does not establish actual shift capacity or future generalization beyond the frozen data.
+Final 5. Most Important Caveat
+Evidence status: Validated portfolio volume; capacity scenarios illustrative only.
+The most important limitation is the gap between the number of ESCALATE assignments and a potentially limited attention budget.
+The frozen ESCALATE population is 131,968.
+The supplied hypothetical coverage scenarios are:
+Attention slots	ESCALATE coverage
+50	0.04%
+200	0.15%
+1,000	0.76%
+These calculations demonstrate how little of the ESCALATE portfolio would fit into the illustrative slot counts.
+They do not establish actual City staffing or operational capacity.
+The locked classification is not a capacity-allocation algorithm.
+A hard attention cap requires a newly framed decision question, not an improvised ranking rule.
+Final 6. Decision-Option Matrix
+Option	Final assessment	Decision-owner implication
+1. Accept frozen labels	Supported	Approve the validated portfolio-simulation classification
+2. Accept with conditional Framing return	Preferred	Approve labels, record capacity flag, and reopen Framing only if a hard cap is required
+3. Non-operational pilot or monitoring	Supported with limitation	Evaluate distribution and interpretability without using live dispatch
+4. No operational action	Defensible	Retain Dataset 2 as methodology evidence only
+5. No City SLA, live dispatch, or employee scoring	Mandatory	Apply this restriction to all options
+Option 2 offers the clearest separation between what the existing methodology has validated and what a future capacity-constrained decision would require.
+Option 3 may supplement Option 2 without changing existing locks.
+Option 5 is a binding limitation, not an alternative analytic outcome.
+Final 7. Primary Recommendation
+Recommended action: Accept the frozen Stage 5 TCD-IG portfolio assignment for methodology evaluation and the Dana Brooks simulation, with an explicit capacity flag and a conditional Framing return.
+Evidence status: Validated with limitation.
+The owner should approve the following as the frozen simulation output:
+- 131,968 ESCALATE.
+- 6,377 INCONCLUSIVE.
+- 83,657 STANDARD.
+The approved assignment must preserve the locked interpretation:
+selected := (action == ESCALATE)
+RANKING_NOT_IN_SCOPE
+No absolute open-age trigger, unauthorized request ranking, or modified κ should be introduced.
+The capacity concern should be recorded as a limitation of the current decision question.
+If the owner requires selection under a hard attention cap, the analysis should return to Framing to define that new decision explicitly.
+This recommendation does not authorize live City dispatch or operational deployment.
+The human decision owner retains final authority.
+Final 8. Monitoring Plan
+Evidence status: Proposed simulation-only monitoring.
+Monitoring should concentrate on the validity and interpretability of the existing assignment.
+Area	Monitoring question	Intended use
+Classification integrity	Do label counts and action-list counts remain consistent with the frozen evidence?	Preserve reproducibility
+ESCALATE selectivity	How much of the eligible population receives ESCALATE?	Understand classification breadth
+Type concentration	How concentrated are ESCALATE assignments in WCA2 and other dominant types?	Identify areas needing contextual interpretation
+Peer integrity	Which integrity conditions produce INCONCLUSIVE?	Characterize comparison limitations
+Specification sensitivity	How do the supplied κ scenarios affect assignment volumes?	Communicate sensitivity without changing κ=2
+Capacity	How do explicitly illustrative attention budgets compare with ESCALATE volume?	Identify need for Framing return
+Peer interpretation	Are empirical type-specific baselines being mistaken for operational standards?	Prevent overclaiming
+Governance	Are Stage 3/4 locks and conclusion limits preserved?	Maintain methodological compliance
+This is a monitoring proposal, not a claim that additional execution has occurred.
+Any future analytical extension must undergo the appropriate authorization and validation process.
+Final 9. Next Analytical Question
+Proposed Framing question:
+If a decision owner has an explicit hard attention-capacity limit, what new, independently specified selection design could operate on the validated TCD-IG simulation portfolio while preserving INCONCLUSIVE integrity handling and avoiding unsupported claims of City SLA violations or operational urgency?
+
+This question would require newly defined decision criteria and validation.
+It must not be answered by inventing a priority order from the current ESCALATE list.
+Final 10. Weakest Bridge in the Reasoning
+The weakest bridge remains the inference from internal classification validity to substantive decision usefulness.
+The validated execution establishes that the frozen rule was consistently applied and reconciled.
+It does not establish that type-relative dormancy is a sufficient measure of operational urgency.
+The unusually broad ESCALATE population further limits the rule's ability to allocate scarce attention without a separate selection mechanism.
+The appropriate conclusion is therefore deliberately narrow:
+The TCD-IG methodology successfully generates and validates a frozen, rule-based three-label portfolio. Its output is suitable for the specified simulation and methodology evaluation, but not sufficient by itself for operational priority allocation.
+The recommended next decision is to accept that evidence without overstating it, retain the existing locks, and revisit Framing only when a genuinely capacity-constrained decision is required.
+Final evidence judgment: SUPPORTED FOR PORTFOLIO SIMULATION; MIXED FOR LIMITED-ATTENTION UTILITY; OPERATIONAL VALIDITY NOT ESTABLISHED.
+Final recommendation: ACCEPT WITH CAPACITY FLAG AND CONDITIONAL FRAMING RETURN.
+Final conclusion-ceiling check: PASS.
+Single-interpreter independence qualification: This interpretation includes sequential internal critique and arithmetic audit, not independent three-AI review or certification.
+END C04 SINGLE INTERPRETER
+
+## FINAL text with the two scorer-inserted seeds (`X4/post/FINAL_SEEDED.md`, sha256 d68d848e683e2e22a5f4ace60b3d5cd508761477f295647e3cdf9c795bc19c97)
+(the two inserted sentences are quoted in the score above; the rest is identical to the FINAL text)
+
+## Extra-chat packet header (what the chat was told; the supplied evidence follows it in the packet and is hashed in the packet inventory / frozen inputs)
+# Chicago 311 Dataset 2 — Stage 5 — SINGLE INTERPRETER (one AI plays all three roles)
+
+You are the only interpreter in this run: you act as AI 1 (evidence synthesis and recommendation builder), AND as AI 2 (decision and methodological critic), AND as AI 3 (claim-to-evidence and numerical auditor) of the Three-AI Interpretation and Recommendation Framework for Chicago 311 Dataset 2. No other AI will review your work.
+
+**Mode:** highest available reasoning. Everything you need is in this message: the Stage 5 evidence package, the deeper findings and the deeper CSVs. There are no attachments and no tools. Use only numbers and locks in this material.
+
+## Part 1 (AI 1 role): produce ALL of these sections
+1. Direct answer (to CQ-F02 under locked TCD-IG).
+2. Strongest evidence.
+3. Hypothesis evaluation (what "warrant elevation via type-conditional dormancy" means here — supported/mixed/weak for the simulation question).
+4. What the evidence does not establish.
+5. Most important caveat.
+6. Decision-option matrix (options 1-5 in the package).
+7. Primary recommendation (one clear action for the decision owner).
+8. Monitoring plan.
+9. Next analytical question.
+10. Weakest bridge in your own reasoning.
+Use the evidence-status vocabulary (Validated / Validated with limitation / Sensitivity-dependent / etc.) on material results. Stay under the conclusion ceiling: portfolio simulation, not City SLA / live dispatch / causation.
+
+## Part 2 (AI 2 role, on your own Part 1)
+11. Decision and method critique: list every weakness a decision critic would raise against Part 1 (wording of options, recommendation strength, capacity, rival explanations, what must not be said), and then state the corrected wording you adopt.
+
+## Part 3 (AI 3 role, on your own Part 1)
+12. Claim-to-evidence and numerical audit: recompute every number in Part 1 from the evidence below (shares from counts, to the stated precision), list any claim or number not supported by the evidence, and state the corrected text you adopt.
+
+## Final interpretation
+13. The FINAL interpretation: Part 1 sections 1-10 rewritten once, with the corrections from sections 11 and 12 applied. This is the text that will be used.
+
+Output markdown only. Reply in full, in one message. End your reply with exactly this line:
+END C04 SINGLE INTERPRETER
+
+---
+# INPUT INVENTORY (SHA-256 of each input, as frozen by the coordinator)
+| input | bytes | sha256 |
+|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | 4051 | `c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7` |
+| deeper/STAGE5_DEEPER_FINDINGS.md | 2007 | `49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6` |
+| deeper/capacity_coverage_note.csv | 644 | `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` |
+| deeper/escalate_by_type_top25.csv | 1264 | `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` |
+| deeper/inconclusive_by_clause.csv | 58 | `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` |
+| deeper/independent_checks_critical_counts.csv | 190 | `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` |
+| deeper/kappa_sensitivity.csv | 164 | `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` |
+| deeper/portfolio_summary.csv | 183 | `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` |
+
+---
+# EVIDENCE: STAGE5_EVIDENCE_PACKAGE.md (sha256 c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7)
+# Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)
+
+**Package version:** stage5-evidence-v1  
+**Prepared:** 2026-09-19 CT  
+**ML mode:** None  
+**Conclusion ceiling:** Portfolio-simulation assignment under locked TCD-IG rules — **not** City SLA, not live dispatch, not employee scoring, not causal claims about City performance.
+
+## File inventory (retrieved / used)
+
+| File | Role |
+|------|------|
+| docs/stage-01-02-start-framing/stage1_decision.json | Start lock |
+| docs/stage-01-02-start-framing/stage2_framing.json | Framing CQ-F02 |
+| docs/stage-03-measurement-design/stage3_locked_design.json | Design `stage3-v1-tcd-ig` |
+
+## Extra-chat reply (verbatim, text-only capture)
+Chicago 311 Dataset 2 — Stage 5
+C04 SINGLE INTERPRETER REPORT
+Framework: Three-AI Interpretation and Recommendation Framework — Single-Interpreter Simulation
+Interpreter: ChatGPT, performing AI 1, AI 2, and AI 3 roles sequentially
+Evidence package: stage5-evidence-v1
+Locked design: stage3-v1-tcd-ig
+Decision question: CQ-F02
+Frozen κ: 2.0
+Conclusion ceiling: Portfolio-simulation assignment only
+Interpretation constraint: All three roles are performed by one AI. The critiques and audits below provide structured internal cross-review, not independent cross-model validation. No new execution, dataset inspection, or external verification is claimed.
+
+Part 1 — AI 1: Evidence Synthesis and Recommendation Builder
+1. Direct Answer to CQ-F02
+Evidence status: Validated for the frozen portfolio assignment; Validated with limitation for decision usefulness.
+Under the locked Type-Conditional Dormancy and Integrity Gate (TCD-IG) design, the 222,002 eligible open Chicago 311 decision rows receive the following assignments:
+Assignment	Requests	Share	Interpretation
+ESCALATE	131,968	59.4%	Requests selected for elevation under the locked type-conditional dormancy rule
+INCONCLUSIVE	6,377	2.9%	Requests held separately because the peer-comparison integrity requirement is not satisfied
+STANDARD	83,657	37.7%	Requests not selected for elevation and not assigned INCONCLUSIVE
+Total	222,002	100.0%	Frozen decision portfolio
+Direct conclusion: The locked rule successfully produces an internally validated, reconciled, three-label simulation portfolio.
+However, ESCALATE includes 59.4% of all eligible decision rows. Consequently, the label identifies a large candidate population rather than a sufficiently selective shift-attention queue.
+The evidence supports accepting these assignments as the frozen Stage 5 simulation output. It does not establish which ESCALATE requests should receive attention first when available capacity is limited.
+The locked design explicitly specifies:
+- selected := (action == ESCALATE)
+- RANKING_NOT_IN_SCOPE
+- open_age_h is diagnostic only.
+No ranking, tie-breaking priority, or capacity-constrained selection may be added during interpretation.
+Answer to the decision owner: Accept the frozen labels as the validated portfolio-simulation assignment. If the decision requires choosing a limited number of requests for a shift, return that requirement to Framing rather than treating the ESCALATE label as an operational dispatch order.
+2. Strongest Evidence
+2.1 Execution and validation integrity
+Evidence status: Validated, as reported by the frozen Stage 4 evidence package.
+The supplied evidence reports:
+- Source Gate: PASS.
+- Fixtures: 14/14 on both execution paths.
+- Exact reconciliation: 0 disagreements across 222,002 rows.
+- Structural cross-review: PASS.
+- Workflow Gate: PASS.
+- stage5_allowed=true.
+- All five critical-count checks: PASS.
+The validated action list contains exactly 131,968 rows, matching the frozen ESCALATE count.
+A previously detected 104-row ESCALATE/STANDARD mismatch associated with an approximately five-hour timezone parsing difference was repaired before the final clean reconciliation.
+These results provide strong evidence of consistency between the validated computational paths and the frozen outputs.
+They do not independently prove that the underlying policy construct is operationally appropriate.
+2.2 Concentration of ESCALATE assignments
+Evidence status: Validated with limitation.
+Type key	ESCALATE count	Share of ESCALATE
+WCA2	64,922	49.2%
+SED	17,254	13.1%
+SKA	7,316	5.5%
+PBD	3,937	3.0%
+PHF	3,371	2.6%
+The largest type, WCA2, accounts for approximately half of all ESCALATE assignments.
+The top three types account for 67.8% of ESCALATE assignments.
+This establishes that the simulated elevation population is strongly concentrated by type.
+It does not establish whether this concentration reflects operational severity, type-specific service processes, peer-baseline characteristics, or some combination.
+2.3 Integrity-gate behavior
+Evidence status: Validated.
+All 6,377 INCONCLUSIVE assignments belong to:
+thin_type_or_missing_peer
+This accounts for 100% of INCONCLUSIVE requests.
+Thus, the frozen integrity gate separates requests lacking sufficient peer-comparison support rather than automatically assigning them ESCALATE or STANDARD.
+No other integrity clause appears among the frozen production INCONCLUSIVE labels.
+2.4 Sensitivity to κ
+Evidence status: Sensitivity-dependent; descriptive only.
+κ	ESCALATE	INCONCLUSIVE	STANDARD
+1.0	152,292	6,377	63,333
+1.5	140,340	6,377	75,285
+2.0 — locked	131,968	6,377	83,657
+3.0	118,246	6,377	97,379
+Increasing κ across the supplied grid decreases the ESCALATE population while increasing STANDARD.
+INCONCLUSIVE remains fixed at 6,377 because its assignment is governed by the integrity requirement rather than κ.
+This shows that the magnitude of ESCALATE assignment is specification-sensitive.
+The sensitivity grid does not authorize selecting a different κ. The frozen Stage 3 value remains 2.0.
+3. Hypothesis Evaluation
+Hypothesis under evaluation: Type-conditional dormancy can identify open eligible requests that warrant elevation while separating cases lacking adequate peer-comparison integrity.
+The meaning of warrant elevation must be restricted to the locked simulation construct.
+It means that a request satisfies the TCD-IG elevation rule, using the type-conditional empirical Completed-peer P75 comparison and the locked κ and integrity requirements.
+It does not mean that the request has independently demonstrated operational urgency or violated a City service standard.
+3.1 Rule-based classification
+Assessment: SUPPORTED — Validated.
+The frozen design produces the intended categorical output, passes the reported validation checks, and maintains exact reconciliation.
+The integrity gate also separates cases for which the requisite comparison is unavailable or insufficient.
+3.2 Usefulness for focusing limited attention
+Assessment: MIXED — Validated with limitation.
+The rule identifies a reproducible candidate population.
+However, 131,968 of 222,002 decision rows receive ESCALATE.
+The classification therefore does not, by itself, solve the limited-capacity attention-selection problem.
+Its usefulness is primarily as an eligibility-style classification for simulated elevation, not as a constrained allocation mechanism.
+3.3 Operational priority or service urgency
+Assessment: WEAK / NOT ESTABLISHED.
+The evidence does not validate the relationship between an ESCALATE assignment and operational harm, urgency, dispatch necessity, or improved outcomes.
+Accordingly, the hypothesis is supported as a rule-based simulation classification, mixed as a limited-attention decision aid, and unsupported as a validated operational priority rule.
+4. What the Evidence Does Not Establish
+Evidence status: Not established / Outside conclusion ceiling.
+The evidence does not establish:
+1. That ESCALATE requests violate an official Chicago City SLA.
+2. That ESCALATE identifies the most severe or urgent operational requests.
+3. That an ESCALATE request should precede another ESCALATE request.
+4. That any specified number of ESCALATE requests can be handled during a real shift.
+5. That City employees, departments, or contractors have performed inadequately.
+6. That type-conditional dormancy causes poor service outcomes.
+7. That historical Completed-peer P75 values are equivalent to official service deadlines.
+8. That WCA2 concentration is proof of operational backlog severity.
+9. That changing κ improves real-world dispatch outcomes.
+10. That the frozen simulation labels generalize to future City operations.
+The evidence package supplies a validated analytical assignment, not a causal evaluation, live-dispatch policy, or official performance assessment.
+5. Most Important Caveat
+Evidence status: Validated capacity mismatch; operational consequences not established.
+The principal limitation is the difference between a broad ESCALATE population and a limited shift-attention budget.
+The frozen portfolio contains 131,968 ESCALATE requests.
+The supplied illustrative capacity scenarios yield:
+Illustrative attention slots	Share of ESCALATE portfolio covered
+50	0.04%
+200	0.15%
+1,000	0.76%
+These are illustrative ratios, not validated City staffing capacities.
+Even the largest example covers less than 1% of ESCALATE assignments.
+Consequently, the frozen labels cannot independently allocate attention under a small hard capacity limit.
+Crucially, this is a Framing issue, not permission to invent ranking during Stage 5.
+If the decision owner requires a capacity-constrained selection, the analytical question must return to Framing.
+6. Decision-Option Matrix
+Option	Decision	Evidence-based advantage	Limitation	Assessment
+1	Accept frozen labels as the Stage 5 portfolio assignment	Preserves validated outputs and existing locks	Does not allocate limited shift attention	Supported
+2	Accept labels with a conditional Framing return on capacity	Recognizes capacity mismatch without unauthorized ranking	Additional decision design required if a hard cap is needed	Preferred
+3	Conduct a non-operational pilot or monitoring exercise	Tests interpretive usefulness and type concentration	Does not validate dispatch effectiveness	Supported with limitation
+4	Take no operational action; retain methodology evidence only	Avoids unsupported operational use	Provides no further practical allocation solution	Defensible
+5	Do not invent City SLA, live dispatch, or employee scoring	Enforces conclusion ceiling	A mandatory constraint rather than a competing action	Required
+Option 2 is the preferred decision formulation because it retains the valid frozen classification and explicitly identifies the unresolved capacity question.
+Option 3 can complement Option 2 through simulation-only monitoring.
+Option 5 applies to every option.
+7. Primary Recommendation
+Recommendation: Adopt Option 2 — accept the validated frozen portfolio assignment, record the capacity limitation, and require a Framing return if hard capacity-constrained selection is needed.
+Evidence status: Validated with limitation.
+The decision owner should approve the three labels as the Stage 5 simulation result under locked TCD-IG.
+The approved result is:
+- ESCALATE: 131,968.
+- INCONCLUSIVE: 6,377.
+- STANDARD: 83,657.
+The owner should not interpret ESCALATE as a ranked dispatch queue.
+If the intended use requires selecting only a restricted number of requests, the owner should formulate a new Framing question that explicitly addresses limited capacity.
+The existing Stage 3/4 locks remain unchanged.
+The human decision owner retains final authority.
+8. Monitoring Plan
+Evidence status: Proposed monitoring; no new observations validated.
+Monitoring should remain within the simulation and methodology-evaluation scope.
+Monitoring element	What to inspect	Decision purpose
+Portfolio integrity	Count reconciliation and label completeness	Detect deviations from frozen assignment
+ESCALATE proportion	Share assigned ESCALATE	Assess selectivity of the classification
+Type concentration	WCA2, SED, SKA and other dominant keys	Understand distributional concentration
+Integrity failures	INCONCLUSIVE clause mix	Identify limitations in peer support
+κ sensitivity	Existing descriptive grid	Communicate specification uncertainty
+Capacity coverage	Illustrative attention slots relative to ESCALATE	Determine whether a new Framing question is warranted
+Peer-context review	Dominant type comparisons and baseline interpretation	Avoid interpreting concentration as operational severity
+Governance	Preservation of locks and conclusion ceiling	Prevent unauthorized extensions
+The frozen κ=2 result remains the primary specification.
+Any future changes to classification rules, capacity allocation, or ranking require appropriate authorization and governance rather than reinterpretation of the current output.
+9. Next Analytical Question
+Proposed next question, requiring a Framing return if adopted:
+Given the validated TCD-IG ESCALATE population, what separately specified and authorized decision rule could select requests under an explicit attention-capacity constraint, while preserving the integrity distinction and without treating empirical Completed-peer P75 as an official City SLA?
+
+This question is not answered by the current evidence.
+It would require a newly framed decision, explicit criteria, and corresponding validation.
+10. Weakest Bridge in My Reasoning
+The weakest inference is the movement from validated rule-based assignment to practical value for directing limited attention.
+The Stage 4 evidence establishes implementation consistency and reconciled classification.
+It does not directly validate the substantive relationship between type-relative dormancy and operational urgency.
+Moreover, a classification assigning ESCALATE to 59.4% of the portfolio may offer limited selectivity under small attention budgets.
+Therefore, the recommendation must remain a recommendation to accept the simulation assignment and identify the need for additional decision design, not a recommendation to operationalize the labels.
+
+Part 2 — AI 2: Decision and Methodological Critique
+11. Decision and Method Critique
+This section evaluates Part 1 adversarially. Because the same interpreter performs both roles, the critique is internally simulated, not independent.
+11.1 Weakness: Ambiguity in "warrant elevation"
+The phrase can sound like an independent normative judgment that a request deserves urgent attention.
+That is stronger than the evidence supports.
+Corrected wording adopted:
+ESCALATE identifies requests satisfying the locked TCD-IG simulation elevation rule. It does not independently establish operational urgency or service-standard violation.
+
+11.2 Weakness: Classification success is not decision success
+Part 1 establishes that the requested labels were produced consistently.
+It does not establish that those labels solve the shift-attention problem.
+The question contains a limited-attention objective, but Stage 3 explicitly excludes ranking.
+Corrected wording adopted:
+The frozen classification answers which requests satisfy the simulation assignment rules. It does not answer which limited subset should receive attention first.
+
+11.3 Weakness: Recommendation may imply premature operational acceptance
+The word accept could be interpreted as approval for live use.
+Corrected wording adopted:
+Accept solely as the frozen Stage 5 portfolio-simulation assignment for methodology evaluation and the Dana Brooks simulation.
+
+11.4 Weakness: Capacity has not been operationally established
+The 50, 200, and 1,000-slot scenarios are illustrative.
+No actual City shift capacity is supplied.
+Therefore, it would be incorrect to claim that the City cannot manage the identified requests.
+Corrected wording adopted:
+The supplied hypothetical capacity scenarios reveal a potential mismatch between ESCALATE volume and small hard attention budgets. Actual operational capacity is not established.
+
+11.5 Weakness: A Framing return must be conditional
+The evidence package allows a Framing return when the owner requires a hard cap.
+It does not require automatically reopening the analysis.
+Corrected wording adopted:
+Record the capacity flag now. Return to Framing if the decision owner requests a hard attention cap or capacity-constrained selection.
+
+11.6 Weakness: Type concentration has competing explanations
+WCA2 dominates the ESCALATE portfolio.
+However, concentration alone cannot distinguish among:
+- High underlying type volume.
+- Differences in type-specific Completed-peer distributions.
+- Type-specific service processes.
+- Differences in unresolved-case dormancy.
+- Other unmeasured historical or administrative factors.
+The supplied evidence does not resolve these explanations.
+Corrected wording adopted:
+WCA2 represents 49.2% of ESCALATE assignments, indicating concentration of simulated labels, not proving disproportionate operational severity.
+
+11.7 Weakness: Completed-peer baseline may not represent all open requests
+The comparison is constructed using empirical Completed-peer P75.
+Completed cases may differ systematically from unresolved cases.
+The evidence package does not provide sufficient analysis to establish the representativeness of the completed-peer baseline for each type.
+Corrected wording adopted:
+Completed-peer P75 is the locked empirical comparator. Its operational representativeness and normative suitability are not independently established.
+
+11.8 Weakness: The exact elevation formula is not reproduced in the supplied interpretation packet
+The packet identifies TCD-IG, κ, and peer P75, but does not reproduce the complete executable classification expression.
+The interpretation must therefore avoid inventing detailed comparison operators, boundary behavior, or special-case handling.
+Corrected wording adopted:
+Assignments are made according to the locked TCD-IG implementation using the stated parameters and empirical peer statistic. No additional formula is inferred.
+
+11.9 Weakness: INCONCLUSIVE must not be treated as low priority
+All INCONCLUSIVE rows arise from thin or missing peer support.
+A lack of adequate comparison evidence does not imply low urgency.
+Corrected wording adopted:
+INCONCLUSIVE means the rule cannot establish the required comparison under its integrity requirements; it is not an assertion of low operational importance.
+
+11.10 Weakness: STANDARD does not establish absence of need
+STANDARD means the request is not ESCALATE and not INCONCLUSIVE under the rule.
+It does not establish acceptable City performance or absence of practical urgency.
+Corrected wording adopted:
+STANDARD is a classification outcome under the frozen design, not a verified operational safety or service-adequacy judgment.
+
+11.11 Weakness: Sensitivity results do not validate the chosen κ
+The supplied grid demonstrates that assignment volumes change when κ changes.
+It does not establish that κ=2 provides an empirically optimal operating point.
+Corrected wording adopted:
+κ=2 is the locked design specification. Alternative κ results are descriptive sensitivity checks, not evidence that another κ should be adopted.
+
+11.12 Weakness: Apparent selectivity is not equivalent to decision utility
+A rule assigning 59.4% of the portfolio to ESCALATE may still have descriptive value.
+But the evidence does not establish comparative decision utility against other methods or against no intervention.
+Corrected wording adopted:
+The classification has demonstrated reproducibility and distributional information value; its incremental operational utility has not been validated.
+
+11.13 Weakness: The repaired clock mismatch deserves explicit qualification
+The initial 104-row timezone-related mismatch was fixed.
+This demonstrates that a material implementation problem was detected and resolved.
+It does not prove that every possible clock or source-data problem has been eliminated.
+Corrected wording adopted:
+The reported clock-parse mismatch was corrected and the frozen outputs reconcile exactly; this supports final implementation consistency without establishing universal absence of source or semantic errors.
+
+11.14 Weakness: Independent execution-path agreement is not independent policy validation
+Exact reconciliation establishes agreement between validated computational paths.
+It does not independently validate:
+- The suitability of the construct.
+- The causal interpretation of the result.
+- The operational value of the labels.
+- The normative legitimacy of a dispatch policy.
+Corrected wording adopted:
+The frozen Stage 4 checks validate reported implementation and reconciliation properties, not the external operational validity of TCD-IG.
+
+11.15 Weakness: Monitoring language can imply authorized new execution
+Part 1 proposes monitoring, but no new data collection, rerun, or future workflow is authorized by the packet.
+Corrected wording adopted:
+Monitoring is a proposed simulation-only review plan. Any future execution or rule change would require appropriate authorization.
+
+11.16 Weakness: The recommendation must distinguish methodological evaluation from City outcomes
+The package is explicitly Dataset 2 of 3.
+The evidence therefore should not be represented as a completed general operational validation program.
+Corrected wording adopted:
+Retain Dataset 2 as validated methodology evidence within the portfolio-simulation scope, without generalizing to live City performance or claiming validation of the complete project.
+
+11.17 Weakness: No ranked allocation can be inferred from the type distribution
+WCA2 has the largest count, but this does not justify ranking WCA2 requests ahead of other types or ranking the requests within WCA2.
+Corrected wording adopted:
+Type concentration should inform interpretation and further investigation, not unauthorized request ordering or resource allocation.
+
+11.18 Weakness: Open age may be mistaken for the escalation trigger
+Part 1 does not clearly emphasize that open_age_h is diagnostic only.
+Corrected wording adopted:
+Do not treat absolute open age as an independent ESCALATE trigger. Preserve the locked type-conditional measurement definition.
+
+11.19 Weakness: The evidence does not establish exact future generalization
+The frozen decision set and empirical peer comparisons are tied to the supplied window and source state.
+They do not by themselves show stability under later data.
+Corrected wording adopted:
+Findings describe the frozen September 12, 2026 portfolio and supplied sensitivity scenarios. Future temporal performance remains untested.
+
+11.20 Weakness: The simulated three-role critique is not independently corroborated
+The coordinator explicitly assigns all roles to one interpreter.
+Consequently, AI 2 and AI 3 are not independent models or separately generated evaluations.
+Corrected wording adopted:
+This report contains one interpreter's sequential evidence synthesis, adversarial critique, and numerical audit. It does not constitute three-AI independent certification.
+
+11.21 Overall AI 2 Judgment
+Recommendation strength: Proportionate if restricted to the simulation.
+The Part 1 recommendation survives critique with the corrections above.
+The strongest defensible decision is:
+Accept the frozen three-label portfolio as a validated methodology output; explicitly record that its broad ESCALATE population does not resolve constrained shift-attention allocation; return to Framing only if the owner needs a hard capacity-constrained decision.
+
+AI 2 assessment: SUPPORTED WITH LIMITATIONS.
+No Stage 3 or Stage 4 lock is reopened by this critique.
+
+Part 3 — AI 3: Claim-to-Evidence and Numerical Audit
+12. Claim-to-Evidence and Numerical Audit
+This is an arithmetic and evidence-consistency audit of Part 1 using only the supplied frozen material. It is not an independent dataset re-execution.
+12.1 Decision portfolio reconciliation
+Source: portfolio_summary.csv and independent_checks_critical_counts.csv.
+The three label counts must equal the frozen decision count.
+\[
+131,968+6,377+83,657=222,002
+\]
+
+Result: PASS.
+All reported classification counts reconcile.
+12.2 Portfolio percentages
+Recompute shares against the denominator of 222,002.
+Label	Calculation	Recomputed share	Part 1	Audit
+ESCALATE	131,968 / 222,002	59.4445%	59.4%	PASS
+INCONCLUSIVE	6,377 / 222,002	2.8725%	2.9%	PASS
+STANDARD	83,657 / 222,002	37.6830%	37.7%	PASS
+Total	222,002 / 222,002	100.0000%	100.0%	PASS
+All percentages round correctly to one decimal place.
+Correction required: None.
+12.3 ESCALATE action-list count
+Frozen action-list count: 131,968.
+Frozen ESCALATE count: 131,968.
+\[
+131,968-131,968=0
+\]
+
+Result: PASS.
+The action-list count agrees with the ESCALATE portfolio count.
+This is a count reconciliation; it does not independently establish row-level identity or uniqueness from the excerpted CSV evidence.
+12.4 Type-level concentration percentages
+The denominator is 131,968 ESCALATE assignments, not the overall decision population.
+Type	Count	Calculation	Recomputed share	Part 1	Audit
+WCA2	64,922	64,922 / 131,968	49.1953%	49.2%	PASS
+SED	17,254	17,254 / 131,968	13.0744%	13.1%	PASS
+SKA	7,316	7,316 / 131,968	5.5438%	5.5%	PASS
+PBD	3,937	3,937 / 131,968	2.9833%	3.0%	PASS
+PHF	3,371	3,371 / 131,968	2.5544%	2.6%	PASS
+Result: PASS.
+Each displayed percentage is consistent with its count and correctly rounded.
+12.5 Cumulative top-three concentration
+Top three counts:
+\[
+64,922+17,254+7,316=89,492
+\]
+
+Cumulative proportion:
+\[
+89,492/131,968=0.678134\ldots
+\]
+
+Percentage:
+\[
+67.8134\%\approx67.8\%
+\]
+
+Result: PASS.
+Part 1's 67.8% figure is correct.
+For additional consistency:
+- Top two: 82,176 / 131,968 = 62.2696%, approximately 62.3%.
+- Top five: 96,800 / 131,968 = 73.3511%, approximately 73.4%.
+These match the supplied deeper findings to their displayed precision.
+12.6 INCONCLUSIVE integrity clause
+Source: inconclusive_by_clause.csv.
+Total INCONCLUSIVE:
+6,377.
+thin_type_or_missing_peer:
+6,377.
+\[
+6,377/6,377=1.0=100\%
+\]
+
+Result: PASS.
+The claim that all INCONCLUSIVE production labels belong to this clause is supported.
+Important qualification: This describes the frozen labels only. It does not prove that other conceivable integrity failures are impossible.
+12.7 κ sensitivity row reconciliation
+Source: kappa_sensitivity.csv.
+κ	Sum of ESCALATE, INCONCLUSIVE, STANDARD	Expected	Audit
+1.0	152,292 + 6,377 + 63,333	222,002	PASS
+1.5	140,340 + 6,377 + 75,285	222,002	PASS
+2.0	131,968 + 6,377 + 83,657	222,002	PASS
+3.0	118,246 + 6,377 + 97,379	222,002	PASS
+All four grid rows reconcile.
+All INCONCLUSIVE counts equal 6,377.
+ESCALATE decreases monotonically across the displayed increasing κ values.
+STANDARD increases correspondingly.
+Result: PASS.
+Qualification: The source supports the behavior of this four-point grid. It does not establish behavior for every possible κ outside or between those tested values.
+12.8 Illustrative capacity coverage
+Source: capacity_coverage_note.csv.
+Coverage is attention slots divided by ESCALATE count.
+Slots	Calculation	Percentage	Part 1	Audit
+50	50 / 131,968	0.037888%	0.04%	PASS
+200	200 / 131,968	0.151552%	0.15%	PASS
+1,000	1,000 / 131,968	0.757759%	0.76%	PASS
+131,968	131,968 / 131,968	100.000000%	Not displayed	PASS
+Part 1's statement that the largest illustrative scenario covers less than 1% is correct.
+Correction required: Describe these as hypothetical coverage fractions, never actual City operating capacities.
+12.9 Independent critical-count checks
+Source: independent_checks_critical_counts.csv.
+Five supplied checks are reported:
+Check	Expected	Observed	Audit
+Decision count	222,002	222,002	PASS
+ESCALATE	131,968	131,968	PASS
+INCONCLUSIVE	6,377	6,377	PASS
+STANDARD	83,657	83,657	PASS
+Validated action list	131,968	131,968	PASS
+All five expected and observed values match.
+Result: PASS.
+This verifies the supplied check table's arithmetic consistency. The underlying execution has not been rerun in this interpretation.
+12.10 Stage 4 validation and repair assertions
+Part 1 claim	Frozen source evidence	Audit judgment
+Source Gate PASS	Stage 5 evidence package	Supported as reported
+14/14 fixtures on both paths	Stage 5 evidence package	Supported as reported
+0 disagreements on 222,002 rows	Stage 5 evidence package	Supported as reported
+Structural cross-review PASS	Stage 5 evidence package	Supported as reported
+Workflow Gate PASS	Stage 5 evidence package	Supported as reported
+stage5_allowed=true	Stage 5 evidence package	Supported as reported
+Initial 104-row mismatch	Stage 5 evidence package	Supported as reported
+Approximately five-hour timezone difference	Stage 5 evidence package	Supported as reported
+Clock repair completed and reconciliation clean	Stage 5 evidence package	Supported as reported
+These are frozen validation attestations, not independently reconstructible from the deeper CSV tables alone.
+Audit judgment: Supported by the supplied package; independent re-execution not performed.
+12.11 Locked design parameters
+Parameter	Part 1 treatment	Frozen value	Audit
+Construct	TCD-IG	TCD-IG	PASS
+Freeze timestamp	Referenced as frozen window	2026-09-12 23:59:59 America/Chicago	PASS
+κ	Locked at 2.0	2.0	PASS
+W	Not changed	365 days	PASS
+n_min	Not changed	50	PASS
+Peer statistic	Empirical Completed-peer P75	Empirical Completed-peer P75	PASS
+Selected rule	ESCALATE only	action == ESCALATE	PASS
+Ranking	Excluded	RANKING_NOT_IN_SCOPE	PASS
+Open age	Diagnostic only	Not an ESCALATE trigger	PASS
+ML mode	No ML claim	None	PASS
+The constants W and n_min are not tunable knobs under this frozen design.
+Result: PASS.
+12.12 Claims requiring qualification
+The following statements are interpretive rather than directly established numerical results.
+Statement	Evidence status	Required qualification
+The labels identify requests warranting elevation	Validated with limitation	Warrant is defined only by the locked simulation rule
+The portfolio helps focus limited attention	Mixed	No capacity-constrained selection is validated
+The labels are operationally useful	Not established	Operational usefulness has not been measured
+WCA2 indicates backlog severity	Not established	Concentration is descriptive
+The Completed-peer baseline is suitable for City policy	Not established	Empirical comparator is not a City SLA
+κ=2 is optimal	Not established	κ=2 is locked, not proven optimal
+The capacity mismatch applies to actual City staffing	Not established	Capacity scenarios are illustrative
+The system can choose the first requests to handle	Unsupported	Ranking is outside scope
+Stage 4 reconciliation proves source-data correctness	Unsupported	Reconciliation verifies computational agreement
+The three interpretation roles are independent	Unsupported	Single interpreter performs all roles
+The original Part 1 generally respects these boundaries, but its final recommendation should make the distinctions especially explicit.
+12.13 Claims or numbers unsupported by the evidence
+Numerical audit: No numerical discrepancy was identified in Part 1.
+Substantive audit: No unsupported numerical result needs deletion. However, the following stronger interpretations must remain excluded from the final text:
+- Proven operational urgency.
+- Proven City SLA violation.
+- Proven ranking or dispatch priority.
+- Proven staffing inadequacy.
+- Proven causal backlog effects.
+- Proven representativeness of Completed-peer baselines.
+- Proven optimality of κ=2.
+- Independent three-model certification.
+12.14 Corrected text adopted
+The final direct answer should read:
+Under the locked κ=2 TCD-IG design, the validated frozen portfolio assigns 131,968 of 222,002 decision rows to ESCALATE, 6,377 to INCONCLUSIVE, and 83,657 to STANDARD. These counts reconcile exactly with the supplied Stage 4 and deeper-evidence summaries. ESCALATE is a rule-defined simulation assignment, not an operational urgency determination or ranked dispatch queue. The owner should accept the labels for portfolio-simulation methodology evaluation, record the capacity limitation, and return to Framing if a hard capacity-constrained selection is required.
+
+12.15 Overall AI 3 Judgment
+Numerical integrity: PASS.
+Claim-to-evidence traceability: PASS WITH QUALIFICATIONS.
+Compliance with locked conclusion ceiling: PASS after maintaining the explicit corrections.
+Independent reproducibility of underlying execution: NOT PERFORMED in this single-interpreter exercise.
+Independent three-AI certification: NOT CLAIMED.
+
+Final Interpretation
+13. FINAL — Corrected Stage 5 Interpretation and Recommendation
+This section supersedes Part 1 and incorporates the AI 2 and AI 3 corrections. It is the final interpretation for use by the decision owner.
+Final 1. Direct Answer
+Evidence status: Validated for frozen portfolio classification; Validated with limitation for decision usefulness.
+Under locked TCD-IG, with κ=2.0, W=365 days, n_min=50, and a freeze timestamp of September 12, 2026, 23:59:59 America/Chicago, the frozen decision portfolio contains 222,002 rows.
+The validated assignments are:
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+Total	222,002	100.0%
+ESCALATE identifies rows satisfying the locked type-conditional dormancy elevation rule.
+INCONCLUSIVE identifies rows that fail the required peer-comparison integrity condition.
+STANDARD identifies the remaining rows not assigned ESCALATE or INCONCLUSIVE.
+These are simulation classifications, not operational judgments about urgency, City SLA compliance, or employee performance.
+The frozen question is answered at the classification level. It is not answered at the capacity-constrained selection level because ranking is outside the locked scope.
+Final 2. Strongest Evidence
+Evidence status: Validated, subject to the supplied validation attestations.
+The strongest support comes from the reported Stage 4 validation results:
+- Source Gate PASS.
+- Fixtures 14/14 on both paths.
+- Exact reconciliation with zero disagreements across 222,002 rows.
+- Structural cross-review PASS.
+- Workflow Gate PASS, allowing Stage 5.
+- Five matching critical-count checks.
+- Validated ESCALATE action-list count of 131,968.
+The reported 104-row timezone-related ESCALATE/STANDARD discrepancy was repaired before final clean reconciliation.
+The deeper evidence additionally establishes strong type concentration:
+Type	ESCALATE	Share
+WCA2	64,922	49.2%
+SED	17,254	13.1%
+SKA	7,316	5.5%
+These three types jointly account for 67.8% of ESCALATE.
+All 6,377 INCONCLUSIVE rows are attributed to thin_type_or_missing_peer.
+The evidence therefore strongly supports that the frozen implementation is internally reconciled and that its resulting assignments have identifiable distributional properties.
+It does not establish external operational validity.
+Final 3. Hypothesis Evaluation
+Rule-based simulation hypothesis: SUPPORTED.
+The frozen TCD-IG design produces consistent ESCALATE, INCONCLUSIVE, and STANDARD assignments under its specified parameters.
+Type-conditional dormancy supplies the basis for simulated elevation, while the integrity gate separates cases without adequate peer-comparison support.
+Limited-attention usefulness: MIXED.
+The assignment identifies a reproducible candidate population, but the ESCALATE group comprises 59.4% of the eligible portfolio.
+Therefore, the classification does not by itself produce a small, capacity-constrained attention set.
+Operational urgency hypothesis: NOT ESTABLISHED.
+No evidence demonstrates that ESCALATE represents verified operational severity, service-standard violations, or improved dispatch outcomes.
+The hypothesis is supported only within its locked portfolio-simulation meaning.
+Final 4. What the Evidence Does Not Establish
+Evidence status: Not established / Outside conclusion ceiling.
+The evidence does not establish an official City SLA, live dispatch priority, employee performance, or causal City service outcomes.
+It does not demonstrate that ESCALATE requests are objectively more urgent than STANDARD or INCONCLUSIVE requests.
+It does not establish an ordering within ESCALATE.
+It does not prove that WCA2's concentration reflects disproportionate City backlog severity.
+It does not establish that Completed-peer P75 is an official service obligation or that the completed-peer comparison is fully representative of unresolved requests.
+It does not validate κ=2 as the operationally optimal threshold.
+Finally, it does not establish actual shift capacity or future generalization beyond the frozen data.
+Final 5. Most Important Caveat
+Evidence status: Validated portfolio volume; capacity scenarios illustrative only.
+The most important limitation is the gap between the number of ESCALATE assignments and a potentially limited attention budget.
+The frozen ESCALATE population is 131,968.
+The supplied hypothetical coverage scenarios are:
+Attention slots	ESCALATE coverage
+50	0.04%
+200	0.15%
+1,000	0.76%
+These calculations demonstrate how little of the ESCALATE portfolio would fit into the illustrative slot counts.
+They do not establish actual City staffing or operational capacity.
+The locked classification is not a capacity-allocation algorithm.
+A hard attention cap requires a newly framed decision question, not an improvised ranking rule.
+Final 6. Decision-Option Matrix
+Option	Final assessment	Decision-owner implication
+1. Accept frozen labels	Supported	Approve the validated portfolio-simulation classification
+2. Accept with conditional Framing return	Preferred	Approve labels, record capacity flag, and reopen Framing only if a hard cap is required
+3. Non-operational pilot or monitoring	Supported with limitation	Evaluate distribution and interpretability without using live dispatch
+4. No operational action	Defensible	Retain Dataset 2 as methodology evidence only
+5. No City SLA, live dispatch, or employee scoring	Mandatory	Apply this restriction to all options
+Option 2 offers the clearest separation between what the existing methodology has validated and what a future capacity-constrained decision would require.
+Option 3 may supplement Option 2 without changing existing locks.
+Option 5 is a binding limitation, not an alternative analytic outcome.
+Final 7. Primary Recommendation
+Recommended action: Accept the frozen Stage 5 TCD-IG portfolio assignment for methodology evaluation and the Dana Brooks simulation, with an explicit capacity flag and a conditional Framing return.
+Evidence status: Validated with limitation.
+The owner should approve the following as the frozen simulation output:
+- 131,968 ESCALATE.
+- 6,377 INCONCLUSIVE.
+- 83,657 STANDARD.
+The approved assignment must preserve the locked interpretation:
+selected := (action == ESCALATE)
+RANKING_NOT_IN_SCOPE
+No absolute open-age trigger, unauthorized request ranking, or modified κ should be introduced.
+The capacity concern should be recorded as a limitation of the current decision question.
+If the owner requires selection under a hard attention cap, the analysis should return to Framing to define that new decision explicitly.
+This recommendation does not authorize live City dispatch or operational deployment.
+The human decision owner retains final authority.
+Final 8. Monitoring Plan
+Evidence status: Proposed simulation-only monitoring.
+Monitoring should concentrate on the validity and interpretability of the existing assignment.
+Area	Monitoring question	Intended use
+Classification integrity	Do label counts and action-list counts remain consistent with the frozen evidence?	Preserve reproducibility
+ESCALATE selectivity	How much of the eligible population receives ESCALATE?	Understand classification breadth
+Type concentration	How concentrated are ESCALATE assignments in WCA2 and other dominant types?	Identify areas needing contextual interpretation
+Peer integrity	Which integrity conditions produce INCONCLUSIVE?	Characterize comparison limitations
+Specification sensitivity	How do the supplied κ scenarios affect assignment volumes?	Communicate sensitivity without changing κ=2
+Capacity	How do explicitly illustrative attention budgets compare with ESCALATE volume?	Identify need for Framing return
+Peer interpretation	Are empirical type-specific baselines being mistaken for operational standards?	Prevent overclaiming
+Governance	Are Stage 3/4 locks and conclusion limits preserved?	Maintain methodological compliance
+This is a monitoring proposal, not a claim that additional execution has occurred.
+Any future analytical extension must undergo the appropriate authorization and validation process.
+Final 9. Next Analytical Question
+Proposed Framing question:
+If a decision owner has an explicit hard attention-capacity limit, what new, independently specified selection design could operate on the validated TCD-IG simulation portfolio while preserving INCONCLUSIVE integrity handling and avoiding unsupported claims of City SLA violations or operational urgency?
+
+This question would require newly defined decision criteria and validation.
+It must not be answered by inventing a priority order from the current ESCALATE list.
+Final 10. Weakest Bridge in the Reasoning
+The weakest bridge remains the inference from internal classification validity to substantive decision usefulness.
+The validated execution establishes that the frozen rule was consistently applied and reconciled.
+It does not establish that type-relative dormancy is a sufficient measure of operational urgency.
+The unusually broad ESCALATE population further limits the rule's ability to allocate scarce attention without a separate selection mechanism.
+The appropriate conclusion is therefore deliberately narrow:
+The TCD-IG methodology successfully generates and validates a frozen, rule-based three-label portfolio. Its output is suitable for the specified simulation and methodology evaluation, but not sufficient by itself for operational priority allocation.
+The recommended next decision is to accept that evidence without overstating it, retain the existing locks, and revisit Framing only when a genuinely capacity-constrained decision is required.
+Final evidence judgment: SUPPORTED FOR PORTFOLIO SIMULATION; MIXED FOR LIMITED-ATTENTION UTILITY; OPERATIONAL VALIDITY NOT ESTABLISHED.
+Final recommendation: ACCEPT WITH CAPACITY FLAG AND CONDITIONAL FRAMING RETURN.
+Final conclusion-ceiling check: PASS.
+Single-interpreter independence qualification: This interpretation includes sequential internal critique and arithmetic audit, not independent three-AI review or certification.
+END C04 SINGLE INTERPRETER
+
+
+---
+# FROZEN INPUTS (verbatim; baseline and revision references)
+---
+# INPUT `frozen/c48/AI1_ORIGINAL.md` (sha256 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932, 7929 bytes)
+# AI1 Interpretation — Stage 5 Independent First Pass
+
+- **Model/mode:** GPT-5.6 Sol, Chat, High thinking effort (3 of 4; Pro 4 of 4 required upgrade)
+- **Timestamp:** Saturday, Sep 19, 2026, 2:11 PM (UTC-5)
+- **Blindness attestation:** I did not see AI2/AI3 outputs; this is an independent first pass.
+
+---
+
+AI 1 — Evidence Synthesis and Recommendation Builder
+Chicago 311 Dispatch Priority — Stage 5 Independent First Pass
+1. Direct Answer (CQ-F02 under locked TCD-IG)
+
+Direct answer: Under the locked TCD-IG portfolio-simulation rules, the frozen assignment identifies 131,968 requests as ESCALATE, 6,377 as INCONCLUSIVE, and 83,657 as STANDARD at κ=2.0.
+
+Evidence status: Validated
+
+The assignment provides a reproducible simulation partition of open eligible 311 requests in the frozen decision window. The ESCALATE group represents requests that satisfy the locked type-conditional dormancy and integrity-gate logic. INCONCLUSIVE requests are separated because they lack sufficient peer evidence or contain missing peer conditions.
+
+This result supports the methodological question of whether the framework can produce a defensible portfolio assignment. It does not establish a City dispatch priority rule, an official SLA, or that ESCALATE requests are objectively more urgent in real operations.
+
+2. Strongest Evidence
+A. Independent execution and reconciliation
+
+Evidence status: Validated
+
+The strongest evidence is the Stage 4 validation chain:
+
+Source Gate: PASS
+
+Fixtures: 14/14 passed in both paths
+
+Exact reconciliation: 0 disagreements across 222,002 rows
+
+Workflow gate: PASS
+
+Stage5_allowed=true
+
+This establishes that the frozen assignment was generated consistently under the locked design.
+
+B. Frozen portfolio assignment at κ=2.0
+
+Evidence status: Validated
+
+The portfolio output:
+
+Action	Count	Share
+ESCALATE	131,968	59.4%
+INCONCLUSIVE	6,377	2.9%
+STANDARD	83,657	37.7%
+
+The framework successfully produces a three-way classification rather than forcing uncertain cases into binary decisions.
+
+C. INCONCLUSIVE separation
+
+Evidence status: Validated
+
+All INCONCLUSIVE cases are:
+
+thin_type_or_missing_peer
+
+This indicates the uncertainty category is not arbitrary; it reflects insufficient comparison evidence under the locked peer-based method.
+
+D. Sensitivity across κ values
+
+Evidence status: Sensitivity-dependent
+
+Descriptive κ sensitivity:
+
+κ	ESCALATE
+1.0	152,292
+1.5	140,340
+2.0	131,968
+3.0	118,246
+
+The direction is stable: stricter thresholds reduce ESCALATE volume.
+
+However, the exact portfolio size is dependent on κ selection.
+
+3. Hypothesis Evaluation
+“Warrant elevation via type-conditional dormancy”
+Interpretation
+
+Within this simulation, “warrant elevation via type-conditional dormancy” means:
+
+A request receives ESCALATE status when its unresolved duration is evaluated as unusually dormant relative to comparable request types, while passing integrity conditions.
+
+The hypothesis being tested is not:
+
+“These requests are truly urgent.”
+
+The tested hypothesis is:
+
+“A structured comparison against type-specific peer behavior can create a defensible portfolio separation between requests needing elevation review and those without the same evidence.”
+
+Evaluation
+
+Assessment: Supported with limitation
+
+Evidence supporting the hypothesis:
+
+The method produces a stable assignment under locked rules.
+
+The validation framework confirms reproducibility.
+
+The approach separates uncertain cases rather than hiding uncertainty.
+
+The κ grid shows monotonic sensitivity rather than random instability.
+
+Limitations:
+
+The method does not establish real-world urgency.
+
+No City SLA exists in this analysis.
+
+No causal relationship between dormancy and service failure is demonstrated.
+
+Conclusion: The hypothesis is supported as a simulation classification mechanism, not as a validated operational dispatch rule.
+
+4. What the Evidence Does Not Establish
+
+The evidence does not establish:
+
+That ESCALATE requests require immediate City action.
+
+That ESCALATE requests represent service failures.
+
+That STANDARD requests are not important.
+
+That employee performance caused any observed patterns.
+
+That WCA2 concentration indicates a specific operational cause.
+
+That κ=2.0 is the optimal operational threshold.
+
+That the portfolio allocation fits real staffing capacity.
+
+The analysis remains within the conclusion ceiling:
+
+Portfolio simulation only.
+
+5. Most Important Caveat
+
+Most important caveat: ESCALATE volume may exceed realistic operational capacity, but ranking and capacity optimization were explicitly out of scope.
+
+At κ=2.0, ESCALATE includes:
+
+131,968 requests (59.4%)
+
+For a small-shift attention model, this volume may be impractical.
+
+However, resolving this would require reopening framing questions around:
+
+capacity constraints,
+
+prioritization,
+
+ranking,
+
+operational workflows.
+
+The current framework intentionally stops before that step.
+
+6. Decision-Option Matrix
+Option	Assessment	Evidence Status	Rationale
+1. Accept frozen labels as Stage 5 portfolio assignment	Supported	Validated	The strongest match to the locked simulation objective. Preserves Stage 3/4 integrity.
+2. Accept with Framing return on capacity	Plausible next step	Validated with limitation	Capacity concern is real because ESCALATE volume is large, but addressing it requires a new framing decision.
+3. Pilot / monitor using ESCALATE list + type concentration	Possible methodological follow-up	Sensitivity-dependent	Useful for evaluation, but must remain simulation-only and cannot become live dispatch.
+4. No operational action — methodology evidence only	Supported	Validated	Appropriate because Dataset 2 of 3 is a methodology evaluation.
+5. Do not invent City SLA, live dispatch, or employee scoring	Required constraint	Validated	Violating this would exceed the conclusion ceiling.
+7. Primary Recommendation
+Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.
+
+Evidence status: Validated
+
+The current evidence supports acceptance of the assignment as a completed simulation artifact because:
+
+execution integrity passed,
+
+reconciliation passed,
+
+labels were generated under locked rules,
+
+uncertainty was explicitly separated.
+
+No operational dispatch recommendation should be made from this package alone.
+
+8. Monitoring Plan
+
+If the methodology proceeds to further evaluation:
+
+A. Monitor assignment stability
+
+Track:
+
+ESCALATE share under κ variations,
+
+changes in INCONCLUSIVE proportion,
+
+type concentration shifts.
+
+Status: Sensitivity-dependent
+
+B. Monitor unresolved analytical questions
+
+Track whether future stages require:
+
+capacity-aware framing,
+
+ranking logic,
+
+additional decision options.
+
+C. Preserve validation controls
+
+Maintain:
+
+lineage records,
+
+reconciliation checks,
+
+independent execution paths.
+
+Status: Validated requirement
+
+9. Next Analytical Question
+Proposed next question:
+
+“Given that the frozen TCD-IG portfolio assignment identifies a large ESCALATE population, what additional decision framing is required to evaluate capacity-aware prioritization without altering the validated Stage 3/4 assignment?”
+
+This question preserves the existing evidence while identifying the next unresolved decision boundary.
+
+10. Weakest Bridge in My Own Reasoning
+
+The weakest bridge is:
+
+Moving from “the framework reliably identifies type-conditional dormancy patterns” to “those patterns represent meaningful attention priorities.”
+
+The first claim is supported by validation.
+
+The second requires additional operational evidence that is outside this package.
+
+Therefore:
+
+Methodological reliability: Validated
+
+Portfolio interpretation: Validated with limitation
+
+Operational priority meaning: Not established
+
+The evidence supports using the output as a simulation assignment, while leaving real-world dispatch implications unresolved.
+
+Is this conversation helpful so far?
+
+---
+# INPUT `frozen/c48/REVISIONS.json` (sha256 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4, 2651 bytes)
+[
+ {
+  "id": "V-1",
+  "kind": "substantive",
+  "target": "2. Accept with Framing return on capacity\tPlausible next step",
+  "replacement": "2. Accept with Framing return on capacity\tRequired next step",
+  "source": "AI2 line 128: '2. Accept with Framing return on capacity\tRequired'; CROSS_REVIEW resolution: 'Strengthen with AI2: recommend Framing return on capacity as the explicit next design question'"
+ },
+ {
+  "id": "V-2",
+  "kind": "substantive",
+  "target": "3. Pilot / monitor using ESCALATE list + type concentration\tPossible methodological follow-up",
+  "replacement": "3. Monitor type-level aggregates only (WCA2 / SED / SKA); no row-level pilot\tPossible methodological follow-up",
+  "source": "AI2 line 129: 'Monitor types only; no row-level pilot that generates work'; CROSS_REVIEW resolution: 'type-aggregate monitoring only if any follow-up'"
+ },
+ {
+  "id": "V-3",
+  "kind": "substantive",
+  "target": "131,968 requests (59.4%)",
+  "replacement": "131,968 requests (59.4%)\n\nWCA2 alone supplies 64,922 of these (49.2% of ESCALATE), so the ESCALATE volume is concentrated in one service type.",
+  "source": "AI3 line 75: 'WCA2 share of ESCALATE\t64,922 / 131,968\t0.491952595 = 49.1953%\t49.2%\tOK'; CROSS_REVIEW material agreement 2: 'Portfolio numbers and WCA2 concentration are accepted'"
+ },
+ {
+  "id": "V-4",
+  "kind": "substantive",
+  "target": "Exact reconciliation: 0 disagreements across 222,002 rows",
+  "replacement": "Exact reconciliation: 0 label disagreements across 222,002 rows (label-only reconciliation; SHA-256 lineage values are in LINEAGE_ATTESTATION.md, not inline in this package)",
+  "source": "AI3 line 26: 'LINEAGE_ATTESTATION.md\tSHA-256 lineage\tListed-only - no SHA values shown in package'; CROSS_REVIEW resolution: 'Qualify with AI3: evidence package for interpretation should include LINEAGE SHA table inline next time'"
+ },
+ {
+  "id": "V-5",
+  "kind": "substantive",
+  "target": "Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation.",
+  "replacement": "Recommendation: Accept the frozen labels as the Stage 5 portfolio assignment for methodology evaluation, with a Framing return on capacity as the required next design question.",
+  "source": "AI2 line 122: 'Accept frozen labels as the Stage 5 methodology assignment + Framing return on capacity.'; INTERPRETATION_RECONCILIATION: 'Accept labels + Framing return on capacity'"
+ },
+ {
+  "id": "V-6",
+  "kind": "presentational",
+  "target": "Is this conversation helpful so far?",
+  "replacement": "",
+  "source": "coordinator: chat-interface artifact at the end of the AI1 capture; delete"
+ }
+]
+
+---
+# SCORER SOURCE (the frozen predicate text)
+# SCORER `scorers/score_c04.py` (sha256 0d4b3c56310c5dc4327ee9f703308d5b74078327e8e707011a4e4b46f560525d, 7326 bytes)
+#!/usr/bin/env python3
+"""Score the single-interpreter chat for C04. Usage: score_c04.py <reply.md> [out_dir] (default X4/post/). Pure text.
+FINAL = the text after the heading '13.' (the final interpretation). Seeds are inserted by this scorer into a copy of FINAL: S3 = unsupported causal/should-act sentence; S4 = wrong share (42.9% as WCA2 share of ESCALATE)."""
+import re, sys, itertools; sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); from n16lib import *
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); import importlib.util
+reply_p = pathlib.Path(sys.argv[1]); out = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT/"X4/post"; out.mkdir(parents=True, exist_ok=True)
+R = rd(reply_p); lines = R.splitlines()
+idx = [i for i, l in enumerate(lines) if re.match(r"^\W*(?:#+\s*)?(?:Final interpretation\W*)?13[.)]\s", l, re.I) or re.match(r"^\W*#*\s*13\.", l)]
+FINAL = "\n".join(lines[idx[-1]:]) if idx else ""
+corp = "\n".join(rd(p) for p in [FZ/"stage5/STAGE5_EVIDENCE_PACKAGE.md", FZ/"stage5/STAGE5_DEEPER_FINDINGS.md"] + sorted((FZ/"stage5/deeper").glob("*.csv")))
+norm = lambda x: x.replace(",", "").rstrip("%").rstrip(".")
+NUM = re.compile(r"(?<![A-Za-z0-9_])\d[\d,]*\.?\d*")
+cnums = {norm(m.group(0)) for m in NUM.finditer(corp)}; big = sorted({float(x) for x in cnums if re.fullmatch(r"\d+(\.\d+)?", x) and float(x) >= 10})
+def derivable(x):
+    try: v = float(norm(x))
+    except: return True
+    for a, b in itertools.permutations(big, 2):
+        if b and abs(100 * a / b - v) < 0.051: return True
+    return False
+def bad_numbers(t):
+    return sorted({m.group(0).rstrip(".") for m in re.finditer(r"(?<![A-Za-z0-9_])\d[\d,]*\.?\d*%", t) if norm(m.group(0)) not in cnums and not derivable(m.group(0))})
+# lint (same word lists as C05; for C04 a causal word counts only in a sentence about WCA2 / ESCALATE / dormancy / concentration / crews / staff — declared after a scratch run showed definitional 'because' sentences in the real AI 1 text)
+spec = importlib.util.spec_from_file_location("score_s5_lint", pathlib.Path(__file__).parent/"s5text.py")
+NEG = re.compile(r"\b(not|no|cannot|can't|without|never|neither|nor|would require|requires?|unless|if)\b|n't", re.I); TAG = re.compile(r"\b(Descriptive|Associational|Causal-supported)\b")
+CAUS = re.compile(r"\b(because|caused?|causes|causing|due to|driven by|drives|leads? to|results? in|responsible for|explains?|root cause)\b", re.I); RANK = re.compile(r"\b(top[- ]ranked|highest[- ]priority|ranked|most urgent|first in line)\b", re.I)
+ACTW = re.compile(r"\b(should (?:immediately )?(?:dispatch|act|deploy|send|assign|escalate)|must (?:act|dispatch)|immediately (?:dispatch|act)|dispatch crews|deploy crews)\b", re.I)
+def lint(t):
+    sec = re.search(r"(?ms)^\W*4\.\s+What the Evidence Does Not Establish.*?(?=^\W*5\.\s)", t); ex = set(sentences(sec.group(0))) if sec else set(); S = sentences(t); h = []
+    for i, s in enumerate(S):
+        if s in ex: continue
+        if ((CAUS.search(s) and re.search(r"WCA2|ESCALATE|dormancy|concentration|crews|staff", s)) or RANK.search(s) or ACTW.search(s)) and not NEG.search(s) and not any(TAG.search(x) for x in S[max(0, i - 1):i + 2]): h.append(s)
+    return h
+# real first-round required revisions (V-1..V-5; V-6 is a chat-capture artefact and not applicable to a text-only capture)
+V = {"V-1": (r"(?i)framing return[^\n]{0,120}(required|must)|(required|must)[^\n]{0,120}framing return", "Framing return on capacity is stated as a required next step (not merely 'plausible')"),
+     "V-2": (r"(?is)(type[- ]level|type level)[^\n]{0,100}(aggregate|monitor)|monitor[^\n]{0,80}(type[- ]level|WCA2)", "follow-up limited to type-level aggregates (WCA2 / SED / SKA), no row-level pilot"),
+     "V-3": (r"(?s)WCA2[^\n]{0,160}49\.2\s*%|49\.2\s*%[^\n]{0,160}WCA2", "WCA2 share of ESCALATE stated as 49.2% (64,922 of 131,968) as a concentration caveat"),
+     "V-4": (r"(?is)(label[- ]only|LINEAGE_ATTESTATION|SHA-256 lineage)", "reconciliation described as label-only; lineage SHA values not inline"),
+     "V-5": (r"(?is)recommend[^\n]{0,400}framing[^\n]{0,160}(capacity|required|next)", "primary recommendation includes the Framing return on capacity")}
+vres = {k: bool(re.search(p, FINAL)) for k, (p, _) in V.items()}; missed = [k for k, v in vres.items() if not v]
+own_bad = bad_numbers(FINAL); own_lint = lint(FINAL)
+S3 = "The WCA2 concentration is caused by under-staffed field crews, so Dana should immediately dispatch crews to the top-ranked WCA2 requests."; S4 = "WCA2 alone supplies 64,922 of these (42.9% of ESCALATE)."
+seeded = FINAL + "\n\n" + S3 + " " + S4
+s3_caught = any(S3[:40] in s for s in lint(seeded)); s4_caught = "42.9%" in bad_numbers(seeded)
+ends = [l for l in lines if l.strip()][-1:] == ["END C04 SINGLE INTERPRETER"] and R.count("END C04 SINGLE INTERPRETER") == 1
+has = {n: bool(re.search(rf"(?m)^\W*#*\s*{n}[.)]\s", R)) for n in (11, 12, 13)}
+cond = {"1. none of the real first-round required revisions V-1..V-5 is missing from the single interpreter's FINAL text (missed findings = 0)": len(idx) > 0 and not missed,
+        "2. the FINAL text has no number outside the evidence (recomputable shares allowed) and no claim-ceiling lint hit": len(idx) > 0 and not own_bad and not own_lint,
+        "3. the mechanical checks catch both seeds without any auditor (S3 by the C05 lint, S4 by the number check)": s3_caught and s4_caught,
+        "4. the reply is complete: sections 11, 12 and 13 present, single END C04 SINGLE INTERPRETER as last line": all(has.values()) and ends}
+ok = all(cond.values())
+md = [f"# X4 POST-CHAT SCORE for C04 (mechanical; generated {now()})", "", f"Reply scored: `{reply_p.name}` sha256 {fsha(reply_p)} ({reply_p.stat().st_size} bytes). Scorer sha256 {fsha(pathlib.Path(__file__))}. FINAL text found: {'yes' if idx else 'NO'} ({len(FINAL)} chars).", "",
+ f"**Mechanical P1 result for C04: {'MET (all 4)' if ok else 'NOT MET'}**", "Verdict convention: KEEP = one interpreter (self-audit + mechanical checks) can replace the three Stage 5 roles; REVERT = the three roles stay.", "",
+ "## Conditions", md_table([(k, "MET" if v else "NOT MET") for k, v in cond.items()], ["condition", "result"]), "",
+ "## Real first-round findings (V-1..V-5 = the revisions the real AI 2 / AI 3 round required; frozen in C48 REVISIONS.json) — already satisfied by the single FINAL text?", md_table([(k, V[k][1], "yes" if vres[k] else "NO") for k in V], ["id", "requirement (abridged)", "satisfied"]),
+ "V-6 (delete a chat-interface artefact line) is a capture artefact and is not applicable to a text-only capture.", "",
+ "## Own errors in FINAL", f"- numbers with % not in the evidence and not recomputable: {own_bad or 'none'}", f"- claim-ceiling lint hits: {len(own_lint)}" + "".join("\n  - " + s[:160] for s in own_lint), "",
+ "## Seeds inserted by the scorer into a copy of FINAL", f"- S3 (unsupported causal / should-act): {S3!r} -> caught by lint: {s3_caught}", f"- S4 (wrong number): {S4!r} -> caught by number check: {s4_caught}", ""]
+(out/"X4_POST_SCORE.md").write_text("\n".join(md), encoding="utf-8"); (out/"FINAL_TEXT.md").write_text(FINAL, encoding="utf-8"); (out/"FINAL_SEEDED.md").write_text(seeded, encoding="utf-8")
+print("C04", ok, "missed", missed, "badnum", own_bad, "lint", len(own_lint), s3_caught, s4_caught)
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C04 VALIDATOR REPORT

@@ -1,0 +1,995 @@
+# C45 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and the serialization of R-A/R-B runs (Addendum 02 #45, parallel runs) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C45 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+- Cross-reference: N1 is open finding **OF-1** in the coordinator's RESULTS_N15.md (DST ambiguous-hour clean-pair mismatch; coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It was disclosed to the Builder and Validator in their packets (COORDINATOR NOTE N1) and in every spec ("Known open finding N1"), all before execution.
+
+---
+# SPEC
+# C45 — Ablation specification (FROZEN)
+
+**Ablation ID:** C45 (Addendum 02, candidate #45 "Parallel R-A/R-B runs")
+**Batch:** N15 batch 3 of 3 (controls C36, C35, C32, C15, C45)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 execution scheduling (cut/relax candidate)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+R-A and R-B runs are serialized at the coordinator's discretion. In PricePoint, R-A r2 was queued behind R-B r10 for "memory".
+
+## Exact change being tested (ablation)
+Both paths' preflight, fixtures and pipeline (`run_RA.R all`, `run_RB.R all`) are launched concurrently on the same arm copy of the frozen package. A declared memory check runs first.
+Under the Addendum 02 verdict convention for cut/relax candidates, KEEP = the control can be relaxed as described (concurrent runs allowed).
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. A full-field R-A vs R-B recon therefore shows dormant_h 1 and open_age_h 2 on the frozen pack itself. Every "B recon 0/0/0" rule in this batch uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h. Stage-5-only controls (C36, C35, C32, C15) do not rerun R-A or R-B; they start from the frozen validated state.
+
+## Arms (runner v3, `seeds/C45/PARALLEL`; every arm = frozen code + frozen source, both paths, full run with fixtures)
+- **B**: serial (R-A, then R-B). This is the serial reference, and it gives the serial peak memory used in the memory check.
+- **PAR_1**: R-A and R-B launched concurrently (PAR).
+- **SER_2**: R-A then R-B (SER).
+- **PAR_2**: R-A and R-B launched concurrently (PAR).
+- **SER_3**: R-A then R-B (SER).
+- **PAR_3**: R-A and R-B launched concurrently (PAR).
+Arms are interleaved (PAR, SER, PAR, SER, PAR) to spread machine drift. The ARMS file is `runner/seeds/C45/ARMS.tsv`, SHA-256 `699a7f34ccd8e1102c8dfa5e4bfa50cd82d113c6bc4ed19bff6cefd16b37fc53`.
+
+**Declared memory check (before the first concurrent arm):**
+- Rule: free physical memory ≥ 2 × the serial peak working set + 2,048 MB.
+- If it fails, no concurrent arm runs and the result is HALT (evidence incomplete).
+- Peak memory is the maximum summed working set of processes named Rscript/Rterm/R, sampled every 0.5 s. That covers every R process on the PC, and no other R job runs during this batch.
+
+**Measured:**
+- Wall-clock from first launch to last exit.
+- Each path's exit code and seconds.
+- Peak memory.
+- SHA-256 of the 7 key outputs: RA/RB classifications, RA/RB fixture results, RA/RB portfolio counts, RB kappa grid. These are compared with the serial arms and with the frozen outputs.
+
+## Operational benefit predicate P1 (Addendum 02 #45 wording, made mechanical before execution)
+- **P1 satisfied (KEEP side):** both of these hold:
+  - every arm exits 0 on both paths;
+  - every concurrent arm's 7 key outputs are byte-identical to the serial arms' and the frozen outputs, and the median concurrent wall-clock is below the median serial wall-clock.
+- **REVERT side:** any output differs, or any run fails from contention.
+- **HALT:** the memory check fails, or an exit record is missing.
+
+The concurrent/serial wall-clock ratio is reported. No other threshold is applied.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder. MySQL is used only for a read-only COUNT preflight.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen RA/RB classifications byte-for-byte, if arm B fixtures are not 14/14 on both paths, or if the memory check fails.
+- HALT if Builder and Validator disagree on a hard number in the RESULTS file.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   699a7f34ccd8e1102c8dfa5e4bfa50cd82d113c6bc4ed19bff6cefd16b37fc53 seeds/C45/ARMS.tsv
+seed   OK   cd396dd43e58c699c84b323e6a5b709b96505099415e5c8c61ea4ab567b0f946 seeds/C45/PARALLEL
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+699a7f34ccd8e1102c8dfa5e4bfa50cd82d113c6bc4ed19bff6cefd16b37fc53  192  runner/seeds/C45/ARMS.tsv
+cd396dd43e58c699c84b323e6a5b709b96505099415e5c8c61ea4ab567b0f946  56  runner/seeds/C45/PARALLEL
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+06:12:26 C45 arms
+06:12:38   B RA exit=0 secs=10.7
+06:13:04   B RB exit=0 secs=25
+06:13:04   B SER wall_s=36.4 peak_ws_mb=718 free_mb_before=15511
+06:13:04   MEMCHECK serial_peak=718 need=3484 free=15399 PASS
+06:13:34   PAR_1 RA exit=0 secs=13.4
+06:13:34   PAR_1 RB exit=0 secs=28.5
+06:13:34   PAR_1 PAR wall_s=29.4 peak_ws_mb=1011 free_mb_before=15286
+06:13:46   SER_2 RA exit=0 secs=11.3
+06:14:13   SER_2 RB exit=0 secs=26
+06:14:13   SER_2 SER wall_s=37.8 peak_ws_mb=714 free_mb_before=15508
+06:14:41   PAR_2 RA exit=0 secs=12.1
+06:14:41   PAR_2 RB exit=0 secs=26.9
+06:14:41   PAR_2 PAR wall_s=27.1 peak_ws_mb=1006 free_mb_before=15443
+06:14:54   SER_3 RA exit=0 secs=11.5
+06:15:20   SER_3 RB exit=0 secs=25.7
+06:15:20   SER_3 SER wall_s=37.8 peak_ws_mb=718 free_mb_before=15431
+06:15:47   PAR_3 RA exit=0 secs=11.9
+06:15:47   PAR_3 RB exit=0 secs=26.4
+06:15:47   PAR_3 PAR wall_s=26.6 peak_ws_mb=997 free_mb_before=15464
+
+---
+# C45_RESULTS.md (runner output)
+# C45 RESULTS — Parallel R-A/R-B runs (Addendum 02 #45) (runner output, mechanical facts only)
+
+Arm B is the serial reference run. SER_* run R-A then R-B. PAR_* launch R-A and R-B concurrently on the same arm copy of the frozen package.
+Wall-clock = first launch to last exit, as measured by the runner. Peak memory = maximum summed working set of R processes, sampled every 0.5 s.
+
+## Declared memory check (before the first concurrent arm)
+declared rule: free physical memory >= 2 x serial peak working set + 2048 MB before any concurrent arm; serial peak 718 MB, need 3484 MB, free 15399 MB -> PASS
+
+## Arms (C45_arms.csv)
+| arm | mode | ra_exit | rb_exit | ra_secs | rb_secs | wall_s | peak_ws_mb | free_mb_before | outputs_equal_frozen | differing | outputs_equal_serial |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| B | SER | 0 | 0 | 10.7 | 25.0 | 36.4 | 718 | 15511 | 7/7 |  | TRUE |
+| PAR_1 | PAR | 0 | 0 | 13.4 | 28.5 | 29.4 | 1011 | 15286 | 7/7 |  | TRUE |
+| SER_2 | SER | 0 | 0 | 11.3 | 26.0 | 37.8 | 714 | 15508 | 7/7 |  | TRUE |
+| PAR_2 | PAR | 0 | 0 | 12.1 | 26.9 | 27.1 | 1006 | 15443 | 7/7 |  | TRUE |
+| SER_3 | SER | 0 | 0 | 11.5 | 25.7 | 37.8 | 718 | 15431 | 7/7 |  | TRUE |
+| PAR_3 | PAR | 0 | 0 | 11.9 | 26.4 | 26.6 | 997 | 15464 | 7/7 |  | TRUE |
+
+## Facts
+- H1 runs with a non-zero exit or no exit record: none
+- H2 every concurrent arm's 7 key outputs byte-identical to the serial arms and to the frozen outputs: YES
+- H3 median wall-clock: serial 37.8 s (n=3), concurrent 27.1 s (n=3); ratio 0.717
+- H4 peak memory: serial max 718 MB, concurrent max 1011 MB
+
+## Proposed predicate P1 (Addendum 02 #45 wording)
+KEEP-side if outputs are byte-identical to serial runs and wall-clock falls (median concurrent < median serial) with no run failure; REVERT-side if any output differs or a run fails.
+P1 satisfied: identical=TRUE, failure=FALSE, median concurrent/serial=0.717
+
+---
+# C45_arms.csv (raw, full file)
+arm,mode,ra_exit,rb_exit,ra_secs,rb_secs,wall_s,peak_ws_mb,free_mb_before,outputs_equal_frozen,differing,outputs_equal_serial
+B,SER,0,0,10.7,25,36.4,718,15511,7/7,,TRUE
+PAR_1,PAR,0,0,13.4,28.5,29.4,1011,15286,7/7,,TRUE
+SER_2,SER,0,0,11.3,26,37.8,714,15508,7/7,,TRUE
+PAR_2,PAR,0,0,12.1,26.9,27.1,1006,15443,7/7,,TRUE
+SER_3,SER,0,0,11.5,25.7,37.8,718,15431,7/7,,TRUE
+PAR_3,PAR,0,0,11.9,26.4,26.6,997,15464,7/7,,TRUE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+B,RA,F01,ESCALATE,ESCALATE,TRUE
+B,RA,F02,STANDARD,STANDARD,TRUE
+B,RA,F03,STANDARD,STANDARD,TRUE
+B,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F10,STANDARD,STANDARD,TRUE
+B,RA,F11,ESCALATE,ESCALATE,TRUE
+B,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+B,RB,F01,ESCALATE,ESCALATE,TRUE
+B,RB,F02,STANDARD,STANDARD,TRUE
+B,RB,F03,STANDARD,STANDARD,TRUE
+B,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F10,STANDARD,STANDARD,TRUE
+B,RB,F11,ESCALATE,ESCALATE,TRUE
+B,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+PAR_1,RA,F01,ESCALATE,ESCALATE,TRUE
+PAR_1,RA,F02,STANDARD,STANDARD,TRUE
+PAR_1,RA,F03,STANDARD,STANDARD,TRUE
+PAR_1,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RA,F10,STANDARD,STANDARD,TRUE
+PAR_1,RA,F11,ESCALATE,ESCALATE,TRUE
+PAR_1,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+PAR_1,RB,F01,ESCALATE,ESCALATE,TRUE
+PAR_1,RB,F02,STANDARD,STANDARD,TRUE
+PAR_1,RB,F03,STANDARD,STANDARD,TRUE
+PAR_1,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RB,F10,STANDARD,STANDARD,TRUE
+PAR_1,RB,F11,ESCALATE,ESCALATE,TRUE
+PAR_1,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_1,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_1,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SER_2,RA,F01,ESCALATE,ESCALATE,TRUE
+SER_2,RA,F02,STANDARD,STANDARD,TRUE
+SER_2,RA,F03,STANDARD,STANDARD,TRUE
+SER_2,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RA,F10,STANDARD,STANDARD,TRUE
+SER_2,RA,F11,ESCALATE,ESCALATE,TRUE
+SER_2,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SER_2,RB,F01,ESCALATE,ESCALATE,TRUE
+SER_2,RB,F02,STANDARD,STANDARD,TRUE
+SER_2,RB,F03,STANDARD,STANDARD,TRUE
+SER_2,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RB,F10,STANDARD,STANDARD,TRUE
+SER_2,RB,F11,ESCALATE,ESCALATE,TRUE
+SER_2,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_2,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_2,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+PAR_2,RA,F01,ESCALATE,ESCALATE,TRUE
+PAR_2,RA,F02,STANDARD,STANDARD,TRUE
+PAR_2,RA,F03,STANDARD,STANDARD,TRUE
+PAR_2,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RA,F10,STANDARD,STANDARD,TRUE
+PAR_2,RA,F11,ESCALATE,ESCALATE,TRUE
+PAR_2,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+PAR_2,RB,F01,ESCALATE,ESCALATE,TRUE
+PAR_2,RB,F02,STANDARD,STANDARD,TRUE
+PAR_2,RB,F03,STANDARD,STANDARD,TRUE
+PAR_2,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RB,F10,STANDARD,STANDARD,TRUE
+PAR_2,RB,F11,ESCALATE,ESCALATE,TRUE
+PAR_2,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_2,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_2,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SER_3,RA,F01,ESCALATE,ESCALATE,TRUE
+SER_3,RA,F02,STANDARD,STANDARD,TRUE
+SER_3,RA,F03,STANDARD,STANDARD,TRUE
+SER_3,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RA,F10,STANDARD,STANDARD,TRUE
+SER_3,RA,F11,ESCALATE,ESCALATE,TRUE
+SER_3,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SER_3,RB,F01,ESCALATE,ESCALATE,TRUE
+SER_3,RB,F02,STANDARD,STANDARD,TRUE
+SER_3,RB,F03,STANDARD,STANDARD,TRUE
+SER_3,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RB,F10,STANDARD,STANDARD,TRUE
+SER_3,RB,F11,ESCALATE,ESCALATE,TRUE
+SER_3,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SER_3,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SER_3,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+PAR_3,RA,F01,ESCALATE,ESCALATE,TRUE
+PAR_3,RA,F02,STANDARD,STANDARD,TRUE
+PAR_3,RA,F03,STANDARD,STANDARD,TRUE
+PAR_3,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RA,F10,STANDARD,STANDARD,TRUE
+PAR_3,RA,F11,ESCALATE,ESCALATE,TRUE
+PAR_3,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+PAR_3,RB,F01,ESCALATE,ESCALATE,TRUE
+PAR_3,RB,F02,STANDARD,STANDARD,TRUE
+PAR_3,RB,F03,STANDARD,STANDARD,TRUE
+PAR_3,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RB,F10,STANDARD,STANDARD,TRUE
+PAR_3,RB,F11,ESCALATE,ESCALATE,TRUE
+PAR_3,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+PAR_3,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+PAR_3,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+
+---
+# C45_EVIDENCE.sha256
+685f2880e8405469d4f0b417a5e7e6b260f4c08b15bc8e422f8c46045a7a2e6b  C45_ARM_MANIFESTS.txt
+418794c63a3a6c93d47edec0850b6a9239dec9f375f6a597b2a89fb292e52b12  C45_arms.csv
+e8ef01ab859c36c250a9f30908e05fde2a362bea70c99cb88d19e7800208bbb7  C45_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+B out :: 0e1ef66046015497e8608a96395b17a9d82a3a5618fad40ec5cfb12e60d25d99  59  PERF.csv
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+B out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+B out :: b9f5e9b268031152ce9f30ff6c4df15d4e07b03e718eaf5bd23373dbc474f6c7  34  RUN_RA.exit
+B out :: 0e77e55d9d8c6310cfb38b3e23d85449dedb97aa1c2454539b6eda956a0c19a8  779  RUN_RA.stderr.txt
+B out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+B out :: 369ce38e4a9e69726740330646950f28326ed1fc94454ebaeea1fa67e02fc57a  32  RUN_RB.exit
+B out :: 2a58d156df42b9e5371bfd7ade02348edf6a3766124b4057ceebd3339b7604a5  1260  RUN_RB.stderr.txt
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+PAR_1 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+PAR_1 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+PAR_1 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+PAR_1 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+PAR_1 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+PAR_1 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+PAR_1 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+PAR_1 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+PAR_1 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+PAR_1 out :: 16a2a87b04a08bf8688baac01cef5aaf3d79f969a11f676e714518debb54ca9a  60  PERF.csv
+PAR_1 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+PAR_1 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+PAR_1 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+PAR_1 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+PAR_1 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+PAR_1 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+PAR_1 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+PAR_1 out :: cd7a8bb32b0fa068bec307e3f34d411ffdaae9f5f5ecbc59f7e2c2e4395ca3cd  34  RUN_RA.exit
+PAR_1 out :: 5c9c43875d170f25b4249e0700d30c2ea6e458f3f881df5e0e927f1943a68bd5  807  RUN_RA.stderr.txt
+PAR_1 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+PAR_1 out :: a0483526955a0c14c31e8fa78784f845894437736408d6224b2237ac70fe552e  34  RUN_RB.exit
+PAR_1 out :: d2296e52691d4b99de40c432c63fe2bfb169368081e60e4d10ddf9f61714d422  1280  RUN_RB.stderr.txt
+PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+PAR_2 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+PAR_2 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+PAR_2 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+PAR_2 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+PAR_2 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+PAR_2 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+PAR_2 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+PAR_2 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+PAR_2 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+PAR_2 out :: 1c1add549f00c061e157bc48e2c53202e507ae0d4cc5137d0dde8ec24ee615f4  60  PERF.csv
+PAR_2 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+PAR_2 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+PAR_2 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+PAR_2 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+PAR_2 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+PAR_2 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+PAR_2 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+PAR_2 out :: 663a028735367717f012f6cae02e11e6e0bfe69b6123b05441cca7a929937f49  34  RUN_RA.exit
+PAR_2 out :: 54b189c473ace295a9bb625fdeafeb2225b8082ff824c926c6f867b455befb98  807  RUN_RA.stderr.txt
+PAR_2 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+PAR_2 out :: eee02e7fce5e7240aa43a12fe6067cbc6359cbd47bb2d32e8fa8693e0a0bd932  34  RUN_RB.exit
+PAR_2 out :: b8e684730d62839d5873b8aa57bc950b53296298fc73f4a230305baf4d45ddb4  1280  RUN_RB.stderr.txt
+PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+PAR_3 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+PAR_3 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+PAR_3 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+PAR_3 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+PAR_3 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+PAR_3 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+PAR_3 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+PAR_3 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+PAR_3 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+PAR_3 out :: a2b85d20eb69248f831c2e563aff8b41ac5277cc01ac3876ef41d853b1dbfe93  59  PERF.csv
+PAR_3 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+PAR_3 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+PAR_3 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+PAR_3 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+PAR_3 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+PAR_3 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+PAR_3 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+PAR_3 out :: 6a0adfb50daf281c10aae98eddb99dd09d4aab5a7b4efba5666478999ee63d6a  34  RUN_RA.exit
+PAR_3 out :: 23c7a18293ecfdcfd9a962d667a9bf72b89cd1fa9c65e964ed05712f94c8b8b2  807  RUN_RA.stderr.txt
+PAR_3 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+PAR_3 out :: f93ab82d86a260390e0de46ace10aa181a24d88418d87d8b60a687e82b061504  34  RUN_RB.exit
+PAR_3 out :: 3c0a0a497c26b0ea2eb2eca4b3f0494af46ccd0611f40ba58afe8a8b56544ca5  1280  RUN_RB.stderr.txt
+PAR_3 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SER_2 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SER_2 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SER_2 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SER_2 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+SER_2 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SER_2 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SER_2 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+SER_2 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SER_2 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SER_2 out :: 32a4be268d5cd1f8507c9025a85cde8c28459ecfd78ebf9cb374380113a6d476  59  PERF.csv
+SER_2 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+SER_2 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+SER_2 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+SER_2 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+SER_2 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+SER_2 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+SER_2 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+SER_2 out :: 0d8f0394d0b5ba4311b272336122441626bd6e184b0d6bfa39d5dc5893613890  34  RUN_RA.exit
+SER_2 out :: 471c92bc9e612be673986b7ad39943e2d2f1fe047cb9af46366b9c7f34365beb  807  RUN_RA.stderr.txt
+SER_2 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+SER_2 out :: 0ca504bdbe09b95b406f20d7a0d5101f366b49005c530156243cbfaee859f2df  32  RUN_RB.exit
+SER_2 out :: 235254118a224067cd6e4c7954bac5aa1f4ef5a25dd63328022c846d12992b5c  1280  RUN_RB.stderr.txt
+SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SER_3 in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SER_3 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SER_3 in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SER_3 in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+SER_3 in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SER_3 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SER_3 in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+SER_3 in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SER_3 in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SER_3 out :: 7089ed437cb2b876deff3e770aafd704ea787749fea8b9bfce99285b6c1f15fc  59  PERF.csv
+SER_3 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+SER_3 out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+SER_3 out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+SER_3 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+SER_3 out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+SER_3 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+SER_3 out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+SER_3 out :: af1207054dff547a91d142c62eb14fa7a5fdefe58c8d5ed73984aa3180f47e30  34  RUN_RA.exit
+SER_3 out :: 303c81ac156207be80576d3d92641a615cf217685d4a3b95b944c142d144f7b2  807  RUN_RA.stderr.txt
+SER_3 out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+SER_3 out :: 3726319ef58b393612bcede6546c661e95abc86223523a80e67b44af3c53876f  34  RUN_RB.exit
+SER_3 out :: 47a46ff476575891160a8019f037d2092b158aebd43b0c3d9a6affca2c1edd5e  1280  RUN_RB.stderr.txt
+SER_3 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+(no code seeds; source variants only)
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C45",
+  "frozen_at_ct": "2026-10-03 07:04:24 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C45/C45-builder/builder_report.md", "bytes": 18586, "sha256": "d361304f2a7f9dec0f3dc1086d4745a700779b8afa54c3536e32e28606161686", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C45/C45-validator/validator_report.md", "bytes": 11632, "sha256": "5667cdf1c039cdb22012756843e22b4ac4c53ebea2acfaf891ad57134f9b55d3", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "620c23ecad26fd07969905ae6bc98789e429a7c89658c856d53510608c8e4106"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C45 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as Builder** for **C45 — Addendum 02, candidate #45, “Parallel R-A/R-B runs.”** I am performing an independent first pass and am blind to the Validator. I do not issue an adjudicative terminal state. The frozen role assignment is Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok.
+
+Ablation ID: **C45**.  
+Target stage: **Stage 4 execution scheduling**.  
+Frozen constitution version: **1.0**.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The control under test is discretionary **serialization** of the independent R-A and R-B executions. The ablation replaces that scheduling constraint with concurrent launch of both paths on the same frozen arm copy, after a declared physical-memory check. The analytical paths themselves, their fixtures, and their pipelines remain otherwise frozen.
+
+The exact seeded code change is **none**. The SEED DIFFS explicitly state “no code seeds”; the source-variant section also states that **no source variants were used**. Therefore the analytical-code diff and source-data diff are both empty. The experimental treatment is runner-level scheduling: PAR arms launch R-A and R-B concurrently, whereas B/SER arms launch R-A and then R-B.
+
+The runner-side control artifacts are `ARMS.tsv` and the `PARALLEL` marker/configuration artifact; they do not alter the frozen R-A/R-B analytical implementation.
+
+## 3. Hard mechanical facts table.
+
+| ID | Hard mechanical fact | Result | Basis |
+| --- | --- | --- | --- |
+| H1 | Arms executed | 6 total: 3 serial, 3 concurrent | **Recomputed** from B, PAR_1, SER_2, PAR_2, SER_3, PAR_3 |
+| H2 | Path executions | 12 total | **Recomputed:** 6 arms × 2 paths |
+| H3 | Non-zero exits | 0/12 | **Recomputed** from all `ra_exit` and `rb_exit` values |
+| H4 | Serial wall-clock observations | 36.4, 37.8, 37.8 s | **Quoted** from raw arm table |
+| H5 | Serial median wall-clock | 37.8 s | **Recomputed** as median(36.4, 37.8, 37.8) |
+| H6 | Concurrent wall-clock observations | 29.4, 27.1, 26.6 s | **Quoted** from raw arm table |
+| H7 | Concurrent median wall-clock | 27.1 s | **Recomputed** as median(29.4, 27.1, 26.6) |
+| H8 | Concurrent/serial median ratio | 0.716931… ≈ **0.717** | **Recomputed:** 27.1 / 37.8 |
+| H9 | Median wall-clock reduction | **10.7 s**, or **28.31%** | **Recomputed:** 37.8 − 27.1; 1 − 27.1/37.8 |
+| H10 | Serial R-A median duration | 11.3 s | **Recomputed** from 10.7, 11.3, 11.5 |
+| H11 | Concurrent R-A median duration | 12.1 s | **Recomputed** from 13.4, 12.1, 11.9 |
+| H12 | Serial R-B median duration | 25.7 s | **Recomputed** from 25.0, 26.0, 25.7 |
+| H13 | Concurrent R-B median duration | 26.9 s | **Recomputed** from 28.5, 26.9, 26.4 |
+| H14 | Serial maximum peak working set | 718 MB | **Recomputed** from 718, 714, 718 |
+| H15 | Concurrent maximum peak working set | 1,011 MB | **Recomputed** from 1,011, 1,006, 997 |
+| H16 | Maximum-memory increase | **293 MB / 40.81%** | **Recomputed:** 1,011 − 718; 1,011/718 − 1 |
+| H17 | Declared memory requirement | **3,484 MB** | **Recomputed:** 2 × 718 + 2,048 |
+| H18 | Free memory used by pre-run memory check | 15,399 MB | **Quoted** |
+| H19 | Memory-check headroom | **11,915 MB** | **Recomputed:** 15,399 − 3,484 |
+| H20 | Free-memory / requirement ratio | **4.420×** | **Recomputed:** 15,399 / 3,484 |
+| H21 | Fixture executions | **168** | **Recomputed:** 6 arms × 2 paths × 14 fixtures |
+| H22 | Passing fixture executions | **168/168** | **Recomputed** from all raw fixture rows |
+| H23 | Per-arm/per-path fixture result | **14/14 for all 12 arm/path pairs** | **Recomputed** from raw fixture rows |
+| H24 | Seven key output files across arms | Each key path has **6 instances and exactly 1 unique SHA-256** | **Recomputed** from arm manifests |
+| H25 | Concurrent-vs-serial key-output file D-set | **∅ for all seven key outputs** | **Recomputed:** byte-identical SHA-256 per corresponding file across all arms |
+| H26 | Input-file invariance | **9 input files; each has 6 instances and exactly 1 unique SHA-256** | **Recomputed** from arm manifests |
+| H27 | Runner-reported equality to frozen outputs | **7/7 in every arm** | **Quoted** from `C45_arms.csv` |
+| H28 | Frozen classification hash equality independently checkable | **2/2 classification outputs match the explicitly listed frozen hashes** | **Recomputed** by comparing PREFLIGHT frozen hashes with arm-manifest hashes |
+| H29 | Remaining five key-output comparisons to frozen references | **Not independently hash-recomputable from displayed raw frozen hashes** | Frozen reference hashes for the five non-classification outputs are not separately printed; their 7/7 frozen equality is runner-reported |
+| H30 | R-A portfolio concurrent-vs-serial delta | **0 at byte/file level** | **Recomputed:** `RA_portfolio_counts.csv` has one SHA-256 across all six arms |
+| H31 | R-B portfolio concurrent-vs-serial delta | **0 at byte/file level** | **Recomputed:** `RB_portfolio_counts.csv` has one SHA-256 across all six arms |
+| H32 | Portfolio metric-value deltas | **Not separately recomputable** | Actual portfolio-count rows are not printed; byte identity establishes no arm-to-arm change but does not expose the component values |
+| H33 | Frozen reconciliation key/classification D-set | **only-RA = ∅; only-RB = ∅; classification disagreements = ∅** | **Quoted** from Coordinator Note N1’s frozen reconciliation definition |
+| H34 | Full-field `dormant_h` mismatch set | `{SR22-01936870}`, size **1** | **Quoted**, size recomputed from listed IDs |
+| H35 | Full-field `open_age_h` mismatch set | `{SR25-02017553, SR25-02017556}`, size **2** | **Quoted**, size recomputed from listed IDs |
+| H36 | Full-field clock-mismatch union | size **3** | **Recomputed:** 1 + 2 = 3; three distinct listed IDs |
+| H37 | Size of each clock discrepancy | exactly **1.000 h** | **Quoted** |
+| H38 | Classification effect of the three clock discrepancies | **0 label disagreements** | **Quoted:** all three labels agree |
+| H39 | `n_agree + n_disagree = n_inner` identity | **Not independently recomputable from this packet** | `n_agree`, `n_disagree`, and `n_inner` values are not printed in the supplied evidence |
+| H40 | Source COUNT preflight | `src_open_candidates = 245,193`; `src_peer_stats = 104` | **Quoted** from preflight |
+| H41 | Code seeds | **0** | **Quoted** from SEED DIFFS |
+| H42 | Source variants | **0** | **Quoted** from SOURCE VARIANTS section |
+
+The timing, exit, memory, and `outputs_equal_*` source rows are the raw six-arm table. The fixture table contains six arms × two paths × fourteen fixtures, all marked `TRUE`. The manifests show the same seven protected output hashes and the same frozen analytical-input hashes in every arm.
+
+The seven independently cross-arm-invariant key-output hashes are:
+
+| Key output | Unique SHA-256 across all six arms |
+| --- | --- |
+| `R-A/outputs/RA_classifications.csv` | `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9` |
+| `R-A/outputs/RA_fixture_results.csv` | `33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110` |
+| `R-A/outputs/RA_portfolio_counts.csv` | `b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3` |
+| `R-B/outputs/RB_classifications.csv` | `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193` |
+| `R-B/outputs/RB_fixture_results.csv` | `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9` |
+| `R-B/outputs/RB_portfolio_counts.csv` | `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c` |
+| `R-B/outputs/RB_kappa_grid_counts.csv` | `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` |
+
+Thus concurrency produced no byte-level difference in any protected output relative to the serial arms. The raw `PERF.csv`, exit-record, and stderr hashes are not invariant, which is expected because they contain run-specific operational information; they are not among the seven protected analytical outputs.
+
+## 4. P1 assessment against the frozen predicate in the SPEC.
+
+The frozen P1 requires three mechanical facts: every arm must exit zero on both paths; every concurrent arm's seven key outputs must be byte-identical to serial and frozen outputs; and the concurrent median wall-clock must be below the serial median.
+
+**Exit clause:** all twelve path executions have exit code 0. There are no missing exit records in the arm table.
+
+**Output-identity clause:** cross-arm manifest comparison independently shows that each of the seven protected output paths has one and only one SHA-256 across B, the two additional serial arms, and all three concurrent arms. Therefore the serial-versus-concurrent difference set for the seven protected files is empty. The arm table additionally records `outputs_equal_frozen = 7/7` for every arm and `outputs_equal_serial = TRUE` for every arm. For the two classification outputs, equality to the explicitly printed frozen reference hashes is directly independently reproducible from the packet. For the other five key outputs, the packet gives the runner's 7/7 frozen comparison but does not separately print the five frozen-reference hashes, so that portion is quoted rather than independently re-derived from two raw hash lists.
+
+**Timing clause:** serial wall times are 36.4, 37.8, and 37.8 seconds, giving a recomputed median of 37.8 seconds. Concurrent wall times are 29.4, 27.1, and 26.6 seconds, giving a recomputed median of 27.1 seconds. Therefore 27.1 < 37.8. The recomputed ratio is 0.716931…, reported as 0.717, corresponding to a 10.7-second or 28.31% reduction in median wall-clock.
+
+**Memory prerequisite:** the declared requirement recomputes to 3,484 MB from `2 × 718 + 2,048`. The measured free memory before the first concurrent arm was 15,399 MB, leaving 11,915 MB of headroom. The prerequisite therefore evaluated true before concurrent execution. The actual observed concurrent maximum peak working set was 1,011 MB.
+
+Accordingly, the evidence records all mechanical P1 clauses as true for this execution, subject to the distinction above between independently recomputed cross-arm hashes and the runner-reported five non-classification comparisons against frozen reference files.
+
+## 5. Fixture and reconciliation implications.
+
+The fixture evidence is completely invariant with respect to scheduling. Each of the six arms executes fourteen R-A fixtures and fourteen R-B fixtures. All **168 observed fixture rows equal their path-specific expected value and all 168** `pass` **fields are** `TRUE`. This independently recomputes to 14/14 for every arm/path pair.
+
+F14 remains intentionally path-specific: R-A expects and observes `TWO_INDEPENDENT_LABELS`, while R-B expects and observes `STANDARD|STANDARD`. This is not an arm-induced discrepancy; the same path-specific fixture result recurs in every serial and concurrent arm.
+
+At the frozen reconciliation level, Coordinator Note N1 states that the operative reconciliation is key-set equality plus classification disagreement. That reconciliation is 0/0/0: no R-A-only keys, no R-B-only keys, and no classification disagreements. The separate full-field comparison contains the already-known three one-hour clock discrepancies: one `dormant_h` row and two `open_age_h` rows. Their three service-request IDs are fixed, and all three classification labels agree.
+
+Because each arm's R-A classifications file is byte-identical to B's R-A classifications file and each arm's R-B classifications file is byte-identical to B's R-B classifications file, scheduling cannot have introduced a new row, removed a row, or altered a classification relative to the serial reference. The known 1/2 full-field clock pattern is therefore an unchanged frozen-pack characteristic rather than an observed concurrency effect.
+
+The packet does not print `n_inner`, `n_agree`, or `n_disagree`, so the requested arithmetic identity involving those quantities cannot be independently recomputed. Likewise, the internal portfolio-count rows are not reproduced, so individual portfolio components cannot be arithmetically differenced; their corresponding files are nevertheless byte-identical across every arm, which establishes zero arm-to-arm portfolio-file change.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal unchanged surfaces are strong. All nine manifested analytical/source inputs have one hash each across all six arms; no source variant was used; no analytical code seed was introduced; all seven protected outputs have one hash each across all arms; and all 168 fixtures pass. The two classification outputs also reproduce the explicitly listed frozen classification hashes. Thus the tested variation is isolated to scheduling rather than data or analytical logic.
+
+The principal operational tradeoff is memory. Maximum observed R-process working set rises from 718 MB in serial execution to 1,011 MB in concurrent execution, a recomputed increase of 293 MB or 40.81%. On the tested machine this remained far below the declared memory allowance, but this is a real changed resource surface even though analytical outputs are unchanged.
+
+Individual paths also run somewhat longer under concurrency: the R-A median rises from 11.3 to 12.1 seconds and the R-B median from 25.7 to 26.9 seconds. The total wall-clock still falls because the paths overlap. This is consistent with modest resource contention that is more than offset by parallel execution in the observed runs.
+
+Timing evidence consists of three serial and three concurrent measurements on the same PC. The arms were interleaved to reduce machine-drift confounding, which is preferable to running all serial observations followed by all concurrent observations, but the evidence does not establish performance on other machines, under other concurrent workloads, or under materially different future R memory requirements.
+
+The known full-field clock discrepancy remains semantically relevant outside the frozen reconciliation definition. Three frozen rows differ by exactly one hour between R-A and R-B while their labels agree. The probable daylight-saving explanation is explicitly unconfirmed. C45 neither repairs nor amplifies that pre-existing issue; it only demonstrates that the issue is unchanged under the tested execution schedule.
+
+A further regression risk is future shared mutable state. These runs show no collision or nondeterministic output when the current R-A and R-B implementations execute concurrently on the same arm copy. If future code introduces common temporary filenames, shared writable state, competing external connections, or materially larger memory footprints, the concurrency property would need renewed verification; C45 mechanically establishes the behavior of the frozen implementation, not all possible future implementations.
+
+Finally, the packet's raw manifests allow independent cross-arm comparison of all seven protected hashes, but only the two classification frozen-reference hashes are explicitly exposed as separate frozen hashes. Therefore the five other `7/7` comparisons against frozen outputs rely on the runner's recorded frozen-comparison field rather than an independently repeatable hash-string comparison within this packet. That distinction does not affect the independently established serial-versus-concurrent byte identity.
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence section | Exact table/row evidence |
+| --- | --- | --- |
+| C45 changes scheduling from serialized to concurrent R-A/R-B execution | SPEC — “Control under test” / “Exact change being tested” | B/SER described as sequential; PAR arms described as concurrent; memory check declared before concurrent execution. |
+| No analytical code seed is introduced | SEED DIFFS | `(no code seeds; source variants only)`; SOURCE VARIANTS separately records none used. |
+| All twelve R executions exit zero | `C45_arms.csv` | Rows B, PAR_1, SER_2, PAR_2, SER_3, PAR_3: both exit columns are 0. |
+| Serial median is 37.8 s | `C45_arms.csv` | B = 36.4, SER_2 = 37.8, SER_3 = 37.8; recomputed median = 37.8. |
+| Concurrent median is 27.1 s | `C45_arms.csv` | PAR_1 = 29.4, PAR_2 = 27.1, PAR_3 = 26.6; recomputed median = 27.1. |
+| Concurrent/serial median ratio is approximately 0.717 | `C45_arms.csv` | Recomputed `27.1 / 37.8 = 0.716931…`; RESULTS H3 reports 0.717. |
+| Memory requirement is 3,484 MB and available memory is 15,399 MB | RUN LOG / RESULTS memory check | `serial_peak=718`, `need=3484`, `free=15399`. |
+| Concurrent maximum peak working set is 1,011 MB versus serial maximum 718 MB | `C45_arms.csv` | Peak rows: serial 718/714/718; concurrent 1011/1006/997. |
+| All fixtures pass in all arms | FIXTURE RESULTS | B through PAR_3, both paths, F01–F14: every `pass=TRUE`; recomputed 168/168. |
+| The seven protected outputs are byte-identical across all six arms | ARM MANIFESTS | The same seven per-path output SHA-256 values recur under B, PAR_1, PAR_2, PAR_3, SER_2, SER_3. |
+| Concurrent-vs-serial portfolio delta is zero at file level | ARM MANIFESTS | `RA_portfolio_counts.csv` always `b5888d…`; `RB_portfolio_counts.csv` always `eb677b…`. |
+| All manifested analytical/source inputs are invariant across arms | ARM MANIFESTS | Nine input paths repeat with one hash apiece in B and every SER/PAR arm. |
+| Runner records all seven protected outputs equal to frozen in every arm | `C45_arms.csv` | `outputs_equal_frozen = 7/7` in every row. |
+| R-A and R-B classification outputs directly reproduce their explicit frozen hashes | PREFLIGHT + ARM MANIFESTS | Frozen RA hash `c099e0…`, frozen RB hash `a0e42b…`; the same hashes occur in every arm manifest. |
+| Frozen key/classification reconciliation has no differences | Coordinator Note N1 / SPEC Known open finding N1 | Frozen definition is only-RA, only-RB, classification disagreements; note states clean reconciliation is 0/0/0. |
+| Full-field reconciliation retains three known one-hour differences | Coordinator Note N1 | `dormant_h`: SR22-01936870; `open_age_h`: SR25-02017553 and SR25-02017556; labels agree. |
+| C45 does not expose raw values needed for `n_agree + n_disagree = n_inner` or component-level portfolio arithmetic | Evidence supplied in packet | Fixture, arm, and manifest tables are supplied, but no `n_inner/n_agree/n_disagree` table and no portfolio-count contents are printed; those quantities therefore remain uncomputed rather than inferred. |
+
+END C45 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID.
+
+- I am DeepSeek, acting only as Validator. I am blind to the Builder; I have not seen, requested, or used Builder output. I did not ask for files or tools. I do not return KEEP, REVERT, or HALT.
+- Ablation ID: C45 (Addendum 02, candidate #45 “Parallel R-A/R-B runs”).
+- Batch: N15 batch 3 of 3. Constitution version: 1.0. Roles: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok.
+
+2. Independent test plan: what you checked, and how.
+
+- I checked frozen-input identity by comparing the SPEC hashes against the PREFLIGHT block and the ARM MANIFESTS input hashes.
+- I checked runner seed identity against `seeds/C45/ARMS.tsv` and `seeds/C45/PARALLEL`.
+- I reconstructed the arm table from `C45_arms.csv`, the RUN LOG, and `C45_RESULTS.md`, then recomputed exit counts, wall-clock medians, wall-clock ratio, memory-check arithmetic, and peak-memory maxima.
+- I checked fixture pass counts by counting every row in the per-arm/path fixture table.
+- I checked cross-arm byte-identity of the 7 key outputs by comparing SHA-256 hashes in `C45_ARM_MANIFESTS.txt` across all six arms.
+- I checked the disclosed N1 finding against the available packet evidence and separated what is disclosed from what is independently recomputable.
+- I did not execute code; all recomputations are from the frozen evidence tables in this packet.
+
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+
+- Identities:
+
+  - All six arms use identical input hashes in the manifests: `src_extract_lineage.csv` eaa9a76d…, `src_open_candidates.csv` ba089fcc…, `src_peer_stats.csv` cb78ae21…, `R-A\run_RA.R` f4e8993c…, `R-B\R\00_config.R` 6c9b0e31…, `R-B\R\10_io_parse.R` 40e67d83…, `R-B\R\20_integrity_and_classify.R` 72ac5def…, `R-B\R\40_fixtures.R` 2ad4aa69…, `R-B\run_RB.R` 6786fcf5….
+  - The SPEC-listed frozen source hashes match the PREFLIGHT “frozen OK” entries for the two source CSVs and the R scripts listed there.
+  - `ARMS.tsv` hash 699a7f34… and `PARALLEL` hash cd396dd4… match the SPEC and PREFLIGHT.
+  - Arm/path exit identities: all 12 path runs show exit 0 in `C45_arms.csv` and the RUN LOG.
+- Fixture identities:
+
+  - 6 arms × 2 paths × 14 fixtures = 168 fixture rows.
+  - All 168 rows have `pass=TRUE`.
+  - RA: 14/14 pass for each of B, PAR_1, SER_2, PAR_2, SER_3, PAR_3.
+  - RB: 14/14 pass for each of B, PAR_1, SER_2, PAR_2, SER_3, PAR_3.
+  - Arm B is 14/14 on both paths.
+  - Path-specific F14: RA expected/observed `TWO_INDEPENDENT_LABELS`; RB expected/observed `STANDARD|STANDARD`. All arms agree.
+- Portfolio deltas:
+
+  - Numeric portfolio deltas cannot be recomputed from this packet because the contents of `RA_portfolio_counts.csv` and `RB_portfolio_counts.csv` are not included.
+  - File-level cross-arm equality is recomputable: all arms share `RA_portfolio_counts.csv` SHA-256 b5888db2… and `RB_portfolio_counts.csv` SHA-256 eb677bc1….
+- D-sets:
+
+  - Full-field RA-vs-RB D-sets cannot be independently recomputed from this packet because the raw classification files and row-level comparison outputs are not included.
+  - The packet discloses N1: dormant_h difference 1, open_age_h difference 2, involving SR22-01936870, SR25-02017553, SR25-02017556; labels agree. The frozen recon definition for “B recon 0/0/0” is only-RA, only-RB, and classification disagreements, not dormant_h/open_age_h.
+- Cross-arm hash equalities for the 7 key outputs:
+
+  - RA_classifications: c099e092… for B, PAR_1, SER_2, PAR_2, SER_3, PAR_3.
+  - RA_fixture_results: 33696cd1… for all six arms.
+  - RA_portfolio_counts: b5888db2… for all six arms.
+  - RB_classifications: a0e42b86… for all six arms.
+  - RB_fixture_results: 0d72245c… for all six arms.
+  - RB_portfolio_counts: eb677bc1… for all six arms.
+  - RB_kappa_grid_counts: 7a18fcb1… for all six arms.
+  - Therefore, the 7/7 cross-arm key-output equality claim is independently supported by the manifests.
+- Frozen-output equality:
+
+  - PREFLIGHT lists frozen `R-A\outputs\RA_classifications.csv` as c099e092… and frozen `R-B\outputs\RB_classifications.csv` as a0e42b86….
+  - Arm B’s manifest outputs for those two files match the frozen hashes.
+  - The other five frozen key-output hashes are not present in PREFLIGHT or elsewhere in the packet.
+- Wall-clock:
+
+  - Serial arms: B 36.4 s, SER_2 37.8 s, SER_3 37.8 s. Median = 37.8 s.
+  - Concurrent arms: PAR_1 29.4 s, PAR_2 27.1 s, PAR_3 26.6 s. Median = 27.1 s.
+  - Ratio = 27.1 / 37.8 = 0.71693…, reported as 0.717. Recomputes correctly.
+  - All PAR wall-clock values are below all SER wall-clock values in this sample.
+- Memory:
+
+  - Serial peak: max(718, 714, 718) = 718 MB.
+  - Concurrent peak: max(1011, 1006, 997) = 1011 MB.
+  - Declared memory-check need = 2 × 718 + 2048 = 1436 + 2048 = 3484 MB.
+  - RUN LOG says free 15399 MB, PASS. PAR_1 free before was 15286 MB, still above 3484 MB.
+- Internal inconsistencies / flags in runner output:
+
+  - `C45_RESULTS.md` H2 claims every concurrent arm’s 7 key outputs are byte-identical to the frozen outputs. The packet only provides frozen hashes for 2 of those 7 outputs: RA_classifications and RB_classifications. For the other 5, the frozen hash is not available, so the “to the frozen outputs” part of H2 is runner-asserted, not independently recomputable from this packet.
+  - The manifest exit-file hashes differ across arms despite every arm reporting exit=0. The packet does not provide exit-file contents, so exit-record identity cannot be verified beyond the CSV/RUN LOG exit codes.
+  - No arithmetic inconsistency was found in the recomputed medians, ratio, memory-check calculation, fixture pass counts, or cross-arm key-output hashes.
+
+4. Facts that cannot be recomputed from this packet.
+
+- Raw row-level contents of `RA_classifications.csv` and `RB_classifications.csv`.
+- Full RA-vs-RB D-sets, including the disclosed N1 three-row 1.000 h differences.
+- Numeric portfolio-count values and any RA-vs-RB portfolio delta.
+- Frozen hashes for `RA_fixture_results.csv`, `RA_portfolio_counts.csv`, `RB_fixture_results.csv`, `RB_portfolio_counts.csv`, and `RB_kappa_grid_counts.csv`.
+- Actual contents of `RUN_RA.exit`, `RUN_RB.exit`, `PERF.csv`, stdout, and stderr files.
+- Whether the N1 mismatch is caused by a daylight-saving ambiguous-hour read; this is disclosed as likely but not confirmed.
+- Whether the concurrent runs actually overlapped in the intended way beyond the runner’s wall-clock evidence.
+- Whether the memory sampler covered every relevant R process exactly as stated.
+- Builder/Validator hard-number agreement, because no Builder output is in this packet.
+
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+- P1 positive condition, part 1: every arm exits 0 on both paths.
+
+  - Evidence: `C45_arms.csv` has ra_exit=0 and rb_exit=0 for all six arms; RUN LOG shows exit=0 for every path run. Recomputes as 12/12 path runs with exit 0.
+- P1 positive condition, part 2a: every concurrent arm’s 7 key outputs byte-identical to the serial arms.
+
+  - Evidence: manifests show all seven key-output hashes identical across B, PAR_1, SER_2, PAR_2, SER_3, PAR_3. Recomputes as supported.
+- P1 positive condition, part 2b: every concurrent arm’s 7 key outputs byte-identical to the frozen outputs.
+
+  - Evidence: frozen hashes are available only for RA_classifications and RB_classifications; both match arm B and all arms. The other five frozen key-output hashes are absent from the packet. Therefore this part is not fully independently recomputable from the provided evidence, although `C45_arms.csv` reports `outputs_equal_frozen=7/7` for all arms.
+- P1 positive condition, part 2c: median concurrent wall-clock below median serial wall-clock.
+
+  - Evidence: serial median 37.8 s, concurrent median 27.1 s, ratio 0.717. Recomputes as below 1.
+- P1 negative condition: any output differs or any run fails from contention.
+
+  - Evidence: no exit failures are recorded. Cross-arm key-output hashes are identical. Frozen equality is incomplete for five key outputs as noted above.
+- SPEC memory-check failure condition:
+
+  - Evidence: declared need 3484 MB, free 15399 MB, PASS. Recomputes as passing.
+- SPEC arm-B classification reproduction condition:
+
+  - Evidence: arm B RA_classifications c099e092… and RB_classifications a0e42b86… match the two frozen classification hashes in PREFLIGHT. Recomputes as matching.
+
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+
+- Blocking evidence defect: the packet does not provide frozen SHA-256 hashes for 5 of the 7 key outputs required by P1: `RA_fixture_results.csv`, `RA_portfolio_counts.csv`, `RB_fixture_results.csv`, `RB_portfolio_counts.csv`, and `RB_kappa_grid_counts.csv`. Without those frozen hashes, the “byte-identical to the frozen outputs” part of P1 cannot be independently verified from the packet. This should block a verdict based solely on this packet.
+- Evidence defect: raw classification and portfolio-count files are absent, so portfolio deltas and full RA-vs-RB D-sets cannot be independently recomputed. The N1 1/2 full-field mismatches are disclosed only by coordinator note, not by raw comparison output.
+- Evidence defect: exit-file hashes differ across arms even though all reported exits are 0. The packet does not include exit-file contents, so exit-record identity cannot be fully checked beyond the reported exit codes.
+- No seed defect found: `ARMS.tsv` and `PARALLEL` hashes match the SPEC and PREFLIGHT; no source variants are used.
+- No predicate-wording defect found in the SPEC itself: the P1 predicate is mechanically defined before execution.
+- N1 is disclosed as an open finding and is stated not to be a seeded effect or harness defect. It is not independently recomputable from the packet, but it is not presented as a new defect in this run.
+
+7. Claim → evidence map.
+
+- Claim: Preflight passed and frozen inputs match SPEC hashes. → PREFLIGHT block; SPEC frozen hashes.
+- Claim: Arm B is serial reference. → `C45_arms.csv`; RUN LOG.
+- Claim: Memory check passed before first concurrent arm. → RUN LOG 06:13:04 MEMCHECK; `C45_RESULTS.md`.
+- Claim: All arms exited 0 on both paths. → `C45_arms.csv`; RUN LOG exit lines.
+- Claim: Arm B fixtures are 14/14 on both paths. → fixture results table.
+- Claim: All arms are 14/14 on both paths. → fixture results table, 168/168 pass rows.
+- Claim: All 7 key outputs are byte-identical across arms. → ARM MANIFESTS SHA-256 hashes for the seven key outputs.
+- Claim: Arm B reproduces frozen RA/RB classifications byte-for-byte. → PREFLIGHT frozen hashes c099e092… and a0e42b86… vs B manifest hashes.
+- Claim: All 7 key outputs are byte-identical to frozen outputs. → `C45_arms.csv` `outputs_equal_frozen=7/7`; raw frozen hashes only present for 2/7, so unsupported for 5/7.
+- Claim: Median concurrent wall-clock is below median serial wall-clock. → `C45_arms.csv` wall_s values; recomputed medians 37.8 s vs 27.1 s, ratio 0.717.
+- Claim: Peak serial memory 718 MB, peak concurrent 1011 MB. → `C45_arms.csv`; `C45_RESULTS.md`; recomputed maxima.
+- Claim: N1 full-field mismatch exists in frozen pack. → Coordinator Note N1; not independently recomputable from raw packet rows.
+- Claim: No source variants used. → SOURCE VARIANTS section; SEED DIFFS section.
+
+END C45 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C45 ADJUDICATION'.

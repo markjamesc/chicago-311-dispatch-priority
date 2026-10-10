@@ -1,0 +1,31 @@
+{
+ "cid": "C03",
+ "role": "adjudicator",
+ "source": "C03/C03-adjudicator/adjudicator_grok_TEXTONLY.txt",
+ "source_bytes": 12457,
+ "source_sha256": "f14b21846b3fee02da499a30e46e1c98c695c407b5adc55e08d0d374a82e521b",
+ "output": "C03/C03-adjudicator/adjudicator_raw.md",
+ "output_bytes": 12454,
+ "output_sha256": "003eaa9c2d9d84302ae8d0cecc652e68d2b0c08775a39a43fbf58fdcff76360b",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "terminal_state_lines": 1,
+  "second_last_is_terminal": true,
+  "leak": false,
+  "sections_found_in_order": [],
+  "sections_by_title": [
+   "Role attestation",
+   "Freeze check",
+   "Hard-fact agreement",
+   "KEEP conditions",
+   "HALT conditions",
+   "Blocking objections",
+   "Verdict rationale"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 04:22:32\nreply_complete=2026-10-09 04:24:45"
+}

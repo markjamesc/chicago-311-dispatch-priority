@@ -1,0 +1,38 @@
+{
+ "cid": "C37",
+ "role": "builder",
+ "source": "C37/C37-builder/builder_chatgpt_TEXTONLY.txt",
+ "source_bytes": 24087,
+ "source_sha256": "5b15de13f551b674df4fe4d9f466cb9ba60168c46f6a99ee650fa31b98934d46",
+ "output": "C37/C37-builder/builder_report.md",
+ "output_bytes": 24084,
+ "output_sha256": "3451fcb5dd9ed1040cfb847943ac03bb4f15772f46f74c809eed965023be91e8",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 3,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Conceptual diff",
+   "Hard mechanical facts",
+   "P1 assessment",
+   "Fixture and reconciliation",
+   "Semantic/regression risks",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 05:29:15\nreply_complete=2026-10-09 05:37:28\n# reply_complete = first-seen (upper bound; polled ~3 min apart, true finish not observed). Retry chat; first attempt https://chatgpt.com/c/6ac8c0b1-a6e8-83ea-ae71-15cb40ca440a (sent 05:24:10) abandoned: reply stopped mid-table without END line"
+}

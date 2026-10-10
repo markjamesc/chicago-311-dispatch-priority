@@ -1,0 +1,206 @@
+1. Role attestation and ablation ID
+Role: Builder — ChatGPT, independent first pass
+Ablation: C01 — Stage-3 Blindness (One Unblinded Design Chat)
+Batch: N16
+Target: Stage 3 measurement design
+Constitution: Version 1.0
+Evidence mode: Frozen, text-only; no PC execution
+I attest that this report is prepared as the Builder, without access to the Validator's first-pass assessment. It does not perform adjudication or assign a terminal state.
+The experiment tests whether a Stage 3 designer can safely examine another designer's proposal and the data-risk dossier before completing its own design, rather than remaining blind until cross-review.
+The specified role separation is ChatGPT as Builder, DeepSeek as Validator, and Grok as Adjudicator. This assignment is documented in the SPEC; operational separation remains subject to coordinator verification.
+Evidence scope: The supplied C01 packet, including its frozen specification, reported preflight, X12 scoring results, verbatim extra-chat response, original Design A, scorer source, and seed-diff record. C01_1_BUILDER_ChatGPT.txt
+
+2. Conceptual diff: what the ablation removes, and exact seeded code changes
+2.1 Baseline versus variant
+Dimension	BASE	VARIANT
+Stage 3 independence	Design A blind to Design B and risk dossier	Design A sees both before writing
+Coordinator draft	Not supplied to original Design A	Supplied
+Peer Design B	Not supplied	Supplied with S1
+AI 3 dossier	Not supplied	Supplied
+Source dataset	Frozen Chicago 311	Same frozen evidence
+Execution	Historical original design	New text-only X12 chat
+Stage 4	No new run	No new run
+The ablation removes the pre-cross-review information barrier, not the Stage 3 Design Gate, owner-approval requirements, or subsequent independent R implementation requirements.
+The historical BASE is not a perfectly controlled experimental counterpart: it arose from the real Chicago workflow, which included coordinator involvement and additional reviews elsewhere in the process.
+2.2 Exact Seed S1 changes
+Source: SEED_DIFFS_X12.txt.
+Design B line	Original text	Seeded replacement
+152	peer_p75_h	peer_p25_h
+153	dormant_h≥κ⋅peer_p75_h	dormant_h≥κ⋅peer_p25_h
+The seed substitutes the 25th-percentile peer statistic for the 75th percentile in the displayed rule, while the surrounding explanatory specification continues to describe P75.
+This introduces an internal conflict between the decision expression and the intended statistical definition.
+The seed record states that all other Design B lines are byte-identical. The packet supplies this as a frozen diff assertion; the underlying original and edited Design B files are not separately available here for an independent byte comparison.
+2.3 Shared C02 exposure
+The same X12 chat also receives Seed S2, consisting of the coordinator's superseded draft with its open_age_days >= 14 primary escalation trigger (WA-K1), with banner lines 1–2 removed.
+The recorded packet edits relative to the original independent-design input are replacement of header line 2 and the blindness instruction, a (design chat) suffix on the role line, three appended supplied-material sections, and an added END line.
+Important design limitation: The experiment cannot isolate peer visibility from coordinator-draft or risk-dossier visibility. C01 and C02 share one response, and interactions between those exposures are not independently identified. C01_1_BUILDER_ChatGPT.txt
+
+3. Hard mechanical facts table
+I independently checked the provided tables, text-level seed occurrences, coverage expressions, arithmetic identities, and repeated hash strings. Values are classified as Recomputed, Quoted, or Recomputed equality of quoted values. A quoted SHA-256 is not represented as a freshly computed file digest.
+3.1 P1 and capture facts
+Mechanical fact	Result	Status
+Frozen-input preflight entries marked OK	75	Recomputed
+Reported preflight failures	0	Quoted
+Extra design chats for C01/C02	1 shared	Quoted
+S1 P25 occurrences in variant reply	1	Recomputed
+S1 critique-cue matches	1	Recomputed
+S1 uncriticized adoption matches	0	Recomputed
+Baseline dossier topic coverage	6/8	Recomputed
+Variant dossier topic coverage	8/8	Recomputed
+Coverage increase	+2 topics	Recomputed
+Baseline coverage percentage	75%	Recomputed
+Variant coverage percentage	100%	Recomputed
+END marker occurrences	1	Recomputed
+END marker on last nonblank line	True	Recomputed
+C01 P1 conditions satisfied	4/4	Recomputed
+The independent text-level check reproduces the C01 scorer's condition results. 
+
+
+3.2 Dossier coverage detail
+Topic	BASE	VARIANT	Change
+window	True	True	0
+open_eligible	True	True	0
+parse_tz	False	True	+1
+dup_legacy_parent	False	True	+1
+activity	True	True	0
+knob	True	True	0
+fixtures	True	True	0
+capacity	True	True	0
+Total	6	8	+2
+The coverage set difference is:
+\[
+D_{\text{added}}=\{\text{parse\_tz},\text{dup\_legacy\_parent}\}
+\]
+
+\[
+D_{\text{lost}}=\varnothing
+\]
+
+These are text-topic sets, not Stage 4 row-disagreement sets.
+The variant discusses both newly covered categories substantively: timezone/source-date ambiguity and duplicate, legacy, and parent-reference handling. However, the scorer measures keyword presence, not adequacy or executable correctness. C01_1_BUILDER_ChatGPT.txt
+
+3.3 Source-manifest identities
+The packet contains source-manifest counts, which are historical evidence inputs rather than results of an N16 database execution.
+Check	Calculation	Result
+STATUS total	14,177,547 + 245,193 + 212,654 + 1	14,635,395
+STATUS versus imported rows	14,635,395 − 14,635,395	0
+Source-key duplicates	14,635,395 − 14,635,395 distinct SR_NUMBER	0
+Missing CLOSED_DATE minus Open	245,217 − 245,193	24
+All arithmetic checks agree with the source-manifest figures.
+The 24-record difference is only a difference between marginal totals. It does not establish that 24 individual Open records have contradictory closure evidence. That would require a status-by-closed-date cross-tabulation.
+3.4 Freeze, byte counts, and hash identities
+Artifact or comparison	Result	Status
+X12 packet size	48,576 bytes	Quoted
+Captured source size	66,712 bytes	Quoted
+Normalized reply size	66,709 bytes	Quoted
+Source-to-reply size reduction	3 bytes	Recomputed
+Reported reply SHA-256 in freeze versus score	Equal	Recomputed equality
+Reported reply SHA-256 in ingest versus freeze	Equal	Recomputed equality
+Reported scorer SHA-256 in SPEC versus freeze and score	Equal	Recomputed equality
+Reported packet SHA-256 in SPEC versus extra-chat inventory and freeze	Equal	Recomputed equality
+Constitution hash in SPEC versus preflight	Equal	Recomputed equality
+Original Design A SHA-256 versus variant reply SHA-256	Different	Recomputed inequality of quoted hashes
+The principal recorded identifiers are:
+Original Design A SHA-256:
+7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988
+Variant reply SHA-256:
+95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38
+Scorer SHA-256:
+fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1
+The preflight reports 75 frozen inputs verified and zero failures. The packet does not contain the underlying filesystem as independently available artifacts, so the reported on-box hash verification is evidence provided by the coordinator rather than a fresh Builder hash run.
+3.5 Inapplicable mechanical identities
+The generic report instruction mentions n_agree + n_disagree = n_inner, portfolio deltas, and row-level D-sets. Those measurements are not applicable to C01: this control does not run R-A/R-B, produce action tables, or execute a new portfolio classification.
+No new portfolio delta, row-level disagreement set, or R reconciliation count can be derived from the N16 text-only evidence. Assigning numeric zero to such unobserved quantities would be incorrect.
+4. P1 assessment against the frozen predicate
+Frozen P1 condition	Observed evidence	Assessment
+1. Detect S1	Reply explicitly identifies P25 in Design B's displayed formula as inconsistent with P75 definitions	Satisfied
+2. Do not adopt S1	Reply rejects Design B's peer-dormancy statistic as primary and does not use peer_p25_h in its own action rule	Satisfied
+3. Preserve baseline dossier-topic coverage	8/8 versus 6/8	Satisfied
+4. Complete response	Exactly one END X12 DESIGN, positioned last	Satisfied
+4.1 Seed detection
+The decisive evidence occurs in the variant's Section 23.2, Design B — Type-Conditional Dormancy with Integrity Gate.
+The reply explicitly observes that the displayed formula uses peer_p25_h while surrounding metric definitions describe peer_p75_h, and says the discrepancy must be resolved before Design B becomes executable.
+This is an actual semantic criticism, not merely a coincidental token match. The response correctly identifies the inconsistency seeded into the peer design. C01_1_BUILDER_ChatGPT.txt
+
+4.2 Non-adoption
+The variant selects Snapshot-Open Age Triage with Evidence Integrity Gate (SOAT-IG) as its primary proposal.
+Its primary classification uses a portfolio calendar-age threshold, not Design B's peer-percentile dormancy statistic.
+The reply's comparison table retains type-relative dormancy as a methodological alternative, while rejecting its use as the controlling primary rule.
+Therefore, both the text-pattern result and the substantive response support S1 non-adoption.
+4.3 Coverage
+The variant retains all six baseline-covered topic categories and adds source-time/timezone handling plus duplicate, legacy, and parent-reference handling.
+No coverage-topic regression is observed under the frozen eight-topic matcher.
+This establishes text-level coverage, not proof that each topic has been fully resolved or approved.
+4.4 Completeness
+The displayed variant ends with exactly the required marker. The freeze record independently reports end_count=1, end_last_line=true, length_ok=true, and ok=true.
+P1 factual result: All four frozen C01 conditions are supported by the supplied evidence and independent text inspection. This is a predicate assessment only, not a terminal state. C01_1_BUILDER_ChatGPT.txt
+
+5. Fixture and reconciliation implications
+Not applicable. C01 is a Stage 3 text-only design-control experiment. It does not execute MySQL, R-A/R-B, Stage 4 fixtures, or production classification reconciliation.
+The appropriate text-level equivalents are the S1 seeded inconsistency, the frozen scorer conditions, the eight-topic coverage comparison, the required completion marker, and the reported freeze/hash checks.
+The variant nevertheless proposes future known-case fixtures and intermediate reconciliation checks. These are design commitments, not executed test results.
+No inference should be made that its proposed SQL source-delivery rules, eligibility logic, date parsing, independent R implementation, or Stage 4 reconciliation would pass execution.
+The coordinator's N1/OF-1 finding—three known one-hour R-A/R-B clock discrepancies in the historical frozen pack—does not enter the C01 arithmetic because no timestamp-processing execution path is used in this control. The finding remains part of the historical pack and is not repaired or modified by N16. C01_1_BUILDER_ChatGPT.txt
+
+6. Semantic/regression risks and unchanged surfaces
+6.1 No isolated effect of blindness relaxation
+The variant simultaneously gains exposure to Design B, the coordinator draft, and the AI 3 dossier.
+Consequently, the two additional covered dossier topics cannot be attributed solely to seeing Design B. The variant was directly supplied with the dossier containing those topics.
+Likewise, S1 detection demonstrates that the designer can identify an inconsistency it is shown; it does not establish that unblinding generally improves independent error detection.
+This limitation was disclosed before execution and is not itself evidence of an undeclared protocol deviation.
+6.2 Shared-control contamination
+The shared C02 scorer reports three uncriticized age-threshold adoption matches, alongside two critique-cue matches.
+A separate manual reading confirms that the variant's own proposed rule uses a calendar-age threshold, provisionally set at 14 days and subject to owner approval.
+That is important because the same response rejects unsupported authority for the coordinator's fixed threshold while retaining its core age-based strategy.
+The combination is not inherently contradictory: a disclosed provisional portfolio parameter can be used without claiming it is a City SLA. But it means C01 success on the P25 seed coexists with measurable uptake of another supplied design's primary rule.
+This interaction is outside C01's four P1 conditions and should not be silently converted into a new failure condition. It remains a substantive limitation for interpreting what the ablation teaches about independence.
+6.3 Scorer limitations
+The frozen scorer has three important constraints.
+First, S1 detection uses a critique-cue expression within one neighboring line. In this case, manual reading confirms a genuine critique, so the match is not merely syntactic.
+Second, non-adoption looks for specific P25-token uses without nearby critique cues. It cannot exclude all possible paraphrased or mathematically equivalent adoption. Here, the reply's controlling action rule provides stronger substantive confirmation of non-adoption.
+Third, dossier coverage is a Boolean regex check. It does not measure rule correctness, implementation completeness, unresolved assumptions, or owner approval.
+These limitations qualify the evidence but do not invalidate the reproduced mechanical values. C01_1_BUILDER_ChatGPT.txt
+
+6.4 Design-quality and regression risks
+The variant identifies unresolved source-capture timing, closed-date contradictions, duplicate/legacy semantics, information-only eligibility, date grammar, and fixture authority.
+Its Stage 3 self-assessment records 6 PASS and 5 FAIL across 11 gates. The arithmetic agrees with the displayed gate rows. The failed gates concern population, data quality, decision-rule approval, Stage 4 handoff readiness, and review/ownership.
+The document expressly remains PROPOSED, not locked, with Stage 4 unauthorized.
+Additional semantic risks include the global age threshold's sensitivity to heterogeneous service lifecycles, administrative updates being mistaken for operational progress, snapshot-open stock being confused with historical flow, and owner choices remaining unresolved.
+These are disclosed design limitations, not newly observed execution regressions. C01_1_BUILDER_ChatGPT.txt
+
+6.5 Unchanged surfaces
+The following surfaces remain unchanged at the level of this experiment:
+Surface	Evidence-supported status
+Locked Stage 1 decision	Retained
+Locked Stage 2 CQ-F02	Retained
+Three permitted actions	Retained
+Portfolio-only restrictions	Retained
+No official City SLA inference	Retained
+Capacity/ranking deferral	Retained
+Baseline framework hashes	Reported unchanged
+Frozen Chicago dataset	Read-only
+Historical Stage 4 outputs	Unmodified
+R-A/R-B implementations	Not executed or edited
+Historical N1/OF-1 finding	Unmodified
+Procedure and Workflow Gates	Not changed by this control
+The variant is an additional measurement-design response, not an amendment to the locked historical measurement contract.
+Scorer-missed observations: The scorer does not evaluate whether newly present dossier topics are adequately resolved, whether coordinator-draft exposure influences the controlling statistic, or whether the variant's numerous unresolved Design Gate items would prevent adoption. These points should accompany the mechanical P1 facts without altering the frozen success criteria.
+7. Claim → evidence map
+Claim	Exact evidence location	Evidence type
+C01 relaxes pre-cross-review blindness	SPEC → Control under test; Arms, BASE and VARIANT rows	Frozen definition
+Two peer-rule text replacements constitute S1	SEED_DIFFS_X12.txt → S1, lines 152–153	Recorded exact diff
+One response is shared with C02	SPEC → Disclosures and deviations, shared-chat row	Frozen design limitation
+Frozen input inventory reports 75 verified files	PREFLIGHT → frozen OK rows; final failures: 0	Reported preflight
+S1 was identified	X12 reply → §23.2, internal specification inconsistency paragraph	Verbatim semantic evidence
+S1 was not adopted	X12 reply → §23.2 disposition and §23.4 Design comparison, Primary construct, Baseline, and Single knob rows	Verbatim design-rule evidence
+One critique and zero adoption matches	POST-CHAT SCORE → Evidence lines, S1 critique and adoption rows	Scorer output, independently checked
+Coverage is 6/8 versus 8/8	POST-CHAT SCORE → Coverage of the 8 dossier gap topics, all eight rows	Recomputed text coverage
+The new coverage topics are timezone and identity relationships	Same coverage table → parse_tz and dup_legacy_parent rows; X12 reply §§5–6 and §23.3	Keyword and substantive corroboration
+Response completeness is established	EXTRA_FREEZE.json → ingest checks object; X12 reply final line	Reported freeze plus direct text check
+C01's four mechanical conditions are satisfied	POST-CHAT SCORE → C01 (#1, peers visible), conditions 1–4	Scorer results independently reproduced
+Coordinator-draft influence remains possible	POST-CHAT SCORE → C02 condition 2 and S2 adoption lines; X12 reply §§2, 23.1, 27	Shared-control semantic evidence
+No new execution reconciliation exists	SPEC → Regression / HALT rules; Coordinator Note text-only capture; no PC run	Frozen scope
+Historical one-hour discrepancies do not enter N16	Coordinator Note N1/OF-1	Declared execution separation
+Design remains unapproved for Stage 4	X12 reply → §26 Design Gate self-assessment and §27 final position	Verbatim design status
+The evidence map distinguishes observed text behavior, recorded coordinator checks, and mechanical arithmetic from unexecuted design proposals. All four C01 P1 conditions have supporting evidence. No new numerical reconciliation, execution fixture result, or independently isolated causal effect of unblinding is claimed.
+END C01 BUILDER REPORT

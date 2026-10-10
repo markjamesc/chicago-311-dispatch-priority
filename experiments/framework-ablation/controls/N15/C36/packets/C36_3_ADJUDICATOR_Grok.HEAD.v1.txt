@@ -1,0 +1,605 @@
+# C36 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and No Re-Judging of Validation Labels (catalog #36) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C36 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+
+---
+# SPEC
+# C36 — Ablation specification (FROZEN)
+
+**Ablation ID:** C36 (owner Remaining Ablation Program, catalog #36 "No Re-Judging Validation Labels")
+**Batch:** N15 batch 3 of 3 (controls C36, C35, C32, C15, C45)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 5 (analysis adds insight; it does not reclassify)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Deeper analysis cannot change classifications set by the Validation Gate. Before release, a label-consistency check confirms that every label-derived Stage-5 output matches the validated labels.
+
+## Exact change being tested (ablation)
+There is no label-consistency check. Stage 5's own independent checks stay; they test the input counts, not the outputs.
+Seeded Stage-5 variants re-judge labels inside the analysis.
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. A full-field R-A vs R-B recon therefore shows dormant_h 1 and open_age_h 2 on the frozen pack itself. Every "B recon 0/0/0" rule in this batch uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h. Stage-5-only controls (C36, C35, C32, C15) do not rerun R-A or R-B; they start from the frozen validated state.
+
+## Stage-5-only arm design (runner v3, `seeds/<CID>/S5ONLY`)
+Every arm, including arm B, starts from the frozen validated state, copied from the frozen PC pack:
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9` (22,271,481 bytes)
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` (164 bytes)
+- `outputs/validated_action_list.csv` SHA-256 `2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a` (13,625,648 bytes)
+- `stage-05/run_deeper_analysis.R` SHA-256 `ed8694277737989d301b9b1f7e6a06a2dbb87a2ad25254fd53b1db47d92c1ec2` (3,443 bytes)
+- `stage-05/deeper/independent_checks_critical_counts.csv` SHA-256 `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` (190 bytes)
+- `stage-05/deeper/portfolio_summary.csv` SHA-256 `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` (183 bytes)
+- `stage-05/deeper/escalate_by_type.csv` SHA-256 `0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159` (3,932 bytes)
+- `stage-05/deeper/escalate_by_type_top25.csv` SHA-256 `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` (1,264 bytes)
+- `stage-05/deeper/inconclusive_by_clause.csv` SHA-256 `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` (58 bytes)
+- `stage-05/deeper/escalate_dormancy_summary.csv` SHA-256 `1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63` (138 bytes)
+- `stage-05/deeper/kappa_sensitivity.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` (164 bytes)
+- `stage-05/deeper/capacity_coverage_note.csv` SHA-256 `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` (644 bytes)
+Before anything else runs, the runner writes `VALIDATION_FREEZE.sha256` (SHA-256 and bytes of `R-A/outputs/RA_classifications.csv`, `R-B/outputs/RB_kappa_grid_counts.csv` and `outputs/validated_action_list.csv`). Each arm then runs these steps:
+1. **PRE** (C32 only): the arm's post-validation edit script.
+2. **FRZ_PRE**: re-hash of the three files against the freeze.
+3. **S5**: Stage 5, either the frozen-path harness `runner/stage45/run_deeper_analysis.R` (SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94`, 3439 bytes; a path-only copy of the frozen `stage-05/run_deeper_analysis.R`) or the arm's seeded variant.
+4. **FRZ_POST**: re-hash of the three files after Stage 5.
+
+**Arm B** = no edit + harness. It is the truth reference, and it must reproduce the frozen `stage-05/deeper` outputs.
+
+The harness keeps Stage 5's own independent checks: a `stopifnot` that n_decision, n_ESCALATE, n_INCONCLUSIVE, n_STANDARD and the validated-list count equal the frozen counts. Stage-5 outputs are compared by CSV content, with numbers to 1e-9. Seed scripts and diffs vs the harness are in `runner/SEEDS_b3.sha256` and `runner/SEED_DIFFS_b3.txt`. No R-A/R-B code seeds and no source variants are used in batch 3.
+
+**Harm set H:** Stage 5 completes and either of these holds:
+- a label-derived output (`portfolio_summary`, `escalate_by_type`, `escalate_by_type_top25`, `inconclusive_by_clause`, `escalate_dormancy_summary`) differs from arm B;
+- an added output's SR-level labels (columns sr_number + classification/action/label) or class totals (n_ESCALATE / n_INCONCLUSIVE / n_STANDARD) disagree with the frozen validated labels.
+
+**Caught with the control:** the label-consistency check, which uses the same definition, fails.
+**Caught without the control (D_abl):** Stage 5 exits non-zero.
+Disclosure: H and "caught with" coincide by construction, and the benign arm tests for false positives. A benign arm that adds insight without changing labels must not be flagged.
+
+## Seeded arms (frozen before execution)
+- **RJ_INC2ESC**: analysis re-judges INCONCLUSIVE with dormant_h >= 8760 as ESCALATE.
+  - Stage-5 script `runner/seeds/C36/RJ_INC2ESC__run_deeper_analysis.R` SHA-256 `70f8ed752b24f13556b143f4689576b8c2afdba2475a2c39288440c3f6638753` (3632 bytes)
+- **RJ_KAPPA3**: analysis re-judges ESCALATE at kappa 3 and reports kappa 3.
+  - Stage-5 script `runner/seeds/C36/RJ_KAPPA3__run_deeper_analysis.R` SHA-256 `60fef3511f3c703fb181dc8ac485df41a41b8523439728eaf04d1e447c98dc94` (3611 bytes)
+- **RJ_OPENAGE**: analysis demotes ESCALATE with open_age_h < 720 (diagnostic-only field).
+  - Stage-5 script `runner/seeds/C36/RJ_OPENAGE__run_deeper_analysis.R` SHA-256 `7c2410e125cfcc896fc94072ddd5fd044c7f789fc0501ce879bc94f94f902c03` (3619 bytes)
+- **RJ_PRECHECK**: re-judging placed before Stage 5's own checks.
+  - Stage-5 script `runner/seeds/C36/RJ_PRECHECK__run_deeper_analysis.R` SHA-256 `974bb28be6f2ab44651a7b015d5e3d8d68465c987835dc811d621fab62e1bb28` (3617 bytes)
+- **RJ_BENIGN**: benign: adds an ESCALATE-by-peer_n-bin table; labels unchanged.
+  - Stage-5 script `runner/seeds/C36/RJ_BENIGN__run_deeper_analysis.R` SHA-256 `f5083f8070fd3253c1447b9f0a7e79f7ab67c541dcd94759b9a7e1dc401a023f` (3714 bytes)
+
+## Operational benefit predicate P1
+- **P1 satisfied (KEEP side):** arm B is clean (Stage 5 exit 0; 8/8 outputs equal the frozen stage-05/deeper; the with-control check does not flag B) and H \ D_abl = ∅. Every harm is still caught without the control.
+- **P1 failed:** H \ D_abl ≠ ∅.
+
+Also reported, but not counted in P1:
+- H \ caught-with: harms the control itself misses.
+- Arms flagged with the control but not in H: the control's over-blocking cost.
+Owner threshold: Pass = all validated labels remained unchanged; Fail = labels were (even subtly) changed (keep rule).
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract. MySQL is used only for a read-only COUNT preflight. Nothing in the frozen pack is modified. All edits happen on arm copies.
+
+## Regression / HALT rules
+- HALT if arm B's Stage 5 exits non-zero, if arm B's 8 Stage-5 outputs differ from the frozen `stage-05/deeper`, or if any arm lacks an S5 exit record or a FRZ_PRE/FRZ_POST file.
+- HALT if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm whose Stage 5 exits non-zero counts as caught in every regime (D_abl). It is not a HALT.
+- Raw evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   70f8ed752b24f13556b143f4689576b8c2afdba2475a2c39288440c3f6638753 seeds/C36/RJ_INC2ESC__run_deeper_analysis.R
+seed   OK   60fef3511f3c703fb181dc8ac485df41a41b8523439728eaf04d1e447c98dc94 seeds/C36/RJ_KAPPA3__run_deeper_analysis.R
+seed   OK   7c2410e125cfcc896fc94072ddd5fd044c7f789fc0501ce879bc94f94f902c03 seeds/C36/RJ_OPENAGE__run_deeper_analysis.R
+seed   OK   974bb28be6f2ab44651a7b015d5e3d8d68465c987835dc811d621fab62e1bb28 seeds/C36/RJ_PRECHECK__run_deeper_analysis.R
+seed   OK   f5083f8070fd3253c1447b9f0a7e79f7ab67c541dcd94759b9a7e1dc401a023f seeds/C36/RJ_BENIGN__run_deeper_analysis.R
+seed   OK   5497f523756c82588313dc9575573cc8ae00596fbbdc2a53b6bba60c6e1c6885 seeds/C36/ARMS.tsv
+seed   OK   bff067e867a0f3f503b286ab47b647d687203dae33817b57c32a97602adcd94b seeds/C36/S5ONLY
+seed   OK   a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94 stage45/run_deeper_analysis.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+70f8ed752b24f13556b143f4689576b8c2afdba2475a2c39288440c3f6638753  3632  runner/seeds/C36/RJ_INC2ESC__run_deeper_analysis.R
+60fef3511f3c703fb181dc8ac485df41a41b8523439728eaf04d1e447c98dc94  3611  runner/seeds/C36/RJ_KAPPA3__run_deeper_analysis.R
+7c2410e125cfcc896fc94072ddd5fd044c7f789fc0501ce879bc94f94f902c03  3619  runner/seeds/C36/RJ_OPENAGE__run_deeper_analysis.R
+974bb28be6f2ab44651a7b015d5e3d8d68465c987835dc811d621fab62e1bb28  3617  runner/seeds/C36/RJ_PRECHECK__run_deeper_analysis.R
+f5083f8070fd3253c1447b9f0a7e79f7ab67c541dcd94759b9a7e1dc401a023f  3714  runner/seeds/C36/RJ_BENIGN__run_deeper_analysis.R
+5497f523756c82588313dc9575573cc8ae00596fbbdc2a53b6bba60c6e1c6885  606  runner/seeds/C36/ARMS.tsv
+bff067e867a0f3f503b286ab47b647d687203dae33817b57c32a97602adcd94b  64  runner/seeds/C36/S5ONLY
+a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94  3439  runner/stage45/run_deeper_analysis.R
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+06:11:46 C36 arms
+06:11:46   B FRZ_PRE changed=0
+06:11:48   B S5 exit=0 secs=2
+06:11:49   B FRZ_POST changed=0
+06:11:49   RJ_INC2ESC FRZ_PRE changed=0
+06:11:51   RJ_INC2ESC S5 exit=0 secs=2
+06:11:51   RJ_INC2ESC FRZ_POST changed=0
+06:11:52   RJ_KAPPA3 FRZ_PRE changed=0
+06:11:54   RJ_KAPPA3 S5 exit=0 secs=2.1
+06:11:54   RJ_KAPPA3 FRZ_POST changed=0
+06:11:55   RJ_OPENAGE FRZ_PRE changed=0
+06:11:57   RJ_OPENAGE S5 exit=0 secs=2
+06:11:57   RJ_OPENAGE FRZ_POST changed=0
+06:11:58   RJ_PRECHECK FRZ_PRE changed=0
+06:12:00   RJ_PRECHECK S5 exit=1 secs=2.1
+06:12:00   RJ_PRECHECK FRZ_POST changed=0
+06:12:01   RJ_BENIGN FRZ_PRE changed=0
+06:12:04   RJ_BENIGN S5 exit=0 secs=3.2
+06:12:04   RJ_BENIGN FRZ_POST changed=0
+
+---
+# C36_RESULTS.md (runner output)
+# C36 RESULTS — No Re-Judging of Validation Labels (catalog #36) ablation (runner output, mechanical facts only)
+
+Every arm starts from the frozen validated state (RA_classifications.csv, RB_kappa_grid_counts.csv, validated_action_list.csv copied from the frozen pack) and records VALIDATION_FREEZE.sha256 before anything else runs.
+Arm B runs the frozen-path Stage-5 harness with no edit and is the truth reference. Seeded arms apply the listed edit (PRE step) or Stage-5 variant.
+
+## Definitions (frozen in the spec)
+- Harm set H: Stage 5 completes and a label-derived output (portfolio_summary, escalate_by_type(_top25), inconclusive_by_clause, escalate_dormancy_summary) differs from arm B, or an added output's SR-level labels or class totals disagree with the validated labels
+- Caught with the control: the label-consistency check (same definition as H, applied before release) fails
+- Caught without the control (D_abl): Stage 5 exits non-zero (its own independent count checks)
+
+## Arm B
+- Stage 5 exit 0; outputs equal frozen stage-05/deeper: YES (8/8); with-control check on B: clean
+
+## Arms (C36_arms.csv)
+| arm | pre_exit | s5_exit | frz_pre_changed | frz_post_changed | s5_outputs_differ_vs_B | s5_added_files | label_check_fail | action_set_differs | rank_or_priority_cols | in_H | caught_with | caught_without |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| B | NA | 0 |  |  |  |  |  |  |  | NA | FALSE | FALSE |
+| RJ_INC2ESC | NA | 0 |  |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv |  |  | TRUE | TRUE | FALSE |
+| RJ_KAPPA3 | NA | 0 |  |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv |  |  | TRUE | TRUE | FALSE |
+| RJ_OPENAGE | NA | 0 |  |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv |  | portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv |  |  | TRUE | TRUE | FALSE |
+| RJ_PRECHECK | NA | 1 |  |  |  |  |  |  |  | FALSE | FALSE | TRUE |
+| RJ_BENIGN | NA | 0 |  |  |  | escalate_by_peer_n_bin.csv |  |  |  | FALSE | FALSE | FALSE |
+
+## Sets
+- H = {RJ_INC2ESC,RJ_KAPPA3,RJ_OPENAGE}
+- caught with the control = {RJ_INC2ESC,RJ_KAPPA3,RJ_OPENAGE}
+- D_abl (caught without) = {RJ_PRECHECK}
+- H \ D_abl (escapes once the control is removed) = {RJ_INC2ESC,RJ_KAPPA3,RJ_OPENAGE}
+- H \ caught-with (missed even with the control) = {}
+- flagged with the control but not in H (control cost / over-blocking) = {}
+
+## Predicate P1 (frozen)
+KEEP-side requires arm B clean and H \ D_abl = {} (removing the control lets no harm through). Otherwise the control stays.
+P1 failed: H \ D_abl = {RJ_INC2ESC,RJ_KAPPA3,RJ_OPENAGE}
+
+---
+# C36_arms.csv (raw, full file)
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+RJ_INC2ESC,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;inconclusive_by_clause.csv;escalate_dormancy_summary.csv,,,analysis re-judges INCONCLUSIVE with dormant_h >= 8760 as ESCALATE,TRUE,TRUE,FALSE
+RJ_KAPPA3,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,,analysis re-judges ESCALATE at kappa 3 and reports kappa 3,TRUE,TRUE,FALSE
+RJ_OPENAGE,NA,0,,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,portfolio_summary.csv;escalate_by_type.csv;escalate_by_type_top25.csv;escalate_dormancy_summary.csv,,,analysis demotes ESCALATE with open_age_h < 720 (diagnostic-only field),TRUE,TRUE,FALSE
+RJ_PRECHECK,NA,1,,,,,,,,re-judging placed before Stage 5's own checks,FALSE,FALSE,TRUE
+RJ_BENIGN,NA,0,,,,escalate_by_peer_n_bin.csv,,,,benign: adds an ESCALATE-by-peer_n-bin table; labels unchanged,FALSE,FALSE,FALSE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+
+---
+# C36_EVIDENCE.sha256
+ad1ca3a10c2a168e364461ec5436eb6719a0147948f552dcfde36e2449a36dfa  C36_ARM_MANIFESTS.txt
+84158c6a182c48068507d953c1fa1584305d681babe1ee715bded1a65d7b4960  C36_arms.csv
+7bf2c082e93078d968c94f0299d7b6b1977f4601a2f8f9f4d1f2a58b912bcb4f  C36_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: 9fa8f9758bd0e253651cd8233d7368883d29bb7d03bf4c882534d599aa8d0f09  111  ARM_SCRIPTS.txt
+B in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+B out :: 9fa8f9758bd0e253651cd8233d7368883d29bb7d03bf4c882534d599aa8d0f09  111  ARM_SCRIPTS.txt
+B out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+B out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+B out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: 9b0777d21f4714aa8740c03f93f0b7a7e99126d501452e282abda77e15e2b921  31  RUN_S5.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+B out :: bced33433ddf8eb3a7a99c4068aade70140eee0c1f8f0e15ca922faa34136d69  1970  RUN_S5.stdout.txt
+B out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+B out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+B out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+B out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+B out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+B out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+B out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+B out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_BENIGN in  :: 567f9e52a90d2c8028a7f399556e4166c7d1b37147b4146a25efbc86c6aa0897  124  ARM_SCRIPTS.txt
+RJ_BENIGN in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_BENIGN out :: 567f9e52a90d2c8028a7f399556e4166c7d1b37147b4146a25efbc86c6aa0897  124  ARM_SCRIPTS.txt
+RJ_BENIGN out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+RJ_BENIGN out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+RJ_BENIGN out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+RJ_BENIGN out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+RJ_BENIGN out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+RJ_BENIGN out :: d3c995d82eb640cfdfe9ac12a17aac5f0f48f820b8e9a1248217cb75ce6a564c  33  RUN_S5.exit
+RJ_BENIGN out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+RJ_BENIGN out :: 00424a964c4349cd7cbd739afd30974356c4313578429231602ba30153af8cbd  1978  RUN_S5.stdout.txt
+RJ_BENIGN out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+RJ_BENIGN out :: 09b6590a3253f80f3de228f349ef12ba87069728fc6d23c867baed4c6da207b8  89  stage-05\deeper\escalate_by_peer_n_bin.csv
+RJ_BENIGN out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+RJ_BENIGN out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+RJ_BENIGN out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+RJ_BENIGN out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+RJ_BENIGN out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+RJ_BENIGN out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+RJ_BENIGN out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+RJ_BENIGN out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_INC2ESC in  :: b7c26ff40e25b3e82363fb321071afeefa3a8658dadab2aaeedb7b92434e3393  125  ARM_SCRIPTS.txt
+RJ_INC2ESC in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_INC2ESC out :: b7c26ff40e25b3e82363fb321071afeefa3a8658dadab2aaeedb7b92434e3393  125  ARM_SCRIPTS.txt
+RJ_INC2ESC out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+RJ_INC2ESC out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+RJ_INC2ESC out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+RJ_INC2ESC out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+RJ_INC2ESC out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+RJ_INC2ESC out :: 1a277b11b8fc66f1d38e53e2205c95e11acd75aae7113a6ef7be43ab57e7e5fb  31  RUN_S5.exit
+RJ_INC2ESC out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+RJ_INC2ESC out :: 2fa34d28bbe9dfbcfd2d556cc5823cb595fac5432a38d94a301c8cbd153146a5  1979  RUN_S5.stdout.txt
+RJ_INC2ESC out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+RJ_INC2ESC out :: 17a2b12ff8d2899b52003c84c0b2cc1bdba78949f470bc6bd631625e14bd3e86  4073  stage-05\deeper\escalate_by_type.csv
+RJ_INC2ESC out :: 90336794e60ea70391521de7f11797625884257ee7a724a1d9fe0d58a88f9e14  1270  stage-05\deeper\escalate_by_type_top25.csv
+RJ_INC2ESC out :: 80c35d260415eb28cab2450d5e71a74259f2d30bc74e785bc3cb9b34df805260  147  stage-05\deeper\escalate_dormancy_summary.csv
+RJ_INC2ESC out :: 3e9152915dbd18b03c7ac661e7894c236f744c9322f1a4a8cfbfae93d61fbe6c  58  stage-05\deeper\inconclusive_by_clause.csv
+RJ_INC2ESC out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+RJ_INC2ESC out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+RJ_INC2ESC out :: 24aab10669096f469fc085b364b3e1baf0c0624194572c48e6cfaeb8e580ba2d  183  stage-05\deeper\portfolio_summary.csv
+RJ_INC2ESC out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_KAPPA3 in  :: 7ccfd7787466efa61920bdd87442bf6a38366de07e74b556f388b8abb297e83b  124  ARM_SCRIPTS.txt
+RJ_KAPPA3 in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_KAPPA3 out :: 7ccfd7787466efa61920bdd87442bf6a38366de07e74b556f388b8abb297e83b  124  ARM_SCRIPTS.txt
+RJ_KAPPA3 out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+RJ_KAPPA3 out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+RJ_KAPPA3 out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+RJ_KAPPA3 out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+RJ_KAPPA3 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+RJ_KAPPA3 out :: 67f1a3039e2bf411b7a757eff5980e44da3ea4dcdabab186d0aa5a1088f13d76  33  RUN_S5.exit
+RJ_KAPPA3 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+RJ_KAPPA3 out :: 97871457f4af3ec0f366ea4c2a80a5259d02ebb779cd91b1a3dd26c40f821b47  1978  RUN_S5.stdout.txt
+RJ_KAPPA3 out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+RJ_KAPPA3 out :: df4fcaaac78ccb85f56046d22100daa61bcdf188d2b58c81475b881076313a36  3818  stage-05\deeper\escalate_by_type.csv
+RJ_KAPPA3 out :: a673267ceb42f7f38f76c03074031e9727d792c6f4258b2d1dc0e336a76ca4ad  1261  stage-05\deeper\escalate_by_type_top25.csv
+RJ_KAPPA3 out :: fd3ad2b2c3bf673222d4360de0d8f263a4ed34ba872af885097a3f1439207af5  141  stage-05\deeper\escalate_dormancy_summary.csv
+RJ_KAPPA3 out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+RJ_KAPPA3 out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+RJ_KAPPA3 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+RJ_KAPPA3 out :: a72147c13197e85adc159870a084b7cf4c7b2d92269b4856c54fc8c368e9c456  184  stage-05\deeper\portfolio_summary.csv
+RJ_KAPPA3 out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_OPENAGE in  :: e9d9ec2c32b1c3560d20648d8bc16dc53e157a392606164b04d530bd5c08d235  125  ARM_SCRIPTS.txt
+RJ_OPENAGE in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_OPENAGE out :: e9d9ec2c32b1c3560d20648d8bc16dc53e157a392606164b04d530bd5c08d235  125  ARM_SCRIPTS.txt
+RJ_OPENAGE out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+RJ_OPENAGE out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+RJ_OPENAGE out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+RJ_OPENAGE out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+RJ_OPENAGE out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+RJ_OPENAGE out :: 075183d000c02b1e66f8654143b605b035171d741d0c102b2d60b2a19a05ae6c  31  RUN_S5.exit
+RJ_OPENAGE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+RJ_OPENAGE out :: 146f83043c021d40843489edd1810d6f7b5c31f17ea2505fa080709a2b017aa4  1979  RUN_S5.stdout.txt
+RJ_OPENAGE out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+RJ_OPENAGE out :: d9ca8bc7b211e4815ddca72179ed66dd11016aa5c0bb3c7c470c5ead39a98e45  3821  stage-05\deeper\escalate_by_type.csv
+RJ_OPENAGE out :: 11fe5e69b6a8ea6ca91218dd8531cf21307f148b830f16209578d0aa777ffa2c  1269  stage-05\deeper\escalate_by_type_top25.csv
+RJ_OPENAGE out :: 98888cc2e7f39f1205b2bf5cdc9fda21aa3a31a17de09bed84c0f9fa266c18fb  138  stage-05\deeper\escalate_dormancy_summary.csv
+RJ_OPENAGE out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+RJ_OPENAGE out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+RJ_OPENAGE out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+RJ_OPENAGE out :: 274bbf9f409ffa3120cd5439b95b1118486c3b8407a7c2ea1f062390663a4922  184  stage-05\deeper\portfolio_summary.csv
+RJ_OPENAGE out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_PRECHECK in  :: 8116cbec302f54e8753d08aa6c9e4f9e0a69ae92d5f8160b0244c2e54b507568  126  ARM_SCRIPTS.txt
+RJ_PRECHECK in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+RJ_PRECHECK out :: 8116cbec302f54e8753d08aa6c9e4f9e0a69ae92d5f8160b0244c2e54b507568  126  ARM_SCRIPTS.txt
+RJ_PRECHECK out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+RJ_PRECHECK out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+RJ_PRECHECK out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+RJ_PRECHECK out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+RJ_PRECHECK out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+RJ_PRECHECK out :: 098ec040ee8f41f53df961a82dc16e15b13726e1ab1a4df3920a8e630f7338ea  33  RUN_S5.exit
+RJ_PRECHECK out :: dc58f53369f6cf0f187f87c54387c60036706884ec7f770a47f6601ebb59bf1d  52  RUN_S5.stderr.txt
+RJ_PRECHECK out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stdout.txt
+RJ_PRECHECK out :: e6105c60cdb6a34f7d78518bf21cd44559c69a60c17e658a0f2d5d6613af2cf6  192  stage-05\deeper\independent_checks_critical_counts.csv
+RJ_PRECHECK out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen-harness/stage45/run_deeper_analysis.R
++++ seeds/C36/RJ_INC2ESC__run_deeper_analysis.R
+@@ -29,6 +29,7 @@
+ ) %>% mutate(pass = expected == observed)
+ write_csv(chk, file.path(out, "independent_checks_critical_counts.csv"))
+ stopifnot(all(chk$pass))
++ra <- ra %>% mutate(classification = ifelse(classification == "INCONCLUSIVE" & dormant_h >= 8760, "ESCALATE", classification))  # [seed] analyst re-judges long-dormant INCONCLUSIVE as ESCALATE
+ 
+ portfolio <- ra %>%
+   summarise(
+
+--- frozen-harness/stage45/run_deeper_analysis.R
++++ seeds/C36/RJ_KAPPA3__run_deeper_analysis.R
+@@ -29,6 +29,7 @@
+ ) %>% mutate(pass = expected == observed)
+ write_csv(chk, file.path(out, "independent_checks_critical_counts.csv"))
+ stopifnot(all(chk$pass))
++ra <- ra %>% mutate(classification = ifelse(classification == "ESCALATE" & dormant_h < 3 * peer_p75_h, "STANDARD", classification))  # [seed] analysis re-judges at kappa 3
+ 
+ portfolio <- ra %>%
+   summarise(
+@@ -39,7 +40,7 @@
+     pct_ESCALATE = n_ESCALATE / n_decision,
+     pct_INCONCLUSIVE = n_INCONCLUSIVE / n_decision,
+     pct_STANDARD = n_STANDARD / n_decision,
+-    kappa = 2
++    kappa = 3
+   )
+ write_csv(portfolio, file.path(out, "portfolio_summary.csv"))
+ 
+
+--- frozen-harness/stage45/run_deeper_analysis.R
++++ seeds/C36/RJ_OPENAGE__run_deeper_analysis.R
+@@ -29,6 +29,7 @@
+ ) %>% mutate(pass = expected == observed)
+ write_csv(chk, file.path(out, "independent_checks_critical_counts.csv"))
+ stopifnot(all(chk$pass))
++ra <- ra %>% mutate(classification = ifelse(classification == "ESCALATE" & open_age_h < 720, "STANDARD", classification))  # [seed] re-judged on open_age_h (diagnostic-only field)
+ 
+ portfolio <- ra %>%
+   summarise(
+
+--- frozen-harness/stage45/run_deeper_analysis.R
++++ seeds/C36/RJ_PRECHECK__run_deeper_analysis.R
+@@ -15,6 +15,7 @@
+ val <- read_csv(file.path(root, "outputs/validated_action_list.csv"), show_col_types = FALSE)
+ kappa_grid <- read_csv(file.path(root, "R-B/outputs/RB_kappa_grid_counts.csv"), show_col_types = FALSE)
+ 
++ra <- ra %>% mutate(classification = ifelse(classification == "INCONCLUSIVE" & dormant_h >= 8760, "ESCALATE", classification))  # [seed] re-judging before the independent checks
+ # Independent checks vs freeze
+ chk <- tibble(
+   check = c("n_decision", "n_ESCALATE", "n_INCONCLUSIVE", "n_STANDARD", "validated_action_list_n"),
+
+--- frozen-harness/stage45/run_deeper_analysis.R
++++ seeds/C36/RJ_BENIGN__run_deeper_analysis.R
+@@ -86,6 +86,8 @@
+ )
+ write_csv(cap, file.path(out, "capacity_coverage_note.csv"))
+ 
++esc_bin <- ra %>% filter(classification == "ESCALATE") %>% mutate(peer_n_bin = cut(peer_n, c(0, 99, 999, 9999, Inf))) %>% count(peer_n_bin, name = "n_ESCALATE")
++write_csv(esc_bin, file.path(out, "escalate_by_peer_n_bin.csv"))  # [seed] benign: adds insight, labels unchanged
+ cat("Stage 5 deeper analysis wrote to ", out, "\n", sep = "")
+ print(chk)
+ print(portfolio)
+
+
+

@@ -1,0 +1,7 @@
+arm,mode,ra_exit,rb_exit,ra_secs,rb_secs,wall_s,peak_ws_mb,free_mb_before,outputs_equal_frozen,differing,outputs_equal_serial
+B,SER,0,0,10.7,25,36.4,718,15511,7/7,,TRUE
+PAR_1,PAR,0,0,13.4,28.5,29.4,1011,15286,7/7,,TRUE
+SER_2,SER,0,0,11.3,26,37.8,714,15508,7/7,,TRUE
+PAR_2,PAR,0,0,12.1,26.9,27.1,1006,15443,7/7,,TRUE
+SER_3,SER,0,0,11.5,25.7,37.8,718,15431,7/7,,TRUE
+PAR_3,PAR,0,0,11.9,26.4,26.6,997,15464,7/7,,TRUE

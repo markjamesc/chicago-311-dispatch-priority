@@ -1,0 +1,2 @@
+REFUSED: no fenced code block
+2026-10-03 12:43:39 C40 INC r2 extraction REFUSED

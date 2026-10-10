@@ -1,0 +1,180 @@
+Role attestation.
+
+Adjudicator only, Grok, Expert mode, as in A01–A08. Ablation ID C06, batch N16, owner list control #6: Start Gate action-vocabulary lock (drift scan). Constitution 1.0. I did not rerun the scorer, repair code, create a criterion, relax a gate, or substitute a result. Builder (ChatGPT) and Validator (DeepSeek) packs were taken as frozen. No terminal state is borrowed from either pack. Verdict convention used is the SPEC’s, not the generic direction: KEEP means the lock may be dropped; REVERT means the lock stays. P1 is inverted relative to the usual “benefit of the change” reading: all four MET means the lock earns its keep, so REVERT.
+
+Freeze check.
+
+FREEZE RECORD (2026-10-09 04:03:52 CT) names the Builder pack C06/C06-builder/builder_report.md, 22200 bytes, SHA-256 6daec089f27532c195c642220e13c16bb8c4f9734fff23550a00057851bca33a, verdict_token_leak: false, and the Validator pack C06/C06-validator/validator_report.md, 9314 bytes, SHA-256 8b809f23914853eb0f5fe34468de984294182789c80bf420e6d2fec9f70729c9, verdict_token_leak: false. The reports embedded in this packet are those frozen packs. Each is complete and ends with its END line (END C06 BUILDER REPORT; END C06 VALIDATOR REPORT). Neither pack emits KEEP, REVERT, or HALT.
+Frozen-reference hashes cited by both packs match the SPEC and the preflight: constitution e6c3b348…fdae9; stage1_decision.json a74389af…dec430; AI1_ORIGINAL.md 73f448d4…d7932 (also equal to stage5/AI1_INTERPRETATION_BUILDER.md); score_c06.py bb2a6609…16e7; C06_RESULTS.md e43b1fa6…a82b; seeds bd79f9a2…796d3, f9a2d9de…f3bb, aa01c4c5…8f1d; n16lib.py 4a6675fa…9e47 (SPEC and the 04:08 supplement; absent from C06_EVIDENCE.sha256, not a mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES). Preflight: 0 failures. Baseline hashes match the SPEC. No mid-run constitution or baseline change is recorded.
+
+Hard-fact agreement table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkLocked Start setESCALATE, INCONCLUSIVE, STANDARD (3)samesameagreeIgnore listSR_NUMBER, SR_TYPE, COORDINATOR_DRAFTsamesame in sourceagreeCLEAN_EDIT lockno flag; D emptynonePASSagreeSEED_1_UPPER lockFLAG PILOT_EXPANDPILOT_EXPANDFLAG PILOT_EXPANDagreeSEED_2_LOWER lockFLAG pilot-and-expandpilot-and-expandFLAG pilot-and-expandagreeOriginal unmodifiedno flagnoneunlisted - on c48 rowagreeNumber-diff on both seeds0 / PASSPASS (WCA2 digit ignored)PASS (no number changed)agreeP1.1 both seeds flaggedMETMETMETagreeP1.2 clean and original not flaggedMETMETMETagreeP1.3 unlisted tokens on the scanned tableMET on 28-file tableMET on 28-file tableMETagreeP1.4 number-diff does not flag seedsMETMETMETagreeAggregate P1 on the executed scorer4/4 MET4/4 MET on the tableMET (all 4)agreeReal-record rows / hits / unlisted28 / 46 / 028 / 46 / 028 rows, unlisted all -agreeSeed sizes7929 / 7929 / 8049 / 8022sameprefixes match evidenceagreePortfolio sum222,002222,002quoted in original textagreeJSON / non-md files omitted by FILES filternoted as scope risknoted as scope defectsource excludes .json and non-.mdagree on the fact; differ on whether it blocks
+No hard number or P1 classification conflicts. The residual difference is whether the scorer’s declared file filter fully covers the SPEC’s prose “Stage 2-5 records.” Both accept the table-level MET.
+
+The nine KEEP conditions of constitution §7.
+
+KEEP here would mean the lock may be dropped. All nine are conjunctive.
+
+Evidence packs complete and frozen: PASS. FREEZE RECORD plus both END lines; scorer RESULTS, scorer source, seed diffs, Start JSON, and original text are in the packet. Preflight failures: 0.
+Role separation valid: PASS. Builder ChatGPT, Validator DeepSeek, Adjudicator Grok; extra chats 0; both attest blindness; verdict_token_leak: false.
+Builder and Validator agree on hard mechanical facts: PASS. Section 3; no conflicting number or seed classification.
+Exact reconciliation where required: PASS by inapplicability. SPEC and coordinator note: no R path, no reconciliation; N1/OF-1 cannot enter N16. Text-level equivalents (original, CLEAN_EDIT, both seeds) match expected flags.
+Every mandatory fixture passes: PASS by inapplicability. No fixture in this text-only control. Known-answer arms match the SPEC.
+No undeclared semantic change detected: PASS. Seeds are declared copies; frozen Stage 1-5 inputs are read-only; preflight hashes hold. The scan does not mutate the pack.
+No locked regression introduced: PASS. Number-diff PASS on both seeds; portfolio counts in the frozen text are untouched (131,968 + 6,377 + 83,657 = 222,002). No R/SQL path run.
+Predeclared benefit predicate satisfied: FAIL. The ablation is dropping the lock. SPEC P1 is the mechanical test that the lock earns its keep. All four conditions are MET (scorer RESULTS; both packs). SPEC: all four MET → REVERT, not KEEP. Dropping the lock is not shown to be safe: the lock flags both seeded actions, the clean edit and original are not flagged, the executed real-record scan has no unlisted token after the ignore list, and the existing number-diff does not catch either seed.
+No blocking objection remains supported by the frozen evidence: FAIL as a KEEP condition, not as a HALT. The Validator’s scope objection is supported by the frozen scorer (FILES drops .json and non-.md, so stage2_framing.json, stage3_locked_design.json, *_meta.txt, and AI1_PASTE.txt are unscanned). That is a coverage limit of a declared weak test, not a conflicting mechanical result. It does not turn the executed P1 vector from MET to NOT MET, and it is not a ground to invent a wider scan.
+
+Conditions 8 and 9 fail. KEEP is not available.
+
+HALT conditions of §9.
+
+
+Hard mechanical conflict: absent. Section 3; both classify the four executed conditions MET. SPEC HALT-on-disagreement is not triggered.
+Required raw evidence missing: absent. Scorer RESULTS, raw real-record table, scorer source, seed diffs, Start JSON, original text, and hashes are present. Packet rule: do not HALT only because historical stdout is missing. n16lib.py is in the supplement at the SPEC hash.
+Hash or frozen-version mismatch: absent. Section 2. n16lib.py missing from C06_EVIDENCE.sha256 is an evidence-list gap, not a hash mismatch against the FREEZE RECORD or FROZEN REFERENCE HASHES.
+Baseline or constitution changed mid-run: absent. Hashes match the SPEC; preflight OK.
+Role separation violated: absent. Three distinct roles; leak flags false.
+Information barrier breached before first-pass freeze: absent. Both attest blindness; extra chats 0.
+Predicate not defined before execution: absent. P1’s four clauses and the inverted verdict map are in the frozen SPEC; owner answer Z at 2026-10-09 01:49 CT.
+Authoritative pack indeterminate: absent. FREEZE RECORD names one Builder pack and one Validator pack; both are present and complete.
+
+No HALT condition is present. A seed was applied; the scan did not error.
+
+Blocking objections and the evidence.
+
+Scope defect. Supported as a description of the frozen scorer: stage12 * is then filtered to non-JSON, stage3/stage5 are *.md only, plus c48/AI1_ORIGINAL.md. Unscanned frozen files exist. It does not decide a P1 condition the other way. Condition 3 in the scorer is len(real_fp) == 0 over that FILES list, and both packs and the RESULTS table give 0 unlisted tokens (46 action-like hits, all inside the allowed set or the ignore list). Widening the corpus would be a new criterion (constitution §10). SPEC already marks this a weak text scan, ignore-list tuned on the real records before seeds, and not a live-builder test. Those items are not evidence either way.
+Raw per-file token lists absent. Supported. Both packs say the 27 non-original real files cannot be re-scanned from this packet, only aggregated. The coordinator rule treats the scorer table plus source as the raw evidence and forbids HALT for missing stdout alone. The seed arms are independently recomputed by both from the embedded original, the diffs, and P_UP / P_LO, and they agree.
+n16lib.py omitted from C06_EVIDENCE.sha256, and no stdout. Supported as a packaging gap. Supplement quotes the helper at the SPEC hash 4a6675fa…9e47. Not a freeze mismatch and not a P1 input.
+None of these is a hard disagreement, a failed seed, or a scan error. They bound generalisation; they do not unset the four MET results.
+
+Verdict rationale.
+
+The change under test is removal of the Start-Gate action-vocabulary lock. On the frozen records the executed scan actually read, it did not change labels: 0 unlisted action-like tokens after the ignore list, so the real Chicago Stage 1-5 markdown corpus does not contain a drift hit under this scanner. The operational question is whether the lock still earns its keep. It does, on the predeclared predicate. SEED_1_UPPER is flagged PILOT_EXPAND; SEED_2_LOWER is flagged pilot-and-expand; CLEAN_EDIT (case-only) and the unmodified original are not flagged; the C48-style number-diff stays PASS on both seeds, including the digit inside WCA2. That is exactly the owner rule quoted in the SPEC: keep the rule (REVERT) if the lock catches it and nothing else does. P1 is therefore MET, which under this control’s inverted map is REVERT. N1/OF-1 stays outside N16. Fixture and reconciliation headings are not applicable: text-only, no R, no fixture; the known-answer arms are the original, the clean edit, and the two seeds, and they match.
+TERMINAL_STATE: REVERT
+END C06 ADJUDICATION

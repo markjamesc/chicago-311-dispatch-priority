@@ -1,0 +1,8 @@
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+FV_VALSORT,NA,0,,outputs\validated_action_list.csv,,,,,,Stage 5 re-sorts the validated list in place,TRUE,TRUE,FALSE
+FV_ADDRANK,NA,0,,R-A\outputs\RA_classifications.csv,,,,,,Stage 5 adds priority_rank to the validated classifications in place,TRUE,TRUE,FALSE
+FV_ROUND,NA,0,,R-A\outputs\RA_classifications.csv,,,,,,Stage 5 writes rounded dormant_h back into the validated classifications,TRUE,TRUE,FALSE
+FV_DROPTHIN,NA,0,,outputs\validated_action_list.csv,,,,,,Stage 5 overwrites the validated list with peer_n>=100 rows only,TRUE,TRUE,FALSE
+FV_EARLY,NA,1,,outputs\validated_action_list.csv,,,,,,Stage 5 drops one validated-list row before its own checks,TRUE,TRUE,TRUE
+FV_BENIGN,NA,0,,,,diag_type_by_class.csv,,,,benign: Stage 5 writes one extra diagnostic under stage-05 only,FALSE,FALSE,FALSE

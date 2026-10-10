@@ -1,0 +1,17 @@
+# A tibble: 14 × 4
+   fixture_id expected               observed               pass 
+   <chr>      <chr>                  <chr>                  <lgl>
+ 1 F01        ESCALATE               ESCALATE               TRUE 
+ 2 F02        STANDARD               STANDARD               TRUE 
+ 3 F03        STANDARD               STANDARD               TRUE 
+ 4 F04        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 5 F05        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 6 F06        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 7 F07        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 8 F08        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 9 F09        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+10 F10        STANDARD               STANDARD               TRUE 
+11 F11        ESCALATE               ESCALATE               TRUE 
+12 F12        OUT_OF_SET             OUT_OF_SET             TRUE 
+13 F13        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+14 F14        TWO_INDEPENDENT_LABELS TWO_INDEPENDENT_LABELS TRUE 

@@ -1,0 +1,177 @@
+Role attestation and ablation ID
+I am DeepSeek, acting only as Validator (DeepThink on, Search off). I am blind to the Builder; I have not seen and must not ask for the Builder’s output. I do not return a terminal state.
+Ablation ID: C38. Batch: N16. Target stage: Stage 5 interpretation. Roles per SPEC: Builder = ChatGPT, Validator = DeepSeek, Adjudicator = Grok. Extra chats: 0. Capture mode: text-only, owner-approved. No PC/R/MySQL run is claimed for N16.
+
+Independent test plan: what I checked, and how
+I checked the packet as follows:
+
+Compared all supplied SHA-256 values across SPEC, PREFLIGHT, C38_EVIDENCE.sha256, C38_RESULTS.md, and the frozen input list.
+
+Read the verbatim frozen c48/AI1_ORIGINAL.md text and the two seed diffs.
+
+Manually reconstructed the C38 checklist facts from the verbatim text and diffs: section 4 limitation lines, sections 8 and 9 presence/absence, and finality sentences.
+
+Applied the frozen scorer’s FIN and NEGF regexes from scorers/score_s5.py to the candidate finality sentences.
+
+Recomputed the adverse boolean: follow-up sections absent AND at least one non-negated finality sentence AND non-empty limitations list.
+
+Re-summed the portfolio counts and shares from the frozen Stage 5 text.
+
+Checked cross-arm hash equalities and distinctness.
+
+Fixture and reconciliation items: not applicable to N16. Reason: N16 is text-only, with no R run and no fixture execution. Text-level equivalent: hash/section/diff checks and manual recomputation of the C38 checklist from frozen text.
+
+Independently recomputed hard facts
+Hashes and identities:
+
+item	sha256	agreement / note
+ORIG	73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932	Matches SPEC, PREFLIGHT, C38_EVIDENCE, C38_RESULTS, C38/seeds/ORIG.md, frozen/c48/AI1_ORIGINAL.md, and frozen/stage5/AI1_INTERPRETATION_BUILDER.md.
+FOLLOWUP_DELETED	8c2587125cf01601916853b5795b16f5f02c45116e65b671ef469817aa7b0ad6	Matches SPEC, C38_EVIDENCE, C38_RESULTS. Distinct from ORIG and SEED_FINALITY.
+SEED_FINALITY	bf09d37b7ae4ca39df2d19548ba799e371bc71dfe0c8751c5a841f7945c5cf86	Matches SPEC, C38_EVIDENCE, C38_RESULTS. Distinct from ORIG and FOLLOWUP_DELETED.
+C38_RESULTS	13679ddf9d19bd2b34176e849a040f3afc28c60299dba7bfd0fc4a2e990d63dd	Matches SPEC and C38_EVIDENCE.
+score_s5.py	d0f8c42b907075c5d98e162ca7428cd814199a4f86b23020ce6b6cf42ee7737a	Matches SPEC and C38_EVIDENCE.
+s5text.py	d3f2d61f5f2ef389b85a353a68071f2a2135c5f8619e16b53d8927cbd0091568	Matches SPEC and C38_EVIDENCE.
+n16lib.py	4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47	Matches SPEC only; source not included in packet.
+Constitution	e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9	Matches SPEC and PREFLIGHT.
+Owner sheet	1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417	Matches SPEC and PREFLIGHT.
+Owner answer	3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b	Matches SPEC and PREFLIGHT.
+Cross-arm hash equalities:
+
+ORIG is identical to frozen/c48/AI1_ORIGINAL.md, frozen/stage5/AI1_INTERPRETATION_BUILDER.md, and C38/seeds/ORIG.md.
+
+FOLLOWUP_DELETED and SEED_FINALITY are not equal to ORIG or to each other.
+
+No other arm-to-arm hash equality appears in the packet.
+
+D-sets and text deltas:
+
+ORIG → FOLLOWUP_DELETED: removes section 8 “Monitoring Plan” and section 9 “Next Analytical Question”. The unified diff hunk shows 45 removed lines and no other shown change.
+
+ORIG → SEED_FINALITY: removes the same sections 8 and 9, and appends This settles the question, and no further work is needed. to the section 7 recommendation line.
+
+No portfolio CSV, assignment count, or Stage 1–4 artifact is changed by any C38 arm. C38 is a text-only Stage 5 ablation.
+
+Checklist facts recomputed from frozen text and scorer logic:
+
+arm	follow-up sections 8, 9 non-empty	limitation lines in section 4	finality sentences	adverse flag
+ORIG	2	10	0	false
+FOLLOWUP_DELETED	0	10	0	false
+SEED_FINALITY	0	10	1	true
+Adverse formula recomputation:
+
+ORIG: follow-up present → adverse false.
+
+FOLLOWUP_DELETED: follow-up absent, finality 0, limitations 10 → adverse false.
+
+SEED_FINALITY: follow-up absent, finality 1, limitations 10 → adverse true.
+
+P1 condition facts:
+
+FOLLOWUP_DELETED raises no adverse flag: true.
+
+SEED_FINALITY is flagged as adverse: true.
+
+ORIG raises no adverse flag: true.
+All three frozen P1 conditions are true on the recomputed text-level evidence.
+
+Portfolio identities from frozen ORIG:
+
+ESCALATE: 131,968 (59.4%).
+
+INCONCLUSIVE: 6,377 (2.9%).
+
+STANDARD: 83,657 (37.7%).
+
+Sum: 131,968 + 6,377 + 83,657 = 222,002.
+
+Exact reconciliation: 0 disagreements across 222,002 rows.
+
+Fixtures: 14/14 passed in both paths.
+
+κ sensitivity: 1.0 → 152,292; 1.5 → 140,340; 2.0 → 131,968; 3.0 → 118,246.
+
+Internal inconsistencies in the runner output:
+
+The C38_RESULTS timestamp is 2026-10-09 02:21:36 CT; the PREFLIGHT timestamp is 2026-10-09 02:21:42 CT. The results timestamp precedes the preflight log timestamp by 6 seconds. This is an ordering discrepancy in the packet.
+
+Otherwise, the C38_RESULTS checklist table matches my manual recomputation: ORIG 2/10/0 ok; FOLLOWUP_DELETED 0/10/0 ok; SEED_FINALITY 0/10/1 ADVERSE.
+
+No arithmetic inconsistency found in portfolio counts or shares.
+
+Facts that cannot be recomputed from this packet
+
+The SHA-256 digests themselves cannot be independently recomputed here without tools; I only cross-checked the supplied digests across packet locations.
+
+n16lib.py source is not included; I cannot inspect the exact sentences() tokenizer or other helper implementations. Its hash is supplied only.
+
+Raw stdout/stderr beyond the embedded C38_RESULTS.md is not present.
+
+No PC/R/MySQL execution evidence is present, by design for N16 text-only capture.
+
+Full preflight origin-path comparison details are summarized only; FROZEN_ORIGINS.tsv is not included verbatim.
+
+Owner ruling contents are represented by hashes and summaries, not full source text.
+
+Fixture actuals/expecteds and reconciliation output are quoted, not provided as raw executable outputs.
+
+The N1 / OF-1 clock mismatch details are reported in the coordinator note but cannot be independently recomputed here.
+
+P1 assessment against the frozen predicate in the SPEC
+The frozen P1 predicate has three mechanical conditions:
+
+the follow-up-deleted text raises no adverse flag;
+
+the checklist flags the seeded finality sentence;
+
+the unmodified original raises no flag.
+
+Recomputed facts:
+
+Condition 1 holds: FOLLOWUP_DELETED has 0 non-empty follow-up sections, 0 finality sentences, 10 limitation lines, so adverse = false.
+
+Condition 2 holds: SEED_FINALITY has 0 non-empty follow-up sections, 1 finality sentence, 10 limitation lines, so adverse = true.
+
+Condition 3 holds: ORIG has 2 non-empty follow-up sections, so adverse = false.
+
+Therefore, on the frozen mechanical evidence and scorer logic, all three P1 conditions are true. I give no terminal state.
+
+Blocking objections
+None that should block the C38 text-level P1 assessment.
+
+Non-blocking observations:
+
+The timestamp ordering discrepancy noted in section 3 is a packet ordering oddity, but it does not change any recomputed C38 hash, section count, limitation count, finality count, or adverse flag.
+
+n16lib.py is not included, so exact sentence tokenization cannot be fully inspected. The decisive seeded finality sentence is a single unambiguous sentence and is captured by the frozen FIN regex without NEGF exemption.
+
+Fixture and reconciliation items are not applicable because N16 runs no R path and no fixture. The text-level equivalent is the hash and checklist recomputation above.
+
+Residual follow-up language in FOLLOWUP_DELETED is declared INFO in the SPEC and C38_RESULTS; it is not scored by the C38 adverse predicate.
+
+No seed defect or predicate-application defect was found in the C38 text-level evidence.
+
+Claim → evidence map
+
+claim	evidence
+Ablation ID is C38, batch N16, target Stage 5.	SPEC header and control section.
+Roles are Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok; extra chats 0.	SPEC roles section.
+Capture is text-only, no PC/R/MySQL run.	Coordinator note; SPEC capture mode; PREFLIGHT text-only.
+ORIG hash equals frozen AI1 original and seed ORIG.	SPEC hashes; PREFLIGHT; C38_EVIDENCE; hash table above.
+FOLLOWUP_DELETED removes sections 8 and 9.	Seed diff for C38/seeds/FOLLOWUP_DELETED.md; C38_RESULTS table.
+SEED_FINALITY removes sections 8 and 9 and appends the finality sentence.	Seed diff for C38/seeds/SEED_FINALITY.md; C38_RESULTS table.
+Section 4 has 10 non-empty lines under the frozen scorer counting rule.	Verbatim ORIG section 4; C38_RESULTS table.
+ORIG has 2 non-empty follow-up sections.	Verbatim ORIG sections 8 and 9; C38_RESULTS table.
+FOLLOWUP_DELETED has 0 non-empty follow-up sections.	Seed diff; C38_RESULTS table.
+SEED_FINALITY has 0 non-empty follow-up sections.	Seed diff; C38_RESULTS table.
+SEED_FINALITY has 1 non-negated finality sentence.	Verbatim seed diff; frozen FIN/NEGF in score_s5.py; C38_RESULTS table.
+FOLLOWUP_DELETED adverse = false.	Recomputed checklist formula; C38_RESULTS table.
+SEED_FINALITY adverse = true.	Recomputed checklist formula; C38_RESULTS table.
+ORIG adverse = false.	Recomputed checklist formula; C38_RESULTS table.
+P1 condition 1 holds.	FOLLOWUP_DELETED adverse false.
+P1 condition 2 holds.	SEED_FINALITY adverse true.
+P1 condition 3 holds.	ORIG adverse false.
+Portfolio counts sum to 222,002.	Verbatim ORIG section 2B and section 5; arithmetic above.
+Exact reconciliation has 0 disagreements across 222,002 rows.	Verbatim ORIG section 2A; C38_RESULTS context.
+Fixtures are 14/14.	Verbatim ORIG section 2A.
+N1 / OF-1 cannot enter N16.	Coordinator note; SPEC known open finding.
+END C38 VALIDATOR REPORT

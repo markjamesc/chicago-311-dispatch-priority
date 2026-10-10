@@ -1,0 +1,5 @@
+arm,expected_gate,rb_exit,gate,fixtures,classifications_equal,hidden_depth_gate
+REF,PASS,0,PASS,14/14,TRUE,PASS
+SEED_TZUTC,FAIL,0,FAIL,14/14,FALSE,not run
+SEED_CLOCKLATE,FAIL,0,FAIL,14/14,FALSE,not run
+SEED_DUPINT,FAIL,0,FAIL,14/14,FALSE,not run

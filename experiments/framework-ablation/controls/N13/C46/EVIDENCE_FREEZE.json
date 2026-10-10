@@ -1,0 +1,14 @@
+{
+  "ablation_id": "C46",
+  "frozen_at_ct": "2026-10-03 10:07:27 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C46/C46-builder/builder_report.md", "bytes": 24696, "sha256": "f895f19e860af304a11674a14120732777983ba840551a9a61253fa3a488ddd6", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C46/C46-validator/validator_report.md", "bytes": 12131, "sha256": "ab927b3db06618cdde97e97e01ea3ef3a53388d1f50413a61854f7444199cd9b", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "e0ace4859e7c7e67bdc61e3f021d0d270d52bef3fa9e317647c2bf9f95f74190"
+}
+

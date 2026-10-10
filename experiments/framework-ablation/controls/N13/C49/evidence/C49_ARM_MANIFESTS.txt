@@ -1,0 +1,16 @@
+﻿arms/CHECK/MANIFEST_inputs.sha256 :: 4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e  1931  c49_check.R
+arms/CHECK/MANIFEST_outputs.sha256 :: ca2d62628098436c0bb40e8093dd31bcc23e28e6b18ab65c6b7f5cc5a31046b9  162  outputs\DELIVERY_CHECK.txt
+arms/CHECK/MANIFEST_outputs.sha256 :: 4f0b3ee471529dc826fb103de9e5a0008835668c444a760d3219c35b449e7a75  2387  outputs\DELIVERY_FILES.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  7929  outputs\unzipped\AI1_INTERPRETATION.md
+arms/CHECK/MANIFEST_outputs.sha256 :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  outputs\unzipped\capacity_coverage_note.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  outputs\unzipped\escalate_by_type_top25.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  outputs\unzipped\inconclusive_by_clause.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  outputs\unzipped\independent_checks_critical_counts.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  outputs\unzipped\kappa_sensitivity.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  outputs\unzipped\portfolio_summary.csv
+arms/CHECK/MANIFEST_outputs.sha256 :: 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75  833  outputs\unzipped\SHA256SUMS
+arms/CHECK/MANIFEST_outputs.sha256 :: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  2007  outputs\unzipped\STAGE5_DEEPER_FINDINGS.md
+arms/CHECK/MANIFEST_outputs.sha256 :: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  4051  outputs\unzipped\STAGE5_EVIDENCE_PACKAGE.md
+arms/CHECK/MANIFEST_outputs.sha256 :: 85a49b4982e3c8f03a3ffa4d5b69fd82bfc6a4839068d97e4c527078037d7cb2  39  RUN_CHECK.exit
+arms/CHECK/MANIFEST_outputs.sha256 :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_CHECK.stderr.txt
+arms/CHECK/MANIFEST_outputs.sha256 :: c1e72488f3f3aae199fa8f6082110aa7f3c35045275fe4f71a8d577029846b5a  163  RUN_CHECK.stdout.txt

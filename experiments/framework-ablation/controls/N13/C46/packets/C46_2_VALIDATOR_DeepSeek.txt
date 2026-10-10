@@ -1,0 +1,795 @@
+# C46 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C46 VALIDATOR REPORT
+
+---
+# COORDINATOR NOTE N1 / OF-1 (clean-pair clock mismatch; read before the RESULTS)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C46 reads the frozen R-B classifications only as labels and features and never reruns R-A or R-B, so N1 does not enter any C46 number.
+
+---
+# SPEC
+# C46 — Ablation specification (FROZEN)
+
+**Ablation ID:** C46 (Addendum 02, candidate #46 "Design-time numerical determinism")
+**Batch:** N13 batch 4 (controls C51, C46, C52; the only three of the 25 open controls that qualified under the owner's 2026-10-03 rules: no new data pulls, no design chat, no owner ruling, mechanical threshold)
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 3 design / Stage 4 reconciliation (proposed addition)
+**Frozen at CT:** 2026-10-03, before the runner executed (runner `run_batch_v4.ps1`, evaluator `eval_b4.R`)
+
+## Control under test (proposed addition)
+Declare four determinism items at design: (1) solver tolerance, (2) order invariance (canonical design-matrix column order), (3) exact tie semantics, (4) rounding-derived reconciliation rules. PricePoint: CC-S4-01 (glmnet default thresh 1e-7, column order, max 0.0715, 11 items > 0.05) and CC-S4-02 (half-cent straddles); combined attributable span ≈ 2 h 33 min (upper bound). Workflow PR #10 folded both in as owner text, not as an ablation result; the ablation baseline predates it.
+
+## Verdict convention (proposed addition)
+**KEEP = the four design-time determinism declarations are adopted. REVERT = they are not adopted.** HALT as in constitution §9.
+
+## Exact change being tested
+The Chicago 311 pack has no iterative fit, so one is **seeded** (Addendum 02 #46 test design) in `runner/seeds/C46/fit_path.R`: binomial glmnet (alpha 1, standardize = FALSE, fixed 30-value lambda path 0.02 → 2e-4, prediction at the smallest lambda) of y = (frozen R-B classification == ESCALATE) on a fixed feature set from the frozen pack (log open age, log peer n/p75/p50, created hour, day-of-week one-hot, top-8 ORIGIN + other, top-10 OWNER_DEPARTMENT + other; 215,687 rows, 32 columns). Each path writes p (17 significant digits), the rounding-derived field p_pct1 = round(100·p, 1), and the tie rule flag = p ≥ 0.5.
+- **Baseline regime:** default thresh 1e-7; R-A uses natural column order, R-B reversed (both legitimate); comparator: |Δp| ≤ 0.05, p_pct1 exact, flag exact.
+- **Declared regime:** thresh 1e-12; canonical (sorted) column order on both paths; tie rule p ≥ 0.5; comparator: |Δp| ≤ 1e-6, p_pct1 may differ by ≤ 0.1 only where |Δp| ≤ 1e-6 (rounding straddle), flag exact.
+- A comparator field with ≥ 1 failing row = one reconciliation event = one change-control / both-path rebuild trigger (`recon_c46.R`).
+
+## Known open finding N1 / OF-1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). C46 reads the frozen R-B classifications only as labels and features; it does not rerun R-A or R-B, so N1 does not enter any C46 number.
+
+## Arms (runner v4, `seeds/C46/DETFIT`; ARMS.tsv in the packet)
+- **REF**: R-A only, canonical order, thresh 1e-14 (convergence reference).
+- **BASE**: baseline regime. **DECL**: declared regime.
+- **THRESH_ONLY**, **ORDER_ONLY**: attribution probes (one declaration each, baseline comparator; reported, not in P1).
+- **DEFECT_DECL**: declared regime, R-B omits feature x_log_peer_p75 (a real defect; must still fail recon). **DEFECT_BASE**: same defect under baseline (reported).
+
+## Operational benefit predicate P1 (made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. BASE: ≥ 1 reconciliation event;
+2. DECL: 0 reconciliation events;
+3. DEFECT_DECL: recon FAIL (the declared tolerance does not hide a real defect);
+4. DECL R-A vs REF: max|Δp| ≤ 1e-6 and identical flags (the declared tolerance is met against a tighter solve);
+5. extra rebuilds: BASE ≥ 1 and DECL = 0.
+REVERT side: any of 1–5 fails.
+**Disclosed limitation (OF-2 candidate):** the addendum's second metric, "design-time cost (logged Stage 3 minutes) below the baseline's rebuild minutes", cannot be measured without a design chat; it is **not measured**. The cost side is operationalised only as rebuild counts. The Adjudicator must not treat it as measured.
+
+## Regression / HALT rules
+- HALT if any fit has jerr ≠ 0, a fit or RECON output is missing, or Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4 (exact reconciliation where required) = the declared-regime comparator on DECL; condition 5 (mandatory fixtures): the seeded fit has no fixture harness, so no mandatory fixture applies (declared now, before execution); conditions 6–7: the frozen pack is only read (its hashes are re-verified by the preflight).
+
+## Allowed source/data scope
+Frozen PC pack, read only. No internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+**Runner-side files for this control (frozen list `runner/SEEDS_b4.sha256`; preflight gating):**
+- `runner/seeds/C46/ARMS.tsv` SHA-256 `d75c3c524b02440976382eecde5a5671c46639cbebbb53a855c9fed4b3b3c5af`
+- `runner/seeds/C46/DETFIT` SHA-256 `6757df6441349d11adab1c808386b13a1251610fcdce529e4bc2613908973fd2`
+- `runner/seeds/C46/fit_path.R` SHA-256 `d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238`
+- `runner/seeds/C46/recon_c46.R` SHA-256 `9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867`
+- `runner/run_batch_v4.ps1` SHA-256 `6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e`
+- `runner/eval_b4.R` SHA-256 `cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above. This spec is hashed in `SPEC_FREEZE_b4.sha256` before execution.
+**Inputs actually read by the fit:** `R-B/outputs/RB_classifications.csv` and `data/source/src_open_candidates.csv` (above).
+
+## Pre-execution check (disclosed)
+Before this spec was frozen, `fit_path.R` and `recon_c46.R` were exercised on the PC in a scratch folder (non-reporting). The first attempt failed on an output-formatting bug (a column reused after formatting) and a deprecated-argument warning; both were fixed (glmnet solver settings now go through `control=` when available) before any result was produced. A second check (natural vs reversed order): thresh 1e-7 → max|Δp| 0.00845, 11 flag differences; thresh 1e-12 → max|Δp| 9.4e-6, 0 flag differences. No arm parameter, threshold or rule was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+seed   OK   d75c3c524b02440976382eecde5a5671c46639cbebbb53a855c9fed4b3b3c5af seeds/C46/ARMS.tsv
+seed   OK   6757df6441349d11adab1c808386b13a1251610fcdce529e4bc2613908973fd2 seeds/C46/DETFIT
+seed   OK   d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238 seeds/C46/fit_path.R
+seed   OK   9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867 seeds/C46/recon_c46.R
+seed   OK   6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e run_batch_v4.ps1
+seed   OK   cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396 eval_b4.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | glmnet 5.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104 ; 8.0.46
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 15139 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+d75c3c524b02440976382eecde5a5671c46639cbebbb53a855c9fed4b3b3c5af  871  runner/seeds/C46/ARMS.tsv
+6757df6441349d11adab1c808386b13a1251610fcdce529e4bc2613908973fd2  82  runner/seeds/C46/DETFIT
+d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  runner/seeds/C46/fit_path.R
+9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  runner/seeds/C46/recon_c46.R
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  16968  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  14883  runner/eval_b4.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b4.sha256` (written 2026-10-03 08:48 CDT before execution):
+dc9181715aba584bc545528d8d8c70280d2acfba6cd7c7954eed32e24333995e  C51/ABLATION_SPEC.md
+6920322b91d2fee391706a98ca7d0dc99f475dc137ad536ce9e5e47fee62e139  C46/ABLATION_SPEC.md
+961faf00c0cd426e4105bf1be2fcaa820c40983241bac7d4d3d88c443b9f7e74  C52/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C51/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C51/BASELINE_FRAMEWORK.sha256
+555492335ba7cfd7bbce46bbf45d74fd287ac37b91e66b6333f1a2d44808885e  runner/SEEDS_b4.sha256
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  runner/eval_b4.R
+9facda2784ea89dbac4f5428dd36002cd6084f01108d183261fd0b7c39dfe8c8  runner/make_seeds_b4.py
+f33399fb73a246ba9d4b39fa6f3c6a364b2a498439349d1e3ec82d8e970d50b0  runner/SEED_DIFFS_b4.txt
+347ee93e0ee79cec9f895e5af6e59d40f5aa147b7f5b647716dc636039f3c37a  tools_make_specs_b4.py
+# frozen 2026-10-03 08:48 CDT before execution
+
+---
+# RUN LOG (this control)
+09:29:10 C46 arms
+09:30:01   REF FIT_RA exit=0 secs=50.5 timeout=0
+09:30:16   BASE FIT_RA exit=0 secs=15 timeout=0
+09:30:31   BASE FIT_RB exit=0 secs=15.1 timeout=0
+09:30:33   BASE RECON exit=0 secs=1.6 timeout=0
+09:31:08   DECL FIT_RA exit=0 secs=35.4 timeout=0
+09:31:44   DECL FIT_RB exit=0 secs=36.3 timeout=0
+09:31:46   DECL RECON exit=0 secs=1.8 timeout=0
+09:32:15   THRESH_ONLY FIT_RA exit=0 secs=28.8 timeout=0
+09:32:46   THRESH_ONLY FIT_RB exit=0 secs=30.5 timeout=0
+09:32:48   THRESH_ONLY RECON exit=0 secs=1.8 timeout=0
+09:33:02   ORDER_ONLY FIT_RA exit=0 secs=14.3 timeout=0
+09:33:16   ORDER_ONLY FIT_RB exit=0 secs=14.3 timeout=0
+09:33:18   ORDER_ONLY RECON exit=0 secs=1.7 timeout=0
+09:33:53   DEFECT_DECL FIT_RA exit=0 secs=34.4 timeout=0
+09:34:09   DEFECT_DECL FIT_RB exit=0 secs=16.6 timeout=0
+09:34:12   DEFECT_DECL RECON exit=0 secs=2.3 timeout=0
+09:34:26   DEFECT_BASE FIT_RA exit=0 secs=14.5 timeout=0
+09:34:39   DEFECT_BASE FIT_RB exit=0 secs=12.9 timeout=0
+09:34:42   DEFECT_BASE RECON exit=0 secs=2.4 timeout=0
+
+---
+# C46_RESULTS.md (runner output)
+Evaluation note: the batch runner evaluates all controls only after the last one (C52, several hours of SQL). So that the C46 chats can start, the coordinator ran the same frozen evaluator (runner/eval_b4.R, hash in the PREFLIGHT) on a byte-copy of the finished C46 arm folders at 2026-10-03 09:41 CDT (PC folder N13\_interim_b4), and assembled C46_ARM_MANIFESTS.txt and C46_EVIDENCE.sha256 with the runner's own manifest code. All C46 arms had finished (RUN LOG below) before this evaluation. The batch-end evaluation will be compared with this one and any difference other than the generation timestamp line will be reported.
+
+# C46 RESULTS (mechanical; generated 2026-10-03 09:41:54 CDT)
+
+**Mechanical predicate result: P1 NOT MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| BASE: >= 1 reconciliation event (baseline regime produces spurious mismatch) | MET |
+| DECL: 0 reconciliation events | MET |
+| DEFECT_DECL: recon FAIL (declared regime still catches a real defect) | MET |
+| DECL R-A vs REF (canonical, thresh 1e-14): max|dp| <= 1e-6 and identical flags | NOT MET |
+| extra rebuilds: BASE >= 1 and DECL = 0 | MET |
+
+## Arms
+| arm | regime | ra_order | rb_order | thresh | rb_drop | jerr_RA | jerr_RB | recon | events | max_abs_dp | fail_p | fail_p_pct1 | fail_flag | extra_rebuilds |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| BASE | baseline | natural | reversed | 1e-7 | - | 0 | 0 | FAIL | 2 | 0.008446989841342178 | 0 | 17564 | 11 | 2 |
+| DECL | declared | canonical | canonical | 1e-12 | - | 0 | 0 | PASS | 0 | 0 | 0 | 0 | 0 | 0 |
+| THRESH_ONLY | baseline | natural | reversed | 1e-12 | - | 0 | 0 | FAIL | 1 | 9.44668978275498e-6 | 0 | 30 | 0 | 1 |
+| ORDER_ONLY | baseline | canonical | canonical | 1e-7 | - | 0 | 0 | PASS | 0 | 0 | 0 | 0 | 0 | 0 |
+| DEFECT_DECL | declared | canonical | canonical | 1e-12 | x_log_peer_p75 | 0 | 0 | FAIL | 3 | 0.766791177978111 | 193060 | 111789 | 2070 | 3 |
+| DEFECT_BASE | baseline | natural | reversed | 1e-7 | x_log_peer_p75 | 0 | 0 | FAIL | 3 | 0.7656221672416856 | 12890 | 111885 | 2082 | 3 |
+
+## DECL vs REF
+- max|dp| = 5.33069e-05 ; flag differences = 0
+
+## Fit info
+| arm | path | order | thresh | drop | n | p_cols | npasses | jerr | dev_ratio_last | secs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| REF | RA | canonical | 1e-14 | - | 215687 | 32 | 16386 | 0 | 0.8356498569181723 | 48.5 |
+| BASE | RA | natural | 1e-7 | - | 215687 | 32 | 1220 | 0 | 0.8356434248182028 | 12.8 |
+| BASE | RB | reversed | 1e-7 | - | 215687 | 32 | 1223 | 0 | 0.8356412282097697 | 12.9 |
+| DECL | RA | canonical | 1e-12 | - | 215687 | 32 | 10811 | 0 | 0.835649844758912 | 33.3 |
+| DECL | RB | canonical | 1e-12 | - | 215687 | 32 | 10811 | 0 | 0.835649844758912 | 34.3 |
+| THRESH_ONLY | RA | natural | 1e-12 | - | 215687 | 32 | 8088 | 0 | 0.8356498304330563 | 27 |
+| THRESH_ONLY | RB | reversed | 1e-12 | - | 215687 | 32 | 8682 | 0 | 0.8356498321830208 | 28.7 |
+| ORDER_ONLY | RA | canonical | 1e-7 | - | 215687 | 32 | 1500 | 0 | 0.8356432205347253 | 12.4 |
+| ORDER_ONLY | RB | canonical | 1e-7 | - | 215687 | 32 | 1500 | 0 | 0.8356432205347253 | 12.6 |
+| DEFECT_DECL | RA | canonical | 1e-12 | - | 215687 | 32 | 10811 | 0 | 0.835649844758912 | 32.5 |
+| DEFECT_DECL | RB | canonical | 1e-12 | x_log_peer_p75 | 215687 | 31 | 2136 | 0 | 0.8294719972850374 | 14.9 |
+| DEFECT_BASE | RA | natural | 1e-7 | - | 215687 | 32 | 1220 | 0 | 0.8356434248182028 | 12.6 |
+| DEFECT_BASE | RB | reversed | 1e-7 | x_log_peer_p75 | 215687 | 31 | 533 | 0 | 0.8294668664093228 | 11.2 |
+
+---
+# C46_arms.csv (raw, full file)
+arm,regime,ra_order,rb_order,thresh,rb_drop,jerr_RA,jerr_RB,recon,events,max_abs_dp,fail_p,fail_p_pct1,fail_flag,extra_rebuilds
+BASE,baseline,natural,reversed,1e-7,-,0,0,FAIL,2,0.008446989841342178,0,17564,11,2
+DECL,declared,canonical,canonical,1e-12,-,0,0,PASS,0,0,0,0,0,0
+THRESH_ONLY,baseline,natural,reversed,1e-12,-,0,0,FAIL,1,9.44668978275498e-6,0,30,0,1
+ORDER_ONLY,baseline,canonical,canonical,1e-7,-,0,0,PASS,0,0,0,0,0,0
+DEFECT_DECL,declared,canonical,canonical,1e-12,x_log_peer_p75,0,0,FAIL,3,0.766791177978111,193060,111789,2070,3
+DEFECT_BASE,baseline,natural,reversed,1e-7,x_log_peer_p75,0,0,FAIL,3,0.7656221672416856,12890,111885,2082,3
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/BASE/ARM.txt
+arm=BASE ra_order=natural rb_order=reversed thresh=1e-7 rb_drop=- regime=baseline
+
+## arms/BASE/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+natural,1e-7,-,215687,32,1220,0,0.8356434248182028,13,12.8,x_log_open_age;x_log_peer_n;x_log_peer_p75;x_log_peer_p50;x_created_hour;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other,5.1
+
+## arms/BASE/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+reversed,1e-7,-,215687,32,1223,0,0.8356412282097697,13,12.9,dept_other;dept_10;dept_09;dept_08;dept_07;dept_06;dept_05;dept_04;dept_03;dept_02;dept_01;origin_other;origin_08;origin_07;origin_06;origin_05;origin_04;origin_03;origin_02;origin_01;dow_7;dow_6;dow_5;dow_4;dow_3;dow_2;dow_1;x_created_hour;x_log_peer_p50;x_log_peer_p75;x_log_peer_n;x_log_open_age,5.1
+
+## arms/BASE/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+baseline,215687,0.05,0.008446989841342178,215637,123276,0,17564,11,17564,2,FAIL
+
+## arms/BASE/RUN_FIT_RA.exit
+0,15,2026-10-03T09:30:16-05:00,0,3600
+
+## arms/BASE/RUN_FIT_RB.exit
+0,15.1,2026-10-03T09:30:31-05:00,0,3600
+
+## arms/BASE/RUN_RECON.exit
+0,1.6,2026-10-03T09:30:33-05:00,0,600
+
+## arms/DECL/ARM.txt
+arm=DECL ra_order=canonical rb_order=canonical thresh=1e-12 rb_drop=- regime=declared
+
+## arms/DECL/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-12,-,215687,32,10811,0,0.835649844758912,13,33.3,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/DECL/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-12,-,215687,32,10811,0,0.835649844758912,13,34.3,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/DECL/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+declared,215687,1e-6,0,0,0,0,0,0,0,0,PASS
+
+## arms/DECL/RUN_FIT_RA.exit
+0,35.4,2026-10-03T09:31:08-05:00,0,3600
+
+## arms/DECL/RUN_FIT_RB.exit
+0,36.3,2026-10-03T09:31:44-05:00,0,3600
+
+## arms/DECL/RUN_RECON.exit
+0,1.8,2026-10-03T09:31:46-05:00,0,600
+
+## arms/DEFECT_BASE/ARM.txt
+arm=DEFECT_BASE ra_order=natural rb_order=reversed thresh=1e-7 rb_drop=x_log_peer_p75 regime=baseline
+
+## arms/DEFECT_BASE/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+natural,1e-7,-,215687,32,1220,0,0.8356434248182028,13,12.6,x_log_open_age;x_log_peer_n;x_log_peer_p75;x_log_peer_p50;x_created_hour;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other,5.1
+
+## arms/DEFECT_BASE/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+reversed,1e-7,x_log_peer_p75,215687,31,533,0,0.8294668664093228,13,11.2,dept_other;dept_10;dept_09;dept_08;dept_07;dept_06;dept_05;dept_04;dept_03;dept_02;dept_01;origin_other;origin_08;origin_07;origin_06;origin_05;origin_04;origin_03;origin_02;origin_01;dow_7;dow_6;dow_5;dow_4;dow_3;dow_2;dow_1;x_created_hour;x_log_peer_p50;x_log_peer_n;x_log_open_age,5.1
+
+## arms/DEFECT_BASE/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+baseline,215687,0.05,0.7656221672416856,215687,193114,12890,111885,2082,111885,3,FAIL
+
+## arms/DEFECT_BASE/RUN_FIT_RA.exit
+0,14.5,2026-10-03T09:34:26-05:00,0,3600
+
+## arms/DEFECT_BASE/RUN_FIT_RB.exit
+0,12.9,2026-10-03T09:34:39-05:00,0,3600
+
+## arms/DEFECT_BASE/RUN_RECON.exit
+0,2.4,2026-10-03T09:34:42-05:00,0,600
+
+## arms/DEFECT_DECL/ARM.txt
+arm=DEFECT_DECL ra_order=canonical rb_order=canonical thresh=1e-12 rb_drop=x_log_peer_p75 regime=declared
+
+## arms/DEFECT_DECL/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-12,-,215687,32,10811,0,0.835649844758912,13,32.5,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/DEFECT_DECL/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-12,x_log_peer_p75,215687,31,2136,0,0.8294719972850374,12,14.9,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50,5.1
+
+## arms/DEFECT_DECL/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+declared,215687,1e-6,0.766791177978111,215687,193060,193060,111789,2070,111789,3,FAIL
+
+## arms/DEFECT_DECL/RUN_FIT_RA.exit
+0,34.4,2026-10-03T09:33:53-05:00,0,3600
+
+## arms/DEFECT_DECL/RUN_FIT_RB.exit
+0,16.6,2026-10-03T09:34:09-05:00,0,3600
+
+## arms/DEFECT_DECL/RUN_RECON.exit
+0,2.3,2026-10-03T09:34:12-05:00,0,600
+
+## arms/ORDER_ONLY/ARM.txt
+arm=ORDER_ONLY ra_order=canonical rb_order=canonical thresh=1e-7 rb_drop=- regime=baseline
+
+## arms/ORDER_ONLY/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-7,-,215687,32,1500,0,0.8356432205347253,13,12.4,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/ORDER_ONLY/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-7,-,215687,32,1500,0,0.8356432205347253,13,12.6,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/ORDER_ONLY/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+baseline,215687,0.05,0,0,0,0,0,0,0,0,PASS
+
+## arms/ORDER_ONLY/RUN_FIT_RA.exit
+0,14.3,2026-10-03T09:33:02-05:00,0,3600
+
+## arms/ORDER_ONLY/RUN_FIT_RB.exit
+0,14.3,2026-10-03T09:33:16-05:00,0,3600
+
+## arms/ORDER_ONLY/RUN_RECON.exit
+0,1.7,2026-10-03T09:33:18-05:00,0,600
+
+## arms/REF/ARM.txt
+arm=REF ra_order=canonical rb_order=- thresh=1e-14 rb_drop=- regime=-
+
+## arms/REF/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+canonical,1e-14,-,215687,32,16386,0,0.8356498569181723,13,48.5,dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;x_created_hour;x_log_open_age;x_log_peer_n;x_log_peer_p50;x_log_peer_p75,5.1
+
+## arms/REF/RUN_FIT_RA.exit
+0,50.5,2026-10-03T09:30:01-05:00,0,3600
+
+## arms/THRESH_ONLY/ARM.txt
+arm=THRESH_ONLY ra_order=natural rb_order=reversed thresh=1e-12 rb_drop=- regime=baseline
+
+## arms/THRESH_ONLY/RA/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+natural,1e-12,-,215687,32,8088,0,0.8356498304330563,13,27,x_log_open_age;x_log_peer_n;x_log_peer_p75;x_log_peer_p50;x_created_hour;dow_1;dow_2;dow_3;dow_4;dow_5;dow_6;dow_7;origin_01;origin_02;origin_03;origin_04;origin_05;origin_06;origin_07;origin_08;origin_other;dept_01;dept_02;dept_03;dept_04;dept_05;dept_06;dept_07;dept_08;dept_09;dept_10;dept_other,5.1
+
+## arms/THRESH_ONLY/RB/fit_info.csv
+order,thresh,drop,n,p_cols,npasses,jerr,dev_ratio_last,df_last,secs,columns,glmnet
+reversed,1e-12,-,215687,32,8682,0,0.8356498321830208,13,28.7,dept_other;dept_10;dept_09;dept_08;dept_07;dept_06;dept_05;dept_04;dept_03;dept_02;dept_01;origin_other;origin_08;origin_07;origin_06;origin_05;origin_04;origin_03;origin_02;origin_01;dow_7;dow_6;dow_5;dow_4;dow_3;dow_2;dow_1;x_created_hour;x_log_peer_p50;x_log_peer_p75;x_log_peer_n;x_log_open_age,5.1
+
+## arms/THRESH_ONLY/RECON.csv
+regime,n,p_tol,max_abs_dp,n_dp_gt_0,n_dp_gt_1e6,fail_p,fail_p_pct1,fail_flag,n_p_pct1_diff,events,recon
+baseline,215687,0.05,9.44668978275498e-6,213998,6627,0,30,0,30,1,FAIL
+
+## arms/THRESH_ONLY/RUN_FIT_RA.exit
+0,28.8,2026-10-03T09:32:15-05:00,0,3600
+
+## arms/THRESH_ONLY/RUN_FIT_RB.exit
+0,30.5,2026-10-03T09:32:46-05:00,0,3600
+
+## arms/THRESH_ONLY/RUN_RECON.exit
+0,1.8,2026-10-03T09:32:48-05:00,0,600
+
+
+---
+# C46_EVIDENCE.sha256
+4027b88e2c817e04fe5efda52d439c052101b97a4c308b0428695c4f46d8d065  C46_ARM_MANIFESTS.txt
+e8c15ac71cd9605dcfcac76ab2e4ee8e692ecc3fd25fd5412925addc531898cd  C46_arms.csv
+b65c015430c406ac272ed3df8fb6ffbf9227e0a5c7d9be2e5bc686cc1c465e42  C46_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm and smoke root
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root; prefix 'smoke/<arm>_<path>_k<k>' = a non-reporting smoke root (C51 only). Bulky data copies are listed by hash and size only.
+arms/BASE in  :: 44cde78d3840877a348ac906d40cd36290b1b70e6be7fe49a5c9a36db90444ce  86  ARM.txt
+arms/BASE in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/BASE in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/BASE out :: 28db77604b09b9c9bc491c23466443a8fb75d4455797a7864fb0aa4d7d07bb25  445  RA\fit_info.csv
+arms/BASE out :: c641eadae6abf07e47aa5ef0fc622a53628135017a1c21e80f8ff9d4a86a8359  8967753  RA\pred.csv
+arms/BASE out :: e2a977231cf2c56c25465fa382cedfecaf3e6c36406a5bcec9901a1344f4a643  446  RB\fit_info.csv
+arms/BASE out :: 6b8e7bf8587a8baf37cf9713cbbef51c6242548208a7e7e56803ee447a5854ea  8967784  RB\pred.csv
+arms/BASE out :: 99032b2a5164515ff41dc5858c11aea1af838a9ad607cd5ca9172d2b6375a079  184  RECON.csv
+arms/BASE out :: 2864036db103d0c14587116e124ba0aa79f1a99c0b553345d1179415ab89294e  39  RUN_FIT_RA.exit
+arms/BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/BASE out :: b22eaa1e352141909e148caf88be5aa0cfeabdd45ff1ef4158d7eac9d41f1c00  76  RUN_FIT_RA.stdout.txt
+arms/BASE out :: bf7c26d6e5c0580e71baab8c87b0966219cb24bf659d050cb0f89031b8c8c18e  41  RUN_FIT_RB.exit
+arms/BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/BASE out :: 36b496ce3922cccda6ffe079031d73343d2bf54b8e99fa852d6bdfece542fc7c  77  RUN_FIT_RB.stdout.txt
+arms/BASE out :: 0351529575b1445005efcb81d2bfc8c42f2a7c3e169a633f5e586f5f3f5835e6  39  RUN_RECON.exit
+arms/BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/BASE out :: ad197da17d2815eff4dc9b9a02e2d187db93857e895350b34a2e54b6f78cfa15  234  RUN_RECON.stdout.txt
+arms/DECL in  :: 752abcb83862f1b7f14f60b63a2aa7414c3d8002f1c69230829ed494d7b99f8c  90  ARM.txt
+arms/DECL in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/DECL in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/DECL out :: 333f2db1c7a984a1b217c0b5265b6859f349f71643b4da9b65742ff5516d6c35  448  RA\fit_info.csv
+arms/DECL out :: fd47d91eb05003d3c2ccc04df5eda018658a8ffabb760d7bde6f7e7edef43e50  8967969  RA\pred.csv
+arms/DECL out :: f6b6d7041e50d32254fd6c3bb9bd09cd61c2f9b72f16f53f7f4fc055c6db8e9e  448  RB\fit_info.csv
+arms/DECL out :: fd47d91eb05003d3c2ccc04df5eda018658a8ffabb760d7bde6f7e7edef43e50  8967969  RB\pred.csv
+arms/DECL out :: ce7f749634ff2a1ff953dfbcde33bbc2d63cd7ca229c1602d715ab7be2223076  146  RECON.csv
+arms/DECL out :: dd26478510e334e700ed6cb3d02c17e7df9da003ac321f804961952b465ca4a3  41  RUN_FIT_RA.exit
+arms/DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/DECL out :: e224fa9cc40c41ac35af66b66c5f15e566184d61652719083ca2f8744481137c  79  RUN_FIT_RA.stdout.txt
+arms/DECL out :: 795ee0e2d57ab19d9c88c21ec66ec0ac272cab3808c7b3ef0419713d5fc1c4f7  41  RUN_FIT_RB.exit
+arms/DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/DECL out :: e224fa9cc40c41ac35af66b66c5f15e566184d61652719083ca2f8744481137c  79  RUN_FIT_RB.stdout.txt
+arms/DECL out :: dee99aa546bbbba9185efdf6e3e5f81c3299d575d7f03d65a9abf88421eb5514  39  RUN_RECON.exit
+arms/DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/DECL out :: cdebe1c1da81662dfd5b0b2a0ab1472ed8f1e02ebc0bad7b0b77d3baf742fe74  234  RUN_RECON.stdout.txt
+arms/DEFECT_BASE in  :: c0afd6dffad6abc23125cefc5532a4b8678a291c44f042ad6f116c0ea880a6a4  106  ARM.txt
+arms/DEFECT_BASE in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/DEFECT_BASE in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/DEFECT_BASE out :: 9b6ceb4a2fe481f2796c0b20d54b2dc2525e36dfba19fd902b465ce29f1d3c39  445  RA\fit_info.csv
+arms/DEFECT_BASE out :: c641eadae6abf07e47aa5ef0fc622a53628135017a1c21e80f8ff9d4a86a8359  8967753  RA\pred.csv
+arms/DEFECT_BASE out :: a2115193cbc234e9436b8bfc9f2be3e7659f3aebdc2774003edf4705385ea7de  443  RB\fit_info.csv
+arms/DEFECT_BASE out :: 7a9dd1e53f7e74cc67370f78621ad8cec0aa567d3181098d027f3c9a1210a95f  8963265  RB\pred.csv
+arms/DEFECT_BASE out :: b5fba7ced2ea2a662c826bceb43ed100bb1b808c3cc325dea91f2e6e9d9f997f  190  RECON.csv
+arms/DEFECT_BASE out :: ff8b97cbca506c492bf02bd721fa3ade08ce7586d51ff9d6ae7245b2e76d12b5  41  RUN_FIT_RA.exit
+arms/DEFECT_BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/DEFECT_BASE out :: b22eaa1e352141909e148caf88be5aa0cfeabdd45ff1ef4158d7eac9d41f1c00  76  RUN_FIT_RA.stdout.txt
+arms/DEFECT_BASE out :: 11212a9f7f563f7063ca2fc3c7eb01a5d05205944678b93544b04898c6d757cf  41  RUN_FIT_RB.exit
+arms/DEFECT_BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/DEFECT_BASE out :: 611b48f8669cbdc2b06ed3fcf4780a0c0ee1c215f3111009266dbdd8afdb5923  89  RUN_FIT_RB.stdout.txt
+arms/DEFECT_BASE out :: 0798c337aaddc541fa82aeec8a0fa44c81a330aa6a9602455d09b15eb834d54f  39  RUN_RECON.exit
+arms/DEFECT_BASE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/DEFECT_BASE out :: 5e6dfc2f432d89819647a85278bcc31f725ce875cf1d3eb8ba2dbcd59622a05d  234  RUN_RECON.stdout.txt
+arms/DEFECT_DECL in  :: 89432b985418104a1cf4f1a4e8546e9347411704ba409f1c2fc8a90a027d9576  110  ARM.txt
+arms/DEFECT_DECL in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/DEFECT_DECL in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/DEFECT_DECL out :: caacb28979f6ca3bfc18162cdabe27c5978e2516265047606e2398455d924bb0  448  RA\fit_info.csv
+arms/DEFECT_DECL out :: fd47d91eb05003d3c2ccc04df5eda018658a8ffabb760d7bde6f7e7edef43e50  8967969  RA\pred.csv
+arms/DEFECT_DECL out :: 1005d925234b89b397376c430aa327813f5c0937fcb1f9e057905470a24ac8ea  446  RB\fit_info.csv
+arms/DEFECT_DECL out :: 6f145005118fb5dbb0a25f86d60517ed86b1fd87c54c270ab76dbb320fd07927  8963704  RB\pred.csv
+arms/DEFECT_DECL out :: a3a0e68330418f3e45137008e714cdfb023269075943ec1f063b366a100d048e  190  RECON.csv
+arms/DEFECT_DECL out :: 048b0f58c04dbcc72bf93c043efeb2e40698a84b2aed92ff967abf3a8744f38a  41  RUN_FIT_RA.exit
+arms/DEFECT_DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/DEFECT_DECL out :: e224fa9cc40c41ac35af66b66c5f15e566184d61652719083ca2f8744481137c  79  RUN_FIT_RA.stdout.txt
+arms/DEFECT_DECL out :: fe8a8f1bbbfdf3fd07a610516fb89f0e485dee02cc0b947fa0d7b8de23ff0ece  41  RUN_FIT_RB.exit
+arms/DEFECT_DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/DEFECT_DECL out :: 39228f7393a536b2c2da81d83328ac97a876a0c942c92bb493d80088f20aa255  91  RUN_FIT_RB.stdout.txt
+arms/DEFECT_DECL out :: 0946fb2f4307d5b9f359beec78d6622db2049fabc5554b7a8a469ed76388e89e  39  RUN_RECON.exit
+arms/DEFECT_DECL out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/DEFECT_DECL out :: 91cfdeef2d4a4605e011e605fef8bd20ffddb9a58c7ba24a1279ab87287e84e1  234  RUN_RECON.stdout.txt
+arms/ORDER_ONLY in  :: 27cbfe0be9d033a95968ec0cb2a3be302b21a4566c617f49708a449471e3ffeb  95  ARM.txt
+arms/ORDER_ONLY in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/ORDER_ONLY in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/ORDER_ONLY out :: 857fdf9bc30b92740dbeaaf5ca0ec6d2f2c62148100d9a64bd07992ce452ab9a  447  RA\fit_info.csv
+arms/ORDER_ONLY out :: ff4b93fe0223b319b3f9b920b3f74d973b8d03ba2b0668f1067c92c40a3e281f  8968141  RA\pred.csv
+arms/ORDER_ONLY out :: 8ef9d44b7b17bb196c1ab2c716425c60a854659c8986f8a0ce623813e3f7e8e0  447  RB\fit_info.csv
+arms/ORDER_ONLY out :: ff4b93fe0223b319b3f9b920b3f74d973b8d03ba2b0668f1067c92c40a3e281f  8968141  RB\pred.csv
+arms/ORDER_ONLY out :: 5c22dec2c33293fcf5580f0488fb13414cffcc374f10ca00f80f459ff89ade72  146  RECON.csv
+arms/ORDER_ONLY out :: 7ca1a335acef0fde8535b26a4e71ef1cd1ca72844f873e61d967813a40c8fbae  41  RUN_FIT_RA.exit
+arms/ORDER_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/ORDER_ONLY out :: d868ae69b26b9213412d7a7c21aa473b12614b0262519a9dbdf8c5660b3886e7  78  RUN_FIT_RA.stdout.txt
+arms/ORDER_ONLY out :: 558700faf8947d095398bff4734586efbb909851cfb59a228ef3ca67b2ac286f  41  RUN_FIT_RB.exit
+arms/ORDER_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/ORDER_ONLY out :: d868ae69b26b9213412d7a7c21aa473b12614b0262519a9dbdf8c5660b3886e7  78  RUN_FIT_RB.stdout.txt
+arms/ORDER_ONLY out :: 49d176d2a9f4d72a80acce206b5aa4bae84a2b3759d2e30adc97226a1608cbf0  39  RUN_RECON.exit
+arms/ORDER_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/ORDER_ONLY out :: 6bd70ef195e8b778ae80d4ce7c008bcf05b0f738a8e8640a835d188eb3bd3217  234  RUN_RECON.stdout.txt
+arms/REF in  :: 056dc387170f91c5e8fdb1d13280aebb44837e38f05f23631a54c6f8c31e79f8  74  ARM.txt
+arms/REF in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/REF in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/REF out :: 757fd6b91741d3ab17fcd03c60b55e6d71ba1204b47bee535236bddb440920c7  449  RA\fit_info.csv
+arms/REF out :: 6ceacb6c68f21cb01a79f4c002ee2b3ff69a9f4ae9dac51f7e6bd542152d12be  8968205  RA\pred.csv
+arms/REF out :: d57c6fd2df4e3a6d8338990cfc3792f1c08837c1c8ba5b0f682fd2b1ee711bd0  41  RUN_FIT_RA.exit
+arms/REF out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/REF out :: 8390463845a607a54a47f52da2dca93c60c6e949f7c4d03fcc52fa267dd7e863  79  RUN_FIT_RA.stdout.txt
+arms/THRESH_ONLY in  :: 3fbbd690fd290babfee8efcfd3486b5a141c1dc8480eaa2dd9417aee849331a7  94  ARM.txt
+arms/THRESH_ONLY in  :: d681aff97febf1045c003bf0fba6715ab80d4660d1d2f36d10e63a904147f238  4407  fit_path.R
+arms/THRESH_ONLY in  :: 9cd9fe1248985db26bbaf334dfc6bfbcf9d60e21f342b7388c25c5e10e150867  1774  recon_c46.R
+arms/THRESH_ONLY out :: 431dd6c930b81104a62ee474632ef1bf164074339c12126ffdc18b2adae7b7cd  444  RA\fit_info.csv
+arms/THRESH_ONLY out :: 8838f7acc0dcaad7045789798056e43deda880a443fe89911559d0bb8f87ac40  8967889  RA\pred.csv
+arms/THRESH_ONLY out :: 719e14ce000816d6fd8dd66b51089045f7c048ab3d3d52d31a0eac0e3744f380  447  RB\fit_info.csv
+arms/THRESH_ONLY out :: c152accc22a7ad89df203d2183c0c2e16237ca059b23398185a6bc038d952bb8  8968183  RB\pred.csv
+arms/THRESH_ONLY out :: 21c0f710e53afd319de7bcefc6103d168a9a4d63b1f0c1b3f3c43b7b68ef51c0  174  RECON.csv
+arms/THRESH_ONLY out :: 932de0fac6a92e2e876f3986a6df50bbe98764cffbaa672a9bdda3fca55397ed  41  RUN_FIT_RA.exit
+arms/THRESH_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RA.stderr.txt
+arms/THRESH_ONLY out :: 7f9a99ca5fb18cb961f7cbfee95776fa7538b3cff93cb1deffdfad372bcb3ee8  76  RUN_FIT_RA.stdout.txt
+arms/THRESH_ONLY out :: 5e6281cdcd63cd8419ddfd9ccbd21ccb94e191125da81ce6859a98ae971f0179  41  RUN_FIT_RB.exit
+arms/THRESH_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_FIT_RB.stderr.txt
+arms/THRESH_ONLY out :: e5075e1a14010eb5a65d5a22fb70d2425d5cd46c60064561f98c178c74e41e7e  77  RUN_FIT_RB.stdout.txt
+arms/THRESH_ONLY out :: aa167086ffe58c641141a9b7d32dc6341097df506bdd2cf865775ba0386aa28c  39  RUN_RECON.exit
+arms/THRESH_ONLY out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RECON.stderr.txt
+arms/THRESH_ONLY out :: 3cdceca6e30207e70b146ea4e9979febaeea05ac2c271e4bd9ce898100176142  236  RUN_RECON.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+### seeds/C46/fit_path.R (new file, 4407 bytes)
+#!/usr/bin/env Rscript
+# N13 C46 seeded iterative fit (the Chicago 311 pack has no model; Addendum 02 #46 test design: "seed one").
+# One "path" = one builder's legitimate implementation of the same declared model; paths differ only in design-matrix column order.
+# Usage: Rscript fit_path.R <FROZEN_ROOT> <OUT_DIR> <order: natural|reversed|canonical> <thresh> <drop_feature|->
+# Reads the frozen pack read-only: R-B/outputs/RB_classifications.csv (decision rows, validated labels) + data/source/src_open_candidates.csv.
+# Writes <OUT_DIR>/pred.csv (SR_NUMBER, p, p_pct1, flag) and <OUT_DIR>/fit_info.csv.
+suppressPackageStartupMessages({ library(readr); library(dplyr); library(glmnet) })
+a <- commandArgs(trailingOnly = TRUE); stopifnot(length(a) == 5)
+FZ <- a[[1]]; OUT <- a[[2]]; ORD <- a[[3]]; TH <- as.numeric(a[[4]]); DROP <- a[[5]]
+stopifnot(ORD %in% c("natural", "reversed", "canonical"), is.finite(TH), TH > 0)
+dir.create(OUT, recursive = TRUE, showWarnings = FALSE); t0 <- Sys.time()
+cl <- read_csv(file.path(FZ, "R-B/outputs/RB_classifications.csv"), col_types = cols(.default = col_character()), progress = FALSE)
+src <- read_tsv(file.path(FZ, "data/source/src_open_candidates.csv"), col_types = cols(.default = col_character()), quote = "", na = character(0), progress = FALSE) %>%
+  select(SR_NUMBER, ORIGIN, OWNER_DEPARTMENT, CREATED_HOUR, CREATED_DAY_OF_WEEK)
+d <- cl %>% select(SR_NUMBER, classification, open_age_h, peer_n, peer_p75_h, peer_p50_h) %>% inner_join(src, by = "SR_NUMBER") %>%
+  mutate(y = as.integer(classification == "ESCALATE"), open_age_h = as.numeric(open_age_h), peer_n = as.numeric(peer_n),
+         peer_p75_h = as.numeric(peer_p75_h), peer_p50_h = as.numeric(peer_p50_h), CREATED_HOUR = as.numeric(CREATED_HOUR)) %>%
+  filter(!is.na(open_age_h), !is.na(peer_n), !is.na(peer_p75_h), !is.na(peer_p50_h), !is.na(CREATED_HOUR)) %>% arrange(SR_NUMBER)
+top <- function(v, k) { t <- sort(table(v), decreasing = TRUE); n <- names(t); n <- n[order(-as.integer(t), n)]; head(n, k) }
+o_lv <- top(d$ORIGIN, 8); g_lv <- top(d$OWNER_DEPARTMENT, 10); w_lv <- sort(unique(d$CREATED_DAY_OF_WEEK), method = "radix")
+X <- data.frame(x_log_open_age = log1p(d$open_age_h), x_log_peer_n = log1p(d$peer_n), x_log_peer_p75 = log1p(d$peer_p75_h),
+                x_log_peer_p50 = log1p(d$peer_p50_h), x_created_hour = d$CREATED_HOUR, check.names = FALSE)
+for (v in w_lv) X[[paste0("dow_", v)]] <- as.numeric(d$CREATED_DAY_OF_WEEK == v)
+for (i in seq_along(o_lv)) X[[sprintf("origin_%02d", i)]] <- as.numeric(d$ORIGIN == o_lv[i])
+X[["origin_other"]] <- as.numeric(!(d$ORIGIN %in% o_lv))
+for (i in seq_along(g_lv)) X[[sprintf("dept_%02d", i)]] <- as.numeric(d$OWNER_DEPARTMENT == g_lv[i])
+X[["dept_other"]] <- as.numeric(!(d$OWNER_DEPARTMENT %in% g_lv))
+nat <- names(X)
+if (DROP != "-") { stopifnot(DROP %in% nat); X[[DROP]] <- NULL }
+cols <- switch(ORD, natural = names(X), reversed = rev(names(X)), canonical = sort(names(X), method = "radix"))
+M <- as.matrix(X[, cols, drop = FALSE])
+LAMBDA <- exp(seq(log(0.02), log(2e-4), length.out = 30))   # declared fixed path; prediction at the last (smallest) lambda
+fit <- if ("control" %in% names(formals(glmnet))) {   # this glmnet build takes solver settings via control= (thresh=/maxit= args deprecated)
+  glmnet(M, d$y, family = "binomial", alpha = 1, standardize = FALSE, lambda = LAMBDA, control = list(thresh = TH, maxit = 1e5))
+} else glmnet(M, d$y, family = "binomial", alpha = 1, standardize = FALSE, lambda = LAMBDA, thresh = TH, maxit = 1e5)
+p <- as.numeric(predict(fit, newx = M, type = "response")[, length(LAMBDA)])
+pv <- p; out <- tibble(SR_NUMBER = d$SR_NUMBER, p = sprintf("%.17g", pv), p_pct1 = sprintf("%.1f", round(100 * pv, 1)), flag = as.integer(pv >= 0.5))
+write_csv(out, file.path(OUT, "pred.csv"))
+write_csv(tibble(order = ORD, thresh = TH, drop = DROP, n = nrow(M), p_cols = ncol(M), npasses = fit$npasses, jerr = fit$jerr,
+                 dev_ratio_last = fit$dev.ratio[length(LAMBDA)], df_last = fit$df[length(LAMBDA)], secs = round(as.numeric(difftime(Sys.time(), t0, units = "secs")), 1),
+                 columns = paste(cols, collapse = ";"), glmnet = as.character(packageVersion("glmnet"))), file.path(OUT, "fit_info.csv"))
+cat("fit ok order=", ORD, " thresh=", TH, " drop=", DROP, " n=", nrow(M), " p=", ncol(M), " npasses=", fit$npasses, " jerr=", fit$jerr, "\n", sep = "")
+if (fit$jerr != 0) quit(status = 4)
+
+### seeds/C46/recon_c46.R (new file, 1774 bytes)
+#!/usr/bin/env Rscript
+# N13 C46 reconciliation of two path predictions under a declared comparator regime.
+# Usage: Rscript recon_c46.R <ARM_DIR> <regime: baseline|declared>
+#   baseline (pre-hardening, PricePoint comparator v1 style): |dp| <= 0.05 on p; p_pct1 exact; flag exact.
+#   declared (Addendum 02 #46 declaration 4): |dp| <= 1e-6 on p; p_pct1 may differ by <= 0.1 only where |dp| <= 1e-6 (rounding straddle); flag exact.
+# A comparator field with >= 1 failing row = one reconciliation event (a change-control / rebuild trigger). Writes <ARM_DIR>/RECON.csv.
+suppressPackageStartupMessages({ library(readr); library(dplyr) })
+a <- commandArgs(trailingOnly = TRUE); stopifnot(length(a) == 2); D <- a[[1]]; REG <- a[[2]]; stopifnot(REG %in% c("baseline", "declared"))
+rd <- function(p) read_csv(p, col_types = cols(SR_NUMBER = col_character(), p = col_double(), p_pct1 = col_double(), flag = col_integer()), progress = FALSE)
+x <- rd(file.path(D, "RA", "pred.csv")); y <- rd(file.path(D, "RB", "pred.csv"))
+stopifnot(identical(x$SR_NUMBER, y$SR_NUMBER))
+dp <- abs(x$p - y$p); dpp <- abs(x$p_pct1 - y$p_pct1)
+tol <- if (REG == "baseline") 0.05 else 1e-6
+f_p <- dp > tol
+f_pct <- if (REG == "baseline") dpp > 1e-9 else (dpp > 1e-9 & !(dp <= 1e-6 & dpp <= 0.1 + 1e-9))
+f_flag <- x$flag != y$flag
+r <- tibble(regime = REG, n = nrow(x), p_tol = tol, max_abs_dp = max(dp), n_dp_gt_0 = sum(dp > 0), n_dp_gt_1e6 = sum(dp > 1e-6),
+            fail_p = sum(f_p), fail_p_pct1 = sum(f_pct), fail_flag = sum(f_flag), n_p_pct1_diff = sum(dpp > 1e-9),
+            events = as.integer(any(f_p)) + as.integer(any(f_pct)) + as.integer(any(f_flag)),
+            recon = if (any(f_p | f_pct | f_flag)) "FAIL" else "PASS")
+write_csv(r, file.path(D, "RECON.csv")); print(as.data.frame(r))
+
+### seeds/C46/ARMS.tsv (new file, 871 bytes)
+arm	ra_order	rb_order	thresh	rb_drop	regime	desc
+BASE	natural	reversed	1e-7	-	baseline	baseline regime: no determinism declarations; glmnet default thresh 1e-7; paths use different column orders; baseline comparator
+DECL	canonical	canonical	1e-12	-	declared	declared regime: thresh 1e-12, canonical column order, tie rule p>=0.5, rounding-derived reconciliation rule
+THRESH_ONLY	natural	reversed	1e-12	-	baseline	attribution probe: tight thresh only (orders differ, baseline comparator)
+ORDER_ONLY	canonical	canonical	1e-7	-	baseline	attribution probe: canonical order only (default thresh, baseline comparator)
+DEFECT_DECL	canonical	canonical	1e-12	x_log_peer_p75	declared	real defect under the declared regime: R-B omits feature x_log_peer_p75 (must still fail recon)
+DEFECT_BASE	natural	reversed	1e-7	x_log_peer_p75	baseline	same real defect under the baseline regime
+
+### seeds/C46/DETFIT (new file, 82 bytes)
+C46 seeded-fit arms (runner v4); REF = canonical order, thresh 1e-14, single path
+
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C46 VALIDATOR REPORT

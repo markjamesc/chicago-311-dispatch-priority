@@ -1,0 +1,10 @@
+"file","listed","sha_match","first_ok","last_ok","said_opened","opened_proven"
+"STAGE5_EVIDENCE_PACKAGE.md",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"STAGE5_DEEPER_FINDINGS.md",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"capacity_coverage_note.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"escalate_by_type_top25.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"inconclusive_by_clause.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"independent_checks_critical_counts.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"kappa_sensitivity.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"portfolio_summary.csv",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+"AI1_INTERPRETATION.md",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE

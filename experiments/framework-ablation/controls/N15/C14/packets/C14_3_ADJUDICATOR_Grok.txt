@@ -1,0 +1,1110 @@
+# C14 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Explicit Semantics, Open/Eligibility (catalog #14) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C14 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+- Cross-reference: N1 is open finding **OF-1** in the coordinator's RESULTS_N15.md (DST ambiguous-hour clean-pair mismatch; coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It was disclosed to the Builder and Validator in their packets (COORDINATOR NOTE N1) and in every spec ("Known open finding N1"), all before execution.
+
+---
+# SPEC
+# C14 — Ablation specification (FROZEN)
+
+**Ablation ID:** C14 (owner Remaining Ablation Program, catalog #14 "Explicit Semantics (Open/Elig.)")
+**Batch:** N15 batch 2 of 3 (controls C14, C11, C34, C16, C18)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+Frozen code: `R-A/run_RA.R` `f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587`; `R-B/R/00_config.R` `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`; `R-B/R/20_integrity_and_classify.R` `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`; `R-B/R/40_fixtures.R` `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 3→4 (meaning of open, eligible, duplicate, legacy)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+The semantic definitions of "open", "eligibility", "duplicates" and "legacy" are locked in the Stage-3 design (`MEASUREMENT_DESIGN_LOCKED.md` §3, §5). Both builders implement the locked definitions.
+
+## Exact change being tested (ablation)
+The definitions are not locked. Each builder applies its own plausible plain-language reading. Each seeded reading below is either named as an alternative in the design text, or follows from the unlocked term. A reading can be taken by one builder (single path) or by both (shared reading).
+**Caught without the control (D_abl):** crash, recon key/label mismatch (n_only_ra + n_only_rb + n_disagree > 0), or a fixture failure on any path.
+With the control, the locked definition is applied on both paths, which is arm B by construction.
+Disclosure: the frozen fixtures encode the locked definitions (F07 duplicate out of set, F08 legacy out of set). They are kept in every arm.
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. As a result, arm B's full-field recon (R-A vs R-B) shows dormant_h 1 and open_age_h 2 in every control. These mismatches are present in the frozen pack itself. The HALT rule "B recon 0/0/0" uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h.
+
+## Data profile used to choose seeds (frozen source, read-only, computed before the specs were frozen)
+STATUS = "Open" on all 245,193 rows. DUPLICATE: false 222,176 / true 23,017. LEGACY_RECORD: false 245,014 / true 179. PARENT_SR_NUMBER non-blank: 23,014. CLOSED_DATE non-blank: 0. Blank type_key: 0. Unparseable created/mod: 0. mod < created: 0. created > T: 0. Open rows by peer_n: no peer stats 6,443; 1–29: 27; 30–49: 35; 50–74: 14; 75–99: 19; ≥100: 238,655.
+
+## Seeded readings (frozen before execution)
+A clean arm B (frozen R-A + frozen R-B, frozen source) is the truth reference. In a seeded arm, a path that is not run is taken from arm B.
+**Locked fields** compared against arm B: SR_NUMBER key set, classification, dormant_h, open_age_h (|d| > 1e-6 counts as a change).
+**Harm set H:** seeded arms whose output differs from arm B on any locked field, on any path.
+Seed files and SHA-256 are in `runner/SEEDS_b2.sha256`. Code diffs vs the frozen code are in `runner/SEED_DIFFS_b2.txt`. No source variants are used in batch 2.
+- **SEM_DUPKEEP_RB** (paths run: RB): R-B alone reads 'duplicate' as 'keep and hold INCONCLUSIVE' (the F07 alternative named in the design).
+  - code seed `seeds/C14/RB_SEM_DUPKEEP__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48`
+- **SEM_DUPKEEP_CM** (paths run: RA+RB): Both paths read 'duplicate' as 'keep and hold INCONCLUSIVE'.
+  - code seed `seeds/C14/RA_SEM_DUPKEEP__run_RA.R` → `R-A\run_RA.R`, SHA-256 `382cdc1ec4dd929b81e352310efce823e0e0542513f70c3196df4a9dbcb2ed2c`
+  - code seed `seeds/C14/RB_SEM_DUPKEEP__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48`
+- **SEM_NOPEER_RB** (paths run: RB): R-B alone reads 'eligible' as 'has peer statistics' (rows with no peer stats excluded, not INCONCLUSIVE).
+  - code seed `seeds/C14/RB_SEM_NOPEER__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c`
+- **SEM_NOPEER_CM** (paths run: RA+RB): Both paths read 'eligible' as 'has peer statistics'.
+  - code seed `seeds/C14/RA_SEM_NOPEER__run_RA.R` → `R-A\run_RA.R`, SHA-256 `6e3284064f415877466806e4f1ee9ddabc0f33cf41a1b6da1ae6476ab6085237`
+  - code seed `seeds/C14/RB_SEM_NOPEER__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c`
+- **SEM_LEGACYIN_CM** (paths run: RA+RB): Both paths read LEGACY_RECORD rows as eligible (no legacy exclusion).
+  - code seed `seeds/C14/RA_SEM_LEGACYIN__run_RA.R` → `R-A\run_RA.R`, SHA-256 `63fd48501746154fa467b19b3ea6aa9007a29d976303429a68cd535ea02950c0`
+  - code seed `seeds/C14/RB_SEM_LEGACYIN__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `9c624554e023cff2b64e12a5bfff3d41e6818f1a4d5f81fe296cff69b6630bd3`
+- **SEM_OPENEXACT_CM** (paths run: RA+RB): Both paths read 'open' as the exact token STATUS == "Open" (no case/space normalization).
+  - code seed `seeds/C14/RA_SEM_OPENEXACT__run_RA.R` → `R-A\run_RA.R`, SHA-256 `a16dc9b879faa4efc1f083c06f80658f05d16bcdaa229a17d5be85553d6a1261`
+  - code seed `seeds/C14/RB_SEM_OPENEXACT__20_integrity_and_classify.R` → `R-B\R\20_integrity_and_classify.R`, SHA-256 `0619a1990ae6d4725c565f4e661b31e8984c068abd41638e8a195d8fc0c6edee`
+## Operational benefit predicate P1
+Owner threshold: "Pass: No semantic ambiguity arises without lock. Fail: Differing interpretations occur (keep rule)."
+- **P1 satisfied:** H ⊆ D_abl. Every seeded change that alters a locked output field is still caught without the control.
+- **P1 failed:** H \ D_abl is non-empty. At least one change that alters a locked output field passes undetected without the control.
+Arms with no locked-field change are reported. They do not count for or against P1. A single-path reading that recon catches still needs a ruling on the meaning before the outputs can be trusted. This test does not score that ruling.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14, on every path that runs (as frozen unless an arm's seed states a fixture rewrite).
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures in the pack.
+
+## Regression / HALT rules
+- HALT if arm B does not reproduce the frozen pack (any key/label/dormant/open_age difference vs the frozen RA/RB classifications), if B recon (key set + classification, the frozen definition; see N1) is not 0/0/0, or if B fixtures are not 14/14 on both paths.
+- HALT if any seeded run is missing (no exit recorded), or if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm that crashes (exit ≠ 0 or no output) counts as caught in every regime. It is not a HALT.
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   2be2e2196eaa4c2529f74d59c87d832160c56911ec5da669ae3ec3a6b9285a51 seeds/C14/ARMS.tsv
+seed   OK   382cdc1ec4dd929b81e352310efce823e0e0542513f70c3196df4a9dbcb2ed2c seeds/C14/RA_SEM_DUPKEEP__run_RA.R
+seed   OK   63fd48501746154fa467b19b3ea6aa9007a29d976303429a68cd535ea02950c0 seeds/C14/RA_SEM_LEGACYIN__run_RA.R
+seed   OK   6e3284064f415877466806e4f1ee9ddabc0f33cf41a1b6da1ae6476ab6085237 seeds/C14/RA_SEM_NOPEER__run_RA.R
+seed   OK   a16dc9b879faa4efc1f083c06f80658f05d16bcdaa229a17d5be85553d6a1261 seeds/C14/RA_SEM_OPENEXACT__run_RA.R
+seed   OK   3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48 seeds/C14/RB_SEM_DUPKEEP__20_integrity_and_classify.R
+seed   OK   9c624554e023cff2b64e12a5bfff3d41e6818f1a4d5f81fe296cff69b6630bd3 seeds/C14/RB_SEM_LEGACYIN__20_integrity_and_classify.R
+seed   OK   22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c seeds/C14/RB_SEM_NOPEER__20_integrity_and_classify.R
+seed   OK   0619a1990ae6d4725c565f4e661b31e8984c068abd41638e8a195d8fc0c6edee seeds/C14/RB_SEM_OPENEXACT__20_integrity_and_classify.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+2be2e2196eaa4c2529f74d59c87d832160c56911ec5da669ae3ec3a6b9285a51  1458  runner/seeds/C14/ARMS.tsv
+382cdc1ec4dd929b81e352310efce823e0e0542513f70c3196df4a9dbcb2ed2c  25083  runner/seeds/C14/RA_SEM_DUPKEEP__run_RA.R
+63fd48501746154fa467b19b3ea6aa9007a29d976303429a68cd535ea02950c0  25031  runner/seeds/C14/RA_SEM_LEGACYIN__run_RA.R
+6e3284064f415877466806e4f1ee9ddabc0f33cf41a1b6da1ae6476ab6085237  25111  runner/seeds/C14/RA_SEM_NOPEER__run_RA.R
+a16dc9b879faa4efc1f083c06f80658f05d16bcdaa229a17d5be85553d6a1261  25045  runner/seeds/C14/RA_SEM_OPENEXACT__run_RA.R
+3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48  6045  runner/seeds/C14/RB_SEM_DUPKEEP__20_integrity_and_classify.R
+9c624554e023cff2b64e12a5bfff3d41e6818f1a4d5f81fe296cff69b6630bd3  5985  runner/seeds/C14/RB_SEM_LEGACYIN__20_integrity_and_classify.R
+22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c  6025  runner/seeds/C14/RB_SEM_NOPEER__20_integrity_and_classify.R
+0619a1990ae6d4725c565f4e661b31e8984c068abd41638e8a195d8fc0c6edee  6012  runner/seeds/C14/RB_SEM_OPENEXACT__20_integrity_and_classify.R
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+05:41:31 C14 arms
+05:41:43   B RA exit=0 secs=11.1
+05:42:09   B RB exit=0 secs=26.3
+05:42:38   SEM_DUPKEEP_RB RB exit=0 secs=28.2
+05:42:53   SEM_DUPKEEP_CM RA exit=0 secs=14.2
+05:43:19   SEM_DUPKEEP_CM RB exit=0 secs=26.3
+05:43:47   SEM_NOPEER_RB RB exit=0 secs=27.3
+05:44:00   SEM_NOPEER_CM RA exit=0 secs=12.1
+05:44:26   SEM_NOPEER_CM RB exit=0 secs=26.3
+05:44:39   SEM_LEGACYIN_CM RA exit=0 secs=12.2
+05:45:05   SEM_LEGACYIN_CM RB exit=0 secs=26.3
+05:45:19   SEM_OPENEXACT_CM RA exit=0 secs=12.1
+05:45:45   SEM_OPENEXACT_CM RB exit=0 secs=26.3
+
+---
+# C14_RESULTS.md (runner output)
+# C14 RESULTS — Explicit Semantics, Open/Eligibility (catalog #14) ablation (runner output, mechanical facts only)
+
+Truth reference = arm B (frozen code, frozen source, both paths). Locked fields compared: key set (SR_NUMBER), classification, dormant_h, open_age_h (|d| > 1e-6 counts).
+In a seeded arm, a path that is not run is taken from arm B. Fixture columns show the seeded path's own result, or arm B's if that path is not run.
+
+## Mechanical facts
+- H1 arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 arm B reproduces the frozen pack (0 key/label/dormant/open_age differences vs frozen RA and RB) and B recon is 0/0/0: TRUE; B full-field recon mismatches: dormant_h 1, open_age_h 2
+- H3 seeded arms with every run recorded: 6/6
+- H4 harm set H (arms whose output differs from arm B on any locked field: key set, classification, dormant_h, open_age_h): {SEM_DUPKEEP_RB,SEM_DUPKEEP_CM,SEM_NOPEER_RB,SEM_NOPEER_CM,SEM_LEGACYIN_CM}
+- H5 caught without the control [crash, recon key/label mismatch, or fixture failure on any path]: {SEM_DUPKEEP_RB,SEM_DUPKEEP_CM,SEM_NOPEER_RB,SEM_LEGACYIN_CM}
+- H6 H minus caught-without-control: {SEM_NOPEER_CM}
+- H7 arms with no locked-field change: {SEM_OPENEXACT_CM}
+
+## Arm B repro vs frozen pack
+| cmp | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | n_open_age_diff |
+|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 0 | 0 | 0 | 0 | 0 |
+
+## Arm B recon (R-A vs R-B)
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_disagree | n_dormant_mismatch | n_open_age_mismatch |
+|---|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 0 | 1 | 2 |
+
+## Seeded arms
+| arm | paths_run | change | exit | fx_RA | fx_RB | recon_only_ra | recon_only_rb | recon_disagree | recon_dormant_mismatch | recon_open_age_mismatch | RA_vs_B | RB_vs_B | locked_field_changes_vs_B | decision_changes_vs_B | harm | inputs_differing_from_B | caught_with_control | caught_without_control |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| SEM_DUPKEEP_RB | RB | R-B alone reads 'duplicate' as 'keep and hold INCONCLUSIVE' (the F07 alternative named in the design) | RB=0 | 14/14 | 13/14 (F07) | 0 | 23012 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=23012 only_B=0 label=0 dormant=0 open_age=0 | 23012 | 23012 | TRUE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| SEM_DUPKEEP_CM | RA+RB | Both paths read 'duplicate' as 'keep and hold INCONCLUSIVE' | RA=0 RB=0 | 13/14 (F07) | 13/14 (F07) | 0 | 0 | 0 | 1 | 2 | only_x=23012 only_B=0 label=0 dormant=0 open_age=0 | only_x=23012 only_B=0 label=0 dormant=0 open_age=0 | 46024 | 46024 | TRUE | R-A\run_RA.R; R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| SEM_NOPEER_RB | RB | R-B alone reads 'eligible' as 'has peer statistics' (rows with no peer stats excluded, not INCONCLUSIVE) | RB=0 | 14/14 | 14/14 | 6315 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=6315 label=0 dormant=0 open_age=0 | 6315 | 6315 | TRUE | R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| SEM_NOPEER_CM | RA+RB | Both paths read 'eligible' as 'has peer statistics' | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=6315 label=0 dormant=0 open_age=0 | only_x=0 only_B=6315 label=0 dormant=0 open_age=0 | 12630 | 12630 | TRUE | R-A\run_RA.R; R-B\R\20_integrity_and_classify.R | NA | FALSE |
+| SEM_LEGACYIN_CM | RA+RB | Both paths read LEGACY_RECORD rows as eligible (no legacy exclusion) | RA=0 RB=0 | 13/14 (F08) | 13/14 (F08) | 0 | 0 | 0 | 1 | 2 | only_x=174 only_B=0 label=0 dormant=0 open_age=0 | only_x=174 only_B=0 label=0 dormant=0 open_age=0 | 348 | 348 | TRUE | R-A\run_RA.R; R-B\R\20_integrity_and_classify.R | NA | TRUE |
+| SEM_OPENEXACT_CM | RA+RB | Both paths read 'open' as the exact token STATUS == "Open" (no case/space normalization) | RA=0 RB=0 | 14/14 | 14/14 | 0 | 0 | 0 | 1 | 2 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | only_x=0 only_B=0 label=0 dormant=0 open_age=0 | 0 | 0 | FALSE | R-A\run_RA.R; R-B\R\20_integrity_and_classify.R | NA | FALSE |
+
+
+---
+# C14_arms.csv (raw, full file)
+arm,paths_run,change,exit,fx_RA,fx_RB,recon_only_ra,recon_only_rb,recon_disagree,recon_dormant_mismatch,recon_open_age_mismatch,RA_vs_B,RB_vs_B,locked_field_changes_vs_B,decision_changes_vs_B,harm,inputs_differing_from_B,caught_with_control,caught_without_control
+SEM_DUPKEEP_RB,RB,R-B alone reads 'duplicate' as 'keep and hold INCONCLUSIVE' (the F07 alternative named in the design),RB=0,14/14,13/14 (F07),0,23012,0,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=23012 only_B=0 label=0 dormant=0 open_age=0,23012,23012,TRUE,R-B\R\20_integrity_and_classify.R,NA,TRUE
+SEM_DUPKEEP_CM,RA+RB,Both paths read 'duplicate' as 'keep and hold INCONCLUSIVE',RA=0 RB=0,13/14 (F07),13/14 (F07),0,0,0,1,2,only_x=23012 only_B=0 label=0 dormant=0 open_age=0,only_x=23012 only_B=0 label=0 dormant=0 open_age=0,46024,46024,TRUE,R-A\run_RA.R; R-B\R\20_integrity_and_classify.R,NA,TRUE
+SEM_NOPEER_RB,RB,"R-B alone reads 'eligible' as 'has peer statistics' (rows with no peer stats excluded, not INCONCLUSIVE)",RB=0,14/14,14/14,6315,0,0,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=6315 label=0 dormant=0 open_age=0,6315,6315,TRUE,R-B\R\20_integrity_and_classify.R,NA,TRUE
+SEM_NOPEER_CM,RA+RB,Both paths read 'eligible' as 'has peer statistics',RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=6315 label=0 dormant=0 open_age=0,only_x=0 only_B=6315 label=0 dormant=0 open_age=0,12630,12630,TRUE,R-A\run_RA.R; R-B\R\20_integrity_and_classify.R,NA,FALSE
+SEM_LEGACYIN_CM,RA+RB,Both paths read LEGACY_RECORD rows as eligible (no legacy exclusion),RA=0 RB=0,13/14 (F08),13/14 (F08),0,0,0,1,2,only_x=174 only_B=0 label=0 dormant=0 open_age=0,only_x=174 only_B=0 label=0 dormant=0 open_age=0,348,348,TRUE,R-A\run_RA.R; R-B\R\20_integrity_and_classify.R,NA,TRUE
+SEM_OPENEXACT_CM,RA+RB,"Both paths read 'open' as the exact token STATUS == ""Open"" (no case/space normalization)",RA=0 RB=0,14/14,14/14,0,0,0,1,2,only_x=0 only_B=0 label=0 dormant=0 open_age=0,only_x=0 only_B=0 label=0 dormant=0 open_age=0,0,0,FALSE,R-A\run_RA.R; R-B\R\20_integrity_and_classify.R,NA,FALSE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+B,RA,F01,ESCALATE,ESCALATE,TRUE
+B,RA,F02,STANDARD,STANDARD,TRUE
+B,RA,F03,STANDARD,STANDARD,TRUE
+B,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F10,STANDARD,STANDARD,TRUE
+B,RA,F11,ESCALATE,ESCALATE,TRUE
+B,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+B,RB,F01,ESCALATE,ESCALATE,TRUE
+B,RB,F02,STANDARD,STANDARD,TRUE
+B,RB,F03,STANDARD,STANDARD,TRUE
+B,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F10,STANDARD,STANDARD,TRUE
+B,RB,F11,ESCALATE,ESCALATE,TRUE
+B,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+B,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+B,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_DUPKEEP_RB,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_RB,RB,F02,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_RB,RB,F03,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_RB,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_RB,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_RB,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_RB,RB,F07,OUT_OF_SET,INCONCLUSIVE,FALSE
+SEM_DUPKEEP_RB,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_RB,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_RB,RB,F10,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_RB,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_RB,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_RB,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_RB,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_DUPKEEP_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_CM,RA,F02,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RA,F03,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RA,F07,OUT_OF_SET,INCONCLUSIVE,FALSE
+SEM_DUPKEEP_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RA,F10,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SEM_DUPKEEP_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_CM,RB,F02,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RB,F03,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RB,F07,OUT_OF_SET,INCONCLUSIVE,FALSE
+SEM_DUPKEEP_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RB,F10,STANDARD,STANDARD,TRUE
+SEM_DUPKEEP_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_DUPKEEP_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_DUPKEEP_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_DUPKEEP_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_NOPEER_RB,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_RB,RB,F02,STANDARD,STANDARD,TRUE
+SEM_NOPEER_RB,RB,F03,STANDARD,STANDARD,TRUE
+SEM_NOPEER_RB,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_RB,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_RB,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_RB,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_RB,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_RB,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_RB,RB,F10,STANDARD,STANDARD,TRUE
+SEM_NOPEER_RB,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_RB,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_RB,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_RB,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_NOPEER_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_CM,RA,F02,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RA,F03,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RA,F10,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SEM_NOPEER_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_CM,RB,F02,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RB,F03,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RB,F10,STANDARD,STANDARD,TRUE
+SEM_NOPEER_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_NOPEER_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_NOPEER_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_NOPEER_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_LEGACYIN_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+SEM_LEGACYIN_CM,RA,F02,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RA,F03,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_LEGACYIN_CM,RA,F08,OUT_OF_SET,ESCALATE,FALSE
+SEM_LEGACYIN_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RA,F10,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+SEM_LEGACYIN_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_LEGACYIN_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SEM_LEGACYIN_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_LEGACYIN_CM,RB,F02,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RB,F03,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_LEGACYIN_CM,RB,F08,OUT_OF_SET,ESCALATE,FALSE
+SEM_LEGACYIN_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RB,F10,STANDARD,STANDARD,TRUE
+SEM_LEGACYIN_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_LEGACYIN_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_LEGACYIN_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_LEGACYIN_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+SEM_OPENEXACT_CM,RA,F01,ESCALATE,ESCALATE,TRUE
+SEM_OPENEXACT_CM,RA,F02,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RA,F03,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RA,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RA,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RA,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RA,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RA,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RA,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RA,F10,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RA,F11,ESCALATE,ESCALATE,TRUE
+SEM_OPENEXACT_CM,RA,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RA,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RA,F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE
+SEM_OPENEXACT_CM,RB,F01,ESCALATE,ESCALATE,TRUE
+SEM_OPENEXACT_CM,RB,F02,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RB,F03,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RB,F04,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RB,F05,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RB,F06,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RB,F07,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RB,F08,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RB,F09,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RB,F10,STANDARD,STANDARD,TRUE
+SEM_OPENEXACT_CM,RB,F11,ESCALATE,ESCALATE,TRUE
+SEM_OPENEXACT_CM,RB,F12,OUT_OF_SET,OUT_OF_SET,TRUE
+SEM_OPENEXACT_CM,RB,F13,INCONCLUSIVE,INCONCLUSIVE,TRUE
+SEM_OPENEXACT_CM,RB,F14,STANDARD|STANDARD,STANDARD|STANDARD,TRUE
+
+---
+# C14_EVIDENCE.sha256
+cee3ed648430714d1cbf856a9b1c968c9310dc99476858739d673c54982cba47  C14_ARM_MANIFESTS.txt
+1c5a42dbdf30d270560520faa831ec94f51778f3a64f39897edfd7a014d171f6  C14_arms.csv
+62a0bd8c6808a17f72a5ff250382a243176974d6b89c817307a67453d1cb4b2f  C14_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+B in  :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+B in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+B out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+B out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+B out :: 480f661456df81552bbdf367ee37938a4e3d0e736c5a77ea72eb8f7cfe1783bd  34  RUN_RA.exit
+B out :: 08426d29a422a8092c066875352c3508ac07997e4dc0b203b5191f7ef3dd186c  779  RUN_RA.stderr.txt
+B out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+B out :: cd71130a144c80d5b322ed00055b5673121fd56a533a2ba542d0bdc35473495f  34  RUN_RB.exit
+B out :: 4387d9d088664de8b4166039683e1e94deaee9b675f8cadd4ca6630eff77e3ab  1260  RUN_RB.stderr.txt
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_DUPKEEP_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_DUPKEEP_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_DUPKEEP_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_DUPKEEP_CM in  :: 382cdc1ec4dd929b81e352310efce823e0e0542513f70c3196df4a9dbcb2ed2c  25083  R-A\run_RA.R
+SEM_DUPKEEP_CM in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_DUPKEEP_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_DUPKEEP_CM in  :: 3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48  6045  R-B\R\20_integrity_and_classify.R
+SEM_DUPKEEP_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_DUPKEEP_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_DUPKEEP_CM out :: 99dc5eba7d80a3354a1bb78d2b64797f081109eaac1419c8c275c5ac22dce9d1  24529959  R-A\outputs\RA_classifications.csv
+SEM_DUPKEEP_CM out :: f7a674bd19af99947cd5977db30af938d24a73f1423fe51fa23e92a81fcda9a6  998  R-A\outputs\RA_fixture_results.csv
+SEM_DUPKEEP_CM out :: 499ea6f025964caea3381958f6d3a6148999572f4c3408418a2a1768e79f1e69  141  R-A\outputs\RA_portfolio_counts.csv
+SEM_DUPKEEP_CM out :: 561adc800d1a4f385718167aa1ab1432f39d9d6b940bc97e0bc4e33d5738f1a5  45600346  R-B\outputs\RB_classifications.csv
+SEM_DUPKEEP_CM out :: fe34d4fc2f8ef6fcc68e2e2dde48eb408a2d75a5d37ed7d47fb8a647396c05cc  1839  R-B\outputs\RB_fixture_results.csv
+SEM_DUPKEEP_CM out :: 1214c489a21fa3b7d16c88637a84c2af5387327d46a373203205cc4997efa80e  168  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_DUPKEEP_CM out :: af0711a26f1a460b5f271fa0842bb1fd2f9f2c90d46e8d45da54bce4c18c6ddb  99  R-B\outputs\RB_portfolio_counts.csv
+SEM_DUPKEEP_CM out :: 32298a3eb15a7621325a8ec60333e02f145be9f3a7adeeeb2dc0ecd251aa868b  34  RUN_RA.exit
+SEM_DUPKEEP_CM out :: 9d522e8a3c5ba1d9999897050dee4d7232b33b306612777102191561b0a43922  870  RUN_RA.stderr.txt
+SEM_DUPKEEP_CM out :: 17a89c55551dbe1fb94ffd55932b1f58945ea51c0032293e66d765f2aa1714d9  1361  RUN_RA.stdout.txt
+SEM_DUPKEEP_CM out :: 39046943bb5a733b35b358374abfec97883ed35f0e83d7e5e5cd9ea6eb56f8f7  34  RUN_RB.exit
+SEM_DUPKEEP_CM out :: 30bc90faf74359314539b37c69abc4d6c8ccdab8e909ccda74b20665d15e3c09  1326  RUN_RB.stderr.txt
+SEM_DUPKEEP_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_DUPKEEP_RB in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_DUPKEEP_RB in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_DUPKEEP_RB in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_DUPKEEP_RB in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_DUPKEEP_RB in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_DUPKEEP_RB in  :: 3fed6c826f3ac091eb7f6b7a087208a70c0edaad60cf0f753a0191768c63af48  6045  R-B\R\20_integrity_and_classify.R
+SEM_DUPKEEP_RB in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_DUPKEEP_RB in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_DUPKEEP_RB out :: 561adc800d1a4f385718167aa1ab1432f39d9d6b940bc97e0bc4e33d5738f1a5  45600346  R-B\outputs\RB_classifications.csv
+SEM_DUPKEEP_RB out :: fe34d4fc2f8ef6fcc68e2e2dde48eb408a2d75a5d37ed7d47fb8a647396c05cc  1839  R-B\outputs\RB_fixture_results.csv
+SEM_DUPKEEP_RB out :: 1214c489a21fa3b7d16c88637a84c2af5387327d46a373203205cc4997efa80e  168  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_DUPKEEP_RB out :: af0711a26f1a460b5f271fa0842bb1fd2f9f2c90d46e8d45da54bce4c18c6ddb  99  R-B\outputs\RB_portfolio_counts.csv
+SEM_DUPKEEP_RB out :: 15d5cf9f4a85199c8b009b58ce63b441cd52a2d986b85d89d17228af7494945a  34  RUN_RB.exit
+SEM_DUPKEEP_RB out :: f32dfe9f8ca486b34fac9aca43f613cc8399fd2270d50d648863a5b74bf8697f  1326  RUN_RB.stderr.txt
+SEM_DUPKEEP_RB out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_LEGACYIN_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_LEGACYIN_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_LEGACYIN_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_LEGACYIN_CM in  :: 63fd48501746154fa467b19b3ea6aa9007a29d976303429a68cd535ea02950c0  25031  R-A\run_RA.R
+SEM_LEGACYIN_CM in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_LEGACYIN_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_LEGACYIN_CM in  :: 9c624554e023cff2b64e12a5bfff3d41e6818f1a4d5f81fe296cff69b6630bd3  5985  R-B\R\20_integrity_and_classify.R
+SEM_LEGACYIN_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_LEGACYIN_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_LEGACYIN_CM out :: bd211ae87e5b480ab95ad92b1370418437a6c7d598e5b873e3f6040a08727b15  22289391  R-A\outputs\RA_classifications.csv
+SEM_LEGACYIN_CM out :: bc197ec851ac538c05236653a48e78a2c2a56f7f90d94f1579b15860d89ed890  1001  R-A\outputs\RA_fixture_results.csv
+SEM_LEGACYIN_CM out :: 0f0e7d5d4b3845dd249cf0d012bcd045aec05f592e32e1058992da4e084d79fe  140  R-A\outputs\RA_portfolio_counts.csv
+SEM_LEGACYIN_CM out :: 7f136975192428b6b51faabd49a8f5af65075c86528a6d921ff5322fd6110759  41996881  R-B\outputs\RB_classifications.csv
+SEM_LEGACYIN_CM out :: 515cb43150e52a80e2ef91e92351a2b51df9f75daa29f983073e5824eece6b5b  1869  R-B\outputs\RB_fixture_results.csv
+SEM_LEGACYIN_CM out :: abde056515c7d20696f2716c1562fd9966c0e18317c29f6807f3d5d073c91e1f  164  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_LEGACYIN_CM out :: 4366ca2940ea76d2b629b4950104e10320c74cc8d416739fb216142b1f0d5b75  100  R-B\outputs\RB_portfolio_counts.csv
+SEM_LEGACYIN_CM out :: 5f4eb8af84e0dc9d269be00b3c9bad383c1038f0f12bf1f57918b2950576dd5f  34  RUN_RA.exit
+SEM_LEGACYIN_CM out :: 5d75b1e7b58bd2047bb15392865684dadd74ccd6f647a7782a117cecff2cac6c  877  RUN_RA.stderr.txt
+SEM_LEGACYIN_CM out :: 290b23d3b2864f8fc5af7224e58684e403baeec731b51531214beccc25dead14  1361  RUN_RA.stdout.txt
+SEM_LEGACYIN_CM out :: 43c3965e75522ef3537d4f217d036ce440eb0c6de3a4e5b30e361227727db0a5  34  RUN_RB.exit
+SEM_LEGACYIN_CM out :: fb6457c714ebc722c32abeb0bae74178995771f0363252158d56cdd44f065eac  1330  RUN_RB.stderr.txt
+SEM_LEGACYIN_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_NOPEER_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_NOPEER_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_NOPEER_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_NOPEER_CM in  :: 6e3284064f415877466806e4f1ee9ddabc0f33cf41a1b6da1ae6476ab6085237  25111  R-A\run_RA.R
+SEM_NOPEER_CM in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_NOPEER_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_NOPEER_CM in  :: 22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c  6025  R-B\R\20_integrity_and_classify.R
+SEM_NOPEER_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_NOPEER_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_NOPEER_CM out :: eed990354960a8c6419e8e1f4d45b009bda2f0f39b033e24d0298d7a68484ea8  21622211  R-A\outputs\RA_classifications.csv
+SEM_NOPEER_CM out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+SEM_NOPEER_CM out :: 37a0e860483b4e91f51a6059c2bdbc5fe05c89d6392876fb3e25fc87c0417c40  138  R-A\outputs\RA_portfolio_counts.csv
+SEM_NOPEER_CM out :: 6e439a2fcad8f4191e0f6b3b1a64240e86ccd80955326ce9a0750f1058214b49  41109520  R-B\outputs\RB_classifications.csv
+SEM_NOPEER_CM out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+SEM_NOPEER_CM out :: d7532246ea9280b2d4086eadce3e8d7c747b32dcf6d0692e291e484547aa0dfa  156  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_NOPEER_CM out :: 25f870af7086c76002aa32aabd4e1c7f280ed5dde9fbb1835170b4fe5195ed86  98  R-B\outputs\RB_portfolio_counts.csv
+SEM_NOPEER_CM out :: 024daa83b7bb60a59419b715dc16bf54ae67d568a4106b4558c2f4e38decfa42  34  RUN_RA.exit
+SEM_NOPEER_CM out :: a8201261a1df55d2d50a5db8aee46d73518b249e0cddf16dc5b2b47a4625953a  863  RUN_RA.stderr.txt
+SEM_NOPEER_CM out :: 7c85490958c5eb5e1a68b7328255e7afb61f06884711927b8a2de925ddb064c5  1361  RUN_RA.stdout.txt
+SEM_NOPEER_CM out :: d11c81bf26b7181e4d43d7be424f4945b2f5599292a8b637a3e3e06691260542  34  RUN_RB.exit
+SEM_NOPEER_CM out :: d42f546027a9c398ae76672bb357b90774728d284efd43417a47dc43e2f7f02f  1318  RUN_RB.stderr.txt
+SEM_NOPEER_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_NOPEER_RB in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_NOPEER_RB in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_NOPEER_RB in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_NOPEER_RB in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_NOPEER_RB in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_NOPEER_RB in  :: 22a595002896081a1bb23f2214317bcf2b3c2fdb93f1ffe6f88a8cd38e3f5b4c  6025  R-B\R\20_integrity_and_classify.R
+SEM_NOPEER_RB in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_NOPEER_RB in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_NOPEER_RB out :: 6e439a2fcad8f4191e0f6b3b1a64240e86ccd80955326ce9a0750f1058214b49  41109520  R-B\outputs\RB_classifications.csv
+SEM_NOPEER_RB out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+SEM_NOPEER_RB out :: d7532246ea9280b2d4086eadce3e8d7c747b32dcf6d0692e291e484547aa0dfa  156  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_NOPEER_RB out :: 25f870af7086c76002aa32aabd4e1c7f280ed5dde9fbb1835170b4fe5195ed86  98  R-B\outputs\RB_portfolio_counts.csv
+SEM_NOPEER_RB out :: 2b1c86dac4160fa2dbc2a1a90df87c7957b23b6c7692b5664918974932dc7973  34  RUN_RB.exit
+SEM_NOPEER_RB out :: 4328e2ab6a0b6d150dd43f2dc18d31eb28cdd8540fe5ee5a6b6b594caaa1d975  1318  RUN_RB.stderr.txt
+SEM_NOPEER_RB out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+SEM_OPENEXACT_CM in  :: eaa9a76d8905a562222649fa99438c7347d41ed9318589fba24a570e72cddd1b  458  data\source\src_extract_lineage.csv
+SEM_OPENEXACT_CM in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+SEM_OPENEXACT_CM in  :: cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58  16276  data\source\src_peer_stats.csv
+SEM_OPENEXACT_CM in  :: a16dc9b879faa4efc1f083c06f80658f05d16bcdaa229a17d5be85553d6a1261  25045  R-A\run_RA.R
+SEM_OPENEXACT_CM in  :: 6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  1882  R-B\R\00_config.R
+SEM_OPENEXACT_CM in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+SEM_OPENEXACT_CM in  :: 0619a1990ae6d4725c565f4e661b31e8984c068abd41638e8a195d8fc0c6edee  6012  R-B\R\20_integrity_and_classify.R
+SEM_OPENEXACT_CM in  :: 2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  7260  R-B\R\40_fixtures.R
+SEM_OPENEXACT_CM in  :: 6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  5856  R-B\run_RB.R
+SEM_OPENEXACT_CM out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+SEM_OPENEXACT_CM out :: 33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A\outputs\RA_fixture_results.csv
+SEM_OPENEXACT_CM out :: b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A\outputs\RA_portfolio_counts.csv
+SEM_OPENEXACT_CM out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+SEM_OPENEXACT_CM out :: 0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B\outputs\RB_fixture_results.csv
+SEM_OPENEXACT_CM out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+SEM_OPENEXACT_CM out :: eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B\outputs\RB_portfolio_counts.csv
+SEM_OPENEXACT_CM out :: 8d38e160cf493717ed14e29b7e9ffbe6b757ed838d191b36e9a007a4146b2332  34  RUN_RA.exit
+SEM_OPENEXACT_CM out :: 5e727807d149504ab2b21ab0d5569617291053d71bd96f56fd737c70ee71cbf3  884  RUN_RA.stderr.txt
+SEM_OPENEXACT_CM out :: d1226a50941552caa3b9a77a8c42da200850ef0705aa20f5ad8aa1d548fc3ede  1361  RUN_RA.stdout.txt
+SEM_OPENEXACT_CM out :: 1293986563ac64982dfe26c21ddddc27896f9eecf6c9b0d751b8e5fb8b9fdb04  34  RUN_RB.exit
+SEM_OPENEXACT_CM out :: b1a2e851ff06903dbcd56640d22ff9fd8fb53b84831b23d41d6a18361e779d41  1335  RUN_RB.stderr.txt
+SEM_OPENEXACT_CM out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_RB.stdout.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C14/RB_SEM_DUPKEEP__20_integrity_and_classify.R
+@@ -61,6 +61,7 @@
+   p_missing_dormant <- is.na(mod_ts) | is.na(dormant_h)
+ 
+   integrity_clause <- rep(NA_character_, n)
++  integrity_clause[dup_flag] <- "I00_duplicate_retained"  # [seed] duplicates kept, held INCONCLUSIVE
+   integrity_clause[p_closed_contra] <- "I01_open_closed_date"
+   integrity_clause[is.na(integrity_clause) & p_bad_clock] <- "I02_bad_clocks"
+   integrity_clause[is.na(integrity_clause) & p_blank_type] <- "I03_blank_type_key"
+@@ -73,7 +74,7 @@
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- is_open & !leg_flag
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+--- frozen/R-A/run_RA.R
++++ seeds/C14/RA_SEM_DUPKEEP__run_RA.R
+@@ -241,7 +241,7 @@
+ 
+   # Exclude from decision set: DUPLICATE / LEGACY true-like; non-Open status
+   in_envelope_open <- tolower(status) == "open"
+-  exclude <- is_true_like(dup) | is_true_like(leg) | !in_envelope_open
++  exclude <- is_true_like(leg) | !in_envelope_open
+ 
+   # Peer join
+   peer_df <- peer_df %>%
+@@ -291,6 +291,7 @@
+     integrity_clause[hit] <<- clause
+   }
+ 
++  check(is_true_like(dup), "duplicate_retained")  # [seed] duplicates kept, held INCONCLUSIVE
+   check(is_blank(base$type_key), "blank_type_key")
+   check(!is.na(base$closed_ts), "open_with_closed_date")
+   check(is.na(base$created_ts), "unparseable_created")
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C14/RB_SEM_NOPEER__20_integrity_and_classify.R
+@@ -73,7 +73,7 @@
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- is_open & !dup_flag & !leg_flag & !is.na(peer_p75)  # [seed] 'eligible' read as 'has peer statistics'
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+--- frozen/R-A/run_RA.R
++++ seeds/C14/RA_SEM_NOPEER__run_RA.R
+@@ -275,6 +275,7 @@
+     )
+ 
+   # Integrity clauses (first hit wins for reporting)
++  base$exclude <- base$exclude | base$peer_missing  # [seed] 'eligible' read as 'has peer statistics'
+   integrity_clause <- rep(NA_character_, nrow(base))
+   classification <- rep(NA_character_, nrow(base))
+ 
+--- frozen/R-A/run_RA.R
++++ seeds/C14/RA_SEM_LEGACYIN__run_RA.R
+@@ -241,7 +241,7 @@
+ 
+   # Exclude from decision set: DUPLICATE / LEGACY true-like; non-Open status
+   in_envelope_open <- tolower(status) == "open"
+-  exclude <- is_true_like(dup) | is_true_like(leg) | !in_envelope_open
++  exclude <- is_true_like(dup) | !in_envelope_open  # [seed] legacy records read as eligible
+ 
+   # Peer join
+   peer_df <- peer_df %>%
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C14/RB_SEM_LEGACYIN__20_integrity_and_classify.R
+@@ -73,7 +73,7 @@
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- is_open & !dup_flag  # [seed] legacy records read as eligible
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+--- frozen/R-A/run_RA.R
++++ seeds/C14/RA_SEM_OPENEXACT__run_RA.R
+@@ -240,7 +240,7 @@
+   status <- if ("STATUS" %in% names(open_df)) str_trim(as.character(open_df$STATUS)) else "Open"
+ 
+   # Exclude from decision set: DUPLICATE / LEGACY true-like; non-Open status
+-  in_envelope_open <- tolower(status) == "open"
++  in_envelope_open <- status == "Open"  # [seed] exact token, no case normalization
+   exclude <- is_true_like(dup) | is_true_like(leg) | !in_envelope_open
+ 
+   # Peer join
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C14/RB_SEM_OPENEXACT__20_integrity_and_classify.R
+@@ -19,7 +19,7 @@
+ 
+   n <- nrow(joined)
+   status_norm <- trimws(as.character(joined$STATUS))
+-  is_open <- tolower(status_norm) == "open"
++  is_open <- as.character(joined$STATUS) == "Open"  # [seed] exact token, no trim/case normalization
+ 
+   dup_flag <- rb_truthy(joined$DUPLICATE)
+   leg_flag <- rb_truthy(joined$LEGACY_RECORD)
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C14",
+  "frozen_at_ct": "2026-10-03 07:04:47 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C14/C14-builder/builder_report.md", "bytes": 18371, "sha256": "23f091a28c3dbaa1f86b97bccb5da1bd0afe1a3481ecc3aee30afd020b5d1505", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C14/C14-validator/validator_report.md", "bytes": 7603, "sha256": "8ebff3eec8c938c51e334be089d5c0ad23381be5807451c3b489ba605a0092c6", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "24a290669b3c53d08a0d096453356e947000891a77cf7bc4d5805ba1746e5fd9"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C14 Builder Report
+
+## 1. Role attestation and ablation ID.
+
+I attest that I am acting **only as Builder** for **C14**, Remaining Ablation Program catalog #14, **“Explicit Semantics (Open/Elig.)”**, N15 batch 2 of 3, Constitution v1.0. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. This is an **independent first pass**; I do not rely on or infer the Validator’s assessment.
+
+Target stage: **Stage 3→4**, specifically the semantics of **open, eligible, duplicate, and legacy**. The control locks those meanings in the Stage-3 design and requires both builders to implement them. The ablation removes that semantic lock and permits each builder to apply a plausible plain-language interpretation.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+
+The ablation removes the requirement that “open,” “eligibility,” “duplicate,” and “legacy” have one frozen Stage-3 meaning shared by R-A and R-B. The six arms then test either a single-path alternate reading or a common alternate reading on both paths.
+
+| Seed | Exact code change |
+| --- | --- |
+| **SEM_DUPKEEP_RB** | In R-B, duplicates are assigned `integrity_clause[dup_flag] <- "I00_duplicate_retained"` and `!dup_flag` is removed from `in_decision`, changing `is_open & !dup_flag & !leg_flag` to `is_open & !leg_flag`. |
+| **SEM_DUPKEEP_CM / R-A side** | In R-A, duplicate status is removed from `exclude`, changing `is_true_like(dup) | is_true_like(leg) | !in_envelope_open` to `is_true_like(leg) | !in_envelope_open`; a `check(is_true_like(dup), "duplicate_retained")` integrity clause is added. |
+| **SEM_NOPEER_RB** | In R-B, decision membership gains `& !is.na(peer_p75)`, so a row without peer statistics is excluded. |
+| **SEM_NOPEER_CM / R-A side** | In R-A, `base$exclude <- base$exclude | base$peer_missing` is inserted before classification. |
+| **SEM_LEGACYIN_CM / R-A side** | In R-A, `is_true_like(leg)` is removed from the exclusion expression, so legacy records can enter the decision set. |
+| **SEM_LEGACYIN_CM / R-B side** | In R-B, `!leg_flag` is removed from `in_decision`, changing `is_open & !dup_flag & !leg_flag` to `is_open & !dup_flag`. |
+| **SEM_OPENEXACT_CM / R-A side** | R-A changes `tolower(status) == "open"` to `status == "Open"`. Importantly, `status` was already produced with `str_trim(...)`; therefore this seed removes case normalization but **still retains whitespace trimming on R-A**. |
+| **SEM_OPENEXACT_CM / R-B side** | R-B changes `tolower(status_norm) == "open"` to raw `as.character(joined$STATUS) == "Open"`, removing both trimming and case normalization from the actual comparison. |
+
+Those are the complete seeded hunks shown in `SEED DIFFS`; no source variant is used.
+
+The R-A/R-B difference in the OPENEXACT implementation is noteworthy: the frozen seed description says both paths use the exact token with no case/space normalization, but R-A still trims before its comparison while R-B does not. The frozen source does not exercise that difference because every source STATUS is exactly `"Open"`.
+
+## 3. Hard mechanical facts table.
+
+**Notation:** **R** = recomputed independently from supplied raw/table evidence. **Q** = quoted directly because the underlying scalar cannot be independently reconstructed further from the supplied packet. Where both appear, the quoted value was independently cross-checked by arithmetic.
+
+### Baseline/source arithmetic
+
+| Fact | Result | Basis |
+| --- | --- | --- |
+| Source rows from duplicate split | `222,176 + 23,017 = 245,193` | **R** |
+| Source rows from legacy split | `245,014 + 179 = 245,193` | **R** |
+| Peer-bin total | `6,443 + 27 + 35 + 14 + 19 + 238,655 = 245,193` | **R** |
+| Arm-B decision-set rows, each path | `222,002` | **Q**, RESULTS Arm B recon row |
+| Duplicate∩legacy overlap implied by B | `23,017 + 179 - (245,193 - 222,002) = 5` | **R** |
+| Duplicate-only rows | `23,017 - 5 = 23,012` | **R** |
+| Legacy-only rows | `179 - 5 = 174` | **R** |
+| No-peer rows surviving baseline duplicate/legacy exclusions | `6,315` | **R**, from NOPEER removal |
+| No-peer rows already outside B | `6,443 - 6,315 = 128` | **R** |
+
+The 23,012 duplicate-only and 174 legacy-only derivations exactly reproduce the observed DUPKEEP and LEGACYIN additions in the seeded-arm table.
+
+### Arm-B reconciliation identities
+
+| Fact | Result | Basis |
+| --- | --- | --- |
+| `n_ra` | 222,002 | **Q** |
+| `n_rb` | 222,002 | **Q** |
+| `n_inner` | 222,002 | **Q** |
+| `n_only_ra` | 0 | **Q** |
+| `n_only_rb` | 0 | **Q** |
+| `n_disagree` | 0 | **Q** |
+| `n_agree = n_inner - n_disagree` | `222,002 - 0 = 222,002` | **R** |
+| Check `n_agree + n_disagree = n_inner` | `222,002 + 0 = 222,002` | **R** |
+| Full-field dormant mismatch | 1 | **Q** |
+| Full-field open-age mismatch | 2 | **Q** |
+
+Arm B also shows zero differences against each corresponding frozen classification file for key set, labels, dormant_h and open_age_h.
+
+### Seeded-arm cardinalities and reconciliation identities
+
+Starting from B=`222,002`, the `only_x`/`only_B` comparisons permit the path sizes, intersection sizes, agreements and portfolio-cardinality deltas to be recomputed:
+
+| Arm | Derived `n_RA` | Derived `n_RB` | `n_inner` | `n_agree` | RA Δ vs B | RB Δ vs B | Locked changes | Basis |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SEM_DUPKEEP_RB | 222,002 | 245,014 | 222,002 | 222,002 | 0 | +23,012 | 23,012 | **R** |
+| SEM_DUPKEEP_CM | 245,014 | 245,014 | 245,014 | 245,014 | +23,012 | +23,012 | 46,024 | **R** |
+| SEM_NOPEER_RB | 222,002 | 215,687 | 215,687 | 215,687 | 0 | −6,315 | 6,315 | **R** |
+| SEM_NOPEER_CM | 215,687 | 215,687 | 215,687 | 215,687 | −6,315 | −6,315 | 12,630 | **R** |
+| SEM_LEGACYIN_CM | 222,176 | 222,176 | 222,176 | 222,176 | +174 | +174 | 348 | **R** |
+| SEM_OPENEXACT_CM | 222,002 | 222,002 | 222,002 | 222,002 | 0 | 0 | 0 | **R** |
+
+For every arm, `n_disagree=0`, so `n_agree=n_inner`. The recomputed locked-change totals equal the runner’s reported values exactly: `23,012`, `46,024`, `6,315`, `12,630`, `348`, and `0`.
+
+These deltas are the recomputable **total portfolio/decision-set cardinality deltas**. Exact class-by-class portfolio deltas cannot be numerically reconstructed from the packet because the contents of the `*_portfolio_counts.csv` files are not printed; the manifests provide their hashes and byte sizes, not their internal class counts.
+
+### Runs and fixtures
+
+| Fact | Result | Basis |
+| --- | --- | --- |
+| Baseline path runs | 2 | **R** |
+| Seeded path runs | `1+2+1+2+2+2 = 10` | **R** |
+| Total path runs | 12 | **R** |
+| Seeded arms with all required runs recorded | 6/6 | **R**, confirms quoted H3 |
+| Recorded nonzero exits | 0 | **R** |
+| Fixture rows executed | `12 × 14 = 168` | **R** |
+| Fixture failures | 5 | **R** |
+| Fixture passes | `168 - 5 = 163` | **R** |
+
+The five failing fixture rows are: SEM_DUPKEEP_RB/RB F07; SEM_DUPKEEP_CM/RA F07; SEM_DUPKEEP_CM/RB F07; SEM_LEGACYIN_CM/RA F08; SEM_LEGACYIN_CM/RB F08. All other raw fixture rows pass.
+
+### Recomputed sets
+
+Using the frozen `D_abl` definition—crash, key/label reconciliation mismatch, or any fixture failure:
+
+| Set | Recomputed membership | Basis |
+| --- | --- | --- |
+| Harm set `H` | `{SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_NOPEER_CM, SEM_LEGACYIN_CM}` | **R** from nonzero locked-field changes |
+| `D_abl` | `{SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_LEGACYIN_CM}` | **R** from recon + fixture rows |
+| `H ∩ D_abl` | four arms above | **R** |
+| `H \ D_abl` | `{SEM_NOPEER_CM}` | **R** |
+| No-locked-change set | `{SEM_OPENEXACT_CM}` | **R** |
+| ` | H | ` | 5 | **R** |
+| ` | D_abl | ` | 4 | **R** |
+| ` | H \ D_abl | ` | 1 | **R** |
+
+These recomputations exactly reproduce H4–H7 in the runner results.
+
+### Manifest/hash equalities
+
+| Equality | Recomputed finding |
+| --- | --- |
+| Frozen source lineage across all 7 arms | Same SHA-256 in every arm: `eaa9a76d...ddd1b` — **R** |
+| `src_open_candidates.csv` across all 7 arms | Same SHA-256 `ba089fcc...d81b9` — **R** |
+| `src_peer_stats.csv` across all 7 arms | Same SHA-256 `cb78ae21...d79eb58` — **R** |
+| R-B `00_config.R` across all 7 arms | Same SHA-256 `6c9b0e31...c70450b` — **R** |
+| R-B `10_io_parse.R` across all 7 arms | Same SHA-256 `40e67d83...2154a` — **R** |
+| R-B `40_fixtures.R` across all 7 arms | Same SHA-256 `2ad4aa69...b7a07e` — **R** |
+| R-B `run_RB.R` across all 7 arms | Same SHA-256 `6786fcf5...6defd` — **R** |
+| DUPKEEP RB classification output, single-path vs common-reading arm | Same SHA-256 `561adc80...8f1a5` — **R** |
+| DUPKEEP RB fixture output, single-path vs common-reading arm | Same SHA-256 `fe34d4fc...05cc` — **R** |
+| DUPKEEP RB κ-grid output, single-path vs common-reading arm | Same SHA-256 `1214c489...fa80e` — **R** |
+| DUPKEEP RB portfolio output, single-path vs common-reading arm | Same SHA-256 `af0711a2...6ddb` — **R** |
+| NOPEER RB classification output, single-path vs common-reading arm | Same SHA-256 `6e439a2f...14b49` — **R** |
+| NOPEER RB fixture output, single-path vs common-reading arm | Same SHA-256 `0d72245c...e9e9` — **R** |
+| NOPEER RB κ-grid output, single-path vs common-reading arm | Same SHA-256 `d7532246...0dfa` — **R** |
+| NOPEER RB portfolio output, single-path vs common-reading arm | Same SHA-256 `25f870af...ed86` — **R** |
+| OPENEXACT RA classification/fixture/portfolio outputs vs B | All three hashes identical to B — **R** |
+| OPENEXACT RB classification/fixture/κ-grid/portfolio outputs vs B | All four hashes identical to B — **R** |
+
+Thus the single-path and common-reading versions of DUPKEEP produce byte-identical R-B analytical outputs, as do the two NOPEER R-B executions. OPENEXACT produces byte-identical core analytical outputs to B on both paths.
+
+## 4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+
+The frozen predicate states that P1 is satisfied only when `H ⊆ D_abl`; it is failed when `H \ D_abl` is non-empty.
+
+The recomputed sets are:
+
+`H = {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_NOPEER_CM, SEM_LEGACYIN_CM}`
+
+`D_abl = {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_LEGACYIN_CM}`
+
+Therefore:
+
+`H \ D_abl = {SEM_NOPEER_CM}`
+
+and `H ⊄ D_abl`.
+
+Accordingly, **the frozen P1 failed condition is met**. The specific counterexample is SEM_NOPEER_CM: both implementations adopt the same unlocked reading that eligibility requires peer statistics; each drops 6,315 rows relative to B, producing 12,630 locked-field path-changes in aggregate, while R-A/R-B reconciliation remains `0/0/0`, all 28 fixtures across the two paths pass, and both processes exit normally.
+
+SEM_OPENEXACT_CM is not part of `H`: it produces zero locked-field changes and therefore counts neither for nor against P1 under the frozen definition.
+
+## 5. Fixture and reconciliation implications.
+
+The evidence separates three detection mechanisms cleanly.
+
+**Duplicate semantics are fixture-protected.** SEM_DUPKEEP_RB creates a 23,012-row R-B-only key-set difference and also fails F07 on R-B. SEM_DUPKEEP_CM removes the reconciliation mismatch by making both paths adopt the same interpretation, but F07 fails independently on both paths. Thus the duplicate fixture still exposes common-mode semantic drift.
+
+**Legacy semantics are fixture-protected.** SEM_LEGACYIN_CM adds 174 rows to each path, giving 348 aggregate locked-field changes while path reconciliation remains 0/0/0. F08 changes from expected `OUT_OF_SET` to observed `ESCALATE` on both R-A and R-B, so the shared interpretation is nevertheless exposed by the frozen fixture.
+
+**The tested no-peer eligibility semantics are not fixture-protected.** SEM_NOPEER_RB is detected only because one path changes: R-A has 6,315 keys that seeded R-B no longer contains. When that same interpretation is applied to both paths in SEM_NOPEER_CM, each path contains 215,687 rows, both exclude the same 6,315 B rows, reconciliation is again 0/0/0, and every F01–F14 fixture passes on both paths.
+
+That is the mechanically demonstrated common-mode gap: **independent-path reconciliation detects unilateral semantic drift, but cannot by itself distinguish two mutually agreeing implementations of the same alternate semantic rule.** For duplicate and legacy, F07/F08 supply the extra semantic anchor; for the seeded no-peer definition, the frozen fixture suite does not.
+
+SEM_OPENEXACT_CM also has 0/0/0 reconciliation and 14/14 fixtures on each path, but unlike NOPEER_CM it causes zero locked-field change on this frozen pack. The source profile explains the result: all 245,193 source rows already have STATUS exactly `"Open"`.
+
+The persistent full-field `dormant_h=1` and `open_age_h=2` mismatches are not generated by any seed. The coordinator predeclared them as three existing one-hour differences—SR22-01936870 for dormant_h and SR25-02017553/SR25-02017556 for open_age_h—with agreeing labels. Every seeded-arm result retains the same 1/2 pattern.
+
+## 6. Semantic/regression risks and unchanged surfaces.
+
+The principal demonstrated semantic risk is **common-mode reinterpretation**. SEM_NOPEER_CM shows that two independently implemented paths can agree perfectly with each other while jointly departing from the locked reference by 6,315 rows per path. Reconciliation is therefore evidence of cross-path agreement, not by itself evidence that the agreed semantics are the intended semantics.
+
+Fixture coverage is semantic-specific rather than universal. F07 directly protects the locked duplicate behavior and F08 directly protects the locked legacy behavior. The supplied fixture suite does not distinguish the seeded “eligible means has peer statistics” interpretation from the locked treatment of missing peer statistics.
+
+OPENEXACT has an additional regression-coverage limitation: because every frozen source row is already exact `"Open"` and the executed fixtures also produce no difference, this arm does not behaviorally exercise lower-case, mixed-case, leading-space, or trailing-space source statuses. Moreover, the R-A seed is not literally equivalent to the R-B seed with respect to whitespace: R-A compares an already `str_trim`med value, while R-B compares the untrimmed raw field. That discrepancy is present in the frozen seed code even though it is behaviorally dormant on this pack.
+
+The known three-row clock discrepancy remains an unchanged open finding. Its suspected daylight-saving explanation is explicitly unconfirmed, and no evidence in C14 attributes it to any seeded semantic change.
+
+The following surfaces are mechanically unchanged: the frozen source lineage, `src_open_candidates.csv`, and `src_peer_stats.csv` hashes are identical across every arm; no source variants are used; R-B `00_config.R`, `10_io_parse.R`, `40_fixtures.R`, and `run_RB.R` remain byte-identical across arms; only the declared semantic seed target files differ from B. The baseline framework hashes and frozen-code hashes also match the preflight declarations.
+
+Finally, SEM_OPENEXACT_CM provides a direct unchanged-output regression check: despite altered comparison code, its R-A classification, fixture and portfolio outputs and its R-B classification, fixture, κ-grid and portfolio outputs have exactly the same hashes as B.
+
+## 7. Claim → evidence map.
+
+| Claim | Evidence section and row/hunk |
+| --- | --- |
+| **C1. ChatGPT is Builder for C14; target is Stage 3→4 semantic locking.** | SPEC → header rows “Ablation ID,” “Roles,” “Target stage”; Control under test. |
+| **C2. C14 removes the frozen semantic lock and seeds plausible alternate readings.** | SPEC → “Exact change being tested (ablation)” and “Seeded readings.” |
+| **C3. DUPKEEP, NOPEER, LEGACYIN and OPENEXACT code changes are as described in §2.** | SEED DIFFS → each R-A/R-B unified-diff hunk. |
+| **C4. Baseline source arithmetic gives 245,193 rows, duplicate-only 23,012, legacy-only 174, and a 5-row duplicate/legacy overlap.** | SPEC → Data profile row; RESULTS → Arm-B recon row; recomputation shown in §3. |
+| **C5. The six seeded-arm cardinality changes are +23,012, +23,012 each, −6,315, −6,315 each, +174 each, and zero respectively.** | C14_RESULTS → Seeded arms rows SEM_DUPKEEP_RB through SEM_OPENEXACT_CM; independently recomputed from `RA_vs_B`/`RB_vs_B`. |
+| **C6. All seeded reconciliations have zero classification disagreement; shared-reading arms have zero key-set mismatch.** | C14_RESULTS → Seeded arms, `recon_only_ra`, `recon_only_rb`, `recon_disagree` columns. |
+| **C7. H contains five arms, D_abl contains four, and** `H \ D_abl={SEM_NOPEER_CM}`**.** | SPEC → frozen D_abl/P1 definitions; C14_RESULTS → H4/H5/H6 and Seeded arms rows. |
+| **C8. The frozen P1 failed condition is met.** | SPEC → P1 rows defining failure as nonempty `H \ D_abl`; RESULTS → H6=`{SEM_NOPEER_CM}`. |
+| **C9. F07 catches duplicate reinterpretation and F08 catches legacy reinterpretation, while NOPEER_CM passes all fixtures.** | FIXTURE RESULTS → SEM_DUPKEEP_RB/CM F07 rows, SEM_NOPEER_CM F01–F14 rows, SEM_LEGACYIN_CM F08 rows. |
+| **C10. SEM_NOPEER_CM is a common-mode semantic change invisible to key/label reconciliation and the frozen fixtures.** | C14_RESULTS → SEM_NOPEER_CM row: 12,630 locked changes, recon 0/0/0, 14/14 + 14/14, `caught_without_control=FALSE`. |
+| **C11. The persistent 1 dormant_h / 2 open_age_h mismatches are the predeclared three-row N1 finding, not a seed effect.** | COORDINATOR NOTE N1; SPEC → Known open finding N1; every RESULTS arm row repeats 1/2. |
+| **C12. Source hashes and non-target R-B support-code hashes remain unchanged across arms.** | ARM MANIFESTS → input rows for B and all seeded arms; preflight frozen hashes. |
+| **C13. DUPKEEP_RB and DUPKEEP_CM have byte-identical R-B analytical outputs; the same is true for NOPEER_RB vs NOPEER_CM.** | ARM MANIFESTS → corresponding R-B classification, fixture, κ-grid and portfolio rows. |
+| **C14. OPENEXACT_CM has byte-identical core analytical outputs to B.** | ARM MANIFESTS → B output rows and SEM_OPENEXACT_CM output rows. |
+| **C15. R-A OPENEXACT still trims whitespace whereas R-B performs a raw exact comparison.** | SEED DIFFS → R-A OPENEXACT hunk and R-B OPENEXACT hunk. |
+
+END C14 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID.  
+   I am DeepSeek, acting as Validator only, with DeepThink on. I am blind to the Builder; I have not seen and will not ask for its output. I have no attachments or tools and did not rerun code. Ablation ID: C14. Batch: N15 batch 2 of 3. Role assignment per SPEC: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Constitution version: 1.0.
+2. Independent test plan: what you checked, and how.  
+   I checked the frozen SPEC, Constitution, coordinator note N1, preflight hashes, run log, C14_RESULTS.md, C14_arms.csv, fixture result rows, arm manifests, seed diffs, and evidence hashes. I recomputed arithmetic from the source profile and the arm tables, reconstructed B’s decision-set size, reconstructed the harm set H and caught-without-control set D_abl from the frozen definitions, checked cross-arm SHA-256 equalities in the manifests, and checked exit/fixture/recon summaries against the raw arm rows. I did not independently re-execute R or MySQL and did not inspect row-level classification files.
+3. Independently recomputed hard facts.
+
+- Preflight/frozen hashes: source, frozen code, and seed hashes in the preflight match the SPEC and the arm manifests. No hash mismatch is visible in the packet.
+- Source row identities: total rows 245,193. DUPLICATE false 222,176 + true 23,017 = 245,193. LEGACY false 245,014 + true 179 = 245,193. Peer_n bins: 6,443 + 27 + 35 + 14 + 19 + 238,655 = 245,193.
+- B decision-set identity: B recon has n_ra = n_rb = n_inner = 222,002. Source 245,193 − 222,002 = 23,191 excluded. DUPLICATE+LEGACY union = 23,017 + 179 − overlap. Solving from B exclusion gives overlap = 5. Check: 23,017 + 179 − 5 = 23,191.
+- Seed deltas consistent with overlap 5: SEM_DUPKEEP adds 23,017 − 5 = 23,012 per path; SEM_LEGACYIN adds 179 − 5 = 174 per path. SEM_NOPEER removes 6,315 per path; source no-peer rows 6,443, so 128 no-peer rows are already excluded by duplicate/legacy in B.
+- Arm B repro vs frozen pack: R-A vs frozen RA all 0 for only_x, only_truth, label_diff, dormant_diff, open_age_diff; R-B vs frozen RB all 0. B recon key set/classification: 0/0/0. B full-field recon: dormant_h mismatch 1, open_age_h mismatch 2, matching N1.
+- Harm set H recomputed from arm rows: {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_NOPEER_CM, SEM_LEGACYIN_CM}.
+- Caught-without-control D_abl recomputed from frozen definition: {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_LEGACYIN_CM}.
+- H \ D_abl = {SEM_NOPEER_CM}.
+- Arms with no locked-field change = {SEM_OPENEXACT_CM}.
+- Per-arm recomputation:
+
+  - SEM_DUPKEEP_RB: RB adds 23,012 keys; recon only_rb=23,012; F07 fails; harm true; caught true.
+  - SEM_DUPKEEP_CM: both paths add 23,012 each; total locked-field changes 46,024; recon 0/0/0; F07 fails on both; harm true; caught true by fixture failure.
+  - SEM_NOPEER_RB: RB loses 6,315 keys; recon only_ra=6,315; fixtures 14/14 both; harm true; caught true by recon key mismatch.
+  - SEM_NOPEER_CM: both paths lose 6,315 each; total locked-field changes 12,630; recon 0/0/0; fixtures 14/14 both; harm true; caught false.
+  - SEM_LEGACYIN_CM: both paths add 174 each; total locked-field changes 348; recon 0/0/0; F08 fails on both; harm true; caught true by fixture failure.
+  - SEM_OPENEXACT_CM: 0 locked-field changes; recon 0/0/0; fixtures 14/14 both; harm false; caught false.
+- Cross-arm hash equalities from manifests: B RA outputs equal SEM_OPENEXACT_CM RA outputs for RA_classifications, RA_fixture_results, RA_portfolio_counts. B RB outputs equal SEM_OPENEXACT_CM RB outputs for RB_classifications, RB_fixture_results, RB_kappa_grid_counts, RB_portfolio_counts. SEM_DUPKEEP_RB RB outputs equal SEM_DUPKEEP_CM RB outputs for RB_classifications, RB_fixture_results, RB_kappa_grid_counts, RB_portfolio_counts. SEM_NOPEER_RB RB outputs equal SEM_NOPEER_CM RB outputs for RB_classifications, RB_fixture_results, RB_kappa_grid_counts, RB_portfolio_counts. SEM_NOPEER_CM RB_fixture_results equals B RB_fixture_results. These equalities support the table’s no-change / shared-change labels.
+- Internal inconsistency flags: I found none in the runner output. The H2 wording “B recon is 0/0/0” alongside “full-field recon mismatches dormant_h 1, open_age_h 2” is consistent with the frozen recon definition and N1. The H5 caught set for SEM_DUPKEEP_CM and SEM_LEGACYIN_CM is caught by fixture failure, not recon mismatch, which matches the frozen D_abl definition. All six seeded arms have recorded exits. Fixture rows match the summary fixture columns.
+
+4. Facts that cannot be recomputed from this packet.
+
+- Actual row-level classifications, labels, and key lists behind the summary counts.
+- Actual portfolio count values; only file hashes and byte sizes are present.
+- Full fixture input definitions and expecteds beyond the provided fixture result rows.
+- Whether N1’s 1.000 h mismatches are caused by a daylight-saving ambiguous-hour read; this is explicitly unconfirmed.
+- Whether the Builder’s independently recomputed hard numbers agree; I am blind to the Builder.
+- Whether the MySQL read-only count is true beyond the preflight statement.
+- Exact stdout/stderr content; only hashes and sizes are present.
+- Whether any unlisted file changed; manifests are authoritative in the packet but I cannot rehash the actual files.
+
+5. P1 assessment against the frozen predicate in the SPEC.  
+   Frozen P1: satisfied iff H ⊆ D_abl; failed iff H \ D_abl is non-empty. Recomputed H = {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_NOPEER_CM, SEM_LEGACYIN_CM}. Recomputed D_abl = {SEM_DUPKEEP_RB, SEM_DUPKEEP_CM, SEM_NOPEER_RB, SEM_LEGACYIN_CM}. H \ D_abl = {SEM_NOPEER_CM}. SEM_NOPEER_CM changes locked fields: both paths lose 6,315 keys vs B, total 12,630 locked-field changes; harm true; caught_without_control false because recon key/label is 0/0/0 and fixtures are 14/14 on both paths. Therefore the frozen P1 failed condition is met because H \ D_abl is non-empty. Arms with no locked-field change: SEM_OPENEXACT_CM; per SPEC they do not count for or against P1. No terminal state is returned.
+6. Blocking objections.  
+   None. Known open finding N1 is disclosed, frozen, and excluded by the frozen recon definition. All seeded runs have recorded exits. The visible hashes match. I found no hard mechanical disagreement, missing required evidence, or predicate-application defect in the packet. The SEM_NOPEER_CM miss is a P1 result under the frozen predicate, not a harness defect supported as blocking by this evidence.
+7. Claim → evidence map.
+
+- Ablation ID and roles: SPEC header and role line; Constitution §1.
+- Frozen hashes and source/code versions: SPEC, preflight, arm manifests.
+- Source row counts and profile: source profile; preflight MySQL counts; B recon identity.
+- B reproduces frozen pack: C14_RESULTS “Arm B repro vs frozen pack” table; H1/H2.
+- B recon 0/0/0 and full-field 1/2: C14_RESULTS arm B recon table; N1.
+- All seeded runs recorded: run log; C14_arms.csv exits; H3.
+- H set: C14_RESULTS H4; C14_arms.csv; recomputed per-arm locked-field changes.
+- D_abl set: C14_RESULTS H5; C14_arms.csv; recomputed crash/recon/fixture conditions.
+- H \ D_abl: H4 and H5; SEM_NOPEER_CM row in C14_arms.csv.
+- No locked-field change: H7; SEM_OPENEXACT_CM row; manifest hash equalities vs B.
+- Fixture failures F07/F08: raw fixture result rows for SEM_DUPKEEP_* and SEM_LEGACYIN_CM.
+- Cross-arm hash equalities: arm manifests SHA-256 entries.
+- P1 predicate: SPEC P1; recomputed H and D_abl.
+- N1: coordinator note N1; B recon table; H2.
+
+END C14 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C14 ADJUDICATION'.

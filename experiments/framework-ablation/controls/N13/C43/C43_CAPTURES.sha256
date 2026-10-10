@@ -1,0 +1,16 @@
+# C43 capture hash manifest 2026-10-03 12:23:48 CDT. Builder and r1 entries repeat ../CAPTURE_FREEZE_b6.sha256 (r1 = INCOMPLETE, failed evidence only); r2 = authoritative Validator capture (see C43_NOTES.md)
+282e8d0763904059b020092c561eba0d3308d5e09c52b370dc45d19e9a0ad86b  C43-builder/builder_chatgpt.html
+445f74af883d77fca26b1124db37fa460acd0fc00093f050c2046ba104b4701c  C43-builder/builder_report.md
+a5900b5305ce759582b4a3af15c5e7deb6ec08bc14e82c86f0f233932c772333  C43-validator/validator_deepseek.html
+5890ed33b7dbf8d529d10d2b0f1904833c644553fccf0b6dd2ea80269abb8f41  C43-validator/validator_deepseek_r2.html
+4148f956fdbc4adfa519df5d88250d61b0cba06de70a99f50aea5fb87f9b17f4  C43-validator/validator_report.md
+01f631e10a6b8bb35147920fc09d5af313c512a35195a078ba77d1dddfd7fdb8  C43-validator/TIMES.txt
+14f06f96d6294e3c226f9cdec00b453c4a10c2a167a0fd98c339b68ad3746bb9  C43-validator/EXTRACTION_LOG_r2.jsonl
+# r2 _files folder: C43_CAPTURE_ASSETS_r2.sha256 sha256 69656073d09a15b72521a9e5769aaed26b602e536ffd152f62b362e03c72e7d6
+# appended 2026-10-03 12:31:20 CDT: Grok Adjudicator capture (manifest before append: c6c3d8b113c0ead7a647d5f1458f0e75ce33119be8fccaeb3ca7c5fc38062f51); terminal REVERT
+d1c60a502d62fd79578a3489d351fe017a96ed0124f94398bd7d9993b28546c8  C43-adjudicator/adjudicator_grok.html
+8df34ec11bc0aaa7c0b16ef652dce3f745af3d246f995f7c3cbcc6fea16fd961  C43-adjudicator/adjudicator_grok.md
+8df34ec11bc0aaa7c0b16ef652dce3f745af3d246f995f7c3cbcc6fea16fd961  C43-adjudicator/adjudicator_raw.md
+cc2a0fe3396780cb6762b90cdc65047017b84d2a9de140b736134f06190ed9ca  C43-adjudicator/TIMES.txt
+0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0  TERMINAL_STATE.txt
+# Grok _files folder: ../ADJ_GROK_ASSETS_C43.sha256 sha256 6efcec444b16c9e51f350e0f1475ade26609b3a132209d6abf6d5d1b1ae8237d (200 files); extraction log ../ADJ_GROK_C43_EXTRACTION_LOG.jsonl ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754

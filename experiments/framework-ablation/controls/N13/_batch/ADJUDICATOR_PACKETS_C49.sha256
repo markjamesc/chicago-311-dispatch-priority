@@ -1,0 +1,3 @@
+# C49 Adjudicator packet freeze 2026-10-03 13:28:28 CDT; assembled on PC by runner/assemble_adjudicator.R (1327ff98…) from builder_report.md d73c807f… + validator_report.md (r2) f7f285be… + HEAD 3f7b789a…; verdict_token_leak builder FALSE / validator FALSE
+36195e28bbd7e504f204b3445fdc6245252551fc2267643f4cbf1fcf99f465f8  C49/EVIDENCE_FREEZE.json
+48d135cadebbf72ffa567af269b4468f32edaa72fa798259f958137a1e601181  C49/packets/C49_3_ADJUDICATOR_Grok.txt

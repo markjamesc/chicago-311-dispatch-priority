@@ -1,0 +1,251 @@
+﻿C03 BUILDER REPORT
+1. Role attestation and ablation ID
+Field	Attestation
+Ablation ID	C03
+Control	#3 — Design Gate after cross-review (pre-gate replay)
+Batch	N16
+Role	Builder — ChatGPT
+Analysis	Independent first pass
+Information barrier	No Validator or Adjudicator assessment consulted
+Target stage	Stage 3 — Measurement Design
+Method	Text-only mechanical replay and independent examination of the supplied verbatim documents
+Baseline	Frozen Chicago 311 Stage 3 Design Gate, following cross-review
+Variant	Design Gate evaluated before cross-review, using only Design A, Design B, and the AI 3 Data Risk Dossier
+Independence attestation: This report assesses the frozen specification, supplied scorer, evidence tables, and verbatim Stage 3 documents. It does not incorporate another model's evaluation of C03.
+Execution boundary: No MySQL, R, fresh Chicago 311 retrieval, PC execution, or new fixture run was performed for this assessment.
+The frozen baseline records a Design Gate PASS on September 19, 2026, at 05:23:53 CDT. That historical approval is evidence of the actual post-review process, not evidence that a pre-review gate would have produced the same decision.
+Sources: SPEC §§ Arms, Disclosures and deviations; DESIGN_GATE_RECEIPT §§ Owner approval, Stage boundary.
+2. Conceptual diff: what the ablation removes, and exact seeded code changes
+2.1 Baseline and variant
+BASE — established sequence
+Independent Design A + Design B + AI 3 dossier
+
+
+Cross-review and reconciliation
+Compare constructs, identify conflicts, recommend one design
+
+Design Gate and owner approval
+
+
+Locked Stage 3 design
+
+
+VARIANT — C03 pre-gate replay
+Independent Design A + Design B + AI 3 dossier
+
+
+Design Gate applied directly to pre-review documents
+No reconciled candidate yet
+
+Potentially shortened or omitted cross-review
+
+
+The conceptual change is the removal of mandatory reconciliation before owner approval. It is not the removal of an R computation or a modification to the Chicago 311 classification formula.
+The primary risk is that the Design Gate could encounter competing measurement specifications without first establishing which specification it is approving.
+2.2 Exact seeded code changes
+None.
+The frozen SPEC explicitly records Seed files: (none). The packet contains no SEED DIFFS patch for C03. Therefore:
+- No production SQL or R code was seeded or changed.
+- No Stage 3 design document was rewritten.
+- No fixture implementation was modified.
+- No frozen input was intentionally altered.
+- The variant was evaluated through the predefined text-only scorer, scorers/score_c03.py.
+Scorer SHA-256:
+9cd3dc726b2ade2bd0c7431763a0979418de5af4235fec68b131cf46c4dd4e62
+The scorer searches the three pre-review documents for checklist terms, compares locked-design tokens with the pre-review text, and counts the material disagreements listed in cross-review §4.
+Sources: SPEC §§ Control under test, Arms, Frozen reference hashes; SCORER SOURCE score_c03.py, ITEMS, tok, disag, and cond definitions.
+3. Hard mechanical facts table
+3.1 Independently recomputed counts
+The checklist counts, token coverage, disagreements, and arithmetic identities below were independently recalculated from the verbatim documents using the frozen scorer's declared matching rules. 
+
+
+Mechanical fact	Value	Evidence status
+Frozen inputs listed in preflight	75	Recomputed
+Distinct SHA-256 strings in preflight	74	Recomputed
+Preflight failures	0	Quoted
+Design checklist items scored	14	Recomputed
+Items classified pre-review	13	Recomputed
+Items classified SYNTHESIS-ONLY	1	Recomputed
+Items classified neither	0	Recomputed
+Locked-design tokens	47	Recomputed
+Locked tokens found in Design A	7	Recomputed
+Locked tokens found in Design B	45	Recomputed
+Locked tokens found in AI 3 dossier	8	Recomputed
+Tokens shared by A and B	5	Recomputed
+Tokens found only in A, relative to B	2	Recomputed
+Tokens found only in B, relative to A	40	Recomputed
+Locked tokens covered by pre-review union	47	Recomputed
+Locked tokens exclusive to cross-review	0	Recomputed
+Locked tokens absent from all review documents	0	Recomputed
+Material disagreements in cross-review §4	7	Recomputed
+Design conditions satisfied mechanically	1 of 3	Recomputed
+Design conditions not satisfied mechanically	2 of 3	Recomputed
+The 75 preflight entries and zero-failure status agree with the supplied preflight record. This verifies the arithmetic of the reported manifest, not the underlying file bytes independently. 
+
+
+3.2 Complete 14-item checklist recomputation
+Here A = Design A, B = Design B, D = AI 3 dossier. This table reproduces the frozen scorer's lexical classification, without yet treating keyword presence as semantic sufficiency.
+Item	Matching pre-review document(s)	Union	Cross-review	Mechanical class
+1	None	No	Yes	Synthesis-only
+2	B	Yes	Yes	Pre-review
+3	B	Yes	Yes	Pre-review
+4	A, B, D	Yes	Yes	Pre-review
+5	A, B, D	Yes	Yes	Pre-review
+6	A, B, D	Yes	Yes	Pre-review
+7	B, D	Yes	Yes	Pre-review
+8	B, D	Yes	Yes	Pre-review
+9	D	Yes	Yes	Pre-review
+10	B	Yes	Yes	Pre-review
+11	B	Yes	Yes	Pre-review
+12	B	Yes	Yes	Pre-review
+13	A, B, D	Yes	Yes	Pre-review
+14	B	Yes	Yes	Pre-review
+Arithmetic identities:
+- 13 + 1 + 0 = 14 checklist items.
+- 7 + 45 − 5 = 47 distinct tokens covered by A or B.
+- 47 − 47 = 0 locked-design tokens missing from the pre-review union.
+- 0 + 0 = 0 tokens exclusive to cross-review or introduced only at lock.
+- 1 + 2 = 3 total predicate conditions.
+The dossier's eight matched locked tokens add no token that is absent from the union of A and B.
+Sources: C03_items.csv rows 1–14; C03_RESULTS.md §§ Design Gate checklist, Locked-design tokens; SCORER SOURCE ITEMS, tok, META.
+3.3 Material disagreements
+Independent recount of CROSS_REVIEW §4 produces exactly seven:
+#	Disagreement
+1	Calendar age/confidence versus type-conditional dormancy
+2	Undefined confidence threshold versus operational κ
+3	Soft-residual INCONCLUSIVE versus integrity-first INCONCLUSIVE
+4	Minimal eligibility fields versus duplicate/legacy/type/time skeleton
+5	Four fixture categories versus F01–F14, including F03
+6	Soft capacity deferral versus explicit prohibition on ranking and return to Framing
+7	Raw-column-only SQL versus permission for mechanical peer aggregates
+The seven disagreements are substantive design differences, not merely vocabulary differences.
+Source: CROSS_REVIEW §4, numbered rows 1–7.
+3.4 Hash and frozen-evidence consistency
+The six core evidence documents have matching reported SHA-256 digests across their input headers, preflight entries, and evidence manifest. Their six reported digests are mutually distinct, as expected for different documents. The Design Gate receipt's reported digest also agrees between its input header and preflight entry.
+Artifact	Reported SHA-256 prefix	Evidence status
+Design A	7e0e2c4c403e9871	Quoted; cross-reference consistent
+Design B	8153ad4fb16001c1	Quoted; cross-reference consistent
+AI 3 dossier	7f4fc3ee3995e2d2	Quoted; cross-reference consistent
+Cross-review	9f3ea0a7f3e92ab4	Quoted; cross-reference consistent
+Locked design	7297cf3ef25bbf12	Quoted; cross-reference consistent
+Gate package	0ec361b591cc3373	Quoted; cross-reference consistent
+Gate receipt	3a03e139350141ba	Quoted; cross-reference consistent
+These are consistency checks of the supplied hash records. Actual cryptographic verification of the original frozen files was reported by the coordinator's preflight, rather than repeated by this Builder.
+Sources: PREFLIGHT rows for the seven Stage 3 artifacts; C03_EVIDENCE.sha256 rows for the six core artifacts; FROZEN INPUTS headers.
+3.5 Mechanics not applicable to C03
+Requested check	Status	Reason
+n_agree + n_disagree = n_inner	Not applicable	No R-A/R-B inner-join reconciliation was performed
+Portfolio count deltas	Not applicable	No new portfolio labeling run
+D-sets or differing row-ID sets	Not applicable	No competing row-level output sets
+Fixture actual-versus-expected counts	Not applicable	No fixture execution
+R-A/R-B output-hash equality	Not applicable	No R execution
+Seed-code behavioral delta	Not applicable	No seeded implementation changes
+The frozen Stage 3 documents contain design constants and synthetic fixture expectations, but these are not observed outputs from this ablation.
+4. P1 assessment against the frozen predicate
+The frozen P1 is the conjunction of three separately specified conditions.
+Condition	Mechanical result	Independent Builder assessment
+P1.1: All 14 checklist items decidable before synthesis	Not met	Item 1 is synthesis-only; additional semantic qualifications below
+P1.2: Every locked-design token appears before synthesis	Met	All 47 tokens covered by pre-review union
+P1.3: No material disagreements in cross-review §4	Not met	Seven disagreements explicitly documented
+Mechanical P1: NOT MET, consistent with the supplied scorer output. This is a finding about the frozen predicate, not an adjudication outcome.
+4.1 Condition 1 — Checklist decidability
+Item 1 is the decisive lexical failure.
+The actual Gate approves the B-leaning hybrid (TCD-IG). Design B proposes TCD-IG, while Design A proposes an age/activity/confidence architecture. Neither independent document proposes the final combined design as an already-reconciled candidate.
+The hybrid recommendation is made in CROSS_REVIEW §5, retaining Design A's diagnostic and data-quality strengths while adopting Design B's primary measurement construct.
+That distinction matters: the presence of TCD-IG in Design B does not establish that the other design has already been evaluated and reconciled.
+Independent semantic classification challenges
+I agree with the scorer's mechanical keyword results, but two items warrant stricter semantic treatment:
+Item	Scorer class	Builder semantic assessment
+4 — Snapshot as-of T	Pre-review	Synthesis-dependent selection. A and B discuss frozen T, and D identifies the snapshot as a feasible bounded case. The definite selection of snapshot-aligned first-pass analysis appears in the reconciliation and approval process.
+9 — Date parse and timezone rule	Pre-review	Requirement identified, operational rule unresolved in the supplied text. The dossier requires a locked parser and timezone but does not itself supply the exact parsing expression. Cross-review item 9 also requests that rule rather than providing a complete implementation.
+These are semantic qualifications, not changes to the frozen scorer or its mechanical counts.
+Other pre-review items remain mechanically recognizable but require the synthesis or owner decision to acquire final authority. In particular:
+- Item 2: Design B contains κ, but Design A proposes a different knob.
+- Item 7: Design B proposes eligibility restrictions; the dossier warns that treatment needs locking.
+- Item 8: Orphan-parent handling is proposed, not independently owner-approved.
+- Item 12: The F01–F14 outline exists in B, while Design A proposes a less developed fixture set.
+- Item 14: A and B differ on what mechanical aggregation SQL may perform.
+The evidence therefore supports a narrower interpretation of pre-review: the component is mentioned or proposed before reconciliation, not necessarily that a reconciled decision has already been established.
+Sources: Design A §§ 3–6, 13–14, 17; Design B §§ 2, 6, 8–9; AI 3 dossier §§ 3, 8–9; CROSS_REVIEW §§ 4–6; DESIGN_GATE_PACKAGE checklist items 1, 2, 4, 7, 8, 9, 12, 14.
+4.2 Condition 2 — Locked-design token coverage
+Independent token matching establishes:
+- Locked distinct tokens: 47.
+- Covered by pre-review documents: 47.
+- Exclusive to cross-review: 0.
+- Introduced only upon lock: 0.
+The condition is satisfied under the frozen lexical definition.
+However, token coverage must not be interpreted as complete decision coverage. The tokenizer recognizes field names, rule identifiers, fixture IDs, and other structured tokens. It does not establish that their relationships or final meanings were settled before cross-review.
+For example, the tokens supporting TCD-IG exist in Design B, but the conclusion to adopt a B-leaning hybrid is a subsequent synthesis decision.
+Thus there is no contradiction between complete token coverage and incomplete pre-gate decisional readiness.
+Sources: C03_RESULTS.md § Locked-design tokens; SCORER SOURCE tok, only_x, never; CROSS_REVIEW §5.
+4.3 Condition 3 — Material disagreements
+The cross-review explicitly lists seven disagreements.
+The requirement is an empty list. The observed list is nonempty.
+This is a straightforward mechanical failure, independent of subjective evaluation of whether Design A or B is superior.
+A hypothetical owner could choose one of the two proposals before reconciliation, but the frozen record does not demonstrate what decision that owner would have made. The replay does not establish equivalence to the actual post-review approval.
+Sources: CROSS_REVIEW §4 rows 1–7; SPEC § Operational benefit predicate, condition 3; C03_RESULTS.md § Conditions.
+5. Fixture and reconciliation implications
+Not applicable to N16: This is a text-only Stage 3 replay. No SQL/R path, row-level reconciliation, or executable fixture suite was run.
+The text-level equivalents are as follows.
+The pre-review Design A contains four broad fixture categories: clear escalation, clear standard, ambiguous, and boundary cases. Design B defines a specific F01–F14 outline with expected classifications and design implications. The reconciled lock adopts the F01–F14 outline.
+Of particular importance is F03:
+Fixture	Construct test	Expected under Design B
+F03	Type peer P75 = 90 days; dormancy = 100 days; κ = 2	STANDARD
+For F03, the threshold is 2 × 90 = 180 days, while observed dormancy in the synthetic case is 100 days. Its expected STANDARD outcome follows arithmetically from the proposed type-conditional rule.
+F03 separates the two measurement interpretations: a simplistic calendar-age approach could elevate a historically long-cycle request that the type-relative dormancy method does not.
+This is textual fixture evidence, not a new fixture PASS.
+The reconciliation equivalent is the comparison of Design A, Design B, and the dossier in CROSS_REVIEW §§2–5. That process explicitly resolves the principal construct fork, identifies required decisions, and yields the recommended gate candidate.
+The known OF-1 daylight-saving clock discrepancy is unrelated to this ablation's mechanical results because N16 neither reruns R-A/R-B nor calculates fresh row-level time differences.
+Sources: Design A §17; Design B §9, F01–F14; CROSS_REVIEW §§4–5; MEASUREMENT_DESIGN_LOCKED §12; Coordinator Notes N1 / OF-1 and text-only capture.
+6. Semantic/regression risks and unchanged surfaces
+6.1 Decision-changing risks
+Risk	Evidence	Consequence of moving the gate earlier
+Unreconciled measurement construct	CROSS_REVIEW §4 row 1	Owner may approve calendar-age/confidence logic rather than type-conditional dormancy
+Ambiguous knob implementation	§4 row 2	An undefined confidence score could be approved instead of operational κ
+Weaker integrity protection	§4 row 3	Contradictory records or thin-type cases could receive forced labels
+Eligibility differences	§4 row 4	Duplicate, legacy, or parent handling could differ
+Insufficient fixture specificity	§4 row 5	The F03 construct distinction may not receive explicit sign-off
+Capacity scope expansion	§4 row 6	Ranking might enter Stage 3 without returning to Framing
+SQL/R responsibility drift	§4 row 7	The permissible SQL aggregation boundary could remain contested
+The strongest semantic risk is not a missing field token. It is premature authorization of a measurement construct before the competing constructs have been reconciled.
+Cross-review also preserves positive contributions from both designs. Design B supplies the operational dormancy and integrity method; Design A supplies diagnostic segmentation, data-quality checks, and clearer documentation of exclusions and output reasoning. The locked design combines these selectively.
+A gate that simply chooses raw Design B early is not automatically equivalent to approving that reconciled hybrid.
+6.2 Scope and validity limitations
+The replay is deliberately limited.
+The original Chicago baseline involved a coordinator and additional reviews. It is therefore not a perfectly clean experimental comparison. The variant was evaluated against preserved documents, not through a real owner approval exercise.
+Consequently, the packet can establish which specified information was or was not available at the earlier stage. It cannot directly establish what a human owner would have approved under the counterfactual sequence.
+Likewise, the token comparison demonstrates lexical coverage, not semantic equivalence. A shared token may be used under incompatible hypotheses, different rule orderings, or distinct authority assumptions.
+6.3 Unchanged surfaces
+The following are unchanged by C03:
+- Frozen Chicago 311 dataset and Stage 1–5 records.
+- Stage 1 decision and Stage 2 framing authority.
+- Original Design A, Design B, and AI 3 dossier.
+- Actual cross-review, locked design, Gate package, and receipt.
+- Baseline framework files and their recorded SHA-256 values.
+- R-A/R-B code, prior outputs, and known OF-1 discrepancy.
+- Existing Source Gate, SQL delivery, fixture, and reconciliation artifacts.
+- One-row-per-SR_NUMBER grain in the actual locked design.
+- Original owner-approved κ, W, n_min, three-way decision contract, and ranking boundary.
+No downstream production regression was directly exercised. The relevant regression exposure is procedural and semantic: omitting or moving an approval safeguard may allow unreconciled measurement assumptions to pass forward.
+Sources: SPEC §§ Frozen data, Disclosures and deviations, Regression/HALT rules; CONSTITUTION §§2–6; CROSS_REVIEW §§4–6; DESIGN_GATE_PACKAGE; coordinator notes.
+7. Claim → evidence map
+Claim	Source section and exact evidence
+C03 moves the Design Gate before cross-review	SPEC § Control under test; § Arms, BASE and VARIANT
+The real baseline Gate passed after synthesis	SPEC § Arms, BASE; DESIGN_GATE_RECEIPT § Owner approval, PASS and timestamp
+No code seed or PC run exists for C03	SPEC § Frozen reference hashes, Seed files: (none); § Frozen data; Coordinator Note, text-only capture
+One of fourteen items is synthesis-only	C03_items.csv row 1; C03_RESULTS.md § Design Gate checklist, row 1
+Thirteen items match pre-review keywords	C03_items.csv rows 2–14; SCORER SOURCE ITEMS and classification loop
+The final hybrid recommendation follows reconciliation	CROSS_REVIEW §5, “B-leaning hybrid”; §6, owner checklist row 1
+κ, W, and n_min exist in Design B	Design B §§3 and 6; C03_items.csv rows 2–3
+Snapshot choice is not fully settled by the initial feasibility discussion	Design B §2; AI 3 dossier §§7–9; CROSS_REVIEW §6, row 4
+Actual parse/timezone specification remains a separate requirement	AI 3 dossier §3; CROSS_REVIEW §6, row 9; MEASUREMENT_DESIGN_LOCKED §§8, 15
+All 47 locked tokens have pre-review coverage	C03_RESULTS.md § Locked-design tokens; SCORER SOURCE tok, only_x, never
+Cross-review lists seven material disagreements	CROSS_REVIEW §4, numbered rows 1–7; C03_RESULTS.md § Cross-review section 4
+Complete token coverage does not independently settle design choice	CROSS_REVIEW §§4–5; C03_RESULTS.md §§ Locked-design tokens, Reading for the judges
+Fixture F03 distinguishes the measurement constructs	Design B §9, F03; CROSS_REVIEW §4, disagreement 5; MEASUREMENT_DESIGN_LOCKED §12, F03
+The frozen mechanical predicate has one satisfied and two unsatisfied conditions	SPEC § Operational benefit predicate, conditions 1–3; C03_RESULTS.md § Conditions, rows 1–3
+N16 produces no R-A/R-B reconciliation result	Coordinator Note, text-only capture; SPEC §§ Frozen data, Regression/HALT rules
+OF-1 is excluded from N16 mechanics	Coordinator Note N1 / OF-1; SPEC § Disclosures and deviations
+The pre-review replay is not a real owner-approval counterfactual	SPEC § Disclosures and deviations, first two bullets
+Builder finding: The independent mechanical recomputation agrees with the supplied C03 scorer: checklist item 1 is synthesis-only, locked-design token coverage is complete, and cross-review records seven material disagreements. The evidence also demonstrates why lexical presence does not necessarily establish semantic agreement or approved design authority. The frozen predicate is not fully satisfied; no terminal adjudication state is issued.
+END C03 BUILDER REPORT

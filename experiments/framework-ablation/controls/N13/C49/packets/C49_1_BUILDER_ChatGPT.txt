@@ -1,0 +1,1158 @@
+# C49 Builder — ChatGPT (INDEPENDENT FIRST PASS)
+
+Role: Builder only. Use the highest reasoning setting. You are blind to the Validator. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+3. Hard mechanical facts table. Recompute every number you can from the evidence tables below: identities such as n_agree + n_disagree = n_inner, portfolio deltas, D-sets, and hash equalities across arms. Mark each number as recomputed or quoted.
+4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+5. Fixture and reconciliation implications.
+6. Semantic/regression risks and unchanged surfaces.
+7. Claim → evidence map. Cite the section and the table row for each claim.
+End your reply with this exact line on its own:
+END C49 BUILDER REPORT
+
+---
+# COORDINATOR NOTE N1 / OF-1 (clean-pair clock mismatch; read before the RESULTS)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. All three clocks fall in the repeated fall-back hour. Cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST); the owner's 53A clock rule (first occurrence) makes R-B the conforming path. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C49 delivers frozen Stage 5 text and CSVs only; no R path is rerun. The N1 note was included identically in all three reviewer prompts.
+
+---
+# SPEC
+# C49 — Ablation specification (FROZEN)
+
+**Ablation ID:** C49 (Addendum 02, candidate #49 "Individual-file evidence delivery")
+**Batch:** N13 batch 6 (controls C43, C49, C44, C40; owner approval 2026-10-03 10:52 CT; built the way batch b5 was built)
+**Definitions and approval (operational definitions, constitution §9):** Definitions: `ablation_plan/ADDENDUM_01_control_39.md` SHA-256 `a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f` (#40, #43) and `ablation_plan/ADDENDUM_02_pricepoint_candidates.md` SHA-256 `5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6` (#44, #49; #40 evidence). Owner approval of #43, #49, #44, #40: 2026-10-03 10:52 CT (blockers in `N13/SELECTION_N13.md` SHA-256 `f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f`). Owner rulings batch 01 (`OWNER_RULINGS_BATCH_01_DECISIONS.md` SHA-256 `9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba`) apply where cited (41A depth gate, 48A, 53A clock rule).
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Extra chats: 3** (reviewer first passes, all blind to this ablation, each frozen before the Builder/Validator packets are built): **DS_ZIP** (DeepSeek, one zip), **DS_FILES** (DeepSeek, 10 individual files), **GPT_FILES** (ChatGPT, 10 individual files). No Grok arm (SuperGrok usage); DeepSeek is the model that failed in PricePoint and receives each format once, as the addendum asks. Role overlap: DeepSeek is also the Validator and ChatGPT also the Builder; the reviewer chats are separate conversations.
+**Usage priority (owner):** SuperGrok usage is the scarcest resource; extra chats are kept to the smallest number the test validly allows, and no extra chat uses Grok.
+**Target stage:** Stage 5 first-pass evidence delivery (proposed addition)
+**Frozen at CT:** 2026-10-03, before the reporting run executed (runner `runner_b6/run_batch_v6.ps1`, evaluator `runner_b6/eval_b6.R`; R only, no MySQL, no git)
+
+## Control under test (Addendum 02 #49)
+Rule as it stands: no rule; PricePoint sent one zip to the Stage 5 first passes and AI 3 (DeepSeek) r1 could not open it and recomputed nothing (re-issue r2, delay ≤ ~14 min). Variant: individual files plus SHA256SUMS, with a mandatory first-section file inventory with hashes.
+
+## Verdict convention (proposed addition, Addendum 02)
+**KEEP = deliver evidence as individual files plus SHA256SUMS with the inventory requirement. REVERT = the addition is not shown to help.** HALT as in constitution §9.
+
+## Exact change being tested
+- **Evidence (identical in all arms):** the 9 frozen Chicago Stage 5 files used by the b5 C48 audits — `STAGE5_EVIDENCE_PACKAGE.md`, `STAGE5_DEEPER_FINDINGS.md`, the 6 deeper CSVs, and the AI 1 interpretation (`AI1_INTERPRETATION.md`, byte-identical to `AI1_ORIGINAL.md`) — plus `SHA256SUMS`. `seeds/C49/delivery/FILES/` holds the 10 files; `seeds/C49/delivery/ZIP/evidence_pkg.zip` holds byte-identical copies (deterministic zip; checked by `c49_check.R` before any chat).
+- **Prompt (identical except the delivery sentence and the mode line):** AI 3 first pass on AI 1's interpretation. Part 1 = a FILE INVENTORY block per file (`FILE / SHA256 / OPENED / LINES / FIRST / LAST`), part 2 = five hard facts `Q1..Q5` recomputed from the files, part 3 = findings; END line `END C49 FIRST PASS`. The inventory requirement is held constant in both formats so that the arms differ in delivery only (disclosed: the addendum's variant bundles both; this test isolates the delivery format).
+- **Access proof (mechanical):** a file counts as accessed when the reply's FIRST and LAST lines equal the file's first and last non-empty lines (whitespace-normalized). A model cannot produce them without opening the file. **Usable first pass** = END line present + all 9 files proven + all 5 facts answered. Fact correctness against `KNOWN_ANSWERS.csv` (Q1 131968, Q2 64922, Q3 49.2, Q4 25, Q5 118246) is reported, not scored (PricePoint: the format fixed access, not accuracy).
+- **Time to a usable first pass** = `reply_complete − sent` from `TIMES.txt` (unusable = infinite). Timing records: the operator writes `TIMES.txt` beside each saved reply, two lines `sent=YYYY-mm-dd HH:MM:SS` (when the message was sent) and `reply_complete=YYYY-mm-dd HH:MM:SS` (when the reply finished streaming), America/Chicago wall clock, from the operator's clock. Minutes are operator-logged, not tool-measured (disclosed).
+
+## Known open finding N1 / OF-1 (disclosed before execution; frozen pack not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h; mod_ts 2022-11-06 01:00:00) and SR25-02017553, SR25-02017556 (open_age_h; created 2025-11-02 01:19 / 01:21). Their labels agree. All three clocks fall in the repeated fall-back hour. Cause, confirmed on the PC (R 4.6.1, 2026-10-03, read-only probe): R-B's base `as.POSIXct(..., tz = "America/Chicago")` reads a repeated-hour wall time as the first occurrence (CDT; 2025-11-02 01:30 → epoch 1762065000), while R-A's lubridate parse reads it as the second occurrence (CST; epoch 1762068600). It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). The owner's 53A ruling (clock rule: repeated hour = first occurrence, daylight time, on both paths) makes R-B's reading the conforming one; R-A's frozen output departs from it on these 3 rows. C49 delivers frozen Stage 5 text and CSVs only; no R path is rerun. The N1 note is included, identically, in every reviewer prompt (so it cannot differ between arms).
+
+## Arms
+- Runner v6 (`seeds/C49/DELIVCHK`): **CHECK** = `c49_check.R` on the delivery sets (pre-chat validity; HALT if FAIL).
+- Reviewer chats (operator; packets frozen before sending):
+- `C49/packets/C49_R_DS_ZIP.txt` SHA-256 `158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1` (2843 bytes)
+- `C49/packets/C49_R_DS_FILES.txt` SHA-256 `9fa6cc58745d144a5c53a371f0b41db69d0503b212c2b1ce08a33eb84998f7a2` (2808 bytes)
+- `C49/packets/C49_R_GPT_FILES.txt` SHA-256 `bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2` (2821 bytes)
+- Post-chat scorer: `seeds/C49/c49_score.R <N13 root>` → `C49/post/` (replies `C49/C49-<arm>/reply.md`, times `C49/C49-<arm>/TIMES.txt`).
+
+## Operational benefit predicate P1 (made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+0. (validity) the delivery sets pass `c49_check.R`;
+1. variant access: DS_FILES and GPT_FILES each prove access to all 9 evidence files;
+2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in SHA256SUMS;
+3. delay no worse: DS_FILES time to a usable first pass ≤ DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met).
+REVERT side: 1, 2 or 3 fails. HALT if 0 fails, or if a reply or its TIMES.txt is missing or a reply lacks its END line. DS_ZIP's access result is the baseline observation (reported); it does not decide P1 by itself.
+Disclosed limits: one chat per arm (n = 1 per model × format); ChatGPT's zip handling is not tested (no GPT_ZIP arm, to save usage); Grok is not tested.
+
+## Regression / HALT rules
+- HALT if the delivery check fails, if a reviewer reply is missing, incomplete or changed after its freeze, or if Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4: delivery changes no result (byte-identical evidence across arms, checked); condition 5: the check's known-answer cases are the zip/file identity and SHA256SUMS (declared now).
+
+## Allowed source/data scope
+Frozen Chicago Stage 5 documents and evidence (box `chicago-311-dispatch-priority/docs/stage-05-interpretation/`, `chicago-311-run/stage-05/`), copied verbatim into the seeds. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+**Runner-side files for this control (frozen list `runner_b6/SEEDS_b6.sha256`; preflight gating):**
+- `runner_b6/seeds/C49/ARMS.tsv` SHA-256 `edc8a02618014eb9e370ae01f605303630874d465917f3785b7fa5518d3ddeea`
+- `runner_b6/seeds/C49/DELIVCHK` SHA-256 `0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30`
+- `runner_b6/seeds/C49/KNOWN_ANSWERS.csv` SHA-256 `13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2`
+- `runner_b6/seeds/C49/c49_check.R` SHA-256 `4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e`
+- `runner_b6/seeds/C49/c49_score.R` SHA-256 `ce2a6a24168e71ac82b6808f6ed15c51511eb2c7ccd14a5224674da49597632d`
+- `runner_b6/seeds/C49/delivery/FILES/AI1_INTERPRETATION.md` SHA-256 `73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932`
+- `runner_b6/seeds/C49/delivery/FILES/SHA256SUMS` SHA-256 `1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75`
+- `runner_b6/seeds/C49/delivery/FILES/STAGE5_DEEPER_FINDINGS.md` SHA-256 `49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6`
+- `runner_b6/seeds/C49/delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md` SHA-256 `c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7`
+- `runner_b6/seeds/C49/delivery/FILES/capacity_coverage_note.csv` SHA-256 `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609`
+- `runner_b6/seeds/C49/delivery/FILES/escalate_by_type_top25.csv` SHA-256 `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176`
+- `runner_b6/seeds/C49/delivery/FILES/inconclusive_by_clause.csv` SHA-256 `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d`
+- `runner_b6/seeds/C49/delivery/FILES/independent_checks_critical_counts.csv` SHA-256 `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146`
+- `runner_b6/seeds/C49/delivery/FILES/kappa_sensitivity.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+- `runner_b6/seeds/C49/delivery/FILES/portfolio_summary.csv` SHA-256 `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167`
+- `runner_b6/seeds/C49/delivery/ZIP/evidence_pkg.zip` SHA-256 `ea8ff49d164e41dcd442590dbec6c7d9ffb2c83a9baa5a5e6193d79c6cde5f9d`
+- `runner_b6/eval_b6.R` SHA-256 `6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a`
+- `runner_b6/run_batch_v6.ps1` SHA-256 `5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb` (the runner; carries the preflight list above)
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above; definitions files as above. This spec is hashed in `SPEC_FREEZE_b6.sha256` before the reporting run.
+**Evidence files:** the 10 delivery files and the zip are in the seed list above.
+## Pre-execution check (disclosed)
+The predicate text (`eval_b6.R`) and every harness script were hashed in `SEEDS_b6.sha256` before any PC execution. The complete runner was exercised on the PC in scratch folders (non-reporting, NON_REPORTING.txt in each): `N13\_preflight_b6` (runner tar v1) stopped at the preflight because the C49 marker file `seeds/C49/DELIVERY` collided with the folder `seeds/C49/delivery/` on Windows (case-insensitive paths); nothing executed. The marker was renamed `DELIVCHK` (runner and evaluator updated; first builds kept in `runner_b6/_superseded_v0` and `_superseded_v1` with README). `N13\_preflight_b6_2` (runner tar v2) was killed during the C43 audit when the remote session dropped (no result). `N13\_preflight_b6_3` (runner tar v2, SHA-256 7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc, started detached) ran to completion at 11:27:46 PC time (4.18 min, preflight PASS). Before that, the R scripts were dry-run on the box (R 4.5) with synthetic replies for the post-chat scorers; a Q-answer parsing bug in c49_score.R was fixed then. C49 in the scratch run: delivery check PASS (9 files + SHA256SUMS; zip 10 entries, byte-identical). No arm, threshold, seed or predicate was changed after that check.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+seed   OK   edc8a02618014eb9e370ae01f605303630874d465917f3785b7fa5518d3ddeea seeds/C49/ARMS.tsv
+seed   OK   0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30 seeds/C49/DELIVCHK
+seed   OK   13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2 seeds/C49/KNOWN_ANSWERS.csv
+seed   OK   4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e seeds/C49/c49_check.R
+seed   OK   ce2a6a24168e71ac82b6808f6ed15c51511eb2c7ccd14a5224674da49597632d seeds/C49/c49_score.R
+seed   OK   73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 seeds/C49/delivery/FILES/AI1_INTERPRETATION.md
+seed   OK   1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75 seeds/C49/delivery/FILES/SHA256SUMS
+seed   OK   49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 seeds/C49/delivery/FILES/STAGE5_DEEPER_FINDINGS.md
+seed   OK   c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 seeds/C49/delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md
+seed   OK   4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 seeds/C49/delivery/FILES/capacity_coverage_note.csv
+seed   OK   6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 seeds/C49/delivery/FILES/escalate_by_type_top25.csv
+seed   OK   f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d seeds/C49/delivery/FILES/inconclusive_by_clause.csv
+seed   OK   4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 seeds/C49/delivery/FILES/independent_checks_critical_counts.csv
+seed   OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a seeds/C49/delivery/FILES/kappa_sensitivity.csv
+seed   OK   b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 seeds/C49/delivery/FILES/portfolio_summary.csv
+seed   OK   ea8ff49d164e41dcd442590dbec6c7d9ffb2c83a9baa5a5e6193d79c6cde5f9d seeds/C49/delivery/ZIP/evidence_pkg.zip
+seed   OK   6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a eval_b6.R
+R: R version 4.6.1 (2026-06-24 ucrt) | readr 2.2.0 | dplyr 1.2.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql: not used by batch b6 (R-only; batches C52 and C24 hold the database)
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 14871 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+edc8a02618014eb9e370ae01f605303630874d465917f3785b7fa5518d3ddeea  252  runner_b6/seeds/C49/ARMS.tsv
+0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30  189  runner_b6/seeds/C49/DELIVCHK
+13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2  248  runner_b6/seeds/C49/KNOWN_ANSWERS.csv
+4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e  1931  runner_b6/seeds/C49/c49_check.R
+ce2a6a24168e71ac82b6808f6ed15c51511eb2c7ccd14a5224674da49597632d  7287  runner_b6/seeds/C49/c49_score.R
+73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  7929  runner_b6/seeds/C49/delivery/FILES/AI1_INTERPRETATION.md
+1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75  833  runner_b6/seeds/C49/delivery/FILES/SHA256SUMS
+49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  2007  runner_b6/seeds/C49/delivery/FILES/STAGE5_DEEPER_FINDINGS.md
+c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  4051  runner_b6/seeds/C49/delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md
+4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  runner_b6/seeds/C49/delivery/FILES/capacity_coverage_note.csv
+6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  runner_b6/seeds/C49/delivery/FILES/escalate_by_type_top25.csv
+f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  runner_b6/seeds/C49/delivery/FILES/inconclusive_by_clause.csv
+4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  runner_b6/seeds/C49/delivery/FILES/independent_checks_critical_counts.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  runner_b6/seeds/C49/delivery/FILES/kappa_sensitivity.csv
+b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  runner_b6/seeds/C49/delivery/FILES/portfolio_summary.csv
+ea8ff49d164e41dcd442590dbec6c7d9ffb2c83a9baa5a5e6193d79c6cde5f9d  9592  runner_b6/seeds/C49/delivery/ZIP/evidence_pkg.zip
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  10336  runner_b6/eval_b6.R
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  11125  runner_b6/run_batch_v6.ps1 (runner; hashed in SPEC_FREEZE_b6.sha256)
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b6.sha256` (written before the reporting run):
+# N13 batch b6 spec freeze, written 2026-10-03 11:30 CDT before the reporting run (scratch checks in N13/_preflight_b6, _preflight_b6_2, _preflight_b6_3 disclosed in each spec)
+eb91577bac56117d32a4f95a6370831b1521ee54d24cababe36c318654207c2c  C43/ABLATION_SPEC.md
+5630d48511557ac288f689595f649122037c31442c776f1aab7dcabda05f87ab  C49/ABLATION_SPEC.md
+a4811cdf2b2632515964e7f0e826fae70e040c7c8595d05dc7abe112ff0760d9  C44/ABLATION_SPEC.md
+7c1edd58a89b9b7b35faea14ce7bc84a1ede6cf67919cba2296eaf348fd2c663  C40/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C40/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C43/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C44/CONSTITUTION_v1.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C49/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C40/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C43/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C44/BASELINE_FRAMEWORK.sha256
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C49/BASELINE_FRAMEWORK.sha256
+3a201b23c77ac5bd9ddc747ae276a7223d5cb05e6e1ed861ec5849595c681327  runner_b6/SEEDS_b6.sha256
+729ed8cad382ae82805499d493bf7eb8fa38687665286649bb3746330f0b1e2d  runner_b6/SEED_DIFFS_b6.txt
+5822febe57e51e8ef04afdbbcf6e610c79cb9fc95c34560250300c75b5f985c8  runner_b6/PRECHECK_b6.json
+bae228cbf71a25b6b68c9863e4a68f88ca89fa4647ac81acb0ff14332d89bd84  runner_b6/make_seeds_b6.py
+5b97cd2a0520f6ea88f4bf220b3fca0756292ff352eebf28991e52d9d21254fb  runner_b6/run_batch_v6.ps1
+6f5f25181d1033b7162a393b8dc0fd1e2a65cee094cbddf9d9244f707526bb1a  runner_b6/eval_b6.R
+a3c359dc253fd91224b811df2e1f0f14cde5827418da7166e0c8f628256508bb  C44/packets/C44_A3_DELTA_REREVIEW_DeepSeek.txt
+158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1  C49/packets/C49_R_DS_ZIP.txt
+9fa6cc58745d144a5c53a371f0b41db69d0503b212c2b1ce08a33eb84998f7a2  C49/packets/C49_R_DS_FILES.txt
+bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2  C49/packets/C49_R_GPT_FILES.txt
+e140717693b1bf86a0ab1cad9f0575a40b8289e291145de8ce7e5772765021a4  C40/packets/C40_1_INC_BUILDER_ChatGPT.txt
+6a7c477a0d034c992bbcb3544600e455b7e0b217c9d77a125a6acdf575c86bfc  C40/packets/C40_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt
+dab6e55f63eb67f6628ab05b3d5c3d52ab1301e804e8892ba22113735f6aeb96  C48/packets/C48_A3_SECOND_AUDIT_DeepSeek.txt
+eeed4af084b2630f1a6c4a0fc30a87923043631942b50c185409c622849f0c3e  tools_build_extra_b6.py
+8640118c731510dee2dddbe24d8c0f3693f58d22c8406a37135ecbc6b53a0494  tools_make_specs_b6.py
+f6fd85c5137f27710a1b38e24836b3b473a720b5f221f57a38c43b8f11547c8f  SELECTION_N13.md
+7e4dac855c3a640f311856928c9666e50ce8d464a57273f645a4a337d978e7fc  N13_runner_b6_v2.tar
+a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f  ablation_plan/ADDENDUM_01_control_39.md
+5d8756efbed04f168f3d53e2d8fab8064503752bd04f8c61b670cf81f9c757a6  ablation_plan/ADDENDUM_02_pricepoint_candidates.md
+9c2f58098581e31eae81d5742d6784da454fc994e4fc851ca0bc93546f6243ba  ablation_plan/OWNER_RULINGS_BATCH_01_DECISIONS.md
+
+---
+# RUN LOG (this control)
+11:32:06 C49 arms
+11:32:06   CHECK CHECK exit=0 secs=0.6 timeout=0
+
+---
+# C49_RESULTS.md (runner output, pre-chat part)
+# C49 RESULTS (mechanical; generated 2026-10-03 11:34:22 CDT)
+
+**Mechanical predicate result: PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 0. delivery sets valid (pre-chat): the zip holds byte-identical copies of the individual files and SHA256SUMS matches them | MET |
+| 1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file | PENDING |
+| 2. inventory hashes: DS_FILES and GPT_FILES list every evidence file with the SHA256SUMS hash | PENDING |
+| 3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP + 2 min (DS_ZIP not usable = met) | PENDING |
+
+## Arms
+| arm | exit | status | n_evidence_files | zip_entries | zip_bytes | files_bytes_total |
+|---|---|---|---|---|---|---|
+| CHECK | 0 | PASS | 9 | 10 | 9592 | 17323 |
+
+## DELIVERY_FILES.csv
+| file | bytes | sha256_listed | sha256_file | in_zip | sha256_zip |
+|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | 4051 | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 | TRUE | c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 |
+| STAGE5_DEEPER_FINDINGS.md | 2007 | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 | TRUE | 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 |
+| capacity_coverage_note.csv | 644 | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 | TRUE | 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 |
+| escalate_by_type_top25.csv | 1264 | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 | TRUE | 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 |
+| inconclusive_by_clause.csv | 58 | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d | TRUE | f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d |
+| independent_checks_critical_counts.csv | 190 | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 | TRUE | 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 |
+| kappa_sensitivity.csv | 164 | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a | TRUE | 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a |
+| portfolio_summary.csv | 183 | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 | TRUE | b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 |
+| AI1_INTERPRETATION.md | 7929 | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 | TRUE | 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 |
+| SHA256SUMS | 833 | NA | 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75 | TRUE | 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75 |
+
+
+---
+# C49_arms.csv (raw, full file)
+arm,exit,status,n_evidence_files,zip_entries,zip_bytes,files_bytes_total
+CHECK,0,PASS,9,10,9592,17323
+
+---
+# RAW PER-ARM FILES (verbatim; bulky files summarized with their SHA-256)
+## arms/CHECK/RUN_CHECK.exit
+0,0.6,2026-10-03T11:32:06-05:00,0,300
+
+## arms/CHECK/outputs/DELIVERY_CHECK.txt
+status=PASS n_evidence_files=9 zip_entries=10 zip_bytes=9592 files_bytes_total=17323 zip_sha256=ea8ff49d164e41dcd442590dbec6c7d9ffb2c83a9baa5a5e6193d79c6cde5f9d
+
+## arms/CHECK/outputs/DELIVERY_FILES.csv
+"file","bytes","sha256_listed","sha256_file","in_zip","sha256_zip"
+"STAGE5_EVIDENCE_PACKAGE.md",4051,"c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7","c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7",TRUE,"c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7"
+"STAGE5_DEEPER_FINDINGS.md",2007,"49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6","49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6",TRUE,"49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6"
+"capacity_coverage_note.csv",644,"4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609","4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609",TRUE,"4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609"
+"escalate_by_type_top25.csv",1264,"6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176","6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176",TRUE,"6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176"
+"inconclusive_by_clause.csv",58,"f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d","f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d",TRUE,"f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d"
+"independent_checks_critical_counts.csv",190,"4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146","4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146",TRUE,"4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146"
+"kappa_sensitivity.csv",164,"7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a","7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a",TRUE,"7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a"
+"portfolio_summary.csv",183,"b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167","b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167",TRUE,"b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167"
+"AI1_INTERPRETATION.md",7929,"73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932","73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932",TRUE,"73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932"
+"SHA256SUMS",833,NA,"1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75",TRUE,"1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75"
+
+
+---
+# C49_EVIDENCE.sha256
+aa13f382511d241b47f513ac0eb44030e97c0bd17ee5ea70b41c5f577b1c692d  C49_ARM_MANIFESTS.txt
+a681b6ac70ef07d043eeea9b9660752fd967851e936fd4f63bdffadbf20421c8  C49_arms.csv
+1d357173acb8cb1e52f0dda8a50bb1c7e9d4be49f0d71ce3c1db89785d5a4011  C49_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root. Bulky data copies (the frozen source extract, full classifications files, the C43 trail index and its unpacked copy) are listed by hash and size only.
+arms/CHECK in  :: 4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e  1931  c49_check.R
+arms/CHECK out :: ca2d62628098436c0bb40e8093dd31bcc23e28e6b18ab65c6b7f5cc5a31046b9  162  outputs\DELIVERY_CHECK.txt
+arms/CHECK out :: 4f0b3ee471529dc826fb103de9e5a0008835668c444a760d3219c35b449e7a75  2387  outputs\DELIVERY_FILES.csv
+arms/CHECK out :: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  7929  outputs\unzipped\AI1_INTERPRETATION.md
+arms/CHECK out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  outputs\unzipped\capacity_coverage_note.csv
+arms/CHECK out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  outputs\unzipped\escalate_by_type_top25.csv
+arms/CHECK out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  outputs\unzipped\inconclusive_by_clause.csv
+arms/CHECK out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  outputs\unzipped\independent_checks_critical_counts.csv
+arms/CHECK out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  outputs\unzipped\kappa_sensitivity.csv
+arms/CHECK out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  outputs\unzipped\portfolio_summary.csv
+arms/CHECK out :: 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75  833  outputs\unzipped\SHA256SUMS
+arms/CHECK out :: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  2007  outputs\unzipped\STAGE5_DEEPER_FINDINGS.md
+arms/CHECK out :: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  4051  outputs\unzipped\STAGE5_EVIDENCE_PACKAGE.md
+arms/CHECK out :: 85a49b4982e3c8f03a3ffa4d5b69fd82bfc6a4839068d97e4c527078037d7cb2  39  RUN_CHECK.exit
+arms/CHECK out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_CHECK.stderr.txt
+arms/CHECK out :: c1e72488f3f3aae199fa8f6082110aa7f3c35045275fe4f71a8d577029846b5a  163  RUN_CHECK.stdout.txt
+
+---
+# SEED / HARNESS FILES (full text of new runner-side files; binary or verbatim-copied files by hash)
+### seeds/C49/delivery/FILES/STAGE5_EVIDENCE_PACKAGE.md (4051 bytes, sha256 c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7) — verbatim copy of /workspace/chicago-311-run/stage-05/packets/STAGE5_EVIDENCE_PACKAGE.md
+### seeds/C49/delivery/FILES/STAGE5_DEEPER_FINDINGS.md (2007 bytes, sha256 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/STAGE5_DEEPER_FINDINGS.md
+### seeds/C49/delivery/FILES/capacity_coverage_note.csv (644 bytes, sha256 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/capacity_coverage_note.csv
+### seeds/C49/delivery/FILES/escalate_by_type_top25.csv (1264 bytes, sha256 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/escalate_by_type_top25.csv
+### seeds/C49/delivery/FILES/inconclusive_by_clause.csv (58 bytes, sha256 f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/inconclusive_by_clause.csv
+### seeds/C49/delivery/FILES/independent_checks_critical_counts.csv (190 bytes, sha256 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/independent_checks_critical_counts.csv
+### seeds/C49/delivery/FILES/kappa_sensitivity.csv (164 bytes, sha256 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/kappa_sensitivity.csv
+### seeds/C49/delivery/FILES/portfolio_summary.csv (183 bytes, sha256 b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167) — verbatim copy of /workspace/chicago-311-dispatch-priority/docs/stage-05-interpretation/deeper/portfolio_summary.csv
+### seeds/C49/delivery/FILES/AI1_INTERPRETATION.md (7929 bytes, sha256 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932) — verbatim copy of /workspace/ablation_plan/runs/N13/runner_b5/seeds/C48/AI1_ORIGINAL.md
+### seeds/C49/delivery/FILES/SHA256SUMS (833 bytes, sha256 1f2aad88d78e4c4a582e39d0745af8d710d1fcdedb69a35982e245b213ddec75)
+c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  STAGE5_EVIDENCE_PACKAGE.md
+49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  STAGE5_DEEPER_FINDINGS.md
+4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  capacity_coverage_note.csv
+6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  escalate_by_type_top25.csv
+f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  inconclusive_by_clause.csv
+4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  independent_checks_critical_counts.csv
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  kappa_sensitivity.csv
+b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  portfolio_summary.csv
+73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  AI1_INTERPRETATION.md
+### seeds/C49/delivery/ZIP/evidence_pkg.zip (9592 bytes, sha256 ea8ff49d164e41dcd442590dbec6c7d9ffb2c83a9baa5a5e6193d79c6cde5f9d) — deterministic zip (fixed entry time 2026-10-03 10:52:00, deflate) of the same 10 files
+### seeds/C49/KNOWN_ANSWERS.csv (248 bytes, sha256 13d57bb9d40392186ba8f423482c20d9121b56796c5b35c61494b3ee1b4303c2)
+q,answer,source
+Q1,131968,portfolio_summary.csv ESCALATE at kappa=2
+Q2,64922,escalate_by_type_top25.csv WCA2
+Q3,49.2,64922/131968 in percent (1 decimal)
+Q4,25,escalate_by_type_top25.csv data rows
+Q5,118246,kappa_sensitivity.csv ESCALATE at kappa=3
+### seeds/C49/ARMS.tsv (252 bytes, sha256 edc8a02618014eb9e370ae01f605303630874d465917f3785b7fa5518d3ddeea)
+arm	model	delivery	end_line	packet
+DS_ZIP	DeepSeek	ZIP	END C49 FIRST PASS	C49/packets/C49_R_DS_ZIP.txt
+DS_FILES	DeepSeek	FILES	END C49 FIRST PASS	C49/packets/C49_R_DS_FILES.txt
+GPT_FILES	ChatGPT	FILES	END C49 FIRST PASS	C49/packets/C49_R_GPT_FILES.txt
+### seeds/C49/c49_check.R (1931 bytes, sha256 4f6cc57234f784bc84e5a9823f9549713db024e04e32036bd440aa202efd485e)
+#!/usr/bin/env Rscript
+# C49 delivery-set check (N13 b6, pre-chat). Usage: Rscript c49_check.R <delivery_dir> <OUTDIR>
+# Verifies FILES/SHA256SUMS against the files, and that ZIP/evidence_pkg.zip holds byte-identical copies of the same files. Writes OUTDIR/DELIVERY_CHECK.txt, DELIVERY_FILES.csv.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); D <- a[[1]]; OUT <- a[[2]]; dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+sha <- function(p) digest(file = p, algo = "sha256")
+F <- file.path(D, "FILES"); sums <- readLines(file.path(F, "SHA256SUMS"), warn = FALSE); sums <- sums[nzchar(sums)]
+h <- sub("  .*$", "", sums); nm <- sub("^[0-9a-f]{64}  ", "", sums)
+files <- setdiff(list.files(F), "SHA256SUMS")
+uz <- file.path(OUT, "unzipped"); dir.create(uz, showWarnings = FALSE); zf <- file.path(D, "ZIP", "evidence_pkg.zip")
+zl <- utils::unzip(zf, list = TRUE); utils::unzip(zf, exdir = uz)
+tab <- data.frame(file = c(nm, "SHA256SUMS"), bytes = file.info(file.path(F, c(nm, "SHA256SUMS")))$size, sha256_listed = c(h, NA), sha256_file = sapply(file.path(F, c(nm, "SHA256SUMS")), sha),
+                  in_zip = c(nm, "SHA256SUMS") %in% zl$Name, stringsAsFactors = FALSE)
+tab$sha256_zip <- sapply(tab$file, function(f) { p <- file.path(uz, f); if (file.exists(p)) sha(p) else "MISSING" })
+ok <- setequal(nm, files) && all(tab$sha256_listed[seq_along(nm)] == tab$sha256_file[seq_along(nm)]) && all(tab$in_zip) && all(tab$sha256_zip == tab$sha256_file) && nrow(zl) == length(nm) + 1
+write.csv(tab, file.path(OUT, "DELIVERY_FILES.csv"), row.names = FALSE)
+writeLines(sprintf("status=%s n_evidence_files=%d zip_entries=%d zip_bytes=%d files_bytes_total=%d zip_sha256=%s", if (ok) "PASS" else "FAIL", length(nm), nrow(zl), file.info(zf)$size, sum(tab$bytes), sha(zf)), file.path(OUT, "DELIVERY_CHECK.txt"))
+cat(readLines(file.path(OUT, "DELIVERY_CHECK.txt")), "\n"); if (!ok) quit(status = 1)
+### seeds/C49/c49_score.R (7287 bytes, sha256 ce2a6a24168e71ac82b6808f6ed15c51511eb2c7ccd14a5224674da49597632d)
+#!/usr/bin/env Rscript
+# C49 post-chat scorer (N13 b6). Usage: Rscript c49_score.R <N13_ROOT>
+# Reads the frozen delivery set (runner_b6/seeds/C49), the three extracted replies C49/C49-<arm>/reply.md and their TIMES.txt; writes C49/post/.
+# Access proof per file = the reply's FIRST and LAST lines equal the file's first and last non-empty lines (whitespace-normalized). Mechanical; no judgment.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE)
+S <- file.path(W, "runner_b6", "seeds", "C49"); C <- file.path(W, "C49"); OUT <- file.path(C, "post"); dir.create(OUT, showWarnings = FALSE)
+rdl <- function(p) { x <- readLines(p, warn = FALSE, encoding = "UTF-8"); if (length(x) && startsWith(x[1], "\ufeff")) x[1] <- substring(x[1], 2); x }
+nz <- function(x) x[nzchar(trimws(x))]
+norm <- function(s) { s <- gsub("`", "", s); s <- gsub("\\\\\\|", "|", s); s <- gsub("\\*\\*", "", s); s <- gsub("[[:space:]]+", " ", s); trimws(s) }
+arms <- read.delim(file.path(S, "ARMS.tsv"), colClasses = "character")
+sums <- nz(rdl(file.path(S, "delivery", "FILES", "SHA256SUMS"))); H <- setNames(sub("  .*$", "", sums), sub("^[0-9a-f]{64}  ", "", sums))
+truth <- lapply(names(H), function(f) { x <- nz(rdl(file.path(S, "delivery", "FILES", f))); c(first = norm(x[1]), last = norm(x[length(x)])) }); names(truth) <- names(H)
+ka <- read.csv(file.path(S, "KNOWN_ANSWERS.csv"), colClasses = "character")
+tm <- function(p) { if (!file.exists(p)) return(NA_real_); x <- rdl(p); g <- function(k) { z <- grep(paste0("^", k, "="), x, value = TRUE); if (length(z)) as.POSIXct(sub(paste0("^", k, "="), "", z[1]), tz = "America/Chicago", format = "%Y-%m-%d %H:%M:%S") else as.POSIXct(NA) }
+  s <- g("sent"); d <- g("reply_complete"); if (is.na(s) || is.na(d)) NA_real_ else as.numeric(difftime(d, s, units = "mins")) }
+rows <- list(); halt <- character(0)
+for (arm in arms$arm) { f <- file.path(C, paste0("C49-", arm), "reply.md"); endl <- arms$end_line[arms$arm == arm]
+  if (!file.exists(f)) { halt <- c(halt, paste("reply missing:", arm)); next }
+  x <- rdl(f); last <- tail(nz(trimws(x)), 1); end_ok <- length(last) == 1 && grepl(endl, last, fixed = TRUE)
+  if (!end_ok) halt <- c(halt, paste("reply has no END line as last line:", arm))
+  st <- grep("^[[:space:]>*`-]*FILE:", x); inv <- list()
+  for (i in seq_along(st)) { blk <- x[st[i]:min(length(x), if (i < length(st)) st[i + 1] - 1 else st[i] + 12)]
+    g <- function(k) { z <- grep(paste0("^[[:space:]>*`-]*", k, ":"), blk, value = TRUE); if (length(z)) norm(sub(paste0("^[[:space:]>*`-]*", k, ":\\**"), "", z[1])) else NA_character_ }
+    inv[[length(inv) + 1]] <- data.frame(file = g("FILE"), sha256 = g("SHA256"), opened = toupper(g("OPENED")), lines = g("LINES"), first = g("FIRST"), last = g("LAST"), stringsAsFactors = FALSE) }
+  inv <- if (length(inv)) do.call(rbind, inv) else data.frame(file = character(), sha256 = character(), opened = character(), lines = character(), first = character(), last = character())
+  inv$file <- basename(gsub("[`*]", "", inv$file))
+  ev <- data.frame(file = names(H), listed = names(H) %in% inv$file, stringsAsFactors = FALSE)
+  ev$sha_match <- sapply(ev$file, function(fn) { z <- inv$sha256[inv$file == fn]; length(z) > 0 && any(tolower(gsub("[^0-9a-fA-F]", "", z)) == H[[fn]]) })
+  ev$first_ok <- sapply(ev$file, function(fn) any(inv$first[inv$file == fn] == truth[[fn]][["first"]], na.rm = TRUE))
+  ev$last_ok <- sapply(ev$file, function(fn) any(inv$last[inv$file == fn] == truth[[fn]][["last"]], na.rm = TRUE))
+  ev$said_opened <- sapply(ev$file, function(fn) any(grepl("^YES", inv$opened[inv$file == fn])))
+  ev$opened_proven <- ev$first_ok & ev$last_ok
+  write.csv(ev, file.path(OUT, paste0("INVENTORY_", arm, ".csv")), row.names = FALSE)
+  qa <- sapply(ka$q, function(q) { z <- grep(paste0("^[[:space:]>*`-]*", q, "[:.)]"), x, value = TRUE); if (!length(z)) return(NA_character_)
+    s <- sub(paste0("^.*?", q, "[:.)]"), "", z[1], perl = TRUE); v <- regmatches(s, gregexpr("[0-9][0-9,]*\\.?[0-9]*", s))[[1]]; if (length(v)) gsub(",", "", v[1]) else NA_character_ })
+  fa <- data.frame(q = ka$q, expected = ka$answer, reply = unname(qa), correct = !is.na(qa) & suppressWarnings(abs(as.numeric(qa) - as.numeric(ka$answer)) < 1e-9), stringsAsFactors = FALSE)
+  write.csv(fa, file.path(OUT, paste0("FACTS_", arm, ".csv")), row.names = FALSE)
+  mins <- tm(file.path(C, paste0("C49-", arm), "TIMES.txt"))
+  if (is.na(mins)) halt <- c(halt, paste("TIMES.txt missing or incomplete:", arm))
+  usable <- end_ok && all(ev$opened_proven) && all(!is.na(fa$reply))
+  rows[[arm]] <- data.frame(arm = arm, model = arms$model[arms$arm == arm], delivery = arms$delivery[arms$arm == arm], reply_sha256 = digest(file = f, algo = "sha256"), end_line = end_ok,
+    files_listed = sum(ev$listed), files_opened_proven = sum(ev$opened_proven), n_files = nrow(ev), files_said_opened = sum(ev$said_opened), sha_match = sum(ev$sha_match),
+    facts_answered = sum(!is.na(fa$reply)), facts_correct = sum(fa$correct), usable = usable, minutes = round(mins, 2), time_to_usable_min = if (usable) round(mins, 2) else Inf, stringsAsFactors = FALSE) }
+tab <- if (length(rows)) do.call(rbind, rows) else NULL
+g <- function(arm, col) if (!is.null(tab) && arm %in% tab$arm) tab[[col]][tab$arm == arm] else NA
+v <- c("DS_FILES", "GPT_FILES")
+conds <- data.frame(condition = c("1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file (FIRST and LAST lines match)",
+                                  "2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in SHA256SUMS",
+                                  "3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met)"),
+                    met = c(isTRUE(all(sapply(v, g, col = "files_opened_proven") == sapply(v, g, col = "n_files"))),
+                            isTRUE(all(sapply(v, g, col = "sha_match") == sapply(v, g, col = "n_files"))),
+                            isTRUE(g("DS_FILES", "time_to_usable_min") <= g("DS_ZIP", "time_to_usable_min") + 2)))
+verdict <- if (length(halt)) "HALT" else if (all(conds$met)) "P1 MET" else "P1 NOT MET"
+md <- function(df) c(paste0("| ", paste(names(df), collapse = " | "), " |"), paste0("|", paste(rep("---", ncol(df)), collapse = "|"), "|"), apply(df, 1, function(r) paste0("| ", paste(gsub("\\|", "/", r), collapse = " | "), " |")))
+L <- c(paste0("# C49 POST-CHAT RESULTS (mechanical; generated ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), ")"), "", paste0("**Mechanical predicate result: ", verdict, "**"), "",
+       if (length(halt)) c("HALT reasons:", paste0("- ", halt), ""), "## Predicate conditions", md(transform(conds, met = ifelse(conds$met, "MET", "NOT MET"))), "", "## Arms", if (is.null(tab)) "(none)" else md(tab), "")
+for (arm in arms$arm) for (k in c("INVENTORY_", "FACTS_")) { p <- file.path(OUT, paste0(k, arm, ".csv")); if (file.exists(p)) L <- c(L, paste0("## ", k, arm, ".csv"), md(read.csv(p, colClasses = "character")), "") }
+writeLines(L, file.path(OUT, "C49_POST_RESULTS.md")); if (!is.null(tab)) write.csv(tab, file.path(OUT, "C49_POST_arms.csv"), row.names = FALSE)
+cat("C49:", verdict, "\n")
+### seeds/C49/DELIVCHK (189 bytes, sha256 0d355b20e2fcd5c9919546c26d92506826769042a463ed05693fc7c36f110b30)
+C49 delivery-set check (runner v6); reviewer chats scored later by c49_score.R (marker named DELIVCHK, not DELIVERY: Windows paths are case-insensitive and seeds/C49/delivery/ is a folder)
+
+
+---
+# COORDINATOR DEVIATION NOTES (post-freeze, disclosed; read before the reviewer replies)
+The frozen SPEC above is unchanged. These notes record (D-T1) how the reply times were obtained, (PD-3) a harness delivery defect in the first DS_FILES arm and its rerun, and the operator's account of the DS_ZIP upload. The DS_FILES reply scored below is the PD-3 rerun; the superseded first DS_FILES reply is quoted after the notes as evidence only (not scored).
+
+---
+## Deviation notes part 1 — `C49/DEVIATION_NOTES_post.md` (sha256 b1362205dfe866447961c801230b929e3246e3388bb26a819a4e245d0839fdf2, 3877 bytes, verbatim)
+# C49 post-freeze deviation notes (b6)
+
+## D-T1 Reply times written after the chats (coordinator ruling 2026-10-03 12:20 CT)
+- No TIMES.txt was written at chat time. Under the ruling, the coordinator wrote them at ~12:25 CT:
+  - `sent=` is the browser operator's logged send time (given in UTC, converted to CDT = UTC-5; both are in the file).
+  - `reply_complete=` is an **UPPER BOUND**: the box mtime of the saved page (saved right after the END line appears).
+  - Each file also records the page's own "Worked for" / "Thought for" indicator as a cross-check.
+- Rule: if an upper bound makes a timing condition ambiguous, it is reported as ambiguous, not scored as met.
+- Effect on condition 3: none so far. DS_ZIP is not usable: every file is OPENED: NO, because no zip reached the model. By the SPEC, condition 3 is then met whatever the DS_FILES time is, so an upper bound cannot make it ambiguous. Upper bounds: DS_ZIP 0.65 min, DS_FILES 2.48 min, GPT_FILES 5.00 min.
+- The frozen `ABLATION_SPEC.md` is not edited (SPEC_FREEZE_b6.sha256). This note is the post-freeze deviation record.
+
+## PD-3 SHA256SUMS was not delivered to the DS_FILES reviewer (harness delivery defect)
+- **Evidence.** In the saved DS_FILES page (`C49/C49-DS_FILES/reply_deepseek.html`, 6f8681b3…), DeepSeek's thinking lists what it actually received: "That's 10 files provided, but SHA256SUMS missing". These 10 were `C49_R_DS_FILES.txt` plus the 9 evidence files, i.e. 9 of the 10 intended inputs. It also says: "SHA256SUMS not present. So we must inventory those 9. SHA256 cannot be provided."
+- **Gaps in the page record.** The user turn's attachment chips are not in the saved DOM: DeepSeek's virtual list kept only 2 items. The `_files` assets hold only page JS/CSS, not the uploads. So the page cannot show whether an upload was attempted and refused.
+- **Comparison with GPT_FILES.** The ChatGPT page lists `SHA256SUMS Document` among its 11 attachments, and the reply matches 9/9 SHA-256s. The same delivery set reached ChatGPT intact.
+- **Likely cause (not proven).** DeepSeek does not take an extensionless file. The missing file sits in the middle of the alphabetical order, not at the end, which argues against a 10-attachment cap.
+- **Ruling.** This is a harness delivery defect, not a model failure. The DS_FILES condition-2 result ("SHA256: UNAVAILABLE — SHA256SUMS not provided" for all 9 files) is **not scored as NOT MET**. It is recorded here as PD-3.
+- **Fix: rerun the DS_FILES arm only.**
+  - Delivery set `runner_b6/seeds/C49/delivery/FILES_PD3/`: the same 10 files, byte-identical, with `SHA256SUMS` renamed `SHA256SUMS.txt`.
+  - Packet `C49/packets/C49_R_DS_FILES_PD3.txt`: identical to `C49_R_DS_FILES.txt` except that the two mentions of `SHA256SUMS` read `SHA256SUMS.txt`.
+  - New DeepSeek chat (DeepThink). Before sending, the operator checks that 11 attachment chips are shown (packet + 10).
+- **Other arms.**
+  - GPT_FILES received SHA256SUMS, so no rerun.
+  - DS_ZIP: only the packet reached the model (no zip chip; the reply says no zip was attached). That is the baseline observation the control measures (zip delivery to DeepSeek), not PD-3, and it is not rerun. The operator should confirm whether the zip upload was attempted and refused.
+- **Scoring after the rerun.**
+  - `c49_score.R` and `assemble_b6_bv.R` read `C49/C49-DS_FILES/` and the DS_FILES packet path in `ARMS.tsv`. The original DS_FILES record will be moved, not deleted, to `C49/_superseded_PD3/C49-DS_FILES/`, and the rerun placed at `C49/C49-DS_FILES/`.
+  - The DS_FILES packet path will be pointed at `C49_R_DS_FILES_PD3.txt` by a disclosed post-freeze patch. The original hashes stay in `CAPTURE_FREEZE_b6.sha256`.
+  - `C49/REPLY_FREEZE.json` and the C49 B/V packets are **not** written before the rerun. They would freeze the defective arm, and the assembler never overwrites a freeze.
+
+---
+## Deviation notes part 2 — `C49/DEVIATION_NOTES_post_2.md` (sha256 6cd11d74b4cf2f09ebd511d10e3c8fb48d9133765b7b389315db99cd748eb188, 2788 bytes, verbatim)
+# C49 post-freeze deviation notes, part 2 (b6, 2026-10-03 ~12:45 CT). Continues DEVIATION_NOTES_post.md (frozen, unchanged)
+
+## PD-3 resolved by the DS_FILES rerun
+- Rerun: new DeepSeek chat https://chat.deepseek.com/a/chat/s/2bfdcf06-8c20-4656-abbd-e89c99776213, packet `C49/packets/C49_R_DS_FILES_PD3.txt` (89ac5ab5…), delivery `runner_b6/seeds/C49/delivery/FILES_PD3/`. The operator confirmed 11/11 attachment chips uploaded before send; the END line was seen. TIMES.txt was written at chat time: sent 12:30:32, reply_complete 12:31:22 CDT.
+- Result: all 9 files listed with the SHA-256 from SHA256SUMS.txt (9/9 equal to the frozen sums), OPENED: YES, Q1–Q5 = 131968 / 64922 / 49.2 / 25 / 118246.
+- Record handling (nothing deleted):
+  - The original DS_FILES record was moved to `C49/_superseded_PD3/C49-DS_FILES/`; its hashes are unchanged and still match `CAPTURE_FREEZE_b6.sha256`.
+  - The rerun capture stays in `C49/C49-DS_FILES_PD3/` (`CAPTURE_FREEZE_b6b.sha256`). Its reply.md and TIMES.txt are copied byte-identically to `C49/C49-DS_FILES/`, the path the frozen scorer reads (see SOURCE.txt there).
+- Post-freeze runner patch (disclosed): `runner_b6/seeds/C49/ARMS.tsv` DS_FILES row:
+  - `packet` changed to `C49/packets/C49_R_DS_FILES_PD3.txt`.
+  - `delivery` label changed to "FILES (PD-3 rerun: FILES_PD3, SHA256SUMS.txt)".
+  - The original is kept as `ARMS.v1_prePD3.tsv`. `c49_score.R` is unchanged; it reads the sums from `delivery/FILES/SHA256SUMS`, which is byte-identical to `FILES_PD3/SHA256SUMS.txt`.
+- Limit: the assembler's fixed sentence in the B/V packets says the FILES arms got "the 10 files of `FILES/`". For DS_FILES the files were the byte-identical `FILES_PD3/` set (one file renamed); this note and the ARMS delivery label disclose it.
+- Times: DS_FILES now has an operator-logged reply_complete (not an upper bound). DS_ZIP still has the page-mtime upper bound (0.65 min). DS_ZIP is unusable, so condition 3 is met regardless and is not ambiguous.
+
+## DS_ZIP: operator account (recorded 2026-10-03 12:41 CT)
+- The operator says the zip upload was attempted and accepted: no refusal was shown.
+- Yet the page shows only the packet in the user turn (`C49_R_DS_ZIP.txt TXT 2.78KB`). DeepSeek's reply/thinking says no zip was attached or openable ("Missing evidence files"), and lists all 9 files as OPENED: NO.
+- This is the baseline observation the control measures: a zip "accepted" by the DeepSeek UI did not reach the model as readable evidence. It is not PD-3 and not rerun.
+- Scorer note: the DS_ZIP Q2–Q4 parse picks up "25" from the file name `escalate_by_type_top25.csv` in the UNAVAILABLE text. facts_answered=3 / correct=1 should be 0 / 0. There is no effect on P1, because DS_ZIP is unusable either way. The frozen scorer is not changed.
+
+---
+## ARMS.tsv as patched for PD-3 — `runner_b6/seeds/C49/ARMS.tsv` (sha256 bead849473f20fa93faf53091325faaa87f6db9f03c5ea6ed1b6a2809c1a4f95, 296 bytes, verbatim)
+arm	model	delivery	end_line	packet
+DS_ZIP	DeepSeek	ZIP	END C49 FIRST PASS	C49/packets/C49_R_DS_ZIP.txt
+DS_FILES	DeepSeek	FILES (PD-3 rerun: FILES_PD3, SHA256SUMS.txt)	END C49 FIRST PASS	C49/packets/C49_R_DS_FILES_PD3.txt
+GPT_FILES	ChatGPT	FILES	END C49 FIRST PASS	C49/packets/C49_R_GPT_FILES.txt
+
+---
+## ARMS.tsv before the PD-3 patch — `runner_b6/seeds/C49/ARMS.v1_prePD3.tsv` (sha256 edc8a02618014eb9e370ae01f605303630874d465917f3785b7fa5518d3ddeea, 252 bytes, verbatim)
+arm	model	delivery	end_line	packet
+DS_ZIP	DeepSeek	ZIP	END C49 FIRST PASS	C49/packets/C49_R_DS_ZIP.txt
+DS_FILES	DeepSeek	FILES	END C49 FIRST PASS	C49/packets/C49_R_DS_FILES.txt
+GPT_FILES	ChatGPT	FILES	END C49 FIRST PASS	C49/packets/C49_R_GPT_FILES.txt
+
+---
+## Superseded first DS_FILES reply (SHA256SUMS not delivered; evidence only, NOT scored) — `C49/_superseded_PD3/C49-DS_FILES/reply.md` (sha256 21e50e6ae5efd22e5eb7bb1c070167019854bf9e29df3fc9d1322af25e5aab42, 2371 bytes, verbatim)
+FILE: STAGE5_EVIDENCE_PACKAGE.md  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 67  
+FIRST: # Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)  
+LAST: - Human owner retains final authority.
+
+FILE: STAGE5_DEEPER_FINDINGS.md  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 55  
+FIRST: # Stage 5 — Deeper findings (frozen pack)  
+LAST: - High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+FILE: capacity_coverage_note.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 5  
+FIRST: label,attention_slots,escalate_n,coverage,note  
+LAST: full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+FILE: escalate_by_type_top25.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 26  
+FIRST: type_key,n_ESCALATE,share_of_escalate,cum_share  
+LAST: WCA,460,0.0034856935014548982,0.9593765155189137
+
+FILE: inconclusive_by_clause.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 2  
+FIRST: integrity_clause,n,share  
+LAST: thin_type_or_missing_peer,6377,1
+
+FILE: independent_checks_critical_counts.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 6  
+FIRST: check,expected,observed,pass  
+LAST: validated_action_list_n,131968,131968,TRUE
+
+FILE: kappa_sensitivity.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 5  
+FIRST: kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD  
+LAST: 3,222002,118246,6377,97379
+
+FILE: portfolio_summary.csv  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 2  
+FIRST: n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa  
+LAST: 222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+FILE: AI1_INTERPRETATION.md  
+SHA256: UNAVAILABLE — SHA256SUMS not provided  
+OPENED: YES  
+LINES: 252  
+FIRST: # AI1 Interpretation — Stage 5 Independent First Pass  
+LAST: Is this conversation helpful so far?
+
+HARD FACTS  
+Q1: 131968  
+Q2: 64922  
+Q3: 49.2  
+Q4: 25  
+Q5: 118246
+
+FINDINGS  
+none
+
+END C49 FIRST PASS
+
+---
+## Superseded first DS_FILES TIMES.txt — `C49/_superseded_PD3/C49-DS_FILES/TIMES.txt` (sha256 10463753e097b8fc73e69cf28610115b290a0adb3c040f97697e7efd5911ef50, 968 bytes, verbatim)
+sent=2026-10-03 11:42:26
+reply_complete=2026-10-03 11:44:55
+# Written by the coordinator 2026-10-03 ~12:25 CT under the coordinator ruling 2026-10-03 12:20 CT (TIMES.txt was not written at chat time). Times are CT (CDT, UTC-5).
+# sent = the browser operator's logged send time: 16:42:26Z UTC = 11:42:26 CDT.
+# reply_complete = UPPER BOUND, not an observed completion time: box mtime of C49/C49-DS_FILES/reply_deepseek.html = 2026-10-03 11:44:55.052064 CDT (truncated to the second above); the page is saved right after the END line appears.
+# minutes (sent -> reply_complete) = 2.48, an UPPER BOUND on the reply time.
+# cross-check (page's own duration indicator): Thought for 54 seconds (DeepSeek thinking time of the 2nd attempt only; the 1st attempt stopped while thinking and the operator sent 'continue'; neither attempt's start/stop is on the page).
+# Ruling: if an upper bound makes a timing condition ambiguous, report it as ambiguous; do not score it as met.
+
+---
+## PD-3 rerun record pointer — `C49/C49-DS_FILES/SOURCE.txt` (sha256 31d86935c05afc1e355331b90a5f32978c2863bb01052e033d0c7a1a7f2da182, 598 bytes, verbatim)
+PD-3 rerun record (2026-10-03). reply.md and TIMES.txt are byte-identical copies of C49/C49-DS_FILES_PD3/reply.md and TIMES.txt
+(capture C49/C49-DS_FILES_PD3/reply_deepseek.html, frozen in CAPTURE_FREEZE_b6b.sha256; chat https://chat.deepseek.com/a/chat/s/2bfdcf06-8c20-4656-abbd-e89c99776213; 11/11 chips before send).
+The original DS_FILES record (SHA256SUMS not delivered) was moved, not deleted, to C49/_superseded_PD3/C49-DS_FILES/ (hashes in CAPTURE_FREEZE_b6.sha256).
+They are copied here because c49_score.R and assemble_b6_bv.R read C49/C49-<arm>/. See C49/DEVIATION_NOTES_post.md (PD-3).
+
+# C49 REVIEWER REPLIES AND POST-CHAT SCORE (frozen; P1 conditions 1-3 are decided from these)
+REPLY_FREEZE.json SHA-256 dfc41fb13e9bfca1a81c1f1e3cb1f498fba65b6364d7441e6b5a60aa72f243eb:
+{
+  "ablation_id": "C49",
+  "frozen_at_ct": "2026-10-03 12:47:03 CDT",
+  "records": [
+    {"id": "DS_ZIP_reply", "path": "C49/C49-DS_ZIP/reply.md", "bytes": 1842, "sha256": "434ead16128d6b32346a6a5febc0f944477c1d8c15a5a2b6156e75fc67157ca6"},
+    {"id": "DS_ZIP_times", "path": "C49/C49-DS_ZIP/TIMES.txt", "bytes": 841, "sha256": "8b2b645eab7818ee25cfb3827c2d1061bc2265c37651c3aeb11b7844c607e7d5"},
+    {"id": "DS_ZIP_packet", "path": "C49/packets/C49_R_DS_ZIP.txt", "bytes": 2843, "sha256": "158713b3193b8541f0a1f94b26267689a956ec8e11bdf1f759634f9099d4abe1"},
+    {"id": "DS_FILES_reply", "path": "C49/C49-DS_FILES/reply.md", "bytes": 2596, "sha256": "f6e0a1f79a95ad566df9511366f5d5a021947d0e59cd11ca5218b22f663b074f"},
+    {"id": "DS_FILES_times", "path": "C49/C49-DS_FILES/TIMES.txt", "bytes": 60, "sha256": "689612cf41574f755342ab8c2bd3a91f5d0997263b49c00bd6f9bca457c7ef58"},
+    {"id": "DS_FILES_packet", "path": "C49/packets/C49_R_DS_FILES_PD3.txt", "bytes": 2816, "sha256": "89ac5ab586f1daab8d4cbfa8c4819ebb1f2bf764d232773f769cc3c6afed0aba"},
+    {"id": "GPT_FILES_reply", "path": "C49/C49-GPT_FILES/reply.md", "bytes": 3724, "sha256": "94cab4c78cb7760d3a557179579def0409d1ef6faf0c0c45294c31dac2aff740"},
+    {"id": "GPT_FILES_times", "path": "C49/C49-GPT_FILES/TIMES.txt", "bytes": 871, "sha256": "927e813d535df3bfd7ccbdcd302addf2b494584b011bbc3f8da428a399ea2dcf"},
+    {"id": "GPT_FILES_packet", "path": "C49/packets/C49_R_GPT_FILES.txt", "bytes": 2821, "sha256": "bf2f3ac4b7f82e0090852200be6c6906b1cd190fb6533a9ba8075cf04f6c27e2"}
+  ]
+}
+
+
+Each reviewer received only its packet (hashes above) and the delivery set of `runner_b6/seeds/C49/delivery/` (ZIP arm: `ZIP/evidence_pkg.zip`; FILES arms: the 10 files of `FILES/`), new chat, not told about the ablation. Times are operator-logged (TIMES.txt).
+
+---
+## C49 post-chat scorer output (c49_score.R) — `C49/post/C49_POST_RESULTS.md` (sha256 6351460755834a564f2f875f8c73e21befe75cae4f61ece8047c6394d445952c, 4401 bytes, verbatim)
+# C49 POST-CHAT RESULTS (mechanical; generated 2026-10-03 12:47:03 CDT)
+
+**Mechanical predicate result: P1 MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. variant access: DS_FILES and GPT_FILES each prove access to every evidence file (FIRST and LAST lines match) | MET |
+| 2. inventory hashes: in DS_FILES and GPT_FILES every evidence file is listed with the SHA-256 in SHA256SUMS | MET |
+| 3. delay no worse: DS_FILES time to a usable first pass <= DS_ZIP time to a usable first pass + 2 min (DS_ZIP not usable = met) | MET |
+
+## Arms
+| arm | model | delivery | reply_sha256 | end_line | files_listed | files_opened_proven | n_files | files_said_opened | sha_match | facts_answered | facts_correct | usable | minutes | time_to_usable_min |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| DS_ZIP | DeepSeek | ZIP | 434ead16128d6b32346a6a5febc0f944477c1d8c15a5a2b6156e75fc67157ca6 | TRUE | 9 | 0 | 9 | 0 | 0 | 3 | 1 | FALSE | 0.65 |  Inf |
+| DS_FILES | DeepSeek | FILES (PD-3 rerun: FILES_PD3, SHA256SUMS.txt) | f6e0a1f79a95ad566df9511366f5d5a021947d0e59cd11ca5218b22f663b074f | TRUE | 9 | 9 | 9 | 9 | 9 | 5 | 5 | TRUE | 0.83 | 0.83 |
+| GPT_FILES | ChatGPT | FILES | 94cab4c78cb7760d3a557179579def0409d1ef6faf0c0c45294c31dac2aff740 | TRUE | 9 | 9 | 9 | 9 | 9 | 5 | 5 | TRUE | 5.00 | 5.00 |
+
+## INVENTORY_DS_ZIP.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| capacity_coverage_note.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| escalate_by_type_top25.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| inconclusive_by_clause.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| independent_checks_critical_counts.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| kappa_sensitivity.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| portfolio_summary.csv | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+| AI1_INTERPRETATION.md | TRUE | FALSE | FALSE | FALSE | FALSE | FALSE |
+
+## FACTS_DS_ZIP.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | NA | FALSE |
+| Q2 | 64922 | 25. | FALSE |
+| Q3 | 49.2 | 25. | FALSE |
+| Q4 | 25 | 25. | TRUE |
+| Q5 | 118246 | NA | FALSE |
+
+## INVENTORY_DS_FILES.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| capacity_coverage_note.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| escalate_by_type_top25.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| inconclusive_by_clause.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| independent_checks_critical_counts.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| kappa_sensitivity.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| portfolio_summary.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| AI1_INTERPRETATION.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+
+## FACTS_DS_FILES.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | 131968 | TRUE |
+| Q2 | 64922 | 64922 | TRUE |
+| Q3 | 49.2 | 49.2 | TRUE |
+| Q4 | 25 | 25 | TRUE |
+| Q5 | 118246 | 118246 | TRUE |
+
+## INVENTORY_GPT_FILES.csv
+| file | listed | sha_match | first_ok | last_ok | said_opened | opened_proven |
+|---|---|---|---|---|---|---|
+| STAGE5_EVIDENCE_PACKAGE.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| STAGE5_DEEPER_FINDINGS.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| capacity_coverage_note.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| escalate_by_type_top25.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| inconclusive_by_clause.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| independent_checks_critical_counts.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| kappa_sensitivity.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| portfolio_summary.csv | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+| AI1_INTERPRETATION.md | TRUE | TRUE | TRUE | TRUE | TRUE | TRUE |
+
+## FACTS_GPT_FILES.csv
+| q | expected | reply | correct |
+|---|---|---|---|
+| Q1 | 131968 | 131968 | TRUE |
+| Q2 | 64922 | 64922 | TRUE |
+| Q3 | 49.2 | 49.2 | TRUE |
+| Q4 | 25 | 25 | TRUE |
+| Q5 | 118246 | 118246 | TRUE |
+
+
+---
+## DS_ZIP TIMES.txt — `C49/C49-DS_ZIP/TIMES.txt` (sha256 8b2b645eab7818ee25cfb3827c2d1061bc2265c37651c3aeb11b7844c607e7d5, 841 bytes, verbatim)
+sent=2026-10-03 11:41:31
+reply_complete=2026-10-03 11:42:10
+# Written by the coordinator 2026-10-03 ~12:25 CT under the coordinator ruling 2026-10-03 12:20 CT (TIMES.txt was not written at chat time). Times are CT (CDT, UTC-5).
+# sent = the browser operator's logged send time: 16:41:31Z UTC = 11:41:31 CDT.
+# reply_complete = UPPER BOUND, not an observed completion time: box mtime of C49/C49-DS_ZIP/reply_deepseek.html = 2026-10-03 11:42:10.504411 CDT (truncated to the second above); the page is saved right after the END line appears.
+# minutes (sent -> reply_complete) = 0.65, an UPPER BOUND on the reply time.
+# cross-check (page's own duration indicator): Thought for 6 seconds (DeepSeek thinking time only; one attempt).
+# Ruling: if an upper bound makes a timing condition ambiguous, report it as ambiguous; do not score it as met.
+
+---
+## DS_ZIP reply (DeepSeek, ZIP) — `C49/C49-DS_ZIP/reply.md` (sha256 434ead16128d6b32346a6a5febc0f944477c1d8c15a5a2b6156e75fc67157ca6, 1842 bytes, verbatim)
+FILE: STAGE5_EVIDENCE_PACKAGE.md  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: STAGE5_DEEPER_FINDINGS.md  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: capacity_coverage_note.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: escalate_by_type_top25.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: inconclusive_by_clause.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: independent_checks_critical_counts.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: kappa_sensitivity.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: portfolio_summary.csv  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+FILE: AI1_INTERPRETATION.md  
+SHA256: UNAVAILABLE (SHA256SUMS not provided)  
+OPENED: NO  
+LINES: UNAVAILABLE  
+FIRST: UNAVAILABLE  
+LAST: UNAVAILABLE
+
+HARD FACTS  
+Q1: UNAVAILABLE (portfolio_summary.csv OPENED: NO)  
+Q2: UNAVAILABLE (escalate_by_type_top25.csv OPENED: NO)  
+Q3: UNAVAILABLE (escalate_by_type_top25.csv OPENED: NO)  
+Q4: UNAVAILABLE (escalate_by_type_top25.csv OPENED: NO)  
+Q5: UNAVAILABLE (kappa_sensitivity.csv OPENED: NO)
+
+FINDINGS  
+none (AI1_INTERPRETATION.md OPENED: NO; evidence package not attached/openable, so audit cannot be performed)
+
+END C49 FIRST PASS
+
+---
+## DS_FILES TIMES.txt — `C49/C49-DS_FILES/TIMES.txt` (sha256 689612cf41574f755342ab8c2bd3a91f5d0997263b49c00bd6f9bca457c7ef58, 60 bytes, verbatim)
+sent=2026-10-03 12:30:32
+reply_complete=2026-10-03 12:31:22
+
+---
+## DS_FILES reply (DeepSeek, FILES (PD-3 rerun: FILES_PD3, SHA256SUMS.txt)) — `C49/C49-DS_FILES/reply.md` (sha256 f6e0a1f79a95ad566df9511366f5d5a021947d0e59cd11ca5218b22f663b074f, 2596 bytes, verbatim)
+FILE: STAGE5_EVIDENCE_PACKAGE.md  
+SHA256: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  
+OPENED: YES  
+LINES: 67  
+FIRST: # Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)  
+LAST: - Human owner retains final authority.
+
+FILE: STAGE5_DEEPER_FINDINGS.md  
+SHA256: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  
+OPENED: YES  
+LINES: 55  
+FIRST: # Stage 5 — Deeper findings (frozen pack)  
+LAST: - High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+FILE: capacity_coverage_note.csv  
+SHA256: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  
+OPENED: YES  
+LINES: 5  
+FIRST: label,attention_slots,escalate_n,coverage,note  
+LAST: full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+FILE: escalate_by_type_top25.csv  
+SHA256: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  
+OPENED: YES  
+LINES: 26  
+FIRST: type_key,n_ESCALATE,share_of_escalate,cum_share  
+LAST: WCA,460,0.0034856935014548982,0.9593765155189137
+
+FILE: inconclusive_by_clause.csv  
+SHA256: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  
+OPENED: YES  
+LINES: 2  
+FIRST: integrity_clause,n,share  
+LAST: thin_type_or_missing_peer,6377,1
+
+FILE: independent_checks_critical_counts.csv  
+SHA256: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  
+OPENED: YES  
+LINES: 6  
+FIRST: check,expected,observed,pass  
+LAST: validated_action_list_n,131968,131968,TRUE
+
+FILE: kappa_sensitivity.csv  
+SHA256: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  
+OPENED: YES  
+LINES: 5  
+FIRST: kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD  
+LAST: 3,222002,118246,6377,97379
+
+FILE: portfolio_summary.csv  
+SHA256: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  
+OPENED: YES  
+LINES: 2  
+FIRST: n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa  
+LAST: 222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+FILE: AI1_INTERPRETATION.md  
+SHA256: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  
+OPENED: YES  
+LINES: 254  
+FIRST: # AI1 Interpretation — Stage 5 Independent First Pass  
+LAST: Is this conversation helpful so far?
+
+HARD FACTS  
+Q1: 131968  
+Q2: 64922  
+Q3: 49.2  
+Q4: 25  
+Q5: 118246
+
+FINDINGS  
+none
+
+END C49 FIRST PASS
+
+---
+## GPT_FILES TIMES.txt — `C49/C49-GPT_FILES/TIMES.txt` (sha256 927e813d535df3bfd7ccbdcd302addf2b494584b011bbc3f8da428a399ea2dcf, 871 bytes, verbatim)
+sent=2026-10-03 11:44:55
+reply_complete=2026-10-03 11:49:55
+# Written by the coordinator 2026-10-03 ~12:25 CT under the coordinator ruling 2026-10-03 12:20 CT (TIMES.txt was not written at chat time). Times are CT (CDT, UTC-5).
+# sent = the browser operator's logged send time: 16:44:55Z UTC = 11:44:55 CDT.
+# reply_complete = UPPER BOUND, not an observed completion time: box mtime of C49/C49-GPT_FILES/reply_chatgpt.html = 2026-10-03 11:49:55.887331 CDT (truncated to the second above); the page is saved right after the END line appears.
+# minutes (sent -> reply_complete) = 5.00, an UPPER BOUND on the reply time.
+# cross-check (page's own duration indicator): Worked for 1m 42s and Worked for 2m 14s (two indicators on the page; ChatGPT work time only).
+# Ruling: if an upper bound makes a timing condition ambiguous, report it as ambiguous; do not score it as met.
+
+---
+## GPT_FILES reply (ChatGPT, FILES) — `C49/C49-GPT_FILES/reply.md` (sha256 94cab4c78cb7760d3a557179579def0409d1ef6faf0c0c45294c31dac2aff740, 3724 bytes, verbatim)
+FILE INVENTORY
+
+FILE: STAGE5_EVIDENCE_PACKAGE.md  
+SHA256: c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7  
+OPENED: YES  
+LINES: 67  
+FIRST: # Stage 5 Evidence Package — Chicago 311 Dispatch Priority (Dataset 2)  
+LAST: - Human owner retains final authority.
+
+FILE: STAGE5_DEEPER_FINDINGS.md  
+SHA256: 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6  
+OPENED: YES  
+LINES: 55  
+FIRST: # Stage 5 — Deeper findings (frozen pack)  
+LAST: - High ESCALATE share is expected if many Open tickets are dormant relative to type peers at κ=2; it is not proof of operational backlog severity without peer-context review of dominant types (esp. WCA2).
+
+FILE: capacity_coverage_note.csv  
+SHA256: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  
+OPENED: YES  
+LINES: 5  
+FIRST: label,attention_slots,escalate_n,coverage,note  
+LAST: full_escalate_portfolio,131968,131968,1,FLAG only — RANKING_NOT_IN_SCOPE; excess ESCALATE returns to Framing if owner wants a hard cap
+
+FILE: escalate_by_type_top25.csv  
+SHA256: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  
+OPENED: YES  
+LINES: 26  
+FIRST: type_key,n_ESCALATE,share_of_escalate,cum_share  
+LAST: WCA,460,0.0034856935014548982,0.9593765155189137
+
+FILE: inconclusive_by_clause.csv  
+SHA256: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  
+OPENED: YES  
+LINES: 2  
+FIRST: integrity_clause,n,share  
+LAST: thin_type_or_missing_peer,6377,1
+
+FILE: independent_checks_critical_counts.csv  
+SHA256: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  
+OPENED: YES  
+LINES: 6  
+FIRST: check,expected,observed,pass  
+LAST: validated_action_list_n,131968,131968,TRUE
+
+FILE: kappa_sensitivity.csv  
+SHA256: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  
+OPENED: YES  
+LINES: 5  
+FIRST: kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD  
+LAST: 3,222002,118246,6377,97379
+
+FILE: portfolio_summary.csv  
+SHA256: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  
+OPENED: YES  
+LINES: 2  
+FIRST: n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,pct_ESCALATE,pct_INCONCLUSIVE,pct_STANDARD,kappa  
+LAST: 222002,131968,6377,83657,0.5944450950892334,0.028724966441743768,0.3768299384690228,2
+
+FILE: AI1_INTERPRETATION.md  
+SHA256: 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932  
+OPENED: YES  
+LINES: 252  
+FIRST: # AI1 Interpretation — Stage 5 Independent First Pass  
+LAST: Is this conversation helpful so far?
+
+HARD FACTS
+
+Q1: 131968  
+Q2: 64922  
+Q3: 49.2  
+Q4: 25  
+Q5: 118246
+
+FINDINGS
+
+F1 | MATERIAL | “Methodological reliability: Validated”  [source: AI1_INTERPRETATION] | STAGE5_EVIDENCE_PACKAGE.md: validated facts establish Source Gate PASS, 14/14 fixtures on both paths, exact reconciliation with 0 disagreements on 222,002 rows, and Workflow Gate PASS; the package conclusion ceiling remains portfolio-simulation assignment, not broader operational or causal validation.  [source: STAGE5_EVIDENCE_PACKAGE] | Replace with “Execution/reproducibility under the locked design: Validated.” Broader methodological validity or real-world priority validity is not established by the frozen evidence.
+
+F2 | MINOR | “The κ grid shows monotonic sensitivity rather than random instability.”  [source: AI1_INTERPRETATION] | STAGE5_DEEPER_FINDINGS.md: ESCALATE decreases monotonically from 152,292 to 140,340 to 131,968 to 118,246 across κ = 1, 1.5, 2, 3; the evidence contains no stochastic-replication or randomness test.  [source: STAGE5_DEEPER_FINDINGS] | Replace with “The κ grid shows a monotonic decrease in ESCALATE volume as κ increases.” Remove “rather than random instability.”
+
+END C49 FIRST PASS
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C49 BUILDER REPORT

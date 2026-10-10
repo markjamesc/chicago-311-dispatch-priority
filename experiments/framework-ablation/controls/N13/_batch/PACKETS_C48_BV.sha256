@@ -1,0 +1,5 @@
+# N13 b5 C48 second-audit freeze + Builder/Validator packets + Grok HEAD, written on PC DESKTOP-RPECRM9 by runner_b5/assemble_c48_bv.R (sha e8854242…) 11:21 CDT from the TEMPLATEs (PACKETS_b5.sha256) + frozen audit replies (CAPTURE_FREEZE_b5.sha256); box copies byte-identical; content = template with @@C48_AUDIT_REPLIES@@ replaced by the freeze block + both replies verbatim (checked). Note: these 4 files have CRLF line endings (R writeLines on Windows)
+c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878  C48/AUDIT_FREEZE.json
+65b6ab75e9ec4397253b08ae59e4797cd9b1c7274eba269db0dca775b8d656aa  C48/packets/C48_1_BUILDER_ChatGPT.txt
+2238bd08af083b33e7a113889f21690ce08cf6bf2842f7ece93977d2790cb0b3  C48/packets/C48_2_VALIDATOR_DeepSeek.txt
+36f4f77c8791ca1e1b9a273d8efb70a0326eaab75628af6914d8087b7ae6f4a2  C48/packets/C48_3_ADJUDICATOR_Grok.HEAD.txt

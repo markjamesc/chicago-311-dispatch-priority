@@ -1,0 +1,31 @@
+{
+  "ablation_id": "C24V3",
+  "frozen_at_ct": "2026-10-10 12:25:17 CT",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "baseline_sha256_files": [
+    "f37080fb4ca3945f576cd0016f7a48615d6f1aa963e6b14b04f8147b10857412  ABLATION_SPEC_V3.md"
+  ],
+  "builder_pack": [
+    {
+      "path": "C24V3/C24V3-builder/builder_report.md",
+      "bytes": 20882,
+      "sha256": "138ebfa746be0e85c00c1e4579e0fafcd40be68e133cdcabdb0f3bc0763a832a",
+      "verdict_token_leak": false
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "C24V3/C24V3-validator/validator_report.md",
+      "bytes": 11063,
+      "sha256": "3419d15e5222a6591e31f0b2ba211ee8ac0f611a6b8275346f84b3d8069a2717",
+      "verdict_token_leak": false
+    }
+  ],
+  "runner_evidence_sha256_file": "696bd62d6f9d67269d65697e662c276f24af59b45224a85054af7e511e1c50e9",
+  "capture_mode": "text-only (run note; do not publish)"
+}

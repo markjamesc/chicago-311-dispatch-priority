@@ -1,0 +1,30 @@
+{
+ "cid": "C38",
+ "role": "validator",
+ "source": "C38/C38-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 9733,
+ "source_sha256": "4d185b075a6f092d9d06f3b6864f93789cce6107a99f9d29169977d44b104e1b",
+ "output": "C38/C38-validator/validator_report.md",
+ "output_bytes": 9730,
+ "output_sha256": "25368ee9f3b7898a5a9d0a8ae0e15cd68f78cacbb5f9832359a5ec7c30682d03",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 05:54:59\nreply_complete=2026-10-09 06:03:41\n# reply_complete = first-seen (upper bound; still thinking at ~05:59:40, finish seen 06:03:41; true finish not observed). DeepThink ON, Search OFF (was ON by default, turned off before send)"
+}

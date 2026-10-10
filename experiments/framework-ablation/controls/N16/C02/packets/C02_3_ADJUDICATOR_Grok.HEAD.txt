@@ -1,0 +1,2658 @@
+# C02 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: a coordinator draft may be given to the designers.
+- REVERT: no coordinator draft is given (shared packet only).
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the FROZEN REFERENCE HASHES;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (scorer results, raw tables, scorer source, frozen inputs, hashes). Do not HALT only because a historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default (but see the SPEC's P1 note for the control where the direction of P1 is inverted).
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity, fixtures) are not applicable to this text-only control; the known-answer cases are the unmodified / clean arms and the seeds declared in the SPEC. Conditions 6–7: the frozen inputs are only read (preflight).
+- Items the SPEC marks "not measured" or "weak test" are not evidence either way.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs scorer RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did the change under test (No coordinator draft (shared design chat)) materially change the outcome on the frozen records?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C02 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- In the frozen Chicago pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows (SR22-01936870 dormant_h; SR25-02017553 and SR25-02017556 open_age_h); the labels agree. All three clocks fall in the repeated fall-back hour; cause confirmed on the PC 2026-10-03: R-B's base as.POSIXct reads a repeated-hour wall time as the first occurrence (CDT), R-A's lubridate as the second (CST). It is open finding OF-1 in the coordinator's RESULTS_N15.md and is known and expected. N16 runs no R-A / R-B path and reads only frozen Stage 1-5 text, logs and C48 outputs, so N1 / OF-1 cannot enter any N16 number. Nothing in N16 changes the frozen pack.
+- The replies of this control were captured as text (Chrome page saving is broken; owner-approved 2026-10-09 01:52 CT, `runner/ingest_textonly.py`). Every mechanical number in the RESULTS below was produced on the box by the scorer quoted in this packet, from frozen text inputs; nothing was run on the PC (no MySQL, no R). Fixture and reconciliation items (report section 5 / validator test plan) do not apply to N16: keep the heading and write 'not applicable' with one line of reason, plus any text-level equivalent you see.
+---
+# SPEC
+# C02 — Ablation specification (FROZEN)
+
+**Ablation ID:** C02 (owner ablation list control #2: No coordinator draft (shared design chat))
+**Batch:** N16 (the 12 controls untested after N13: #1-#7, #9, #37, #38, #50, #54). Built 2026-10-09 on the box, text only.
+**Definitions and approval (operational definitions, constitution §9):** owner rulings sheet `ablation_plan/OWNER_RULINGS_BATCH_02.md` SHA-256 `1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417`; owner answer **Z (all recommended)** at 2026-10-09 01:49 CT, recorded in `OWNER_BATCH_02_ANSWERS.md` SHA-256 `3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b`. Owner answers Z = recommended: 2-C (same extra chat as #1, separate trio) and Q0-A. Q0 = A: the real Chicago 311 Stage 1-3 run (`chicago-311-run/stage-01-02`, `stage-03`, Stage 5) is the shared baseline for the design controls; it was run with a coordinator and extra reviews, so it is not a perfectly clean A/B.
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data:** the frozen Chicago 311 Dataset 2 run and its Stage 1-5 records; every input is a hashed copy under `N16/frozen/` (`FROZEN_INPUTS.sha256`, origins in `FROZEN_ORIGINS.tsv`, re-verified by `runner/preflight_n16.py`, output `PREFLIGHT_N16.txt`). No MySQL, no fresh pull, no git, no R, nothing on the PC.
+**Roles:** Builder=ChatGPT (High) · Validator=DeepSeek (DeepThink on, Search off) · Adjudicator=Grok (Expert)
+**Extra chats: 1, shared with C01** — `X12/packets/X12_DESIGN_ChatGPT.txt` (ChatGPT, High), a Stage 3 design chat; it is counted once for both controls. The extra chat is a NEW conversation, blind to this ablation's purpose (it is told it may use or reject the supplied material).
+**Capture mode:** TEXT-ONLY (owner-approved 2026-10-09 01:52 CT; `N13/TEXTONLY_PROCEDURE.md`, `runner/ingest_textonly.py`); recorded in run notes only, never in anything published.
+**Target stage:** Stage 3 design
+**Frozen at CT:** 2026-10-09, before any chat of this control; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Control under test (owner list #2)
+Stage 3 as it stands: designers start from a shared packet only; no coordinator pre-draft is given to them.
+Ablation: the coordinator's draft design is given to the designer. KEEP would mean coordinator drafts may be used.
+
+## Verdict convention
+**KEEP = a coordinator draft may be given to the designers. REVERT = no coordinator draft is given (shared packet only).** HALT as in constitution §9.
+
+## Arms
+- BASE (the rule): the real Design A from the shared packet only.
+- VARIANT: the shared extra chat X12; the coordinator draft is `stage3/MEASUREMENT_DESIGN.md` (the real superseded scratch: open_age_days >= 14, WA-K1) with its two SUPERSEDED banner lines removed; scored for SEED S2 = its fixed open-age trigger.
+
+## Operational benefit predicate P1 (made mechanical before execution)
+1. S2 detected: the reply rejects or flags the coordinator draft's fixed open-age trigger;
+2. S2 not adopted: the reply does not make open_age_days >= a threshold its own ESCALATE trigger;
+3. coverage of the 8 blocking-gap topics of the dossier is at least the real Design A's;
+4. the reply is complete (single END X12 DESIGN as last line).
+P1 MET -> KEEP. Not MET -> REVERT. Extra chat incomplete or missing -> HALT.
+
+## Disclosures and deviations (declared before the chats)
+- Shared chat with C01 (see C01 disclosures); effects separated by seed only, interaction not separated.
+- The coordinator draft is a real, known-flawed draft (later superseded), not a coordinator-written best-effort draft; it is the natural 'anchor' available in the frozen run.
+- Same frozen-record discrepancy about the real Design A as in C01.
+- Stage 3 only.
+- Known open finding N1 / OF-1 (clock mismatch on 3 rows of the frozen pack): cannot enter N16 (no R path run). See the coordinator note in the packets.
+- Cost: not measured in minutes; the reply and packet byte sizes are the only cost proxy and are not part of P1 unless stated above.
+
+## Regression / HALT rules
+- HALT as in constitution §9, or if Builder and Validator disagree on a hard number or classification that decides a P1 condition, or if a reply is missing, incomplete (no END line) or changed after its freeze, or if a frozen input hash differs from `FROZEN_INPUTS.sha256`.
+- Constitution §7 conditions 4 and 5 (clean-arm byte identity; fixtures) are not applicable: no R run and no fixture. The known-answer cases are the unmodified / clean arms and the seeds declared above. Conditions 6-7: the frozen inputs are only read (preflight).
+
+## Allowed source/data scope
+Frozen Chicago Stage 1-5 documents, frozen N13 logs and C48 outputs under `N16/frozen/`. No MySQL, no internet, no new data.
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on)
+**Frozen input files:** all 75 files in `FROZEN_INPUTS.sha256`; the ones used here are listed in the EVIDENCE list of the packet.
+**Scorer files (hashed in `SCORERS_N16.sha256` before the reporting run):**
+- `scorers/score_x12.py` SHA-256 `fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1`
+- `scorers/build_x12.py` SHA-256 `73f4e8ab7c4625526de13917f410b3ebfdf062bd79c6bcdf17648588116b4abc`
+- `scorers/n16lib.py` SHA-256 `4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47`
+**Seed files:**
+(none)
+**Result and evidence files:**
+(the post-chat score file is created after the extra chat; its scorer hash is above; the extra-chat packet hash is below)
+- `X12/packets/X12_DESIGN_ChatGPT.txt` SHA-256 `1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372` (48576 bytes); END line `END X12 DESIGN`; reply save: `X12/X12-chat/design_chatgpt_TEXTONLY.txt`.
+**Governance:** constitution and baselines as above; this spec is hashed in `SPEC_FREEZE_N16.sha256`.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT. Check the S2 findings and the coverage table against the verbatim reply.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (box, text only, CT)
+N16 preflight 2026-10-09 02:21:42 CT root /workspace/ablation_plan/runs/N16
+frozen OK 86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08 frozen/BASELINE_FRAMEWORK.sha256
+frozen OK e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 frozen/CONSTITUTION_v1.md
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/c48/AI1_ORIGINAL.md
+frozen OK c70917e4a21e085922e4f2585ed9ae92d7cb2992b27122aedc300409db293878 frozen/c48/AUDIT_FREEZE.json
+frozen OK 5df149f9f300620ebab767f7af17a98d078f92e85b7604cce1f5f82480b59c92 frozen/c48/C48_RESULTS.md
+frozen OK d92e480b9531d5018ca02e6dbd116dbaaa3a2df53981e690e48eff13eb00278c frozen/c48/REVISED_CLEAN.md
+frozen OK c1ac310a7c77ab4228ac14ebb6c56e58b408e4e64cdf74fae8f1f68b9a720b63 frozen/c48/REVISED_SEED.md
+frozen OK 970bac860ea65fcf4658cbb932d11e666f2609de4a8708161ac0b7df824ce0b4 frozen/c48/REVISIONS.json
+frozen OK c7cde8022846cd6aff9b189e32dc3aa4f3eea733835d469093054391490627b2 frozen/c48/TERMINAL_STATE.txt
+frozen OK 06b3e1f75be60142b054ac034cdb78579b9812efb87a1e535d5d0a0530b22e27 frozen/c48/ai2_second_audit.md
+frozen OK 8b473adf6fd7cfe4ba6b363fcb52f009561b26f4ca44d6295126ad9a96c2aed2 frozen/c48/ai3_second_audit.md
+frozen OK 6cc4ea649d67c1d22a90bfcbcbf3756a69837d900f26943940f0b6bb57297156 frozen/c48/rev_check.R
+frozen OK c07e47c76659247fa6c8306723bb8521210acab99c3c662d58d77480f2614cbf frozen/n13logs/ADJ_GROK_B4_EXTRACTION_LOG.jsonl
+frozen OK 191821397bf2b034398e5f975d398ab9d712df47ca0021d4931f401dc427ac9c frozen/n13logs/ADJ_GROK_B5_EXTRACTION_LOG.jsonl
+frozen OK ccc18062b14f341ac356898ce70c6f67485a616d88263c5f0ecc7840dd9ac754 frozen/n13logs/ADJ_GROK_C43_EXTRACTION_LOG.jsonl
+frozen OK 50ef99b3af165a7f01bb4173dc61534989ca0acec9009911c7d1159454c8a04f frozen/n13logs/ADJ_GROK_C44_EXTRACTION_LOG.jsonl
+frozen OK 7ba322a361fa672dc3ad5a46157c35b447ee04bf89904ace1c211c4636d7572d frozen/n13logs/ADJ_GROK_C48_EXTRACTION_LOG.jsonl
+frozen OK eba13ed2b6618a1442f70b09c6b84228f59eba4a466b9b8934833bdc5e250759 frozen/n13logs/ADJ_GROK_C49_EXTRACTION_LOG.jsonl
+frozen OK 980651563bbfd1e0ac9bda44c78964e7599a9778e1de49a950386353f2c9b5bf frozen/n13logs/C40_DEVIATION_NOTES_post.md
+frozen OK 8bea7195c2ebd372f9d724d55a9ba1609f20b249f8d84216332f5f6ca82d1864 frozen/n13logs/C40_DEVIATION_NOTES_post_2.md
+frozen OK cc63489f5f1ba84e02065d296a6474e2d4244784fad94d21308506b9203b7149 frozen/n13logs/C43_NOTES.md
+frozen OK 0bce010488c64b97af4377c8601a35c62797b13025fbb67fae3d2f8ac3d45bd0 frozen/n13logs/C43_TERMINAL_STATE.txt
+frozen OK b1362205dfe866447961c801230b929e3246e3388bb26a819a4e245d0839fdf2 frozen/n13logs/C49_DEVIATION_NOTES_post.md
+frozen OK 6cd11d74b4cf2f09ebd511d10e3c8fb48d9133765b7b389315db99cd748eb188 frozen/n13logs/C49_DEVIATION_NOTES_post_2.md
+frozen OK 53acc3384c0fa49acc1ff6b3138229212f7968b158a2d5f92d18253b259c27d4 frozen/n13logs/C49_NOTES.md
+frozen OK 57ed8ed5f7e0fa5cc35bf0c6df03559514d661fcfea24e2116da44cfdab0ad13 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C48BV.jsonl
+frozen OK 2d1fc0b19611da2f299fd86ccaa4db828bf1fabf04fe217c41fec8c52c0f32c3 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49BV.jsonl
+frozen OK 9cfd0afd05a62fb6ee397f32b03ab69ca8b6206ec12bbd66ea66143b5a8d3072 frozen/n13logs/CAPTURE_EXTRACTION_LOG_C49V_r2.jsonl
+frozen OK daeb45cbc3ce1cac2cc58c61cb36d4b5578a14902d143fa08066630ab7d105e8 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b4.jsonl
+frozen OK b75dc1aaa168c17064f8a94751e3c649297b01ced91c554de8f126307573729a frozen/n13logs/CAPTURE_EXTRACTION_LOG_b5.jsonl
+frozen OK 4440636595651de8c16b1e39be91529ca0f07c01c050c99a9c900965bb688269 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6.jsonl
+frozen OK b165381637d9729ccf215f9591bc5d962cc85adcfa2d9dcad23916b9c6716de9 frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b.jsonl
+frozen OK 89c078e3ca9131a5974604bae69acfe676de1f6ce7aacc5ee56e97c5c708785d frozen/n13logs/CAPTURE_EXTRACTION_LOG_b6b_fix.jsonl
+frozen OK 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b frozen/rulings/OWNER_BATCH_02_ANSWERS.md
+frozen OK 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417 frozen/rulings/OWNER_RULINGS_BATCH_02.md
+frozen OK b29b39086a58e9b440f8a1a40651277c05e2b4251e555f16663c13b68ef9e4e1 frozen/stage12/ai2_framing_review_pass1.md
+frozen OK b3492dd9eca8e5ed4d104474fc12f18bfb7edc04ef78b008e123e000aae0d11c frozen/stage12/ai2_start_review_pass1.md
+frozen OK f1f47dedcc04f326c7bfd899e15b9b0fa245f70fdc1ca25f3beaec061fe8bbfc frozen/stage12/ai3_framing_review_pass1.md
+frozen OK 1cd29a865d34879d4f50f6615d70b438d4e454e1b5a771126645ec922842fdbb frozen/stage12/ai3_start_review_pass1.md
+frozen OK f6d856ea328fd379caf964305df6eacacbe975acd98acc0be0cccb61f5de9ba0 frozen/stage12/ambiguity_ledger.md
+frozen OK fefdaab549d9ec27ba3af4d6118faac8cd2bd886875abb7c3394c3cf2eaec7f3 frozen/stage12/candidate_question_ledger.md
+frozen OK 9d704ede8c2031d13d1771a170a8e99c2c3d51d15810f51fc7308acb8a675bca frozen/stage12/decision_ledger.md
+frozen OK aafa32e34b52efa4900993416a0d3ef823717ca15912d55ac1c7153fccb51d2a frozen/stage12/revision_trail.md
+frozen OK a74389affbdafbb37d6d591b778af6abcd78ecb4fac8d23db91e455b6cdec430 frozen/stage12/stage1_decision.json
+frozen OK 4f56449811e5d7d76c843bf3e503829a06f23d4060689e9a8dec48b150dd1e4a frozen/stage12/stage2_framing.json
+frozen OK 63d0915519094b27234c94acf256a2c390fc795d4781b5727b84162d89863af9 frozen/stage12/verbatim_dialogue_ledger.md
+frozen OK 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988 frozen/stage3/AI1_DESIGN_A.md
+frozen OK 083403f49810898f2c2dea96b7608556125c29a9bc59594ab5725721610940cc frozen/stage3/AI1_INDEPENDENT_DESIGN_A.md
+frozen OK bc096a5be4315882a44e6ce227b6bea40c7a5669e0f9f5f875e0ecbb04179895 frozen/stage3/AI1_meta.txt
+frozen OK 8153ad4fb16001c1f217d8112e878f22ca0b299aa5574b9cd318465e845d52a8 frozen/stage3/AI2_DESIGN_B.md
+frozen OK 808fea8d7c3c207949b0aca144e7d5a8785b10ec3ec915f82202ae0acde1c7b1 frozen/stage3/AI2_meta.txt
+frozen OK 7f4fc3ee3995e2d20472be686887d7c3aa97cbbf365d8ee50e685a3fb2fc62b1 frozen/stage3/AI3_DATA_RISK_DOSSIER.md
+frozen OK db9da8dfcdaf1ef192f64e61d5c08ccb2cf922a3aa10fef5edcd24b3e64e2642 frozen/stage3/AI3_meta.txt
+frozen OK 9f3ea0a7f3e92ab4852a0add67c72389c046e5e6c282937ded350bfc0648aa42 frozen/stage3/CROSS_REVIEW.md
+frozen OK 0ec361b591cc33733814766fefb05739fc80ef8571ded2b44e55974b85935dd8 frozen/stage3/DESIGN_GATE_PACKAGE.md
+frozen OK 3a03e139350141baa2b6fef9d065a6075d9248cf53b971ad1bc6c81aa07fa57f frozen/stage3/DESIGN_GATE_RECEIPT.md
+frozen OK 9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243 frozen/stage3/MEASUREMENT_DESIGN.md
+frozen OK 7297cf3ef25bbf12a04a6d88c0a41dac260de5736c71392783d8f8b7d7389594 frozen/stage3/MEASUREMENT_DESIGN_LOCKED.md
+frozen OK 4b4a8ce3aa63a7eb3c62228a087a876591f556694fbf152a3ef79da4e92ac996 frozen/stage3/SHARED_INPUT_PACKET.md
+frozen OK ff5651d89d276728d50f317d59270e779fec2c3f96022bf9b92e63cd2128f114 frozen/stage3/stage3_locked_design.json
+frozen OK 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 frozen/stage5/AI1_INTERPRETATION_BUILDER.md
+frozen OK d77f55c6b96b87455a60c22907a845f253808d4a466110f87d16825501e8c3a0 frozen/stage5/AI1_PASTE.txt
+frozen OK ca9376b2adeb2ecc276f29c81dc0f10e3b3cc32513f2f916f42dc7bb1418049a frozen/stage5/AI2_DECISION_METHOD_CRITIC.md
+frozen OK 9e4848407a5ae85bf350a150a8ed1f05b25a58821339b802c6429c405401b5b1 frozen/stage5/AI3_CLAIM_EVIDENCE_AUDITOR.md
+frozen OK 9431125a9380c897f4b883bbef2b1c440371679e0ec59a10520733bdd8bff457 frozen/stage5/CROSS_REVIEW.md
+frozen OK 22dc6a94006f83de4e2d741c4de08e0964e6433d08e87d11e98314a0b767c285 frozen/stage5/FINISH_GATE_PACKAGE.md
+frozen OK 80402e93b1fb023c09db016473a80f0feac56b187542f0d205dfe5193d647462 frozen/stage5/INTERPRETATION_RECONCILIATION.md
+frozen OK 49ab09c26c86e4a0abcd2031745e0c4bc786dffc8fe6cf4066e9c3afa93c70e6 frozen/stage5/STAGE5_DEEPER_FINDINGS.md
+frozen OK c8e191d861a71097b4bc2ebaaab2626633617350e39f130e1c7d148a3379bfb7 frozen/stage5/STAGE5_EVIDENCE_PACKAGE.md
+frozen OK 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609 frozen/stage5/deeper/capacity_coverage_note.csv
+frozen OK 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176 frozen/stage5/deeper/escalate_by_type_top25.csv
+frozen OK f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d frozen/stage5/deeper/inconclusive_by_clause.csv
+frozen OK 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146 frozen/stage5/deeper/independent_checks_critical_counts.csv
+frozen OK 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a frozen/stage5/deeper/kappa_sensitivity.csv
+frozen OK b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167 frozen/stage5/deeper/portfolio_summary.csv
+PREFLIGHT PASS failures: 0
+(origin-hash lines omitted here; each frozen file was also compared with its origin path, all OK; full list in FROZEN_ORIGINS.tsv)
+
+---
+# FROZEN REFERENCE HASHES
+Frozen inputs: `FROZEN_INPUTS.sha256` (75 files; verified above). Constitution sha256 e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9; owner sheet sha256 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417; owner answer file sha256 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b.
+Scorer files:
+fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1  4723  scorers/score_x12.py
+73f4e8ab7c4625526de13917f410b3ebfdf062bd79c6bcdf17648588116b4abc  3326  scorers/build_x12.py
+4a6675fa8676c39f776c4c49d37fd46dc189f9588fa6de45b1f56f2bb4bd9e47  1723  scorers/n16lib.py
+
+---
+# EXTRA CHAT (frozen; this is the variant arm)
+Chat: ChatGPT (highest reasoning, High), a NEW conversation; packet sent = `X12/packets/X12_DESIGN_ChatGPT.txt` sha256 1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372 (48576 bytes); END line `END X12 DESIGN`.
+EXTRA_FREEZE.json:
+{
+  "extra": "X12",
+  "frozen_at_ct": "2026-10-09 04:33:13 CT",
+  "packet": "X12/packets/X12_DESIGN_ChatGPT.txt",
+  "packet_sha256": "1af3405807436ea9bac8eafb31d765fa5c986599a710825c41b609fda56ae372",
+  "reply": "X12/X12-chat/reply.md",
+  "reply_sha256": "95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38",
+  "reply_bytes": 66709,
+  "score": "X12/post/X12_POST_SCORE.md",
+  "score_sha256": "0ebccad90338bcce3476c4d45d033bf2e75900998df98efd488fd8a83d2fe8f0",
+  "scorer_sha256": "fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1",
+  "ingest": {
+    "extra": "X12",
+    "source": "X12/X12-chat/design_chatgpt_TEXTONLY.txt",
+    "source_bytes": 66712,
+    "source_sha256": "aee7f51dc16e390d86a83b7bda9f468295c06fb2cc04e949ef040a87c7c4d0ad",
+    "output": "X12/X12-chat/reply.md",
+    "output_bytes": 66709,
+    "output_sha256": "95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38",
+    "checks": {
+      "end_count": 1,
+      "end_last_line": true,
+      "length_ok": true
+    },
+    "ok": true,
+    "times_txt": "sent=2026-10-09 04:04:24\nreply_complete=2026-10-09 04:08:03"
+  }
+}
+
+## Post-chat score (scorer output, `X12/post/X12_POST_SCORE.md`)
+# X12 POST-CHAT SCORE (mechanical; generated 2026-10-09 04:33:13 CT)
+
+Reply scored: `reply.md` sha256 95d1990315cec654439ab4e74bee1f6bfe3a798385fbbbe3152dd3d87ecd4f38 (66709 bytes). Scorer sha256 fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1.
+
+## C01 (#1, peers visible): mechanical P1 MET
+| condition | result |
+|---|---|
+| 1. S1 detected: the reply flags the P25 statistic in Design B's rule (critique cue within one line)  | MET |
+| 2. S1 not adopted: no line uses peer_p25 as the reply's own rule without a critique cue | MET |
+| 3. coverage of the 8 dossier gap topics is at least the real Design A's | MET |
+| 4. the reply is complete (single END X12 DESIGN as last line) | MET |
+
+## C02 (#2, coordinator draft visible): mechanical P1 NOT MET
+| condition | result |
+|---|---|
+| 1. S2 detected: the reply rejects or flags the coordinator draft's fixed open-age trigger | MET |
+| 2. S2 not adopted: no line makes open_age_days >= a threshold the reply's own ESCALATE trigger without a critique cue | NOT MET |
+| 3. coverage of the 8 dossier gap topics is at least the real Design A's | MET |
+| 4. the reply is complete (single END X12 DESIGN as last line) | MET |
+
+## Evidence lines (judges verify against the verbatim reply)
+- S1 critique lines (n=1): Design B also contains an internal specification inconsistency: its displayed decision formula refers to peer_p25_h, while the associated ex
+- S1 adoption lines (n=0): 
+- S2 critique lines (n=2): O09	Single decision knob	Approve open_age_days_threshold=14, or authorize one replacement	Owner || It is intentionally simpler than the type-conditional dormancy counter-design, but more demanding about source identity, missing evidence, c
+- S2 adoption lines (n=3): 3. A disclosed calendar-age rule: Assign ESCALATE to otherwise qualifying requests reaching a single owner-approved age threshold; assign ST || - A traceable ESCALATE subset meeting the locked age threshold. || - ESCALATE: Eligible, sufficiently evidenced request that reaches the owner-approved portfolio calendar-age threshold.
+
+## Coverage of the 8 dossier gap topics
+| topic | real Design A (baseline) | this reply |
+|---|---|---|
+| window | True | True |
+| open_eligible | True | True |
+| parse_tz | False | True |
+| dup_legacy_parent | False | True |
+| activity | True | True |
+| knob | True | True |
+| fixtures | True | True |
+| capacity | True | True |
+
+## Independence (INFO, not scored): Design-B-specific tokens ['TCD-IG', 'peer_p75_h', 'dormant_h', 'thin_type', 'integrity']: real Design A has ['integrity']; this reply has ['peer_p75_h', 'integrity']
+
+## Extra-chat packet header (what the chat was told; the supplied evidence follows it in the packet and is hashed in the packet inventory / frozen inputs)
+# SHARED STAGE 3 INPUT PACKET — Chicago 311 Dispatch Priority
+# Stage 3 design pass. A coordinator draft, a peer design (Design B) and a data-risk dossier are supplied below the packet; use, adopt or reject any of it as you judge.
+# Framework: https://github.com/markjamesc/ai-augmented-analyst-workflow/blob/main/docs/three-ai-measurement-design-framework.md
+
+## Locked Start (stage1_decision.json)
+{
+  "stage": 1,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T21:07:00-05:00",
+  "decision_statement": "Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority (one row per request).",
+  "decision_owner": "Dana Brooks simulation / human owner approval",
+  "actions": [
+    "ESCALATE",
+    "INCONCLUSIVE",
+    "STANDARD"
+  ],
+  "constraints": [
+    "portfolio simulation only \u2014 not live City dispatch",
+    "not employee performance scoring",
+    "do not invent official City SLA"
+  ],
+  "deferred_to_later": [
+    "exact window dates",
+    "open/eligible definitions",
+    "urgency formulas",
+    "capacity/ranking if ESCALATE volume exceeds attention"
+  ],
+  "owner_approval": "Approve Start Gate as three-way ESCALATE/INCONCLUSIVE/STANDARD classification; capacity/ranking later",
+  "ai2_verdict": "Pass (Grok Comprehensive)",
+  "ai3_verdict": "Revise noted; owner chose not to redefine decision; capacity/ranking later"
+}
+
+## Locked Framing CQ-F02 (stage2_framing.json)
+{
+  "stage": 2,
+  "status": "LOCKED",
+  "locked_at": "2026-09-18T22:17:00-05:00",
+  "candidate_id": "CQ-F02",
+  "analytical_question": "Among open eligible 311 requests in the frozen decision window, which requests should Dana Brooks assign ESCALATE, which INCONCLUSIVE, and which STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)? Exact window dates, open/eligible formulas, urgency and evidence rules, and any capacity ranking if ESCALATE volume exceeds attention remain measurement-design open items and are not part of this question.",
+  "decision_linkage": "Assigns each open eligible request in the frozen window to exactly one of ESCALATE / INCONCLUSIVE / STANDARD under the locked Start.",
+  "owner_approval": "Approve Framing Gate with CQ-F02 tightened wording",
+  "reviews": {
+    "ai1": "ChatGPT Chat High \u2014 Keep CQ-F01",
+    "ai2": "Grok Comprehensive \u2014 Tighten to CQ-F02",
+    "ai3": "DeepSeek DeepThink \u2014 Pass with required revision"
+  },
+  "deferred_to_stage3": [
+    "exact window dates / snapshot cutoff",
+    "open/eligible formulas",
+    "urgency and evidence rules",
+    "capacity ranking if ESCALATE exceeds attention"
+  ],
+  "stage3_started": false
+}
+
+## Source manifest (excerpt)
+# Chicago 311 Source Manifest
+
+## Authoritative source
+
+
+## Extra-chat reply (verbatim, text-only capture)
+DESIGN A — Primary Measurement Design
+Chicago 311 Dispatch Priority — Stage 3
+Role: AI 1 — Primary Measurement Architect (ChatGPT)
+Design ID: X12-DESIGN-A
+Design version: stage3-design-a-v1.0-PROPOSED
+Date: 2026-10-09
+Status: PROPOSED — NOT LOCKED
+Design Gate: PENDING REQUIRED RESOLUTIONS
+Stage 4: NOT AUTHORIZED
+Predictive / ML mode: None
+Governing framework: Three-AI Measurement Design Framework 
+
+GitHub
+
+
+
+Design name: Snapshot-Open Age Triage with Evidence Integrity Gate (SOAT-IG).
+Central design claim: A transparent, portfolio-specific open-age threshold can identify unresolved Chicago 311 requests for simulated elevation, provided that uncertain records are held separately, known non-actionable records are excluded under approved rules, and no age threshold is misrepresented as an official City service standard.
+
+0. Document Purpose, Authority, and Status
+This document defines AI 1's complete Stage 3 measurement proposal for the locked Chicago 311 dispatch-priority decision.
+It specifies the population, observation boundary, analytical grain, measurement contracts, eligibility rules, evidence requirements, decision logic, data-quality controls, Stage 4 source-delivery contract, independent R-A/R-B implementation requirements, and known-case fixtures.
+It does not execute the analysis, assert that the design has passed the Design Gate, or authorize Stage 4.
+0.1 Authority hierarchy
+Element	Status	Authority
+Three-way dispatch-priority decision	LOCKED	Stage 1
+Analytical question CQ-F02	LOCKED	Stage 2
+Portfolio simulation only	LOCKED	Stage 1
+No employee scoring	LOCKED	Stage 1
+No invented official City SLA	LOCKED	Stage 1
+Source schema and reported import counts	VERIFIED IN PACKET	Source manifest
+Snapshot observation boundary	OPEN	Requires provenance confirmation
+Operational eligibility	PROPOSED	Design A
+Age-based primary statistic	PROPOSED	Design A
+Fourteen-day threshold	PROVISIONAL	Design A
+Duplicate/legacy/parent policy	PROPOSED	Design A
+Capacity ranking	DEFERRED	Locked Framing
+Fixture authority and human approval	OPEN	Design Gate
+No Design A proposal overrides a locked Stage 1 or Stage 2 statement.
+0.2 Governing distinctions
+- Locked requirement: An approved business decision or constraint.
+- Verified fact: A property established by the supplied source evidence.
+- Proposed rule: An analytical choice awaiting review.
+- Provisional assumption: A temporary choice whose validity or sensitivity must be examined.
+- Open item: An unresolved condition preventing final authorization.
+- Deferred item: A legitimate question outside the present measurement decision.
+The coordinator draft and Design B are inputs for controlled review, not controlling specifications.
+
+1. Approved Decision and Locked Analytical Question
+1.1 Locked Start decision
+Among open eligible 311 requests in a frozen decision window, assign one of ESCALATE, INCONCLUSIVE, or STANDARD dispatch priority (one row per request).
+
+Decision owner: Dana Brooks simulation / human owner approval.
+The three allowed actions are:
+1. ESCALATE
+2. INCONCLUSIVE
+3. STANDARD
+Every eligible open request must receive exactly one of these actions.
+1.2 Locked Framing question — CQ-F02
+Among open eligible 311 requests in the frozen decision window, which requests should Dana Brooks assign ESCALATE, which INCONCLUSIVE, and which STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)? Exact window dates, open/eligible formulas, urgency and evidence rules, and any capacity ranking if ESCALATE volume exceeds attention remain measurement-design open items and are not part of this question.
+
+1.3 Decision alignment
+Design A returns a three-way partition of the approved decision universe.
+It does not:
+- Change the question into predicting future closure.
+- Rank employees, crews, or departments.
+- Optimize a numerical shift capacity.
+- Select a hard-capped shortlist.
+- Infer official service expectations from historical data.
+- Interpret escalation as evidence of severity or negligence.
+- Authorize operational dispatch.
+Intended conclusion type: Descriptive, rules-based decision classification.
+Causal ceiling: No causal conclusions about whether escalation would improve resolution speed or service quality.
+
+2. Proposed Design Strategy
+Design A uses three components:
+1. A defensible open-eligible population: Identify snapshot-open requests while excluding only records covered by explicit, approved exclusion rules.
+2. An evidence integrity gate: Keep uncertain but potentially eligible requests in a separately auditable INCONCLUSIVE category.
+3. A disclosed calendar-age rule: Assign ESCALATE to otherwise qualifying requests reaching a single owner-approved age threshold; assign STANDARD to the remainder.
+The design deliberately separates these concepts:
+Concept	Meaning
+Open	Current source status says the request is unresolved
+Eligible	The request belongs to the approved simulation decision universe
+Evidence sufficient	Available fields permit the age rule to be applied without a material contradiction
+Escalation warrant	Request age meets the portfolio threshold
+INCONCLUSIVE	Eligibility or action evidence is insufficient or contradictory
+STANDARD	Eligible, sufficiently evidenced, and below the escalation threshold
+An old request is not necessarily dangerous, neglected, overdue, or actively awaiting dispatch.
+ESCALATE means an attention candidate under this simulation's chosen rule—not a proven urgent service failure.
+This limited interpretation is essential to construct validity.
+
+3. Hypothesis Contract
+3.1 Primary business hypothesis — H-BUS
+Among snapshot-open, eligible Chicago 311 requests, a practically meaningful subset has accumulated enough unresolved calendar age to justify separate simulated attention under a transparent threshold, while requests with insufficient evidence can be identified and held apart.
+3.2 Primary analytical hypothesis — H-A1
+Using an approved threshold \(K\), a deterministic classification system can partition eligible open requests into ESCALATE, INCONCLUSIVE, and STANDARD without relying on inferred City SLAs, unverifiable work activity, or an unapproved capacity ranking.
+3.3 Mechanism
+Calendar age measures elapsed days since request creation while the request remains classified as open in the frozen source.
+The proposed mechanism is an attention heuristic:
+- Longer unresolved duration increases the reason to review a request.
+- Reliable source evidence is required before applying the threshold.
+- Missing or contradictory information should not automatically produce STANDARD.
+- A transparent threshold gives the simulated owner an inspectable rule.
+This is a policy rationale, not an identified causal mechanism.
+3.4 Observable implications
+If the proposed design is useful, Stage 4 should produce:
+- A reproducible eligible-open universe.
+- Exactly one action per eligible request.
+- A traceable ESCALATE subset meeting the locked age threshold.
+- A STANDARD subset below the threshold.
+- An independently explainable INCONCLUSIVE subset.
+- Exclusion counts that reconcile with source membership.
+- Identical R-A/R-B judgments under the same frozen specification.
+- Monotonic ESCALATE counts when the threshold is increased in predefined sensitivity scenarios.
+A nonempty ESCALATE subset is expected but is not guaranteed or required for technical validity.
+3.5 Counterevidence
+Observation	Implication
+Nearly all eligible requests become ESCALATE	Threshold may offer little attention discrimination
+Almost no requests become ESCALATE	Rule may miss practically relevant old requests
+Large INCONCLUSIVE share	Evidence or eligibility design may be inadequate
+Small threshold changes produce major action churn	Classification is specification-sensitive
+Older open requests are concentrated in types with structurally long lifecycles	Global age is a weak proxy for unusual delay
+Recent administrative modifications routinely occur without work progress	Modification-based alternatives may also be misleading
+Material snapshot/status contradictions cannot be resolved	The decision universe may not be reliable
+R-A/R-B cannot reproduce the same counts and actions	Execution cannot be certified
+3.6 Hypothesis hierarchy
+Primary confirmatory objective: Reproduce the prespecified three-way classification.
+Secondary descriptive objectives: Describe action prevalence and distributions across request types and geography.
+Exploratory objectives: Examine alternative thresholds and type-specific age patterns without rewriting the primary result.
+Not tested: Whether escalation improves service outcomes.
+No null-hypothesis significance test is required for the primary deterministic classification.
+
+4. Verified Source Context
+4.1 Authoritative source
+Property	Source contract
+Dataset	City of Chicago 311 Service Requests
+Dataset ID	v6vf-nfxy
+Official source	data.cityofchicago.org
+Local schema	chicago311
+Authoritative table	raw_311_requests
+Physical columns	39
+Stored types	All varchar
+Database dialect	MySQL
+Source snapshot	One frozen CSV import
+4.2 Reported import evidence
+Measure	Reported value
+Physical source rows	14,635,395
+Distinct SR_NUMBER	14,635,395
+Duplicate SR_NUMBER	0
+Import skipped rows	0
+Import deleted rows	0
+Import warnings	0
+Open requests	245,193
+Completed requests	14,177,547
+Canceled requests	212,654
+Closed requests	1
+Missing CREATED_DATE	0
+Unparseable CREATED_DATE	0
+Missing LAST_MODIFIED_DATE	0
+Missing CLOSED_DATE	245,217
+Missing SR_TYPE	0
+Missing STATUS	0
+Observed creation range:
+- Minimum: 2018-07-01 03:42:31
+- Maximum: 2026-09-12 15:39:45
+These are source-manifest observations, not newly executed database checks.
+4.3 Interpretation
+The reported uniqueness test supports request-level reconciliation using SR_NUMBER for this snapshot.
+It does not establish that:
+- Each request corresponds to a unique physical problem.
+- Duplicate or parent relationships are irrelevant.
+- Open status accurately reconstructs an earlier date.
+- LAST_MODIFIED_DATE represents operational work.
+- All date strings have identical timezone semantics.
+- The snapshot was captured on the last recorded creation date.
+Those limitations control the proposed design.
+
+5. Population and Eligibility Contract
+5.1 Target population
+The intended target is the set of open, eligible Chicago 311 requests available for Dana Brooks's simulated shift-attention decision at the approved observation boundary.
+5.2 Observable population
+The observable population is the set of source records in the frozen chicago311.raw_311_requests snapshot.
+The initial open candidate envelope is proposed as:
+STATUS exactly equal to Open.
+Reported initial candidate count: 245,193.
+This is an expected source-manifest count, not a Stage 4 result.
+5.3 Structural exclusion versus INCONCLUSIVE
+Design A adopts a critical distinction:
+An uncertain record is not necessarily an ineligible record.
+An open request with an unparseable creation date cannot be reliably classified by age. Excluding it from the decision universe would hide that uncertainty.
+Therefore:
+- A known non-actionable request may be excluded under an approved rule.
+- A potentially actionable request with insufficient evidence remains eligible for INCONCLUSIVE.
+- A structurally unusable identifier is handled as a source-quality failure, with a separate audit.
+- An unrecognized flag value cannot silently become false.
+This corrects the coordinator draft's conflict between eligibility exclusions and its INCONCLUSIVE decision branch.
+5.4 Proposed exclusion policy
+Apply these rules in the stated order.
+Priority	Condition	Disposition	Status
+E0	STATUS is not exactly Open	Outside decision universe	Proposed
+E1	Blank SR_NUMBER after whitespace assessment	Structural exclusion; blocking quality exception	Proposed
+E2	Confirmed information-only type	Exclude, EXCLUDE_INFO_ONLY	Provisional
+E3	LEGACY_RECORD unambiguously true	Exclude, EXCLUDE_LEGACY	Provisional
+E4	Confirmed clean duplicate child with an open, resolvable, non-self parent	Exclude, EXCLUDE_DUPLICATE_CHILD	Provisional
+E5	Remaining snapshot-open records	Eligible for judgment, including INCONCLUSIVE	Proposed
+The information-only exclusion candidate is the normalized SR_TYPE value:
+311 INFORMATION ONLY CALL
+The supplied material does not establish its frequency or exhaustiveness. It must be profiled and approved before it becomes controlling.
+5.5 Duplicate and parent rules
+The following is proposed, not yet verified against observed flag distributions.
+Duplicate/parent condition	Treatment
+Duplicate flag false, parent blank	Normal candidate
+Duplicate true, parent exists and is Open, parent distinct from child	Exclude as clean child
+Duplicate true, parent blank	INCONCLUSIVE
+Duplicate true, parent not found	INCONCLUSIVE
+Duplicate true, parent not Open	INCONCLUSIVE
+Parent populated, duplicate false	INCONCLUSIVE
+Parent equals own SR_NUMBER	INCONCLUSIVE
+Duplicate flag unrecognized	INCONCLUSIVE
+The purpose of requiring a resolvable open parent is to avoid discarding an apparently open child merely because an unresolved pointer exists.
+The parent is not substituted for the child, and no parent-cluster collapse occurs.
+5.6 Legacy rules
+Proposed primary treatment:
+- Unambiguous true LEGACY_RECORD: excluded.
+- Unambiguous false LEGACY_RECORD: normal candidate.
+- Unrecognized LEGACY_RECORD: INCONCLUSIVE.
+- False legacy flag with unexplained populated LEGACY_SR_NUMBER: INCONCLUSIVE pending interpretation.
+A legacy exclusion is not evidence that the underlying service issue is invalid.
+5.7 Varchar boolean parsing
+Proposed accepted values after trimming and case normalization:
+Interpretation	Tokens
+True	TRUE, T, YES, Y, 1
+False	FALSE, F, NO, N, 0, empty
+Unknown	All other values
+Treating an empty flag as false is provisional and must be checked against actual source conventions.
+No unexpected token may be silently coerced.
+5.8 Exclusion audit
+The initial open population must reconcile as:
+\[
+N_{\text{open}} =
+N_{\text{excluded}}+
+N_{\text{eligible}}
+\]
+
+The exclusion audit must preserve one mutually exclusive primary exclusion reason per excluded row, plus all applicable diagnostic flags.
+For eligible rows:
+\[
+N_{\text{eligible}} =
+N_E+N_I+N_S
+\]
+
+where:
+- \(N_E\): ESCALATE
+- \(N_I\): INCONCLUSIVE
+- \(N_S\): STANDARD
+The two identities must hold exactly.
+
+6. Observation Window and Date Contract
+6.1 Fundamental distinction
+A frozen source snapshot and a historical as-of reconstruction are not the same thing.
+The source manifest reports the latest CREATED_DATE, but not a verified source export or observation timestamp.
+Therefore, the latest creation date cannot establish when the open-status field was observed.
+Design A must not present the data as historical status at an arbitrary past instant.
+6.2 Proposed primary observation window
+Provisional analytical reference date:
+2026-09-12
+The calendar-day reference interval is:
+- Lower boundary: 2026-09-12 00:00:00
+- Upper boundary: 2026-09-13 00:00:00, exclusive
+Purpose: Set the reference date for the proposed age calculation.
+Interpretation: A date-level analytical anchor, not independently proven source capture time.
+The underlying source population remains the complete snapshot-open stock. There is no creation-date recency filter that drops older unresolved requests.
+Observed historical creation coverage begins on 2018-07-01; this is a property of the source, not an invented operational lookback.
+6.3 Required source-time validation
+Before the design can be locked, establish or explicitly bound:
+1. The frozen CSV identity and checksum.
+2. Its actual capture/export time, where recoverable.
+3. Its relationship to the proposed reference date.
+4. Whether the snapshot supports a September 12 observation claim.
+5. Whether a different analytical reference date is necessary.
+If the available evidence cannot establish status as of September 12, the output must be described as snapshot-open requests assessed using a September 12 reference date, with that mismatch acknowledged.
+It must not be called an exact historical as-of reconstruction.
+Materially inconsistent source timing is a blocking design problem.
+6.4 Date parsing
+Proposed primary CREATED_DATE grammar:
+YYYY-MM-DD HH:MM:SS
+A date must be a valid Gregorian calendar date with valid clock components.
+Additional source formats, fractional seconds, or timezone offsets require explicit profiling and a locked parsing extension.
+For the primary calendar-day calculation:
+- Treat source date text as a civil calendar date.
+- Do not convert it to UTC or calculate elapsed seconds.
+- Do not assume an official City timezone convention.
+- If timezone-bearing formats are present and their date interpretation changes the result, retain an uncertainty branch until semantics are approved.
+The America/Chicago reference describes the portfolio simulation's intended local calendar. It is not proof that the source timestamps were recorded in that timezone.
+6.5 Date-boundary rules
+- Same reference date: age zero.
+- Creation before the reference date: nonnegative integer calendar age.
+- Creation after the reference date: INCONCLUSIVE.
+- Missing/unparseable creation date: INCONCLUSIVE.
+- Exact threshold equality: ESCALATE if all integrity conditions pass.
+- No rounding of dates to hours or seconds for the primary rule.
+A date-level calculation deliberately avoids unsupported hour-level precision and DST ambiguity.
+
+7. Analytical Grain and Join Cardinality
+7.1 Grain contract
+Layer	Grain
+Raw source	One physical source row
+SQL candidate delivery	One physical request row
+Parent-reference delivery	At most one matching parent record per referenced key
+Eligibility	One SR_NUMBER
+Primary evidence	One eligible request
+Decision	One eligible request
+Portfolio KPI	One frozen snapshot
+Diagnostic segment	Segment × action
+Exclusion audit	One source-open request with a primary reason
+7.2 Request key
+SR_NUMBER is the exact source request identifier.
+The import manifest reports uniqueness for the current snapshot. Stage 4 must verify it independently.
+No DISTINCT operation may hide source duplication or unexpected join expansion.
+7.3 Join contract
+The primary candidate source requires no substantive source join.
+A separate mechanical parent-reference delivery may be necessary to validate PARENT_SR_NUMBER against the authoritative raw table.
+Expected relationship:
+- Candidate child → parent lookup: zero or one parent.
+- A parent may be referenced by many children.
+- Parent lookup must not multiply candidate rows.
+If a parent reference resolves to multiple physical source rows, the Source Gate fails.
+No work-order, service-level, employee, department-performance, or external geography table is introduced into the primary classification.
+7.4 Grain preservation
+The final judged table must contain one and only one row for each eligible SR_NUMBER.
+An excluded request belongs in the exclusion audit, not the action table.
+Two unflagged reports at the same location remain separate requests. Design A does not invent geographic deduplication.
+
+8. Primary KPI and Evidence Contracts
+8.1 Primary request-level evidence
+Metric: open_age_calendar_days
+Purpose: Measure unresolved calendar age under the portfolio reference date.
+Grain: One eligible request.
+Definition:
+\[
+A_i =
+\operatorname{ordinal}(D_{\text{reference}})
+-
+\operatorname{ordinal}(D_{\text{created},i})
+\]
+
+where ordinal is a calendar-day index.
+Units: Whole calendar days.
+Precision: Exact integer.
+Direction: Higher values indicate greater elapsed unresolved age under the heuristic; they do not establish greater harm.
+Missingness: Undefined age triggers INCONCLUSIVE for otherwise eligible rows.
+Weighting: One request, one observation.
+Decision threshold: \(A_i \ge K\).
+8.2 Primary portfolio KPI
+Name: Escalation Candidate Share
+\[
+\text{ECS} =
+\frac{N_{\text{ESCALATE}}}
+{N_{\text{eligible}}}
+\]
+
+Numerator: Number of eligible requests assigned ESCALATE.
+Denominator: All eligible snapshot-open requests, including INCONCLUSIVE.
+Unit: Proportion, displayed as a percentage.
+Aggregation: Each request has unit weight.
+Internal precision: Unrounded integer components and full-precision ratio.
+Display: Counts as integers; shares to two decimal places.
+Direction: Descriptive, not an optimization target. Neither a larger nor a smaller share is intrinsically better.
+The denominator includes INCONCLUSIVE because otherwise the measure could look artificially favorable when evidence quality deteriorates.
+8.3 Companion classification KPI
+Name: Conclusive Classification Share
+\[
+\text{CCS} =
+\frac{N_{\text{ESCALATE}}+N_{\text{STANDARD}}}
+{N_{\text{eligible}}}
+\]
+
+This records how much of the approved decision universe received a conclusive age-based assignment.
+It is a quality guardrail, not a replacement for ECS.
+8.4 Guardrail metrics
+Metric	Contract
+INCONCLUSIVE share	inconclusive_n / eligible_n
+Open exclusion share	excluded_open_n / source_open_n
+Creation-date failure share	Eligible records with missing/invalid CREATED_DATE divided by eligible requests
+Parent ambiguity share	Eligible requests with unresolved or contradictory duplicate/parent evidence divided by eligible requests
+Status/closed-date contradiction count	Source-open requests with populated CLOSED_DATE
+Type coverage	Eligible rows with a usable SR_TYPE divided by eligible requests
+Escalation concentration	Share of ESCALATE requests in each reported type or geographic segment
+Zero denominators yield undefined rates, never silently zero.
+Raw components must always accompany percentages.
+8.5 Diagnostic metrics
+- Request age distribution: median, P75, P90.
+- Age distribution separately for ESCALATE, INCONCLUSIVE, and STANDARD where defined.
+- SR_TYPE and SR_SHORT_CODE composition.
+- WARD and COMMUNITY_AREA composition.
+- LAST_MODIFIED_DATE recency where parseable.
+- Duplicate/parent and legacy flag distributions.
+- Counts of source-open requests with closed-date evidence.
+- Exact status versus closed-date cross-tabulation.
+No diagnostic may alter the primary action table without returning to Design.
+
+9. Comparison and Baseline Contract
+9.1 Primary baseline
+The controlling comparison is the approved threshold \(K\).
+Every sufficiently evidenced eligible request is compared against the same calendar-age rule.
+This is a portfolio decision cutoff, not an empirical service promise.
+9.2 Why a global cutoff is proposed
+A global age rule has three advantages for this first simulation:
+1. It requires fewer unverified source-field semantics than a dormancy measure.
+2. It can be independently reconstructed without a historical peer model.
+3. It makes the owner's decision policy and its limitations explicit.
+Its main weakness is also explicit: requests of different service types can have very different normal lifecycles.
+Design A accepts that weakness provisionally rather than introducing a more elaborate empirical benchmark whose interpretation is not yet established.
+9.3 Secondary diagnostic comparisons
+Permitted comparisons include:
+- ESCALATE versus STANDARD type mix.
+- Within-type age distributions.
+- Geographic concentration.
+- Age-triggered classification versus a noncontrolling modification-dormancy diagnostic, if source semantics are profiled.
+- Sensitivity of actions to fixed alternative threshold scenarios.
+All comparisons use request-level weighting.
+No peer benchmark is allowed to silently replace the primary decision rule.
+
+10. Segment Contract
+10.1 Prespecified diagnostic segments
+Segment	Source field	Purpose	Action-changing?
+Request type	SR_TYPE	Identify type-mix concentration	No
+Short service code	SR_SHORT_CODE	Inspect coding heterogeneity	No
+Ward	WARD	Identify geographic concentration	No
+Community area	COMMUNITY_AREA	Identify geographic concentration	No
+Duplicate/parent status	DUPLICATE, PARENT_SR_NUMBER	Audit classification integrity	Only through approved integrity rules
+Legacy status	LEGACY_RECORD	Audit population exclusions	Only through approved eligibility rules
+10.2 Segment processing
+- Preserve source category values and create documented normalized display values.
+- Missing geographic values become UNKNOWN.
+- Do not infer geography from location coordinates without a separately approved design.
+- Use no geographic weights in the primary action rule.
+- Report categories with at least 30 eligible requests individually.
+- Combine smaller categories as OTHER for compact descriptive reporting, while retaining the unsuppressed source-level audit.
+The minimum n=30 is a provisional reporting convention, not a statistical guarantee or official standard.
+Small categories are not excluded from request-level classification.
+10.3 Multiplicity and inference
+Subgroup comparisons are descriptive.
+If numerous categories show extreme escalation shares, the result may reflect small denominators or compositional differences.
+No exploratory category finding may be presented as a prespecified causal or confirmatory conclusion.
+
+11. Confounders and Competing Explanations
+Risk ID	Competing explanation	Available evidence	Planned treatment	Residual limitation
+C01	Different service types have different normal lifecycles	SR_TYPE, SR_SHORT_CODE	Stratified diagnostics	Global threshold may over-escalate slow-cycle types
+C02	Recent modification may indicate active attention	LAST_MODIFIED_DATE	Diagnostic recency analysis	Modification may be administrative rather than substantive
+C03	Open status may be stale	STATUS, CLOSED_DATE, source provenance	Contradiction audit	No supplied historical status log
+C04	Duplicate reports inflate attention volume	DUPLICATE, parent fields	Approved exclusion/integrity rules	Unflagged duplicates remain
+C05	Legacy records have different generation rules	LEGACY_RECORD, LEGACY_SR_NUMBER	Separate exclusion audit	Legacy exclusion may conceal real issues
+C06	Seasonal or event-driven workload changes age distributions	CREATED_DATE, SR_TYPE	Descriptive month/type comparisons	No weather/event source is approved
+C07	Geographic differences reflect request composition or reporting opportunity	WARD, COMMUNITY_AREA	Descriptive stratification	No exposure denominator or equity inference
+C08	Some requests require complex, long-running work	SR_TYPE proxy	Disclose and examine type mix	No authoritative work-order complexity data
+C09	Snapshot records reflect survivorship of unresolved cases	Source-open stock	Explicit stock-versus-flow limitation	Cannot generalize to all created requests
+C10	Data capture may occur after the analytical reference date	Snapshot provenance	Verify source boundary or bound mismatch	Historical as-of inference may be impossible
+C11	Information-only categories may be incompletely identified	SR_TYPE, SR_SHORT_CODE	Category profiling	Eligibility may be overinclusive
+C12	Missing or unknown flag values may reflect source conventions	Duplicate/legacy fields	Token profiling and fail-closed handling	False INCONCLUSIVE classifications possible
+These are interpretation threats, not variables to be automatically adjusted in a causal model.
+No department or employee performance conclusions are authorized.
+
+12. Missingness, Anomalies, and Data-Quality Rules
+12.1 Prespecified rule matrix
+Condition	Policy	Responsible layer
+Duplicate physical SR_NUMBER	Stop Source Gate	SQL Source Gate
+Blank request identifier	Exclusion audit plus blocking source-quality exception	Source Gate / R
+Unknown STATUS token	Profile; do not silently map to Open	Source Gate / design
+Invalid CREATED_DATE	INCONCLUSIVE for otherwise eligible request	R-A/R-B
+Creation after reference date	INCONCLUSIVE	R-A/R-B
+Open status with populated closed date	INCONCLUSIVE	R-A/R-B
+Unknown duplicate flag	INCONCLUSIVE	R-A/R-B
+Contradictory parent/duplicate evidence	INCONCLUSIVE	R-A/R-B
+Unknown legacy flag	INCONCLUSIVE	R-A/R-B
+Missing SR_TYPE	INCONCLUSIVE	R-A/R-B
+Missing geography	Retain, diagnostic UNKNOWN	R-A/R-B
+Missing LAST_MODIFIED_DATE	Retain; diagnostic uncertainty	R-A/R-B
+Last-modified date before creation	Flag as anomaly; not an independent age-rule trigger	R-A/R-B
+Last-modified date after reference date	Flag temporal mismatch; investigate source freeze	R-A/R-B / Design Gate
+Clean duplicate child	Exclude under approved policy	R-A/R-B
+Confirmed information-only request	Exclude under approved policy	R-A/R-B
+Confirmed legacy request	Exclude under approved policy	R-A/R-B
+The actual occurrence of these conditions is not presumed from the packet.
+12.2 Closed-date discrepancy
+Reported source counts are:
+- STATUS='Open': 245,193.
+- Missing CLOSED_DATE: 245,217.
+The marginal count difference is 24.
+This does not prove that exactly 24 rows are contradictory. Opposing mismatch types may partly offset each other.
+Required cross-tabulation:
+	CLOSED_DATE missing	CLOSED_DATE populated
+STATUS='Open'	Count	Count
+Other statuses	Count	Count
+The actual mismatch counts must be established before Stage 4 certification.
+12.3 Unknown missingness
+The packet does not establish complete missingness and value-domain profiles for parent, legacy, duplicate, geography, or modification-format fields.
+Targeted profiling is required before those fields become locked action-changing inputs.
+12.4 Fail-closed principle
+A malformed or unsupported field value must not silently be interpreted in whichever way produces the most favorable action count.
+Source-delivery failure, uncertain eligibility, and insufficient action evidence remain different failure classes.
+
+13. Sample Size, Uncertainty, and Sensitivity
+13.1 Primary classification sample size
+There is no minimum sample-size requirement for assigning a deterministic age rule to an individual eligible request.
+One eligible request still receives one action.
+13.2 Descriptive subgroup sample size
+The proposed reporting minimum of 30 applies only to displayed segment summaries.
+It does not determine request eligibility or ESCALATE membership.
+The reported snapshot is treated as a frozen observed population, not a random sample from which to infer exact future population parameters.
+Routine sampling confidence intervals are therefore not required for the main classification shares.
+13.3 Prespecified sensitivity scenarios
+Primary threshold:
+K = 14 calendar days
+Diagnostic alternatives:
+K = 7 and K = 30 calendar days.
+These are frozen sensitivity scenarios, not additional owner-tunable knobs.
+Expected invariant:
+\[
+N_E(7) \ge N_E(14) \ge N_E(30)
+\]
+
+provided that the same eligible population and integrity rules are retained.
+The INCONCLUSIVE and excluded populations must remain unchanged across threshold-only sensitivity runs.
+13.4 Required reporting
+- Action counts under all three scenarios.
+- Number and percentage of eligible requests whose actions change.
+- Counts immediately around the primary threshold.
+- Whether threshold changes alter the practical interpretation of the result.
+- Type concentrations of threshold-sensitive cases.
+Sensitivity does not authorize choosing whichever threshold produces a preferred escalation volume.
+
+14. Decision Rule Contract
+14.1 Exactly one owner-tunable knob
+Property	Proposed contract
+Name	open_age_days_threshold
+Symbol	\(K\)
+Default	14
+Unit	Calendar days
+Type	Integer
+Allowed proposed domain	1–3,650
+Threshold comparison	Greater than or equal
+Status	PROVISIONAL
+Authority	Human owner approval required
+Interpretation	Portfolio escalation-attention cutoff
+Official City SLA?	No
+The value 14 is inherited as a defensible provisional candidate from the supplied coordinator proposal, not as a verified City or empirical requirement.
+The allowed domain is a proposed validation constraint, not a second decision policy.
+14.2 Order of evaluation
+Step 0 — Source membership
+A record not belonging to the frozen open source envelope receives no decision label.
+Step 1 — Structural exclusions
+Apply the approved exclusion hierarchy, in order:
+1. Invalid identifier.
+2. Confirmed information-only request.
+3. Confirmed legacy request.
+4. Confirmed clean duplicate child.
+Excluded requests do not enter the final three-way denominator.
+Step 2 — INCONCLUSIVE
+For each remaining eligible request, assign INCONCLUSIVE if any material action-evidence failure exists:
+- Missing or invalid creation date.
+- Creation date after the approved reference date.
+- Missing/blank request type.
+- Populated closed date despite Open source status.
+- Unknown duplicate or legacy flag.
+- Contradictory duplicate/parent evidence.
+- Missing or unresolved parent where the proposed duplicate-child exclusion requires one.
+- Another explicitly locked critical evidence contradiction.
+Step 3 — ESCALATE
+If no INCONCLUSIVE condition applies:
+\[
+A_i \ge K \Rightarrow \text{ESCALATE}
+\]
+
+Step 4 — STANDARD
+Otherwise:
+\[
+A_i < K \Rightarrow \text{STANDARD}
+\]
+
+14.3 Truth table
+Eligible	Critical evidence sufficient	Age ≥ K	Action
+No	Any	Any	Outside decision set
+Yes	No	Any/unknown	INCONCLUSIVE
+Yes	Yes	Yes	ESCALATE
+Yes	Yes	No	STANDARD
+No eligible request can receive two actions.
+14.4 Reason-code precedence
+For a request with multiple evidence failures, preserve every applicable failure flag, but assign one deterministic primary reason.
+Proposed primary ordering:
+1. BAD_CREATED_DATE
+2. FUTURE_CREATED_DATE
+3. OPEN_CLOSED_CONTRADICTION
+4. MISSING_TYPE
+5. DUPLICATE_PARENT_CONTRADICTION
+6. PARENT_UNRESOLVED
+7. UNKNOWN_DUPLICATE_FLAG
+8. UNKNOWN_LEGACY_FLAG
+9. LEGACY_REFERENCE_CONTRADICTION
+For conclusive cases:
+- AGE_THRESHOLD_MET
+- AGE_BELOW_THRESHOLD
+The reason ordering is a reporting convention; it must not change the action.
+14.5 Selection field
+attention_candidate = TRUE if and only if action = ESCALATE.
+If a legacy field named selected is required, it has the same meaning.
+It does not mean a request has been assigned actual shift capacity.
+14.6 Capacity and ranking
+No capacity cap, ordered rank, or tie-breaking within ESCALATE is defined.
+All requests exactly at the threshold receive ESCALATE.
+If the volume exceeds practical attention capacity, the resulting issue must be recorded and returned to Framing for a separate ranking or capacity decision.
+Changing \(K\) merely to meet an unstated capacity target is not an authorized workaround.
+14.7 Predictive analytics declaration
+ml_mode = None
+No training, scoring, prediction, Expand model, or post-validation predictive analysis is part of this design.
+Any future model-generated score affecting action or ranking would require appropriate new design authorization.
+
+15. Measurement-Risk Register
+ID	Risk and likelihood	Decision impact	Detection / prevention	Status
+R01	Snapshot/reference misalignment — unknown	May misstate open-at-time population	Verify export timestamp; label snapshot-open honestly	BLOCKING
+R02	Unverified duplicate and legacy conventions — high uncertainty	Wrong exclusion or INCONCLUSIVE classification	Value-domain profile and fixtures	BLOCKING
+R03	Global age ignores type lifecycles — high	Unusual delay and ordinary slow processing mixed	Type diagnostics and design comparison	PROVISIONAL
+R04	Closed-date/status contradictions — confirmed aggregate discrepancy	False open interpretation	Full cross-tab and held cases	OPEN
+R05	Information-only exclusion incomplete — unknown	Wrong eligible denominator	Profile type values and approve exclusion list	OPEN
+R06	Unparseable date formats — unknown	Incorrect age/action	Freeze parser grammar, test edge cases	OPEN
+R07	Duplicate key after refresh — low for reported snapshot	Join expansion or reconciliation failure	Source Gate exact uniqueness	CONTROLLED
+R08	Unflagged conceptual duplicates — unknown	Inflated ESCALATE volume	Disclose; no invented location dedupe	ACCEPTED LIMITATION
+R09	Threshold arbitrariness — high	Action changes with policy choice	Owner approval; prespecified sensitivity	PROVISIONAL
+R10	SQL judged logic contamination — controllable	Correlated incorrect R outputs	Restrict SQL; independent R paths	CONTROLLED BY CONTRACT
+R11	Builder translation drift — controllable	Mismatched actions despite correct source	Frozen fixtures and exact reconciliation	CONTROLLED BY CONTRACT
+R12	Inadequate fixture authority — currently unresolved	False green certification	Freeze identity/hash before builders	BLOCKING
+R13	Geographic/reporting inequity — unknown	Disproportionate attention allocation	Segment diagnostics, no demographic inference	ACCEPTED LIMITATION
+R14	Capacity overflow — unknown	ESCALATE candidates exceed review resources	Report counts; return to Framing	DEFERRED
+R15	Open stock survivorship — structurally present	Results misread as rates across all requests	Distinguish snapshot stock from creation flow	ACCEPTED LIMITATION
+A risk is not resolved merely because it is disclosed. Blocking risks must be resolved or explicitly bounded and approved before lock.
+
+16. Non-Executable SQL → R Implementation Blueprint
+Stage 4 uses Method B:
+Controlled SQL source delivery → SQL Source Gate → independent R-A/R-B judged builds → exact reconciliation → structural review.
+16.1 SQL responsibility
+SQL provides a faithful frozen extract of source evidence at the required grain.
+It may mechanically:
+- Filter to the approved broad Open envelope.
+- Project source columns.
+- Produce source and extraction counts.
+- Preserve original strings.
+- Deliver requested parent-reference evidence.
+- Verify or report key uniqueness.
+- Generate technical lineage hashes.
+- Partition files for safe transport.
+It must not assign judged analytical meanings.
+16.2 R responsibility
+R-A and R-B independently:
+- Interpret source dates under the locked grammar.
+- Apply eligibility and exclusion rules.
+- Evaluate duplicate/legacy/parent semantics.
+- Evaluate integrity conditions.
+- Calculate request ages.
+- Assign actions.
+- Calculate all KPI components.
+- Produce diagnostic segments.
+- Apply frozen sensitivity scenarios.
+- Produce audit outputs.
+16.3 Execution boundary
+No production SQL, executable R workflow, training pipeline, or actual source analysis is generated in this Stage 3 design.
+This document is the implementation contract only.
+
+17. Controlled SQL Source-Delivery Contract
+17.1 Authoritative source
+chicago311.raw_311_requests
+Database access is through the authorized MySQL command-line client.
+R-A and R-B must not connect directly to the database or independently re-query a moving source.
+17.2 Primary candidate extract
+Proposed minimal source columns:
+Column	Function
+SR_NUMBER	Reconciliation key
+STATUS	Open-source evidence
+SR_TYPE	Type and eligibility evidence
+SR_SHORT_CODE	Supporting type diagnosis
+CREATED_DATE	Primary age source
+LAST_MODIFIED_DATE	Diagnostic temporal evidence
+CLOSED_DATE	Open-status contradiction evidence
+DUPLICATE	Duplicate rule
+PARENT_SR_NUMBER	Parent relationship
+LEGACY_RECORD	Legacy rule
+LEGACY_SR_NUMBER	Legacy consistency
+WARD	Diagnostic segment
+COMMUNITY_AREA	Diagnostic segment
+Other raw fields may be included if needed to demonstrate faithful source extraction, but must not become unapproved decision predictors.
+17.3 Envelope
+Proposed extraction envelope:
+STATUS = 'Open'
+This is a literal source-value delivery filter, not a final eligibility judgment.
+The Source Gate separately profiles the full status domain and verifies that the approved envelope is not silently excluding other relevant status tokens.
+No age, type, legacy, duplicate, or INCONCLUSIVE condition may be used to filter the candidate extract in SQL.
+17.4 Parent-reference delivery
+Provide a separate mechanical reference mapping for distinct nonblank PARENT_SR_NUMBER values appearing in the candidate extract.
+For each parent reference, preserve:
+- Requested parent identifier.
+- Matching raw SR_NUMBER, if any.
+- Matching raw STATUS, if any.
+- Match count.
+- Source lineage.
+Do not precompute whether a child is a clean duplicate or eligible.
+R-A and R-B independently interpret those facts.
+17.5 Lineage
+Every frozen delivery package must record:
+- Source dataset ID.
+- Source manifest reference.
+- Frozen snapshot identity and checksum.
+- Source database/schema/table.
+- Extract specification version.
+- Extraction timestamp.
+- Observation/reference-date contract.
+- Raw row count.
+- Candidate-envelope row count.
+- Distinct request count.
+- File count and content checksums.
+- Parent-reference extract identity.
+The expected Open candidate row count is 245,193 based on the packet. Stage 4 must verify rather than assume it.
+
+18. SQL Source Gate Requirements
+Before R-A or R-B may construct judged results, the Source Gate must confirm:
+1. The authoritative source identity matches the manifest.
+2. The frozen source checksum and version are recorded.
+3. The candidate extract matches the raw source's approved envelope.
+4. Delivered row count matches the authoritative envelope.
+5. Delivered SR_NUMBER keys are unique and nonblank.
+6. No keys exist only in the extract or only in the matching authoritative raw envelope.
+7. Required source field values match raw values per key.
+8. String/null representation is fixed consistently.
+9. Date values have not been silently altered.
+10. Parent-reference cardinality matches the raw source.
+11. Extract joins have not multiplied rows.
+12. Category and status domain profiles are recorded.
+13. Missingness and contradictory status/closed-date counts are produced.
+14. Files share one validated lineage.
+15. Extraction is independent of final action assignments.
+Exactness standard: Zero unexplained key, cardinality, critical-field, or lineage mismatches.
+Control totals alone do not substitute for keyed value comparison.
+A Source Gate failure prevents authoritative R judgment.
+
+19. R-A/R-B Judged-Output Contract
+19.1 Independence
+Both builders receive the same:
+- Locked Stage 3 design.
+- Frozen source delivery.
+- Validated source lineage.
+- Frozen known-case fixture pack.
+- Output schema.
+They must not share judged implementation code, final ID membership lists, action lists, selected sets, or another builder's output as construction input.
+19.2 Required judged request fields
+Field	Meaning
+SR_NUMBER	Request key
+snapshot_id	Source lineage
+design_version	Controlling design
+fixture_version	Fixture authority
+simulation_only	Constant TRUE
+is_source_open	Source-state classification
+is_eligible	Eligible membership
+primary_exclusion_reason	Exclusion reason or null
+exclusion_flags	Complete applicable exclusion evidence
+created_date_valid	Date integrity
+created_calendar_date	Parsed creation date or null
+open_age_calendar_days	Exact age or null
+closed_date_conflict	Integrity flag
+duplicate_parent_state	Interpreted identity state
+legacy_state	Interpreted legacy state
+integrity_fail	Critical evidence flag
+integrity_reason	Primary INCONCLUSIVE reason
+all_integrity_flags	All applicable evidence failures
+threshold_days	Locked K
+threshold_met	TRUE/FALSE/null
+action	ESCALATE/INCONCLUSIVE/STANDARD/null outside set
+attention_candidate	TRUE only for ESCALATE
+reason_code	Deterministic action explanation
+For INCONCLUSIVE requests, threshold_met is null when the evidence gate prevents its authoritative evaluation, even if an age value can be mechanically computed.
+For excluded requests, action and judged threshold membership are null in the full source-side audit. Excluded requests are absent from the final eligible decision table.
+19.3 Required aggregate outputs
+- Open source count.
+- Exclusion count by primary reason.
+- Eligible total.
+- ESCALATE total.
+- INCONCLUSIVE total.
+- STANDARD total.
+- Primary KPI numerator and denominator.
+- Guardrail numerator and denominator components.
+- Type and geography diagnostic tables.
+- Prespecified sensitivity counts.
+- Date and flag anomaly tables.
+- Fixture test results.
+- Source/design/fixture lineage.
+19.4 Invariants
+Both builders must independently satisfy:
+\[
+N_{\text{open}} =
+N_{\text{excluded}} + N_{\text{eligible}}
+\]
+
+\[
+N_{\text{eligible}} =
+N_E+N_I+N_S
+\]
+
+\[
+N_{\text{decision rows}}=N_{\text{eligible}}
+\]
+
+\[
+N_{\text{unique decision keys}}=N_{\text{eligible}}
+\]
+
+and:
+\text{attention_candidate}_i
+\iff
+\text{action}_i=\text{ESCALATE}
+No valid row may have multiple actions.
+
+20. Exact Reconciliation Contract
+20.1 Required reconciliation levels
+Level	Required equality
+Source lineage	Exact
+Delivered key coverage	Exact
+Source-open membership	Exact
+Exclusion membership	Exact
+Eligible key sets	Exact
+Exclusion reason counts	Exact
+All eligibility flags	Exact
+Parsed creation dates	Exact
+Integer age values	Exact
+Integrity flags	Exact
+Primary reason codes	Exact
+Threshold value	Exact
+Threshold-met flags	Exact
+Action	Exact
+Attention-candidate flag	Exact
+Primary KPI components	Exact
+Diagnostic integer counts	Exact
+Sensitivity action counts	Exact
+Fixture expected outcomes	Exact
+For request-level fields, equality must be established through keyed comparison, not matching aggregate totals alone.
+All primary decision calculations are integer or categorical. Their reconciliation tolerance is zero.
+For derived portfolio proportions, reconcile the exact integer numerator and denominator first. Identical full-precision recomputation is expected; the displayed percentage is not the authoritative comparison object.
+20.2 Intermediate-state reconciliation
+R-A and R-B must reconcile not only final actions but intermediate states:
+1. Source candidate key sets.
+2. Open membership.
+3. Every exclusion branch.
+4. Eligible membership.
+5. Every integrity-failure branch.
+6. Valid age values.
+7. Threshold comparisons.
+8. Final actions.
+9. Portfolio numerator/denominator pairs.
+10. Sensitivity memberships and counts.
+This prevents matching final totals from concealing offsetting errors.
+20.3 Failure treatment
+Any unexplained reconciliation failure stops certification.
+Builders repair their own implementation against the locked specification.
+They may not repair a discrepancy by copying the other builder's judged code or final classification table.
+A genuine ambiguity in Stage 3 requires specification change control rather than ad hoc implementation agreement.
+
+21. Spec → Builder Translation Requirements
+The locked Spec→builder packet must include the following gate map.
+Clause ID	Design component	Builder obligation	Required fixture coverage
+S01	Source snapshot	Use identical verified lineage	Source identity
+S02	Open envelope	Preserve exact Open-source population	Non-Open
+S03	Identifier	Preserve one request key	Blank/duplicate key
+S04	Information-only policy	Apply locked exclusion	Information-only
+S05	Legacy handling	Distinguish true/false/unknown	Legacy cases
+S06	Duplicate/parent handling	Apply complete identity state machine	Parent cases
+S07	Reference date	Apply approved date boundary	Boundary cases
+S08	Date parser	Apply locked format rules	Invalid dates
+S09	Open/closed contradiction	Hold contradictory cases	Closed-date case
+S10	Eligible population	Preserve exclusion and hold distinctions	Eligibility cases
+S11	Age calculation	Compute calendar-day integer age	Threshold cases
+S12	Action priority	Apply INCONCLUSIVE before threshold	Conflicting-evidence cases
+S13	Single knob	Use exact K and equality rule	Threshold tie
+S14	Capacity	No ranking or cap	No-ranking assertion
+S15	Metrics	Preserve numerator/denominator components	Aggregate invariants
+S16	Sensitivity	Freeze scenarios and monotonicity	Metamorphic test
+S17	Simulation label	Never present live dispatch actions	Output schema
+S18	ML mode	None; no predictive inputs	No-model assertion
+S19	Independence	No shared judged answer inputs	Attestation
+S20	Exact reconciliation	Compare all required intermediate states	Reconciliation report
+Each builder must attest independently to its implementation of every applicable clause.
+Unused optional mechanics must be marked explicitly N/A, with the controlling reason.
+No decision-changing rule may be omitted merely because both builders would otherwise make the same simplifying assumption.
+
+22. Known-Case Fixture Pack — Proposed
+Fixture pack: X12-design-a-fixtures-v1.0-PROPOSED
+Fixture status: NOT FROZEN
+Fixture hash: PENDING
+Fixture authority: PENDING OWNER/ANALYST LOCK
+Fixtures below specify desired expected behavior, not executed test results.
+22.1 Default fixture assumptions
+Unless a fixture overrides them:
+- Source STATUS = Open.
+- Valid unique SR_NUMBER.
+- SR_TYPE = Street Pothole (synthetic).
+- Duplicate flag false.
+- Legacy flag false.
+- Parent number blank.
+- Closed date blank.
+- Valid creation date.
+- Reference date 2026-09-12.
+- Threshold \(K=14\).
+- Parent lookup is complete where needed.
+- No unmentioned integrity failures.
+22.2 Core known cases
+ID	Case	Expected disposition	Critical assertion
+A01	Created August 29, 2026	ESCALATE	Age exactly 14; inclusive threshold
+A02	Created August 30, 2026	STANDARD	Age 13; below threshold
+A03	Created September 12, 2026	STANDARD	Same-day age zero
+A04	Created August 1; modified September 11	ESCALATE	Recent modification does not override primary age rule
+A05	Created September 13, 2026	INCONCLUSIVE	Future relative to date anchor
+A06	Creation date unparseable	INCONCLUSIVE	Invalid clock never defaults to STANDARD
+A07	Blank SR_TYPE	INCONCLUSIVE	Unknown type is not silently excluded
+A08	Open with populated CLOSED_DATE	INCONCLUSIVE	Status/date contradiction
+A09	Duplicate true; valid distinct Open parent	EXCLUDED	Clean duplicate-child exclusion
+A10	Duplicate true; parent missing	INCONCLUSIVE	Incomplete duplicate evidence
+A11	Duplicate false; parent populated	INCONCLUSIVE	Contradictory duplicate/parent evidence
+A12	Legacy true	EXCLUDED	Approved legacy policy
+A13	Confirmed information-only type	EXCLUDED	Approved type exclusion
+A14	STATUS Completed	OUTSIDE SOURCE-OPEN UNIVERSE	Non-Open never receives action
+A15	Blank SR_NUMBER	STRUCTURAL EXCLUSION / QUALITY FAIL	Missing key cannot enter certified decision output
+A16	Unknown duplicate flag token	INCONCLUSIVE	Unknown is not false
+A17	Missing LAST_MODIFIED_DATE, otherwise A01	ESCALATE	Diagnostic missingness alone does not alter primary rule
+A18	Same type/address on two different unflagged requests	Two independent decisions	No invented conceptual deduplication
+A19	Parent equals own request number	INCONCLUSIVE	Self-parent contradiction
+A20	Valid creation at September 12 23:59:59	STANDARD	Date boundary includes entire reference day
+A21	Creation on September 13 00:00:00	INCONCLUSIVE	Upper boundary exclusive
+A22	Legacy false but populated contradictory legacy reference	INCONCLUSIVE	Legacy conflict is not silently ignored
+22.3 Required metamorphic and invariance tests
+M01 — Threshold monotonicity
+For the same eligible/integrity-frozen source:
+\[
+E(7) \supseteq E(14) \supseteq E(30)
+\]
+
+where \(E(K)\) is the ESCALATE key set.
+M02 — Nondecision field invariance
+Changing only WARD or COMMUNITY_AREA must not change an action.
+M03 — Row-order invariance
+Permuting source row order must not change eligible membership, age, or action.
+M04 — Duplicate-key detection
+Introducing an additional physical row with the same SR_NUMBER must fail the Source Gate, not silently deduplicate.
+M05 — INCONCLUSIVE precedence
+If a record meets the age threshold but has a critical integrity failure, the action must be INCONCLUSIVE.
+M06 — Exclusivity
+No eligible record may appear in more than one action set.
+M07 — Count conservation
+Every source-open record must reconcile to exactly one eligible or excluded branch.
+M08 — No inferred capacity ranking
+Reordering ESCALATE records or changing the output display sort must not change membership or create an implicit selected top-N.
+M09 — Threshold independence of eligibility
+Changing only \(K\) must not alter source-open membership, exclusions, or INCONCLUSIVE membership.
+22.4 Fixture authority rules
+Before any R builder starts:
+1. Freeze fixture content.
+2. Record its path, version, and cryptographic hash.
+3. Record owner-approved expected outcomes.
+4. Supply identical frozen fixtures to R-A and R-B.
+5. Require both builders to pass them independently.
+6. Forbid changing expected outcomes after a failure merely to produce a passing result.
+Any legitimate owner-authorized fixture correction produces a new version and requires fresh validation.
+A proposed fixture table is not a Fixture Gate PASS.
+
+23. Controlled Review of Supplied Designs
+23.1 Coordinator draft
+Accepted:
+- Three-way classification.
+- Calendar-age primary statistic.
+- One owner-tunable age threshold.
+- No City SLA inference.
+- No capacity shortlist.
+- One SR_NUMBER decision grain.
+- SQL source delivery followed by independent R judgment.
+- Need for exclusion audits and sensitivity checks.
+Revised:
+- Missing critical dates and types should generally remain eligible as INCONCLUSIVE rather than be excluded.
+- Date-level age is preferred to unverified 86,400-second arithmetic.
+- Snapshot creation maximum is not accepted as proof of the observation timestamp.
+- Duplicate-child exclusion requires coherent identity evidence.
+- Exclusion precedence and INCONCLUSIVE precedence are made explicit.
+- The open/closed-date discrepancy requires a full cross-tabulation, not an assumed 24 contradictory rows.
+- Source and R intermediate states require exact reconciliation.
+Rejected as established fact:
+- That 2026-09-12 23:59:59 was necessarily the actual snapshot observation time.
+- That the proposed information-only set is already exhaustive.
+- That a 14-day threshold has empirical or City-policy warrant.
+- That duplicate/legacy truth conventions are known before profiling.
+23.2 Design B — Type-Conditional Dormancy with Integrity Gate
+Design B offers an important counterargument: older does not necessarily mean more neglected.
+Its type-conditional dormancy approach addresses a real construct-validity weakness in a global age rule.
+Accepted into Design A:
+- Stronger evidence-integrity treatment.
+- Explicit attention to request-type heterogeneity.
+- Distinction between snapshot-open stock and historical flow.
+- Recognition that last-modified activity may be misleading.
+- Explicit INCONCLUSIVE handling for contradictory identity evidence.
+- No hidden capacity ranking.
+- Sensitivity and falsifiability requirements.
+Rejected as the primary Design A statistic:
+1. LAST_MODIFIED_DATE has not been verified as a work-activity event.
+2. Administrative updates could reset dormancy without meaningful progress.
+3. Completed-peer closure distributions are subject to selection and survivorship problems.
+4. Type-specific historical P75 cycles are descriptive and not necessarily appropriate service expectations.
+5. Thin historical peer groups could produce excessive INCONCLUSIVE classifications.
+6. Historical peer extraction and threshold construction add dependencies without a demonstrated improvement in the currently approved decision.
+7. The packet lacks source-time guarantees sufficient for strong historical backcasting.
+Design B also contains an internal specification inconsistency: its displayed decision formula refers to peer_p25_h, while the associated explanation and surrounding metric definitions describe peer_p75_h. That discrepancy would have to be resolved before Design B could serve as an executable contract.
+Design A disposition: Retain type-relative dormancy as a methodological alternative for later controlled evaluation, not as a competing action rule inside this design.
+23.3 AI 3 data-risk dossier
+Accepted:
+- Need to reconcile source-open and closed-date evidence.
+- Source timestamp and timezone uncertainty.
+- Snapshot/historical-as-of distinction.
+- Duplication/legacy/parent interpretation risks.
+- Need for exact SQL Source Gate validation.
+- Need for independent R-A/R-B judged implementations.
+- Leakage limitations.
+- Capacity ranking must not be silently added.
+Modified:
+The dossier permits mechanical SQL operations including date and age calculations and suggests filtering to locked eligibility.
+Design A takes a narrower primary approach:
+- SQL delivers raw source evidence.
+- R-A/R-B independently parse decision dates and calculate age.
+- SQL may mechanically filter only the approved broad source envelope.
+- Judged eligibility and action membership stay in R.
+This preserves the current Method B independence boundary.
+23.4 Design comparison
+Dimension	Design A	Design B	Reason for Design A choice
+Primary construct	Unresolved calendar age	Type-relative dormancy	Fewer unverified activity semantics
+Primary source clock	CREATED_DATE	LAST_MODIFIED_DATE	Creation timing is better characterized in packet
+Baseline	Portfolio K days	Empirical type P75 × κ	Avoid unvalidated historical-cycle interpretation
+Type heterogeneity	Diagnostic	Built into action	Retain diagnostic until construct evidence exists
+Historical completed peers	Not required	Required	Avoid selection and extraction complexity
+Thin-type rule	No classification restriction	INCONCLUSIVE	Avoid parking rare types solely because peers are sparse
+Integrity failures	INCONCLUSIVE	INCONCLUSIVE	Substantive agreement
+Primary SQL judgment	None	Peer statistics proposed in SQL	Stronger separation in A
+Single knob	K days	κ multiplier	Both satisfy one-knob principle
+Capacity ranking	Deferred	Deferred	Agreement with locked Framing
+Resolution: Design A is preferred as the simpler, more auditable first portfolio simulation. It does not claim superior real-world identification of neglected requests.
+A later evidence-backed demonstration that type-relative dormancy better matches the decision owner's intended construct could justify replacing Design A through formal change control.
+No resolution is based on reviewer voting.
+
+24. Known Limitations
+1. Age is not severity. ESCALATE identifies age-based attention candidates, not confirmed emergencies.
+2. Age is not a City SLA. Fourteen days is a provisional portfolio parameter.
+3. Source Open is not historical as-of Open. Historical status requires observation-time evidence unavailable in the supplied packet.
+4. The source is a snapshot stock. It overrepresents long-lived unresolved requests relative to the flow of all newly created requests.
+5. Different service types have different lifecycles. A global threshold can conflate normal long-cycle work and abnormal stagnation.
+6. Work-order status is unavailable. One request may cover operational processes not reflected in request-header fields.
+7. Last modification is not verified field activity. It cannot establish actual crew progress.
+8. Conceptual duplicates may be unflagged. One physical issue can contribute multiple request rows.
+9. Legacy conventions are incompletely characterized. The proposed exclusion may conceal operationally relevant requests.
+10. Geographic comparisons lack exposure denominators. They cannot establish equitable or inequitable service treatment.
+11. There is no operational capacity measurement. Attention candidates may exceed shift resources.
+12. There is no observed intervention outcome. The analysis cannot estimate the effect of taking an ESCALATE action.
+13. Exact reconciliation validates implementation agreement, not the truth of the design. Shared specification errors remain possible.
+14. Source/import totals do not prove current semantic completeness. Targeted profiles and full source validation remain required.
+These limitations define what Stage 5 may and may not claim.
+
+25. Stage 4 Handoff and Lock Conditions
+25.1 Required artifacts
+A successful Stage 3 lock must establish:
+Artifact	Required condition
+Stage_03_Measurement_Design.md	Approved controlling specification
+stage3_locked_design.json	Status LOCKED and matching fields
+Source manifest	Frozen identity and provenance
+SQL source-delivery contract	Approved
+Source Gate contract	Exact validation requirements
+Spec→builder packet	Complete decision-changing clauses
+Known-case fixtures	Frozen version and hash
+R-A builder instructions	Independent judged construction
+R-B builder instructions	Independent judged construction
+Reconciliation contract	Complete intermediate and final checks
+Risk register	Blocking conditions resolved or bounded
+Cross-review record	Required findings adjudicated
+Owner approval	Recorded
+Procedure/workflow authorization	PASS before Stage 4
+25.2 Stage 4 must not begin if
+- The reference/source observation relationship remains materially unresolved.
+- Eligibility rules are not approved.
+- Duplicate/legacy/parent parsing is not frozen.
+- The threshold lacks owner authorization.
+- Fixtures lack valid freeze authority.
+- An unreviewed material contradiction remains.
+- SQL is expected to decide final actions.
+- R-A and R-B independence cannot be demonstrated.
+- The governing procedure or workflow gate denies advancement.
+25.3 Change control
+After Design Lock:
+- A correction fixes implementation to the existing specification.
+- A material amendment changes the controlling specification and must be authorized and versioned.
+- An exploratory sensitivity result does not change the primary locked decision.
+The frozen primary action table must not be silently rewritten by later diagnostics.
+
+26. Design Gate 1–11 Self-Assessment
+The table below is an AI 1 self-check of the proposed design, not an independent three-AI certification or owner approval.
+The formal Gate 1–11 criteria follow the referenced Stage 3 framework.
+Gate	Criterion	Self-score	Rationale
+Gate 1	Decision alignment	PASS	Preserves locked Start, CQ-F02, three actions, simulation restrictions, and ranking deferral
+Gate 2	Hypothesis	PASS	Business/analytical hypotheses, mechanism, implications, counterevidence, and exploratory distinction explicit
+Gate 3	Population	FAIL	Exact source-time interpretation and several proposed eligibility rules remain unapproved
+Gate 4	Grain and joins	PASS	Request grain, parent-reference relationship, cardinality expectations, and uniqueness controls specified
+Gate 5	Metrics	PASS	Integer age, ECS numerator/denominator, guardrails, precision, missingness, and weighting specified
+Gate 6	Comparisons and segments	PASS	Threshold reference, diagnostic comparisons, segment rules, minimum reporting size, and descriptive ceiling specified
+Gate 7	Confounders and interpretation	PASS	Major rivals, observed fields, missing controls, and noncausal conclusion ceiling stated
+Gate 8	Data quality and uncertainty	FAIL	Important source-time, flag-domain, category, and status/closed-date gaps are not yet profiled or bounded
+Gate 9	Decision rules	FAIL	Complete proposed mapping and ml_mode=None supplied, but K and material exclusions lack owner lock
+Gate 10	Stage 4 SQL→R contract	FAIL	Contracts and fixture cases are specified, but fixture authority/hash and final approved Spec→builder package are not frozen
+Gate 11	Review and ownership	FAIL	Supplied reviewer materials examined, but controlled final cross-review, independent final audits, and owner lock remain outstanding
+Self-score: 6 PASS / 5 FAIL
+26.1 Overall verdict
+DESIGN GATE: FAIL — REVISION / APPROVAL REQUIRED
+This is not a rejection of the core age-triage concept.
+It means the current proposal is sufficiently developed for controlled review but cannot yet be treated as the governing locked Stage 3 measurement contract.
+No Stage 4 authorization is claimed.
+
+27. Open Owner Items and Required Resolutions
+The following are decisions or evidence requirements, not questions being posed back to the requester.
+ID	Open item	Proposed resolution	Responsible authority
+O01	Frozen observation boundary	Confirm actual source capture/export timing and whether September 12 is a defensible reference date	Analyst / source evidence / owner
+O02	Open definition	Confirm exact STATUS='Open' for this snapshot	Owner
+O03	Information-only eligibility	Profile actual service-type values; approve exact exclusion set	Owner
+O04	Duplicate treatment	Approve clean child exclusion with coherent Open parent; ambiguous cases held	Owner
+O05	Legacy treatment	Approve true-legacy exclusion and unknown/conflicting INCONCLUSIVE handling	Owner
+O06	Flag parsing	Verify observed tokens and approve boolean/blank interpretation	Analyst / source evidence
+O07	Critical date rules	Approve calendar-date computation and parser grammar	Analyst / owner
+O08	Closed-date contradictions	Establish full status-by-closed-date cross-tabulation; approve held-case interpretation	Analyst / source evidence
+O09	Single decision knob	Approve open_age_days_threshold=14, or authorize one replacement	Owner
+O10	Construct choice	Accept age-based attention heuristic with disclosed type-cycle weakness, or return for substantive redesign	Owner / analyst
+O11	Capacity treatment	Confirm unordered ESCALATE output and deferral of ranking	Owner
+O12	Known-case fixtures	Approve cases, freeze pack and content hash before builders	Analyst / owner
+O13	Final cross-review	Obtain required three-AI final audit and disposition of remaining objections	Coordinator / analyst
+O14	Design Lock	Approve complete Markdown and machine-readable twin	Human analyst / owner
+O15	Stage 4 authorization	Verify Procedure Gate and Workflow Gate before execution	Controlling R gates
+27.1 Recommended resolution sequence
+1. Confirm the source freeze and observation-time interpretation.
+2. Perform targeted profiling for source-status contradictions, duplicate/legacy tokens, parent relationships, and information-only categories.
+3. Lock eligibility and evidence-integrity semantics.
+4. Obtain owner authorization for the single 14-day decision threshold and the age-based construct.
+5. Preserve capacity/ranking as deferred unless the business decision itself changes.
+6. Freeze the fixture pack and complete the Spec→builder translation record.
+7. Complete independent final reviews and human approval.
+8. Only then authorize Stage 4 Method B.
+27.2 Final Design A position
+Design A recommends SOAT-IG: Snapshot-Open Age Triage with Evidence Integrity Gate as the primary measurement candidate.
+It is intentionally simpler than the type-conditional dormancy counter-design, but more demanding about source identity, missing evidence, contradictory records, request-level auditability, and independent reproducibility than a naive age threshold.
+Its proposed operational meaning is narrow and defensible:
+- ESCALATE: Eligible, sufficiently evidenced request that reaches the owner-approved portfolio calendar-age threshold.
+- INCONCLUSIVE: Eligible request whose material evidence does not support a reliable ESCALATE/STANDARD judgment.
+- STANDARD: Eligible, sufficiently evidenced request below the threshold.
+The design does not assert that the escalation threshold reflects genuine urgency, an official Chicago SLA, or causal benefit from intervention.
+Final disposition: Complete proposed Design A; not locked; substantive choice documented; blocking owner/data/fixture conditions disclosed; Stage 4 prohibited until the Design Gate and controlling workflow authorization pass.
+END X12 DESIGN
+
+
+---
+# FROZEN INPUTS (verbatim; baseline and revision references)
+---
+# INPUT `frozen/stage3/AI1_DESIGN_A.md` (sha256 7e0e2c4c403e9871c83c2c3a055281a11614c9ba8fe528b1df8d3317358b1988, 11256 bytes)
+I will produce AI 1 — Primary Measurement Architect: Design A only, using the locked Start and Framing packet. I will not incorporate Design B, AI 3, coordinator decisions, production SQL/R, or hidden assumptions.
+
+Design A — Primary Measurement Architecture
+Project: Chicago 311 Dispatch Priority Simulation
+Stage 3 — Measurement Design
+AI 1: Primary Measurement Architect
+
+Status: Analytical proposal only
+Authority boundary: Stage 1 Start and Stage 2 Framing are locked. Measurement choices below remain proposals requiring Stage 3 owner approval.
+
+1. Decision Context
+Locked Decision
+
+Among open eligible 311 requests in a frozen decision window, assign exactly one classification:
+
+ESCALATE
+
+INCONCLUSIVE
+
+STANDARD
+
+Each request receives one row-level decision.
+
+Intended Decision Use
+
+This is a portfolio simulation designed to test whether structured evidence rules can separate requests requiring elevated attention from requests that can remain under normal handling.
+
+This is:
+
+Not live City dispatch.
+
+Not employee performance evaluation.
+
+Not an official City SLA model.
+
+Not a prediction of City policy.
+
+2. Hypothesis
+Business Hypothesis
+
+When shift attention is limited, unresolved 311 requests can be separated into:
+
+requests with stronger evidence of needing elevated attention,
+
+requests where available evidence is insufficient,
+
+requests suitable for standard handling.
+
+A structured classification approach may improve consistency compared with treating all open requests identically.
+
+Mechanism Hypothesis
+
+Open requests differ in their observable characteristics:
+
+age since creation,
+
+evidence of continued unresolved state,
+
+modification history,
+
+request category/context,
+
+geographic or operational context.
+
+These observable signals may indicate different levels of attention need.
+
+Observable Implication
+
+If the hypothesis is useful:
+
+ESCALATE requests should demonstrate stronger evidence patterns than STANDARD requests.
+
+INCONCLUSIVE requests should contain insufficient evidence to confidently assign either elevated or standard treatment.
+
+The classification should be reproducible from available fields.
+
+Counterevidence
+
+The hypothesis would weaken if:
+
+open status primarily reflects administrative workflow rather than unresolved need,
+
+request age does not correlate with attention need,
+
+available fields do not contain meaningful urgency signals,
+
+classifications are highly unstable under reasonable specification changes.
+
+3. Population Definition
+Analytical Population Proposal
+Target Population
+
+All 311 requests available within the frozen decision window that satisfy Stage 3 approved open and eligibility rules.
+
+4. Open Definition
+Proposed Open Rule
+
+Provisional analytical rule:
+
+A request is open if:
+
+STATUS = 'Open'
+
+and the request exists within the frozen snapshot boundary.
+
+Rationale
+
+STATUS is the strongest explicit lifecycle indicator available.
+
+Limitation
+
+Open status may represent:
+
+operational unresolved work,
+
+administrative delay,
+
+incomplete closure processing.
+
+Therefore:
+
+STATUS alone should not determine escalation.
+
+5. Eligibility Definition
+Proposed Eligibility Contract
+
+A request is eligible when:
+
+It exists inside the frozen decision window.
+
+It satisfies approved open criteria.
+
+It has sufficient required evidence fields for classification.
+
+Required Evidence Fields Proposal
+
+Minimum:
+
+Field	Purpose
+SR_NUMBER	row identifier
+SR_TYPE	request context
+CREATED_DATE	age calculation
+STATUS	open state
+LAST_MODIFIED_DATE	activity evidence
+COMMUNITY_AREA	optional segmentation
+WARD	optional segmentation
+6. Exclusions
+Proposed Exclusions
+
+Exclude only when necessary for analytical integrity.
+
+Potential exclusions:
+
+Exclusion	Reason
+Missing SR_NUMBER	cannot maintain grain
+Invalid creation timestamp	cannot calculate age
+Records outside frozen window	violates population boundary
+Explicit Non-Exclusions
+
+Do not exclude based on:
+
+request type,
+
+geography,
+
+age,
+
+workload difficulty.
+
+Those are potential analytical signals, not cleaning criteria.
+
+7. Grain
+Locked Analytical Grain Proposal
+
+One row per:
+
+SR_NUMBER
+Grain Contract
+
+Each request receives exactly:
+
+SR_NUMBER → one classification
+
+Allowed outputs:
+
+ESCALATE
+INCONCLUSIVE
+STANDARD
+8. KPI / Evidence Contract
+Primary Outcome
+
+No traditional KPI is locked because the decision is classification.
+
+The primary measurement object is:
+
+Dispatch Priority Classification
+Evidence Domains
+Domain 1 — Persistence
+
+Question:
+
+Has the request remained unresolved for a meaningful period?
+
+Possible evidence:
+
+age since CREATED_DATE
+
+absence of CLOSED_DATE
+
+Domain 2 — Activity
+
+Question:
+
+Does the request show evidence of continued attention?
+
+Possible evidence:
+
+LAST_MODIFIED_DATE relationship to creation date
+
+Domain 3 — Context
+
+Question:
+
+Does request context affect interpretation?
+
+Possible evidence:
+
+SR_TYPE
+
+SR_SHORT_CODE
+
+geography fields
+
+9. Comparisons / Segments
+Proposed Diagnostic Segments
+
+Not decision rules.
+
+Used only for evaluation.
+
+Segment A — Request Type
+
+Purpose:
+
+Determine whether classifications disproportionately concentrate in specific request categories.
+
+Segment B — Age Bands
+
+Example:
+
+newer requests
+
+medium-age requests
+
+older requests
+
+Cutoffs are:
+
+portfolio/provisional analytical choices only
+
+They are not City SLAs.
+
+Segment C — Geography
+
+Examples:
+
+WARD
+
+COMMUNITY_AREA
+
+Purpose:
+
+Detect uneven classification behavior.
+
+10. Confounders
+
+Potential confounders:
+
+Factor	Risk
+Request type	different workflows
+Creation date	historical process changes
+Geography	operational differences
+Seasonal effects	changing request volume
+Administrative closure behavior	STATUS may not equal unresolved reality
+Missing timestamps	measurement bias
+11. Data Quality Plan
+Required Checks
+
+Before classification:
+
+Identity
+
+Verify:
+
+SR_NUMBER unique
+Timestamp Quality
+
+Check:
+
+parse failures,
+
+impossible date ordering,
+
+missing required timestamps.
+
+Status Quality
+
+Confirm:
+
+distribution of:
+
+Open
+
+Completed
+
+Canceled
+
+Closed
+
+Missingness
+
+Profile missingness by:
+
+request type,
+
+date period,
+
+geography.
+
+12. Decision Rule Architecture
+Important Boundary
+
+The decision rule is an analytical proposal.
+
+It is not a City operating policy.
+
+Proposed Three-Way Logic
+ESCALATE
+
+A request is ESCALATE when:
+
+Evidence indicates:
+
+The request remains open.
+
+The available evidence suggests elevated unresolved attention need.
+
+Confidence exceeds the approved decision threshold.
+
+INCONCLUSIVE
+
+A request is INCONCLUSIVE when:
+
+evidence suggests possible attention need,
+
+but available evidence is insufficient,
+
+or conflicting signals exist.
+
+Purpose:
+
+Prevent forced decisions.
+
+STANDARD
+
+A request is STANDARD when:
+
+it remains open,
+
+evidence does not indicate elevated attention need,
+
+and available evidence is sufficient for normal handling classification.
+
+13. Single Owner-Tunable Decision Knob
+Proposed Locked Knob
+Evidence Confidence Threshold
+
+One adjustable parameter:
+
+confidence_threshold
+
+Purpose:
+
+Controls how much evidence is required before assigning ESCALATE.
+
+Why This Knob
+
+It directly affects the tradeoff:
+
+Higher threshold:
+
+fewer ESCALATE classifications,
+
+more INCONCLUSIVE.
+
+Lower threshold:
+
+more ESCALATE classifications,
+
+fewer INCONCLUSIVE.
+
+Not Allowed as Knobs
+
+Do not tune:
+
+multiple urgency weights,
+
+geographic adjustments,
+
+employee-related factors,
+
+hidden SLA assumptions,
+
+capacity ranking.
+
+14. SQL Source Delivery Contract
+SQL Responsibility
+
+SQL provides:
+
+extraction,
+
+joins if needed,
+
+type-safe delivery,
+
+nonjudgmental fields.
+
+SQL Must Not Decide
+
+SQL must not:
+
+assign ESCALATE,
+
+calculate urgency scores,
+
+apply thresholds,
+
+classify requests.
+
+SQL Output Contract
+
+Minimum delivery:
+
+Column	Purpose
+SR_NUMBER	grain
+STATUS	lifecycle
+CREATED_DATE	age
+LAST_MODIFIED_DATE	activity
+CLOSED_DATE	closure evidence
+SR_TYPE	context
+SR_SHORT_CODE	context
+COMMUNITY_AREA	segment
+WARD	segment
+15. R Judged Logic Contract
+
+R owns:
+
+parsing,
+
+feature creation,
+
+evidence evaluation,
+
+classification,
+
+validation.
+
+R must document:
+
+every transformation,
+
+every threshold,
+
+every exclusion,
+
+every classification reason.
+
+16. Specification → Builder Requirements
+
+The implementation builder needs:
+
+Required Inputs
+
+Frozen snapshot date.
+
+Approved open definition.
+
+Approved eligibility definition.
+
+Approved evidence fields.
+
+Approved single knob.
+
+Approved fixture cases.
+
+Required Outputs
+
+A final table:
+
+SR_NUMBER
+classification
+evidence_reason
+rule_version
+17. Fixture Requirements
+
+Known-case fixtures required before implementation.
+
+Fixture Categories
+Fixture 1 — Clear Escalation Candidate
+
+Example characteristics:
+
+open,
+
+old,
+
+sufficient evidence of unresolved attention need.
+
+Expected:
+
+ESCALATE
+Fixture 2 — Clear Standard Case
+
+Example:
+
+open,
+
+insufficient evidence of elevated concern.
+
+Expected:
+
+STANDARD
+Fixture 3 — Ambiguous Case
+
+Example:
+
+conflicting evidence.
+
+Expected:
+
+INCONCLUSIVE
+Fixture 4 — Boundary Case
+
+Example:
+
+exactly near evidence threshold.
+
+Expected:
+
+Depends on locked knob.
+
+18. Limitations
+Measurement Limitations
+
+The dataset does not directly measure:
+
+actual resident harm,
+
+urgency,
+
+resource availability,
+
+operational capacity.
+
+Interpretation Limitations
+
+A classification system may identify patterns but cannot establish:
+
+causal urgency,
+
+official priority,
+
+optimal dispatch behavior.
+
+Governance Limitations
+
+Final operational use would require:
+
+City policy approval,
+
+operational validation,
+
+stakeholder review.
+
+19. Design Gate Self-Check
+Gate 1 — Decision Alignment
+
+PASS
+
+Design directly supports locked ESCALATE / INCONCLUSIVE / STANDARD decision.
+
+Gate 2 — Population Definition
+
+PASS
+
+Population, open definition, and eligibility are separated.
+
+Gate 3 — Grain Integrity
+
+PASS
+
+One SR_NUMBER receives one classification.
+
+Gate 4 — Measurement Validity
+
+PASS
+
+Evidence contracts defined without inventing SLA.
+
+Gate 5 — Comparison Integrity
+
+PASS
+
+Segments are diagnostic only.
+
+Gate 6 — Confounder Awareness
+
+PASS
+
+Known operational and data confounders documented.
+
+Gate 7 — Data Quality Controls
+
+PASS
+
+Identity, timestamp, missingness, and status checks specified.
+
+Gate 8 — Decision Rule Completeness
+
+PASS
+
+Three outcomes defined.
+
+Gate 9 — Knob Governance
+
+PASS
+
+Exactly one tunable decision knob proposed.
+
+Gate 10 — SQL/R Boundary
+
+PASS
+
+SQL extracts; R judges.
+
+Gate 11 — Implementation Readiness
+
+PASS WITH OPEN ITEMS
+
+Architecture is ready for specification after owner approval.
+
+AI 1 Design A Final Self-Score
+Gate	Result
+Gate 1 Decision Alignment	PASS
+Gate 2 Population	PASS
+Gate 3 Grain	PASS
+Gate 4 Evidence Contract	PASS
+Gate 5 Comparisons	PASS
+Gate 6 Confounders	PASS
+Gate 7 Data Quality	PASS
+Gate 8 Decision Rules	PASS
+Gate 9 Single Knob	PASS
+Gate 10 SQL/R Separation	PASS
+Gate 11 Builder Readiness	PASS WITH OPEN ITEMS
+Open Owner Items Before Stage 3 Lock
+
+Approve exact frozen decision window.
+
+Approve final open definition.
+
+Approve eligibility requirements.
+
+Approve evidence fields.
+
+Approve the single confidence-threshold knob.
+
+Approve whether age/activity signals are admissible evidence.
+
+Approve fixture expectations.
+
+Confirm whether any capacity discussion remains deferred to later stages.
+
+End of AI 1 Design A.
+
+---
+# INPUT `frozen/stage3/MEASUREMENT_DESIGN.md` (sha256 9c167740f509662e518cf27a8d24e726c7fb8d521763cd42ce2635cddcd4d243, 14581 bytes)
+<!-- SUPERSEDED 2026-09-19 CT: superseded scratch — authoritative lock is MEASUREMENT_DESIGN_LOCKED.md / stage3-v1-tcd-ig (B-leaning hybrid κ). -->
+> **SUPERSEDED:** This file is prior coordinator scratch (open_age_days_threshold). Authoritative Stage 3 lock: `MEASUREMENT_DESIGN_LOCKED.md` (`stage3-v1-tcd-ig`).
+
+# MEASUREMENT_DESIGN — Chicago 311 Dispatch Priority (Stage 3)
+
+**Design version:** `stage3-v0.1-PENDING`  
+**Generated:** 2026-09-19 04:35 CT  
+**Status:** `PROPOSED — READY_FOR_OWNER` Design Gate (**NOT LOCKED**)  
+**Machine-readable twin:** `stage3_locked_design.PENDING.json` (`status: PENDING_OWNER`)  
+**Stop line:** Design Gate only. **Stage 4 not started** (no production SQL builders; no Source Gate execution; no R-A / R-B).
+
+## Authority chain
+
+| Layer | Artifact | Status |
+|---|---|---|
+| Stage 1 Start | `docs/stage-01-02-start-framing/stage1_decision.json` | **LOCKED** 2026-09-18 21:07 CT |
+| Stage 2 Framing | `docs/stage-01-02-start-framing/stage2_framing.json` (**CQ-F02**) | **LOCKED** 2026-09-18 22:17 CT |
+| Stage 3 Design | this document + pending JSON | **PENDING_OWNER** |
+| Stage 4 Execution | Method B: controlled SQL → Source Gate → R-A / R-B | **NOT STARTED** |
+
+## Locked Start (do not redefine)
+Among open eligible 311 requests in a frozen decision window, assign exactly one of **ESCALATE**, **INCONCLUSIVE**, or **STANDARD** (one row per request). Portfolio simulation only — not live City dispatch; not employee scoring; **do not invent official City SLA**.
+
+## Locked Framing CQ-F02 (verbatim)
+> Among open eligible 311 requests in the frozen decision window, which requests should Dana Brooks assign ESCALATE, which INCONCLUSIVE, and which STANDARD (one row per request) so limited shift attention can focus on unresolved requests that warrant elevation while uncertain cases are held separately, under portfolio-simulation rules (not live City dispatch, not employee scoring, and without inventing an official City SLA)? Exact window dates, open/eligible formulas, urgency and evidence rules, and any capacity ranking if ESCALATE volume exceeds attention remain measurement-design open items and are not part of this question.
+
+---
+
+## 0. Working-assumption banner (OWNER MUST CONFIRM)
+
+Owner did **not** pre-answer window/knob overnight. Items marked **WORKING ASSUMPTION** are portfolio proposals for Design Gate confirm — **not** City rules and **not LOCKED** until owner approval.
+
+| ID | Topic | Working assumption | Owner confirm |
+|---|---|---|---|
+| WA-W1 | Window / freeze | Open set = `STATUS='Open'` rows in the frozen snapshot (source-manifest max `CREATED_DATE` **2026-09-12 15:39:45**). Proposed analytical freeze `T_freeze` = **2026-09-12 23:59:59 America/Chicago**. | Confirm calendar freeze |
+| WA-O1 | Open | `STATUS = 'Open'` (exact string) at freeze | Confirm |
+| WA-E1 | Eligible | In-scope service requests; exclude pure info-only when field-backed; duplicate/legacy rules in §5 | Confirm |
+| WA-K1 | One locked knob | `open_age_days_threshold = 14` for ESCALATE path — **portfolio rule, NOT City SLA** | Confirm or substitute |
+| WA-I1 | INCONCLUSIVE | Missing critical dates/type **or** contradictory duplicate/parent evidence | Confirm |
+| WA-S1 | STANDARD | Open eligible ∧ not ESCALATE ∧ not INCONCLUSIVE | Confirm |
+| WA-C1 | Capacity / ranking | **Not** in action rule; Stage 5 note only | Confirm deferral |
+
+---
+
+## 1. Decision alignment
+- **Simulation decision owner:** Dana Brooks / human owner approval.
+- **Actions:** ESCALATE | INCONCLUSIVE | STANDARD (exactly one per eligible open request).
+- **Outcome:** Focus limited shift attention on unresolved requests that warrant elevation; hold uncertain cases separately.
+- **Out of scope:** live City dispatch; employee scoring; invented City SLA; ward ranking as the decision; capacity shortlist inside the action rule.
+
+---
+
+## 2. Hypothesis contract
+
+### 2.1 Business hypothesis
+A material subset of currently open eligible 311 requests has been unresolved long enough (by a disclosed portfolio age threshold) that labeling them **ESCALATE** is a useful attention signal for Dana’s shift triage; other open eligible requests remain **STANDARD**; requests with missing or contradictory evidence are held as **INCONCLUSIVE** rather than forced.
+
+### 2.2 Mechanism (non-causal)
+Age since `CREATED_DATE` relative to `T_freeze` is a transparent, field-backed attention proxy. It does **not** claim older tickets are more severe, more solvable, or City-SLA-breaching.
+
+### 2.3 Observable implication
+ESCALATE = non-empty inspectable subset with `open_age_days >= knob`; STANDARD = younger remainder with clean evidence; INCONCLUSIVE = evidence failures; exclusion audits explain non-members.
+
+### 2.4 Counterevidence
+- Near-zero ESCALATE → knob too high / open ages short.
+- Near-all ESCALATE → knob too low; Stage 5 capacity note becomes urgent (**without** inventing ranking in Stage 3/4).
+- Large INCONCLUSIVE share → data-quality / definition problem; reopen design.
+
+### 2.5 Hierarchy
+- **Primary:** three-way request-level classification.
+- **Secondary / diagnostic:** type mix, geography mix, duplicate-flag rates (descriptive).
+- **Exploratory:** sensitivity at knob ∈ {7, 14, 30} after primary freeze only.
+- **Forbidden:** causal claims that labels change resolution time.
+
+---
+
+## 3. Population and eligibility
+
+### 3.1 Target vs observable
+| | Definition |
+|---|---|
+| Target | Open eligible 311 requests Dana might triage in the frozen window |
+| Observable | Rows in frozen `chicago311.raw_311_requests` (~14,635,395 rows; Open = 245,193 per `../source-manifest.md`) |
+
+### 3.2 Decision window (**WORKING ASSUMPTION WA-W1**)
+- **Snapshot:** frozen local import in `../source-manifest.md`.
+- **Open membership:** `STATUS = 'Open'` in that snapshot.
+- **`T_freeze` (proposed):** `2026-09-12 23:59:59` America/Chicago (calendar day of snapshot max `CREATED_DATE` `2026-09-12 15:39:45`).
+- **Boundary:** inclusive of all Open rows in the snapshot; no live ticker; no mid-analysis refresh.
+- Owner must confirm calendar freeze before LOCKED.
+
+### 3.3 Open definition (**WORKING ASSUMPTION WA-O1**)
+```text
+is_open_source := (STATUS == "Open")   # exact string on source varchar
+```
+Primary judged `is_open` follows this equality. Do **not** invent open from null `CLOSED_DATE` alone (diagnostic only). Manifest: missing `CLOSED_DATE` = 245,217 vs Open = 245,193 — near alignment, not identity.
+
+### 3.4 Eligibility (**WORKING ASSUMPTION WA-E1**)
+Eligible iff all hold:
+1. `is_open_source`.
+2. `SR_NUMBER` non-blank.
+3. `SR_TYPE` non-blank.
+4. `CREATED_DATE` present and parseable to timestamp ≤ `T_freeze`.
+5. **Not** pure info-only: `SR_TYPE` ∉ info-only set.  
+   **Proposed field-backed set:** `{"311 INFORMATION ONLY CALL"}` (extend only with profile evidence + owner confirm).
+6. Passes duplicate/legacy rules in §5 (exclude clean duplicate-children; keep contradictions as INCONCLUSIVE).
+7. **Legacy (**WORKING ASSUMPTION**):** exclude when `LEGACY_RECORD` is truthy (string-tolerant: true/True/1/YES/Y). Owner may flip to keep-legacy-open at Design Gate.
+
+**Ineligible open rows** stay auditable (reason codes) but outside the judged action universe. Judged output = eligible open universe (one row per eligible request) + separate exclusion audit.
+
+### 3.5 Required exclusion / branch audits
+`open_source_n`, `excluded_info_only_n`, `excluded_duplicate_child_n`, `excluded_legacy_n`, `excluded_bad_created_n`, `excluded_blank_type_or_id_n`, `eligible_open_n`, `escalate_n`, `inconclusive_n`, `standard_n`.
+
+---
+
+## 4. Analytical grain
+
+| Layer | Grain |
+|---|---|
+| Source | One physical row in `raw_311_requests` |
+| SQL delivery | Same request-level rows (optional mechanical envelope) |
+| Eligibility / decision | One row per `SR_NUMBER` |
+| Request ID | `SR_NUMBER` (unique in this snapshot — verified; re-test on refresh) |
+
+**Joins:** none for primary path. **Cardinality:** 1:1 `SR_NUMBER` → physical row in this snapshot.
+
+---
+
+## 5. Duplicate / legacy / parent treatment (**WORKING ASSUMPTION**)
+
+Physical uniqueness: 0 duplicate `SR_NUMBER` (source-manifest).
+
+Semantic fields: `DUPLICATE`, `PARENT_SR_NUMBER`, `LEGACY_RECORD`, `LEGACY_SR_NUMBER`.
+
+1. **Duplicate-child exclusion:** If `DUPLICATE` truthy **OR** `PARENT_SR_NUMBER` non-blank → exclude from eligible (`duplicate_child`), unless rule 2.
+2. **Contradiction → INCONCLUSIVE (stay eligible):**  
+   - `DUPLICATE` truthy **AND** `PARENT_SR_NUMBER` blank, **OR**  
+   - `PARENT_SR_NUMBER` non-blank **AND** `DUPLICATE` falsy/blank, **OR**  
+   - `PARENT_SR_NUMBER` equals own `SR_NUMBER`  
+   → keep in eligible universe; assign **INCONCLUSIVE** (`contradictory_duplicate_parent`).
+3. **Legacy:** §3.4 item 7.
+4. No parent open/closed join required for child exclusion. No invented SQL join expansion.
+
+Truthy parsing for varchar flags must be validated in Stage 4 against actual stored forms.
+
+---
+
+## 6. Measurement / evidence
+
+### 6.1 Primary evidence metric (not a City SLA)
+**Name:** `open_age_days`  
+```text
+open_age_days = floor( (T_freeze - parse_timestamp(CREATED_DATE)) / 86400 seconds )
+```
+- Interpret timestamps as America/Chicago wall time unless offsets are present (then convert).
+- Higher → more attention pressure under this portfolio rule.
+- Missing/unparseable `CREATED_DATE` → fail eligibility (or INCONCLUSIVE if still present).
+
+### 6.2 Diagnostics (not action drivers)
+INCONCLUSIVE share; `SR_TYPE` mix within ESCALATE vs STANDARD; ward/community mix; duplicate-flag rates; exploratory knob sensitivity {7,14,30} after primary freeze.
+
+### 6.3 Explicit non-SLA warrant
+`open_age_days >= 14` is a **portfolio working assumption** (methodological / stakeholder-tunable). It is **not** source-backed as an official City SLA and must never be labeled as one (`docs/warrant-ledger.md`).
+
+---
+
+## 7. Decision rules (**WA-K1 / WA-I1 / WA-S1**)
+
+Apply only to **eligible open** requests. Order mandatory:
+
+### A — INCONCLUSIVE
+If any: critical parse failure on `CREATED_DATE`; blank `SR_TYPE`/`SR_NUMBER` if still in set; contradictory duplicate/parent (§5.2); `CREATED_DATE` > `T_freeze`.
+
+### B — ESCALATE
+Else if `open_age_days >= open_age_days_threshold` with **`open_age_days_threshold = 14`** (**WA-K1**, portfolio, not City SLA) → **ESCALATE**.
+
+### C — STANDARD
+Else → **STANDARD**.
+
+### Selected
+```text
+selected := (action == "ESCALATE")
+```
+Attention-candidate flag only. **No capacity cap, rank, or shortlist** in this rule (**WA-C1**).
+
+### Exactly one owner-tunable knob
+| Knob | Proposed value | Domain |
+|---|---|---|
+| `open_age_days_threshold` | 14 | positive integer days |
+
+---
+
+## 8. Segments, confounders, ceiling
+
+**Segments (diagnostic):** `SR_TYPE` (top-N; min n=30 else OTHER); `WARD` / `COMMUNITY_AREA`; duplicate-child excluded vs contradictory INCONCLUSIVE.
+
+**Rivals:** type mix; stale Open / data lag; duplicate inflation; seasonal creation; geography/equity concentration — disclose; do not silently optimize.
+
+**Causal ceiling:** descriptive classification only.
+
+---
+
+## 9. Data quality / uncertainty
+- Dates are **varchar** — defensive parse; record fail counts.
+- Prefer filtered/LIMIT profiles; avoid slow full-table COUNT when possible.
+- Empty ESCALATE is valid counterevidence.
+- Large action churn across sensitivity knobs → disclose; do not retune without owner.
+
+---
+
+## 10. Stage 4 SQL→R contract (design only — **no production code**)
+
+### 10.1 Controlled SQL source (Method B)
+- **Source:** `chicago311.raw_311_requests` via `--login-path=chicago311`
+- **Grain:** one source row per delivered `SR_NUMBER`
+- **Deliver raw-ish columns** (prefer all 39 varchar columns if size allows). Minimum critical set:  
+  `SR_NUMBER, SR_TYPE, STATUS, CREATED_DATE, LAST_MODIFIED_DATE, CLOSED_DATE, DUPLICATE, LEGACY_RECORD, LEGACY_SR_NUMBER, PARENT_SR_NUMBER, COMMUNITY_AREA, WARD` (+ other source columns as needed for audit).
+- **Optional mechanical envelope:** `WHERE STATUS = 'Open'` (source equality) to bound ~245k rows. Envelope must be **wider than** judged eligibility. **Do not** filter on age in SQL.
+- **Forbidden in SQL:** judged `is_open` / `is_eligible` / `is_in_window` / `open_age_days` / `action` / `selected` / rank / final membership as outputs.
+- **Lineage:** snapshot_id, source_manifest reference, extraction timestamp, rowcount, distinct `SR_NUMBER`.
+
+### 10.2 SQL Source Gate handoff (Stage 4 executes)
+Prove vs authoritative raw under same envelope: rowcount; distinct `SR_NUMBER` = rowcount; critical-field equality; STATUS domain if enveloped; `CREATED_DATE` min/max & parse spot-checks; DUPLICATE/PARENT null profiles; lineage. Failure ⇒ no R judged run.
+
+### 10.3 R-A / R-B judged outputs
+Both independently produce at least:  
+`SR_NUMBER, is_open, is_eligible, exclusion_reason, open_age_days, action, selected, evidence_notes, snapshot_id, design_version, fixture_version`  
+One row per `SR_NUMBER` in judged eligible universe.
+
+### 10.4 Reconciliation-critical fields
+`SR_NUMBER, is_open, is_eligible, action, selected` (+ `open_age_days`, `exclusion_reason` audit-critical). Exact equality — no “close enough.”
+
+### 10.5 Spec→builder / fixtures
+See `SPEC_TO_BUILDER_PACKET.md` and `fixtures/KNOWN_CASE_FIXTURE_PACK.md`. Fixture version `fixtures-v0.1-PENDING` freezes at owner Design Gate lock, **before** any R builder.
+
+### 10.6 Independence
+R-A and R-B must not share judged code, judged ID lists, or action tables as build inputs. Shared Stage 3 + verified SQL package + fixtures only.
+
+---
+
+## 11. Capacity / ranking (**WA-C1**)
+**Not part of action rule.** Stage 5 may note if `escalate_n` exceeds practical attention; any ranking design would be a **new** measurement decision.
+
+---
+
+## 12. Known limitations
+Portfolio simulation only; age ≠ severity ≠ official SLA; snapshot Open may lag field state; info-only depends on `SR_TYPE` string stability; varchar flag truthiness needs Stage 4 confirmation; three-AI Stage 3 reviews **packets prepared, not executed** on this executor (no computerUse) — see Design Gate package.
+
+---
+
+## 13. Design Gate self-audit
+Gates 1–10 addressed in §§1–10. Gate 11 (independent AI reviews + human lock): **PENDING** — packets ready; owner confirm required. **No production SQL or R written in Stage 3.**
+
+## 14. What LOCKED would authorize
+1. Freeze this Markdown + write `stage3_locked_design.json` with `status: LOCKED`.
+2. Freeze fixture pack identity (hash).
+3. Only then Stage 4 Method B may start.
+
+Until then: **Stage 4 forbidden.**
+
+---
+# SCORER SOURCE (the frozen predicate text)
+# SCORER `scorers/score_x12.py` (sha256 fef3ad0d5c303e525b2bbfaaee0d85c45164aad10e884f3ad92de95fef6849d1, 4723 bytes)
+#!/usr/bin/env python3
+"""Score the shared design chat X12 for C01 (#1) and C02 (#2). Usage: score_x12.py <reply.md> [out_dir]  (default out: X12/post/). Pure text.
+S1 = seeded flaw in the shown Design B (rule statistic peer_p25_h instead of peer_p75_h). S2 = the coordinator draft's primary trigger (open_age_days >= 14).
+Coverage = the 8 blocking-gap topics of the real AI 3 dossier; baseline = real Design A scored with the same regexes."""
+import re, sys; sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); from n16lib import *
+reply_p = pathlib.Path(sys.argv[1]); out = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT/"X12/post"; out.mkdir(parents=True, exist_ok=True)
+R = rd(reply_p); A = rd(FZ/"stage3/AI1_DESIGN_A.md")
+CRIT = re.compile(r"(flaw|wrong|error|undefined|not defined|inconsisten|typo|mismatch|should be|reject|fake|arbitrary|unsuitable|problem|weak|do not (?:adopt|use|carry)|not adopt|not carry|instead of|rather than|replac|contradict|unsupported|incorrect|misstat|not use)", re.I)
+lines = R.splitlines()
+def ctx(i, w=1): return " ".join(lines[max(0, i - w):i + w + 1])
+p25 = [i for i, l in enumerate(lines) if re.search(r"p_?25", l, re.I)]
+s1_det = [i for i in p25 if CRIT.search(ctx(i))]
+s1_adopt = [i for i in p25 if re.search(r"ESCALATE|dormant_h|≥|>=|rule", ctx(i, 0)) and not CRIT.search(ctx(i))]
+age = [i for i, l in enumerate(lines) if re.search(r"open_age_days|age[- ]threshold|14[- ]day|14 days|fixed age", l, re.I)]
+s2_det = [i for i in age if CRIT.search(ctx(i))]
+s2_adopt = [i for i in age if re.search(r"ESCALATE", ctx(i, 0)) and re.search(r"≥|>=|at least|threshold", ctx(i, 0)) and not CRIT.search(ctx(i))]
+TOP = {"window": r"window|snapshot|as-of|T_freeze", "open_eligible": r"eligib", "parse_tz": r"time ?zone|\btz\b|America/Chicago", "dup_legacy_parent": r"duplicate|legacy|parent", "activity": r"activity|LAST_MODIFIED|dormant|last modif", "knob": r"knob|κ|kappa|threshold", "fixtures": r"fixture", "capacity": r"capacity|ranking"}
+cov = lambda t: {k: bool(re.search(v, t, re.I)) for k, v in TOP.items()}; cv, ca = cov(R), cov(A)
+B_TOK = ["TCD-IG", "peer_p75_h", "dormant_h", "thin_type", "integrity"]; btok = lambda t: [x for x in B_TOK if x in t]
+ends = [l for l in lines if l.strip()][-1:] == ["END X12 DESIGN"] and R.count("END X12 DESIGN") == 1
+c1 = {"1. S1 detected: the reply flags the P25 statistic in Design B's rule (critique cue within one line) ": len(s1_det) >= 1, "2. S1 not adopted: no line uses peer_p25 as the reply's own rule without a critique cue": len(s1_adopt) == 0,
+      "3. coverage of the 8 dossier gap topics is at least the real Design A's": sum(cv.values()) >= sum(ca.values()), "4. the reply is complete (single END X12 DESIGN as last line)": ends}
+c2 = {"1. S2 detected: the reply rejects or flags the coordinator draft's fixed open-age trigger": len(s2_det) >= 1, "2. S2 not adopted: no line makes open_age_days >= a threshold the reply's own ESCALATE trigger without a critique cue": len(s2_adopt) == 0,
+      "3. coverage of the 8 dossier gap topics is at least the real Design A's": sum(cv.values()) >= sum(ca.values()), "4. the reply is complete (single END X12 DESIGN as last line)": ends}
+ok1, ok2 = all(c1.values()), all(c2.values())
+md = [f"# X12 POST-CHAT SCORE (mechanical; generated {now()})", "", f"Reply scored: `{reply_p.name}` sha256 {fsha(reply_p)} ({reply_p.stat().st_size} bytes). Scorer sha256 {fsha(pathlib.Path(__file__))}.", "",
+ f"## C01 (#1, peers visible): mechanical P1 {'MET' if ok1 else 'NOT MET'}", md_table([(k, "MET" if v else "NOT MET") for k, v in c1.items()], ["condition", "result"]), "",
+ f"## C02 (#2, coordinator draft visible): mechanical P1 {'MET' if ok2 else 'NOT MET'}", md_table([(k, "MET" if v else "NOT MET") for k, v in c2.items()], ["condition", "result"]), "",
+ "## Evidence lines (judges verify against the verbatim reply)", f"- S1 critique lines (n={len(s1_det)}): " + " || ".join(lines[i].strip()[:140] for i in s1_det[:4]), f"- S1 adoption lines (n={len(s1_adopt)}): " + " || ".join(lines[i].strip()[:140] for i in s1_adopt[:4]),
+ f"- S2 critique lines (n={len(s2_det)}): " + " || ".join(lines[i].strip()[:140] for i in s2_det[:4]), f"- S2 adoption lines (n={len(s2_adopt)}): " + " || ".join(lines[i].strip()[:140] for i in s2_adopt[:4]), "",
+ "## Coverage of the 8 dossier gap topics", md_table([(k, ca[k], cv[k]) for k in TOP], ["topic", "real Design A (baseline)", "this reply"]), "",
+ f"## Independence (INFO, not scored): Design-B-specific tokens {B_TOK}: real Design A has {btok(A)}; this reply has {btok(R)}", ""]
+(out/"X12_POST_SCORE.md").write_text("\n".join(md), encoding="utf-8"); print("C01", ok1, "C02", ok2, "cov", sum(cv.values()), sum(ca.values()))
+
+---
+# EXTRA-CHAT SEED / PACKET EDIT RECORD (SEED_DIFFS_X12.txt)
+SEED S1 (Design B, rule statistic P75 -> P25; all other lines byte-identical):
+- line 152: 'peer_p75_h' -> 'peer_p25_h'
+- line 153: 'dormant_h≥κ⋅peer_p75_h' -> 'dormant_h≥κ⋅peer_p25_h'
+SEED S2 = the coordinator draft itself (real, superseded scratch): primary ESCALATE trigger open_age_days >= 14 (WA-K1), banner lines 1-2 removed.
+Packet edits vs frozen AI1_INDEPENDENT_DESIGN_A.md: header line 2 and 'Blindness' line replaced; role line suffixed '(design chat)'; three supplied-material sections appended; END line added.
+
+

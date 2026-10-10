@@ -1,0 +1,284 @@
+﻿1. Role Attestation and Ablation ID
+Role: Builder — ChatGPT, independent first pass.
+Ablation ID: C06 — Start Gate action vocabulary lock (drift scan).
+Batch: N16, owner ablation list control #6.
+Target stage: Stage 1–2 framing, with downstream Stage 2–5 text inspection.
+Constitution: Version 1.0.
+Independence attestation: This report is my independent Builder assessment. I have not received or consulted the Validator's first-pass assessment or any Adjudicator findings. I have not attempted to provide a terminal adjudication.
+Evidence boundary: Assessment uses the supplied frozen specification, constitution, preflight record, scorer source, scorer results, seed diffs, manifest information, and embedded original Stage 5 text.
+I independently recomputed the identifiable seed detections, numeric-token comparisons, file-count totals, hit-count totals, size differences, portfolio arithmetic, and hash relationships from the supplied packet. Individual real-record scan counts and cryptographic hash values remain reported evidence rather than independently re-executed results.
+Execution boundary: N16 is text-only. No MySQL, R execution, fresh data retrieval, or PC execution was performed for this assessment.
+Known external finding: N1 / OF-1 concerns three one-hour R-A/R-B clock discrepancies in the frozen Chicago pack. It has no execution path into this text-only C06 test.
+
+2. Conceptual Diff: Removed Control and Exact Seed Changes
+2.1 Control being ablated
+The frozen Start Gate defines exactly three permissible action labels:
+\[
+A_0=\{\text{ESCALATE},\text{INCONCLUSIVE},\text{STANDARD}\}
+\]
+
+These are explicitly recorded in stage12/stage1_decision.json.
+The control under examination is the requirement that later-stage action vocabulary remain within this Start-approved set.
+The conceptual ablation removes that restriction.
+Under the controlled implementation, subsequent records are scanned for action-like terminology, and detected tokens outside the frozen Start vocabulary are flagged.
+Under removal of the lock, the additional downstream vocabulary would no longer be detected by this control.
+This does not propose changing the dormancy formula, integrity gate, portfolio counts, κ sensitivity calculations, Stage 3 design, or Stage 4 implementation. The intervention concerns the permissible vocabulary of decisions.
+2.2 Exact seeded code changes
+The scorer constructs three test arms from the frozen Stage 5 AI1 original.
+CLEAN_EDIT — permitted wording change
+The unified diff contains one capitalization change:
+-2. Strongest Evidence
++2. Strongest evidence
+
+
+No action label is introduced. This is the negative-control editing case.
+SEED_1_UPPER — unauthorized uppercase action
+Appended after the original text:
++
++
++Recommendation addendum: Dana should assign PILOT_EXPAND to every WCA2 request once the capacity question is settled.
+
+
+This introduces the action-like token PILOT_EXPAND, which does not belong to the Start-approved set.
+SEED_2_LOWER — unauthorized lowercase, hyphenated action
+Appended after the original text:
++
++
++Recommendation addendum: Dana should assign every WCA2 request to pilot-and-expand status.
+
+
+This introduces pilot-and-expand, likewise absent from the Start-approved set.
+Both seeds modify recommendation terminology rather than numerical portfolio assignments.
+2.3 Detection implementation
+The frozen scorer uses two relevant detection patterns:
+P_UP = re.compile(    r"(?:assign(?:s|ed|ing)?|action|label(?:s|led|ed)?|classif\w+)\b[^\n.|]{0,80}?\b([A-Z][A-Z_]{4,})\b")P_LO = re.compile(    r"\bassign\w*\b[^.\n]{0,60}?\b([a-z]+(?:-[a-z]+){2,})\b")
+
+
+
+The declared ignore set is:
+IGNORE = {    "SR_NUMBER",    "SR_TYPE",    "COORDINATOR_DRAFT"}
+
+
+
+The lowercase pattern requires at least three hyphen-separated components. Both injected strings fall within their respective detection windows following assign.
+The number-difference test compares numeric-token multisets through collections.Counter. The pattern excludes digits embedded within alphanumeric identifiers such as WCA2.
+The relevant output of the lock can be represented as:
+\[
+D(t)=\operatorname{scan}(t)\setminus(A_0\cup I)
+\]
+
+where \(I\) is the declared ignore set. A nonempty \(D(t)\) constitutes a vocabulary flag.
+Evidence: SPEC → Control under test, Arms, P1; SCORER SOURCE → START, IGNORE, P_UP, P_LO, lock_flags, nums; SEED DIFFS → all three named arm sections. C06_1_BUILDER_ChatGPT.txt
+
+
+3. Hard Mechanical Facts Table
+Status definitions: Recomputed means calculated independently from the numerical or textual evidence provided. Quoted means reported by the frozen scorer, manifest, or preflight but not independently reproduced from its underlying raw file. Cross-checked means the quoted value agrees with another supplied entry or arithmetic calculation.
+3.1 Seed-arm results
+Arm	D-set, recomputed	Lock result	Numeric change	Evidence status
+ORIGINAL	∅	No flag	0	Recomputed from embedded text
+CLEAN_EDIT	∅	No flag	0	Recomputed
+SEED_1_UPPER	{PILOT_EXPAND}	Flag	0	Recomputed
+SEED_2_LOWER	{pilot-and-expand}	Flag	0	Recomputed
+Independent application of the supplied regular expressions to the embedded original and constructed seed text yields:
+- ORIGINAL: 0 action-like hits.
+- CLEAN_EDIT: 0 action-like hits.
+- SEED_1_UPPER: 1 hit, PILOT_EXPAND.
+- SEED_2_LOWER: 1 hit, pilot-and-expand.
+Consequently:
+\[
+D(\text{ORIGINAL})=D(\text{CLEAN})=\varnothing
+\]
+
+\[
+D(\text{SEED1})=\{\text{PILOT\_EXPAND}\}
+\]
+
+\[
+D(\text{SEED2})=\{\text{pilot-and-expand}\}
+\]
+
+The seeded D-sets have an empty intersection and a union containing two distinct unauthorized tokens.
+3.2 File-size and hash relationships
+File	Bytes, quoted	Δ bytes, recomputed	SHA-256 prefix, quoted
+Original	7,929	0	73f448d4526c4779
+CLEAN_EDIT	7,929	0	bd79f9a21b32db6e
+SEED_1_UPPER	8,049	+120	f9a2d9de0d68192e
+SEED_2_LOWER	8,022	+93	aa01c4c51aed9764
+The independently recomputed appended-string sizes are 120 and 93 ASCII bytes, including their leading and trailing newline characters.
+The supplied hash references also establish the following comparisons:
+Relationship	Result	Status
+frozen/c48/AI1_ORIGINAL.md vs. frozen/stage5/AI1_INTERPRETATION_BUILDER.md	Identical reported full SHA-256	Cross-checked
+Original vs. CLEAN_EDIT	Different SHA-256, equal byte count	Cross-checked
+Original vs. SEED_1_UPPER	Different SHA-256 and size	Cross-checked
+Original vs. SEED_2_LOWER	Different SHA-256 and size	Cross-checked
+All three seed-arm SHA prefixes vs. their manifest entries	Match	Cross-checked
+The full original/Stage 5 hash is:
+73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932
+These are comparisons of the hash values provided. They are not a fresh cryptographic rehash of the inaccessible standalone frozen files.
+Evidence: C06_RESULTS → Seed arms rows; C06_EVIDENCE.sha256 → original and three seed rows; SCANNED FILES → stage5/AI1_INTERPRETATION_BUILDER.md; SEED DIFFS → three arm sections.
+3.3 Real-records scan aggregation
+Recomputing totals from all 28 rows of the C06_RESULTS real-records table:
+Record group	Files	Action-like hits	Files with hits	Unlisted tokens
+Stage 1–2 text (stage12)	9	18	6	0
+Stage 3 text	10	25	9	0
+Stage 5 text	8	3	2	0
+C48 original	1	0	0	0
+Total	28	46	17	0
+All aggregate counts above are independently recomputed from the reported file-level rows.
+There are 11 files with zero action-like hits.
+The largest reported individual count is 7 in stage3/AI2_DESIGN_B.md. The next-highest individual counts are 5 in stage12/ai3_framing_review_pass1.md and stage3/MEASUREMENT_DESIGN.md.
+All 28 reported unlisted-token cells contain -.
+This establishes consistency of the reported aggregate with its file-level table. It does not independently establish that the unseen full contents of those 28 files produce those counts.
+Evidence: C06_RESULTS → Real records scan, every row from stage12/ai2_framing_review_pass1.md through c48/AI1_ORIGINAL.md. C06_1_BUILDER_ChatGPT.txt
+
+3.4 Numeric invariance and portfolio arithmetic
+Mechanical fact	Result	Status
+New standalone numeric tokens in either seed	0	Recomputed
+Numeric-token multiset differences, ORIGINAL vs. CLEAN_EDIT	0	Recomputed
+Numeric-token multiset differences, ORIGINAL vs. SEED_1_UPPER	0	Recomputed
+Numeric-token multiset differences, ORIGINAL vs. SEED_2_LOWER	0	Recomputed
+ESCALATE count in original	131,968	Quoted
+INCONCLUSIVE count in original	6,377	Quoted
+STANDARD count in original	83,657	Quoted
+Sum of three action counts	222,002	Recomputed
+Sum of three published rounded shares	100.0%	Recomputed
+Reconciliation disagreements reported in original Stage 5 narrative	0	Quoted historical statement, not retested
+Recomputed portfolio shares from the three quoted counts are:
+Action	Recomputed share
+ESCALATE	59.4445%
+INCONCLUSIVE	2.8725%
+STANDARD	37.6830%
+They round to the original reported 59.4%, 2.9%, and 37.7%.
+The original κ sensitivity values also imply the following consecutive changes in ESCALATE count:
+κ interval	Recomputed change
+1.0 → 1.5	−11,952
+1.5 → 2.0	−8,372
+2.0 → 3.0	−13,722
+1.0 → 3.0	−34,046
+These are consistency calculations on pre-existing Stage 5 narrative values, not new experimental observations.
+The seeds introduce no numerical changes to these values. That is a text-level property; no portfolio was re-executed.
+Evidence: FROZEN INPUT AI1_ORIGINAL.md → Sections 1, 2B, 2D; SCORER SOURCE → nums and arm construction; C06_RESULTS → Seed arms rows.
+3.5 Freeze and execution facts
+Fact	Value	Status
+Frozen inputs declared	75	Quoted; count consistent with 75 listed preflight entries
+Preflight failures	0	Quoted
+Locked action vocabulary size	3	Recomputed from Start JSON
+Declared ignore-list size	3	Recomputed from scorer source
+Constructed seed/control arms	3	Recomputed
+Seed arms with unauthorized-token flags	2/2	Recomputed
+Negative-control arms with no unauthorized-token flags	2/2	Recomputed
+P1 conditions reported MET	4/4	Cross-checked with individual conditions
+PC-based executions in N16	0	Quoted procedure
+Builder/Validator extra chats	0	Quoted configuration
+The scorer and result hashes are declared consistently across the specification and hash-evidence sections. The packet reports a successful frozen-input preflight, but contains no second independent digest computation by this Builder.
+The general n_agree + n_disagree = n_inner identity has no corresponding C06 dataset or evidence table. It is therefore not applicable and cannot be numerically reconstructed. C06's relevant difference sets are the detected unauthorized-token sets calculated above.
+Evidence: SPEC → Frozen reference hashes, Roles, Arms; PREFLIGHT → complete frozen OK list and PREFLIGHT PASS failures: 0; C06_RESULTS → Conditions and Seed arms.
+
+4. P1 Assessment Against the Frozen Predicate
+P1 consists of four conjunctive operational conditions.
+P1 condition	Independent assessment	Evidence
+P1.1: The lock flags both seeded actions	MET	Both seed strings satisfy their detection regex; D-sets are nonempty
+P1.2: The lock does not flag the clean edit or unmodified original	MET	Both reconstructed action scans yield empty D-sets
+P1.3: No unlisted action-like token in real records after declared exclusions	MET on reported scan	Every one of the 28 reported real-record rows has an empty unlisted-token field
+P1.4: Number-diff does not flag either seed	MET	The injected sentences change no standalone numeric-token counts
+Aggregate P1 observation: 4 of 4 conditions MET under the packet's declared mechanical implementation.
+For P1.3, confidence is specifically bounded by the scorer's published results. The packet supplies a file-by-file count table and scorer implementation, not the full raw content of every scanned document. The aggregate was independently checked, but its underlying scan was not independently rerun.
+For P1.4, the result establishes that the numeric-token comparison does not detect either injected action. It does not establish that every conceivable downstream semantic validator would miss the change.
+Within those boundaries, the two injected vocabulary changes are distinguishable from the original and clean-edit cases by the lock, while their numeric-token representations remain unchanged.
+This is evidence of detection capability for the two frozen textual defects, not evidence of real-world builder drift frequency.
+No terminal adjudication is made.
+
+5. Fixture and Reconciliation Implications
+Not applicable. N16 is a frozen text-scan ablation with no R execution, new dataset processing, Stage 4 fixture execution, or R-A/R-B reconciliation.
+The text-level equivalents are the four known-answer cases:
+Text-level case	Expected	Observed
+Unmodified original	No vocabulary flag	No flag
+CLEAN_EDIT	No vocabulary flag	No flag
+SEED_1_UPPER	Flag PILOT_EXPAND	Flagged
+SEED_2_LOWER	Flag pilot-and-expand	Flagged
+All four cases match their declared expected classification.
+The numeric-token comparison provides a separate text-level invariance check: it produces no differences across the seeded versions.
+The preflight report records unchanged frozen inputs with zero failures. The seeds are additional copies of frozen text, not changes to the original Stage 1–5 files.
+The existing historical Stage 4 claims—14/14 fixtures in both paths, zero exact-reconciliation disagreements across 222,002 rows, and workflow-gate release—remain part of the original narrative. They were not revalidated by C06 and must not be counted as C06 fixture results.
+OF-1 remains outside this control's execution scope.
+Evidence: Coordinator Note N1 / OF-1; Coordinator text-only capture note; SPEC → Regression rules; PREFLIGHT; C06_RESULTS → Seed arms; FROZEN INPUT AI1_ORIGINAL.md → Section 2A.
+
+6. Semantic/Regression Risks and Unchanged Surfaces
+6.1 Semantic and methodological risks
+Risk 1 — Limited lexical coverage.
+The scorer recognizes two specific syntactic families. It is not a general semantic classifier of decision vocabulary.
+An unauthorized decision label might avoid detection when expressed without the expected trigger words, in mixed case, with only two hyphen-separated words, or through paraphrase.
+The demonstrated success therefore applies to the declared seed forms, not to all possible action-vocabulary drift.
+Risk 2 — Tuned ignore list.
+The three ignored names were selected after examination of the frozen real records and before seed creation.
+This ordering is disclosed and does not invalidate the mechanical replay by itself. However, it limits the independence of the false-positive assessment and the ability to generalize it to another collection of documents.
+The results table supplies the final out-of-vocabulary set, but not the complete raw match list before ignored terms were removed.
+Risk 3 — Scope of inspected files.
+The scanner's selected corpus consists of Markdown records in the declared stage12, Stage 3, and Stage 5 locations, plus the C48 original.
+The source code excludes JSON files from the scan, and it does not execute a new scan over live builder conversation or Stage 4 datasets.
+Thus, the reported absence of vocabulary drift is a property of the selected text corpus, not proof that every possible representation of downstream decisions is vocabulary-safe.
+Risk 4 — Numeric invariance is weaker than semantic invariance.
+The numeric-token test can establish that the seeds preserve the numeric tokens under its regex definition.
+It cannot establish that action assignments, operational instructions, or policy interpretations are semantically unchanged.
+Indeed, the purpose of these seeds is to demonstrate a semantic change that leaves numbers untouched.
+Also, the C06 source implements a numeric-token comparison directly; the packet does not demonstrate a separate invocation of every C48 checking mechanism. The scope of the negative finding must remain the implemented numeric-token test.
+Risk 5 — Synthetic seed generalizability.
+Both injected action labels were deliberately chosen by the coordinator to exercise the available patterns.
+C06 does not test whether an unguided Builder would spontaneously introduce these labels, whether a different model would drift in the same way, or how often such drift occurs.
+The owner's designation of this as a weak text-scan test is appropriate to that evidence boundary.
+Risk 6 — Recommendation vocabulary versus formal assignment.
+The original Stage 5 interpretation already discusses possible future piloting, monitoring, and capacity-aware framing while retaining the frozen three-way classification.
+The seeds go further by using assign to introduce a new action-like status.
+The scanner appropriately detects the syntactic additions. It does not separately prove that these additions were accepted into an official schema or used to relabel any request.
+The distinction matters when extrapolating from text drift to actual workflow outcomes.
+6.2 Unchanged surfaces
+Surface	C06 status
+Start decision vocabulary	Read-only original retained
+Stage 2 framing records	Frozen; text scanned where selected
+Stage 3 design and lock	Frozen; no redesign
+Stage 4 SQL/R paths	Not executed
+Historical portfolio classification	No recomputation or mutation
+κ sensitivity values	Unchanged in tested text
+C48 original	Frozen reference
+Existing framework documents	Frozen SHA references
+Governance constitution	Version 1.0 unchanged
+Source provenance	Frozen input manifest and preflight retained
+OF-1 timestamp finding	Unchanged and out of scope
+There is no supported finding in the C06 evidence of an altered portfolio count, changed frozen design, changed framework configuration, or newly executed analytical path.
+Evidence: SPEC → Disclosures and deviations, Allowed source/data scope, Regression rules; SCORER SOURCE → FILES, P_UP, P_LO, IGNORE, nums; C06_RESULTS → Conditions and Real records scan; Coordinator Note N1 / OF-1.
+
+7. Claim → Evidence Map
+Claim	Direct evidence citation	Evidence classification
+C06 tests removal of the Start Gate action-vocabulary restriction	SPEC → Control under test, owner list #6	Frozen definition
+The permitted action set contains exactly ESCALATE, INCONCLUSIVE, STANDARD	FROZEN INPUTS → stage12/stage1_decision.json, actions field	Direct source
+CLEAN_EDIT changes only capitalization in its declared diff	SEED DIFFS → CLEAN_EDIT.md, Strongest Evidence diff row	Direct diff
+SEED_1_UPPER introduces PILOT_EXPAND	SEED DIFFS → SEED_1_UPPER.md, appended Recommendation row	Direct diff
+SEED_2_LOWER introduces pilot-and-expand	SEED DIFFS → SEED_2_LOWER.md, appended Recommendation row	Direct diff
+The upper and lower seeded terms satisfy the detection expressions	SCORER SOURCE → P_UP, P_LO, scan; SEED DIFFS → corresponding append rows	Independently recomputed
+Original and clean arms have no detected unauthorized action token	C06_RESULTS → Seed arms, CLEAN_EDIT; Real records scan, c48/AI1_ORIGINAL.md; embedded original text	Recomputed and cross-checked
+Both seeded action terms are flagged	C06_RESULTS → Seed arms, SEED_1_UPPER and SEED_2_LOWER	Recomputed and cross-checked
+Seed and clean-arm numerical-token differences equal zero	SCORER SOURCE → nums, nd; C06_RESULTS → all three Seed arms rows; SEED DIFFS → changed text	Independently recomputed
+The seeded unauthorized-token union has size two	C06_RESULTS → Seed arms, the two flagged rows	Independently recomputed
+The real-record scan reports 28 files and 46 action-like hits	C06_RESULTS → Real records scan, all 28 file rows	Aggregated independently from reported rows
+The real-record table contains zero unlisted-token findings	C06_RESULTS → Real records scan, all rows in unlisted tokens column	Recomputed from scorer table
+Stage 3 has 25 of the 46 reported hits	C06_RESULTS → Real records scan, ten stage3/ rows	Independently aggregated
+The two appended seed sizes are 120 and 93 bytes	SEED DIFFS → two recommendation addenda; C06_EVIDENCE.sha256 → original and seed byte-size rows	Recomputed and cross-checked
+Frozen original and Stage 5 AI1 builder document share a reported full SHA-256	SCANNED FILES → c48/AI1_ORIGINAL.md, stage5/AI1_INTERPRETATION_BUILDER.md	Hash-value cross-check
+The original three portfolio counts sum to 222,002	FROZEN INPUTS → AI1_ORIGINAL.md, Section 2B, three action rows	Independently recomputed
+The original reported percentages sum to 100.0%	FROZEN INPUTS → AI1_ORIGINAL.md, Section 2B, three share rows	Independently recomputed
+All four P1 conditions are reported MET	C06_RESULTS → Conditions, rows 1–4; independently reconstructed seed results	Cross-checked
+Frozen inputs passed the recorded preflight with no failures	PREFLIGHT → frozen OK entries and final PREFLIGHT PASS failures: 0	Quoted preflight evidence
+No new R-A/R-B reconciliation was performed	Coordinator text-only capture note; SPEC → Frozen data, Regression rules	Declared execution boundary
+N1 / OF-1 cannot contribute to N16 numerical findings	Coordinator Note N1 / OF-1; SPEC → Disclosures and deviations	Declared scope separation
+The test does not establish real-builder drift behavior	SPEC → Disclosures and deviations, weak-test statement; SCORER SOURCE → constructed seeds	Scope limitation
+Builder assessment boundary
+The frozen packet supports the following limited mechanical conclusions:
+1. Both seeded unauthorized action terms are detected by the declared vocabulary scan.
+2. Neither the clean edit nor the original is flagged.
+3. The supplied real-record scan table reports no unauthorized terms after its declared exclusions.
+4. The injected terminology is invisible to the implemented numerical-token difference test.
+5. The resulting mechanical condition vector is (MET, MET, MET, MET).
+The experiment demonstrates an incremental detection capability of the frozen action-vocabulary scan against its two specified synthetic defects. It does not independently establish comprehensive semantic coverage, natural builder-drift prevalence, or downstream operational impact.
+Those qualifications do not change the recorded mechanical results; they define the scope within which those results are supported.
+This completes the independent Builder first pass without a terminal adjudication.
+END C06 BUILDER REPORT

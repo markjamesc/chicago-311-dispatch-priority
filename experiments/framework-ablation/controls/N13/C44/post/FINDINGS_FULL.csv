@@ -1,0 +1,2 @@
+"arm","severity","relates_to","row"
+"FULL","BLOCKING","V-3","| F-1 | BLOCKING | V-3 | `WCA2 alone supplies 64,922 of these (42.9% of ESCALATE), so the ESCALATE volume is concentrated in one service type.` | Replace `42.9%` with `49.2%`. Recompute: `64,922 / 131,968 = 0.491952595`, i.e. `49.1953%`, rounded to `49.2%`. The count `64,922` and the concentration sentence are otherwise supported. |"

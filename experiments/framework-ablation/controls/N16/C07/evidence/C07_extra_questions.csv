@@ -1,0 +1,6 @@
+id,point,severity,resolution,class,in_stage3,in_stage5,outcome
+A003,“This period” timing,Material,**Resolved principle (T006):** frozen window; **exact dates OPEN → Stage 3**,extra question (deferred),yes,yes,carried
+A006,Official City SLA,Material,**Resolved (T008):** no invented City SLA; portfolio urgency later,extra question (deferred),yes,yes,carried
+A007,Eligible definition (what “open eligible” excludes),Framing→Stage 3,**Principle resolved (T012):** open = unresolved at frozen cutoff; eligible = in,extra question (deferred),yes,yes,carried
+A008,Urgency / lateness evidence rules,Deferred,**Open — Stage 3**,extra question (deferred),yes,yes,carried
+A011,Capacity / ranking if ESCALATE exceeds attention,Material (Framing note),**Resolved for Framing question (T014):** three-way classification enough; ranki,extra question (deferred),yes,yes,carried

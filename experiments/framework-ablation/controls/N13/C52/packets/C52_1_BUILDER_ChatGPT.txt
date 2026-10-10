@@ -1,0 +1,1239 @@
+# C52 Builder — ChatGPT (INDEPENDENT FIRST PASS)
+
+Role: Builder only. Use the highest reasoning setting. You are blind to the Validator. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS.
+3. Hard mechanical facts table. Recompute every number you can from the evidence tables below: identities such as n_agree + n_disagree = n_inner, portfolio deltas, D-sets, and hash equalities across arms. Mark each number as recomputed or quoted.
+4. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+5. Fixture and reconciliation implications.
+6. Semantic/regression risks and unchanged surfaces.
+7. Claim → evidence map. Cite the section and the table row for each claim.
+End your reply with this exact line on its own:
+END C52 BUILDER REPORT
+
+---
+# COORDINATOR NOTE N1 / OF-1 (clean-pair clock mismatch; read before the RESULTS)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It is known and expected; it is not a seeded effect and not a harness defect. C52 runs no R code, so N1 does not enter any C52 number.
+
+---
+# SPEC
+# C52 — Ablation specification (FROZEN)
+
+**Ablation ID:** C52 (Addendum 02, candidate #52 "Concurrent raw-side Source Gate queries")
+**Batch:** N13 batch 4 (controls C51, C46, C52; the only three of the 25 open controls that qualified under the owner's 2026-10-03 rules: no new data pulls, no design chat, no owner ruling, mechanical threshold)
+**Constitution version:** 1.0 — `CONSTITUTION_v1.md` SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4 Source Gate scheduling (cut/relax candidate)
+**Frozen at CT:** 2026-10-03, before the runner executed (runner `run_batch_v4.ps1`, evaluator `eval_b4.R`)
+
+## Control under test
+The coordinator runs the extract queries and then the raw-side Source Gate queries serially. Source Gate itself was retained by A04 (REVERT); #52 removes no gate item. Hypothesis: on a static snapshot, running the gate concurrently with the extract gives identical results in less wall-clock time.
+
+## Verdict convention (cut/relax candidate, Addendum 02)
+**KEEP = the serial ordering can be relaxed: the gate queries may run concurrently with the extract queries (under the checksum bracket). REVERT = serial ordering stays.** HALT as in constitution §9.
+
+## Exact change being tested
+Read-only forms of the frozen SQL (`runner/seeds/C52/`, generated mechanically from the frozen `sql/01_source_extract.sql` and `sql/02_source_gate_checks.sql`; diffs in the packet):
+- **E1** = Envelope A SELECT (src_open_candidates rows), **E2** = Envelope B as one CTE statement (peer stats); no DDL, no writes.
+- **G** = the 17 gate items, each frozen `INSERT INTO src_gate_results … SELECT …` run as its SELECT, in the frozen order. G reads raw_311_requests and the existing frozen extract tables.
+- **CK** = `CHECKSUM TABLE` on raw_311_requests, src_open_candidates, src_peer_stats, src_extract_lineage, before and after every arm.
+- Each chain runs through the MySQL CLI (`--login-path=chicago311 -N -B --raw`, one session per chain). SER: chain E then chain G. PAR: both chains launched at once.
+- Disclosed difference from the frozen run: the frozen extract wrote the src_ tables and the gate then checked them; here nothing is written, so G checks the existing frozen tables while E1/E2 recompute the extract in parallel. Whether E1/E2 match the frozen CSVs byte-for-byte is reported as INFO only (export flags differ).
+
+## Known open finding N1 / OF-1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. It is open finding OF-1 in the coordinator's RESULTS_N15.md (coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). C52 runs no R code, so N1 does not enter any C52 number.
+
+## Arms (runner v4, `seeds/C52/SQLCONC`)
+SER_1, PAR_1, SER_2, PAR_2 (interleaved to spread drift).
+
+## Operational benefit predicate P1 (Addendum 02 #52 success metric, made mechanical before execution)
+**P1 satisfied (KEEP side)** when all hold:
+1. every chain exit is 0 in every arm and every .err file is empty;
+2. G returns 17 rows with 15 PASS / 0 FAIL / 2 INFO (the frozen Source Gate result, SOURCE_GATE_PASS 15/0/2) and G output is byte-identical across arms;
+3. E1 and E2 outputs are byte-identical across arms;
+4. median PAR wall-clock ≤ 0.80 × median SER wall-clock.
+REVERT side: any of 1–4 fails.
+
+## Regression / HALT rules
+- **HALT** if the CHECKSUM TABLE bracket is missing or changes anywhere (snapshot not static), or Builder and Validator disagree on a hard number in the RESULTS file.
+- Constitution §7 condition 4 = byte identity of E1/E2/G across arms; condition 5: the SQL gate has no fixture harness, so no mandatory fixture applies (declared now); condition 7 = the 15/0/2 gate result (frozen `sql/stage4_extract_run.log`: A 245193/245193, peer types 104, peer rows 1,881,338).
+
+## Allowed source/data scope
+Local MySQL 8.0 (`chicago311`, read-only SELECT and CHECKSUM TABLE through the CLI) and the frozen PC pack. It re-reads the local 8.3 GB raw table several times per arm: no internet, no new data, local disk only. Expected run time several hours (the frozen extract took 77 min and the gate 39 min).
+
+## FROZEN REFERENCE HASHES (every hash a KEEP condition relies on; each is re-verified by the runner preflight, which is quoted in full in the packet)
+**Frozen pack files (preflight gating; any mismatch = no arm runs):**
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+- `sql/01_source_extract.sql` SHA-256 `f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5`
+- `sql/02_source_gate_checks.sql` SHA-256 `ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59`
+**Runner-side files for this control (frozen list `runner/SEEDS_b4.sha256`; preflight gating):**
+- `runner/seeds/C52/ARMS.tsv` SHA-256 `5204d57056a683ad24f138cc52ea518b72bc0297287da113d81880602e2bca69`
+- `runner/seeds/C52/CK.sql` SHA-256 `23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e`
+- `runner/seeds/C52/E1.sql` SHA-256 `b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9`
+- `runner/seeds/C52/E2.sql` SHA-256 `51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7`
+- `runner/seeds/C52/G.sql` SHA-256 `3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25`
+- `runner/seeds/C52/SQLCONC` SHA-256 `9588ddebbfc9b050d5ab0f53921637af2f2270a248fa052164645f049d23fd6c`
+- `runner/run_batch_v4.ps1` SHA-256 `6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e`
+- `runner/eval_b4.R` SHA-256 `cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396`
+**Governance:** constitution SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`; baseline frameworks as above. This spec is hashed in `SPEC_FREEZE_b4.sha256` before execution.
+**Gate reference:** frozen `sql/02_source_gate_checks.sql` and `sql/01_source_extract.sql` (above); E1/E2/G/CK are byte-checked by the preflight via the SEEDS list.
+
+## Pre-execution check (disclosed)
+Before this spec was frozen, `EXPLAIN` forms of E1, E2 and all 17 G statements were run on the PC (syntax/plan check only; no data returned, nothing written); all exited 0.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+seed   OK   5204d57056a683ad24f138cc52ea518b72bc0297287da113d81880602e2bca69 seeds/C52/ARMS.tsv
+seed   OK   23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e seeds/C52/CK.sql
+seed   OK   b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9 seeds/C52/E1.sql
+seed   OK   51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7 seeds/C52/E2.sql
+seed   OK   3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25 seeds/C52/G.sql
+seed   OK   9588ddebbfc9b050d5ab0f53921637af2f2270a248fa052164645f049d23fd6c seeds/C52/SQLCONC
+seed   OK   6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e run_batch_v4.ps1
+seed   OK   cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396 eval_b4.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | glmnet 5.1 | digest 0.6.39 | jsonlite 2.0.0
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104 ; 8.0.46
+machine (INFO): DESKTOP-RPECRM9, logical processors 16, RAM 32430 MB, free 15139 MB
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+5204d57056a683ad24f138cc52ea518b72bc0297287da113d81880602e2bca69  250  runner/seeds/C52/ARMS.tsv
+23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e  175  runner/seeds/C52/CK.sql
+b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9  2811  runner/seeds/C52/E1.sql
+51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7  5195  runner/seeds/C52/E2.sql
+3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25  8001  runner/seeds/C52/G.sql
+9588ddebbfc9b050d5ab0f53921637af2f2270a248fa052164645f049d23fd6c  46  runner/seeds/C52/SQLCONC
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  16968  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  14883  runner/eval_b4.R
+
+---
+# FROZEN REFERENCE HASHES (every frozen hash a KEEP condition of this control relies on)
+Frozen pack files, re-hashed by this run's gating preflight on the PC (same lines as in the PREFLIGHT section):
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+frozen OK   33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110 R-A\outputs\RA_fixture_results.csv
+frozen OK   0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9 R-B\outputs\RB_fixture_results.csv
+frozen OK   b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3 R-A\outputs\RA_portfolio_counts.csv
+frozen OK   eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c R-B\outputs\RB_portfolio_counts.csv
+frozen OK   7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a R-B\outputs\RB_kappa_grid_counts.csv
+frozen OK   f365e84a7e5d95f39a5fc19133d068e53a3aa5898f619e39db4dc6e0ba3a57b5 sql\01_source_extract.sql
+frozen OK   ae26edb6af074a1a61e92d241fffef0730c893fef0c8c7ae6929d3f2d50aef59 sql\02_source_gate_checks.sql
+
+Frozen 7 key outputs, hashed read-only from the frozen PC pack 2026-10-03 08:21 CDT (`N15/REAJ/FROZEN_KEY7.sha256`; identical to the preflight lines above):
+# frozen PC pack C:\Users\Mark\Documents\R Working Directory\chicago311, hashed read-only on DESKTOP-RPECRM9 2026-10-03 08:21 CDT (Get-FileHash SHA256); columns: sha256, bytes, path, file LastWriteTime (CT)
+c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A/outputs/RA_classifications.csv  2026-09-19 13:46:18
+a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B/outputs/RB_classifications.csv  2026-09-19 13:46:36
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  985  R-A/outputs/RA_fixture_results.csv  2026-09-19 13:46:09
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  1792  R-B/outputs/RB_fixture_results.csv  2026-09-19 13:46:19
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  140  R-A/outputs/RA_portfolio_counts.csv  2026-09-19 13:46:18
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  100  R-B/outputs/RB_portfolio_counts.csv  2026-09-19 13:46:36
+7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B/outputs/RB_kappa_grid_counts.csv  2026-09-19 13:46:43
+
+Spec freeze: `N13/SPEC_FREEZE_b4.sha256` (written 2026-10-03 08:48 CDT before execution):
+dc9181715aba584bc545528d8d8c70280d2acfba6cd7c7954eed32e24333995e  C51/ABLATION_SPEC.md
+6920322b91d2fee391706a98ca7d0dc99f475dc137ad536ce9e5e47fee62e139  C46/ABLATION_SPEC.md
+961faf00c0cd426e4105bf1be2fcaa820c40983241bac7d4d3d88c443b9f7e74  C52/ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  C51/CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  C51/BASELINE_FRAMEWORK.sha256
+555492335ba7cfd7bbce46bbf45d74fd287ac37b91e66b6333f1a2d44808885e  runner/SEEDS_b4.sha256
+6b857ef067967e9bec04e8cab7009b69e056c08245f520816f1ffd979b087d7e  runner/run_batch_v4.ps1
+cd5ec767a4d2158830ccd2ba679a0619f668bf5d3f354d9e7a54648e1dab9396  runner/eval_b4.R
+9facda2784ea89dbac4f5428dd36002cd6084f01108d183261fd0b7c39dfe8c8  runner/make_seeds_b4.py
+f33399fb73a246ba9d4b39fa6f3c6a364b2a498439349d1e3ec82d8e970d50b0  runner/SEED_DIFFS_b4.txt
+347ee93e0ee79cec9f895e5af6e59d40f5aa147b7f5b647716dc636039f3c37a  tools_make_specs_b4.py
+# frozen 2026-10-03 08:48 CDT before execution
+
+---
+# RUN LOG (this control)
+09:34:42 C52 arms
+09:38:43   SER_1 CHECKSUM PRE exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+09:49:50   SER_1 chain E exit=0
+10:40:01   SER_1 chain G exit=0
+10:40:01   SER_1 SER wall_s=3677.3
+10:43:35   SER_1 CHECKSUM POST exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+10:47:07   PAR_1 CHECKSUM PRE exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+11:41:14   PAR_1 chain E exit=0
+11:41:14   PAR_1 chain G exit=0
+11:41:14   PAR_1 PAR wall_s=3246.8
+11:45:12   PAR_1 CHECKSUM POST exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+11:48:55   SER_2 CHECKSUM PRE exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+11:57:19   SER_2 chain E exit=0
+12:41:13   SER_2 chain G exit=0
+12:41:13   SER_2 SER wall_s=3137.4
+12:44:40   SER_2 CHECKSUM POST exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+12:48:18   PAR_2 CHECKSUM PRE exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+13:36:50   PAR_2 chain E exit=0
+13:36:50   PAR_2 chain G exit=0
+13:36:50   PAR_2 PAR wall_s=2911.8
+13:40:22   PAR_2 CHECKSUM POST exit=0 :: chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+
+---
+# C52_RESULTS.md (runner output)
+Evidence note: the batch runner crashed at its evidence step (Access denied writing C51\evidence\C51_ARM_MANIFESTS.txt, a read-only copy from the earlier C51 pull) after the evaluator had finished (summarize exit=0, 2026-10-03 13:40) and never logged DONE. The coordinator assembled C52_ARM_MANIFESTS.txt and C52_EVIDENCE.sha256 on 2026-10-09 from the finished arm manifests, using the runner's own method. C52_RESULTS.md and C52_arms.csv are the evaluator's unmodified 2026-10-03 13:40 output.
+
+# C52 RESULTS (mechanical; generated 2026-10-03 13:40:42 CDT)
+
+**Mechanical predicate result: P1 NOT MET**
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| all chain exits 0 in every arm (and empty .err files) | MET |
+| 17 gate rows, 15 PASS / 0 FAIL / 2 INFO, byte-identical G output across arms | MET |
+| E1 and E2 outputs byte-identical across arms | MET |
+| median PAR wall <= 0.80 x median SER wall | NOT MET |
+
+## Arms
+| arm | mode | exits_E1_E2_G | err_bytes | wall_s | E1_sha | E2_sha | G_sha | gate_rows | gate_pass | gate_fail | gate_info | ck_pre | ck_post |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| SER_1 | SER | 0/0/0 | 0 | 3677.3 | 65bf0d9ae5bff494 | 95dc8cab2e82009f | ec26cd171c4617eb | 17 | 15 | 0 | 2 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 |
+| PAR_1 | PAR | 0/0/0 | 0 | 3246.8 | 65bf0d9ae5bff494 | 95dc8cab2e82009f | ec26cd171c4617eb | 17 | 15 | 0 | 2 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 |
+| SER_2 | SER | 0/0/0 | 0 | 3137.4 | 65bf0d9ae5bff494 | 95dc8cab2e82009f | ec26cd171c4617eb | 17 | 15 | 0 | 2 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 |
+| PAR_2 | PAR | 0/0/0 | 0 | 2911.8 | 65bf0d9ae5bff494 | 95dc8cab2e82009f | ec26cd171c4617eb | 17 | 15 | 0 | 2 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 | chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591 |
+
+## Timing
+- median SER wall 3407.4 s; median PAR wall 3079.3 s; ratio 0.904
+
+## INFO (not gating): gate rows vs frozen stage4_extract_run.log (all non-note fields found on a log line naming the check)
+| check | result | in_frozen_log |
+|---|---|---|
+| A_open_count_match | PASS | FALSE |
+| B_distinct_sr_equals_rows | PASS | FALSE |
+| C_id_missing_in_extract | PASS | FALSE |
+| C_id_extra_in_extract | PASS | FALSE |
+| D_field_mismatch_critical | PASS | FALSE |
+| E_status_domain_open_only | PASS | FALSE |
+| F_created_date_range | PASS | FALSE |
+| G_null_profile_created_status | PASS | FALSE |
+| G_null_closed_date_info | INFO | FALSE |
+| H_sr_checksum_match | PASS | FALSE |
+| I_peer_stats_present | PASS | FALSE |
+| I_peer_no_null_type_key | PASS | FALSE |
+| I_peer_p75_nonneg_when_n | PASS | FALSE |
+| J_no_judged_columns | PASS | FALSE |
+| K_lineage_open_matches_raw | PASS | FALSE |
+| K_lineage_t_freeze | PASS | FALSE |
+| L_raw_status_dist_info | INFO | FALSE |
+
+## INFO (not gating): extract outputs vs frozen source CSV data rows (header dropped; line-normalised digest)
+- E1 vs src_open_candidates.csv: FALSE
+- E2 vs src_peer_stats.csv: TRUE
+
+CHECKSUM bracket (all arms, pre and post): chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+
+---
+# C52_arms.csv (raw, full file)
+arm,mode,exits_E1_E2_G,err_bytes,wall_s,E1_sha,E2_sha,G_sha,gate_rows,gate_pass,gate_fail,gate_info,ck_pre,ck_post
+SER_1,SER,0/0/0,0,3677.3,65bf0d9ae5bff494,95dc8cab2e82009f,ec26cd171c4617eb,17,15,0,2,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+PAR_1,PAR,0/0/0,0,3246.8,65bf0d9ae5bff494,95dc8cab2e82009f,ec26cd171c4617eb,17,15,0,2,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+SER_2,SER,0/0/0,0,3137.4,65bf0d9ae5bff494,95dc8cab2e82009f,ec26cd171c4617eb,17,15,0,2,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+PAR_2,PAR,0/0/0,0,2911.8,65bf0d9ae5bff494,95dc8cab2e82009f,ec26cd171c4617eb,17,15,0,2,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591,chicago311.raw_311_requests	727006061 | chicago311.src_open_candidates	1392669554 | chicago311.src_peer_stats	791123155 | chicago311.src_extract_lineage	2028659591
+
+---
+# RAW PER-ARM FILES (verbatim)
+## arms/PAR_1/CK_POST.err
+(empty file)
+
+## arms/PAR_1/CK_POST.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/PAR_1/CK_PRE.err
+(empty file)
+
+## arms/PAR_1/CK_PRE.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/PAR_1/E1.err
+(empty file)
+
+## arms/PAR_1/E2.err
+(empty file)
+
+## arms/PAR_1/G.err
+(empty file)
+
+## arms/PAR_1/G.tsv
+A_open_count_match	245193	245193	PASS	raw_open_n vs extract_open_n; tolerance = exact match
+B_distinct_sr_equals_rows	245193	245193	PASS	src_open_candidates grain
+C_id_missing_in_extract	0	PASS	raw Open SR_NUMBER absent from extract
+C_id_extra_in_extract	0	PASS	extract SR_NUMBER not in raw Open
+D_field_mismatch_critical	0	PASS	null-safe <=> on critical raw columns
+E_status_domain_open_only	1	0	PASS	envelope A must be Open-only
+F_created_date_range	01/01/2019 01:06:20 PM	12/31/2025 12:59:29 PM	01/01/2019 01:06:20 PM .. 12/31/2025 12:59:29 PM	PASS	metric_a=raw_min metric_b=raw_max metric_c=extract min..max
+G_null_profile_created_status	0	0	0	PASS	null/blank CREATED_DATE, STATUS, LAST_MODIFIED_DATE counts
+G_null_closed_date_info	245193	INFO	blank CLOSED_DATE count among Open (expected ~all)
+H_sr_checksum_match	4226609361	4226609361	PASS	BIT_XOR(CRC32(SR_NUMBER)) set fingerprint raw Open vs extract
+I_peer_stats_present	104	104	PASS	peer_stats rowcount = distinct type_key; must be >0
+I_peer_no_null_type_key	0	PASS	type_key must be non-null in peer_stats
+I_peer_p75_nonneg_when_n	0	PASS	peer_p75_h present and >=0 when peer_n>0
+J_no_judged_columns	0	PASS	INFORMATION_SCHEMA probe for forbidden judged columns on src_open_candidates
+K_lineage_open_matches_raw	245193	245193	PASS	src_extract_lineage open_candidate_n vs raw_open_n
+K_lineage_t_freeze	2026-09-12 23:59:59	PASS	T_freeze working must be 2026-09-12 23:59:59
+L_raw_status_dist_info	Canceled=212654; Closed=1; Completed=14177547; Open=245193	INFO	raw STATUS distribution
+
+## arms/PAR_1/PERF.csv
+mode,wall_s
+PAR,3246.8
+
+## arms/PAR_1/RUN_E.exit
+0,1107.7,2026-10-03T11:05:35-05:00
+
+## arms/PAR_1/RUN_G.exit
+0,3246.7,2026-10-03T11:41:14-05:00
+
+## arms/PAR_1/times_E.txt
+E1 start 10:47:07.95 
+E1 exit 0 10:50:30.63 
+E2 start 10:50:30.63 
+E2 exit 0 11:05:35.61
+
+## arms/PAR_1/times_G.txt
+G start 10:47:07.95 
+G exit 0 11:41:14.61
+
+## arms/PAR_2/CK_POST.err
+(empty file)
+
+## arms/PAR_2/CK_POST.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/PAR_2/CK_PRE.err
+(empty file)
+
+## arms/PAR_2/CK_PRE.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/PAR_2/E1.err
+(empty file)
+
+## arms/PAR_2/E2.err
+(empty file)
+
+## arms/PAR_2/G.err
+(empty file)
+
+## arms/PAR_2/G.tsv
+A_open_count_match	245193	245193	PASS	raw_open_n vs extract_open_n; tolerance = exact match
+B_distinct_sr_equals_rows	245193	245193	PASS	src_open_candidates grain
+C_id_missing_in_extract	0	PASS	raw Open SR_NUMBER absent from extract
+C_id_extra_in_extract	0	PASS	extract SR_NUMBER not in raw Open
+D_field_mismatch_critical	0	PASS	null-safe <=> on critical raw columns
+E_status_domain_open_only	1	0	PASS	envelope A must be Open-only
+F_created_date_range	01/01/2019 01:06:20 PM	12/31/2025 12:59:29 PM	01/01/2019 01:06:20 PM .. 12/31/2025 12:59:29 PM	PASS	metric_a=raw_min metric_b=raw_max metric_c=extract min..max
+G_null_profile_created_status	0	0	0	PASS	null/blank CREATED_DATE, STATUS, LAST_MODIFIED_DATE counts
+G_null_closed_date_info	245193	INFO	blank CLOSED_DATE count among Open (expected ~all)
+H_sr_checksum_match	4226609361	4226609361	PASS	BIT_XOR(CRC32(SR_NUMBER)) set fingerprint raw Open vs extract
+I_peer_stats_present	104	104	PASS	peer_stats rowcount = distinct type_key; must be >0
+I_peer_no_null_type_key	0	PASS	type_key must be non-null in peer_stats
+I_peer_p75_nonneg_when_n	0	PASS	peer_p75_h present and >=0 when peer_n>0
+J_no_judged_columns	0	PASS	INFORMATION_SCHEMA probe for forbidden judged columns on src_open_candidates
+K_lineage_open_matches_raw	245193	245193	PASS	src_extract_lineage open_candidate_n vs raw_open_n
+K_lineage_t_freeze	2026-09-12 23:59:59	PASS	T_freeze working must be 2026-09-12 23:59:59
+L_raw_status_dist_info	Canceled=212654; Closed=1; Completed=14177547; Open=245193	INFO	raw STATUS distribution
+
+## arms/PAR_2/PERF.csv
+mode,wall_s
+PAR,2911.8
+
+## arms/PAR_2/RUN_E.exit
+0,902.7,2026-10-03T13:03:21-05:00
+
+## arms/PAR_2/RUN_G.exit
+0,2911.8,2026-10-03T13:36:50-05:00
+
+## arms/PAR_2/times_E.txt
+E1 start 12:48:18.93 
+E1 exit 0 12:51:48.30 
+E2 start 12:51:48.30 
+E2 exit 0 13:03:21.56
+
+## arms/PAR_2/times_G.txt
+G start 12:48:18.95 
+G exit 0 13:36:50.72
+
+## arms/SER_1/CK_POST.err
+(empty file)
+
+## arms/SER_1/CK_POST.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/SER_1/CK_PRE.err
+(empty file)
+
+## arms/SER_1/CK_PRE.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/SER_1/E1.err
+(empty file)
+
+## arms/SER_1/E2.err
+(empty file)
+
+## arms/SER_1/G.err
+(empty file)
+
+## arms/SER_1/G.tsv
+A_open_count_match	245193	245193	PASS	raw_open_n vs extract_open_n; tolerance = exact match
+B_distinct_sr_equals_rows	245193	245193	PASS	src_open_candidates grain
+C_id_missing_in_extract	0	PASS	raw Open SR_NUMBER absent from extract
+C_id_extra_in_extract	0	PASS	extract SR_NUMBER not in raw Open
+D_field_mismatch_critical	0	PASS	null-safe <=> on critical raw columns
+E_status_domain_open_only	1	0	PASS	envelope A must be Open-only
+F_created_date_range	01/01/2019 01:06:20 PM	12/31/2025 12:59:29 PM	01/01/2019 01:06:20 PM .. 12/31/2025 12:59:29 PM	PASS	metric_a=raw_min metric_b=raw_max metric_c=extract min..max
+G_null_profile_created_status	0	0	0	PASS	null/blank CREATED_DATE, STATUS, LAST_MODIFIED_DATE counts
+G_null_closed_date_info	245193	INFO	blank CLOSED_DATE count among Open (expected ~all)
+H_sr_checksum_match	4226609361	4226609361	PASS	BIT_XOR(CRC32(SR_NUMBER)) set fingerprint raw Open vs extract
+I_peer_stats_present	104	104	PASS	peer_stats rowcount = distinct type_key; must be >0
+I_peer_no_null_type_key	0	PASS	type_key must be non-null in peer_stats
+I_peer_p75_nonneg_when_n	0	PASS	peer_p75_h present and >=0 when peer_n>0
+J_no_judged_columns	0	PASS	INFORMATION_SCHEMA probe for forbidden judged columns on src_open_candidates
+K_lineage_open_matches_raw	245193	245193	PASS	src_extract_lineage open_candidate_n vs raw_open_n
+K_lineage_t_freeze	2026-09-12 23:59:59	PASS	T_freeze working must be 2026-09-12 23:59:59
+L_raw_status_dist_info	Canceled=212654; Closed=1; Completed=14177547; Open=245193	INFO	raw STATUS distribution
+
+## arms/SER_1/PERF.csv
+mode,wall_s
+SER,3677.3
+
+## arms/SER_1/RUN_E.exit
+0,666.9,2026-10-03T09:49:50-05:00
+
+## arms/SER_1/RUN_G.exit
+0,3010.4,2026-10-03T10:40:01-05:00
+
+## arms/SER_1/times_E.txt
+E1 start  9:38:43.82 
+E1 exit 0  9:42:49.04 
+E2 start  9:42:49.04 
+E2 exit 0  9:49:49.85
+
+## arms/SER_1/times_G.txt
+G start  9:49:50.78 
+G exit 0 10:40:00.15
+
+## arms/SER_2/CK_POST.err
+(empty file)
+
+## arms/SER_2/CK_POST.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/SER_2/CK_PRE.err
+(empty file)
+
+## arms/SER_2/CK_PRE.tsv
+chicago311.raw_311_requests	727006061
+chicago311.src_open_candidates	1392669554
+chicago311.src_peer_stats	791123155
+chicago311.src_extract_lineage	2028659591
+
+## arms/SER_2/E1.err
+(empty file)
+
+## arms/SER_2/E2.err
+(empty file)
+
+## arms/SER_2/G.err
+(empty file)
+
+## arms/SER_2/G.tsv
+A_open_count_match	245193	245193	PASS	raw_open_n vs extract_open_n; tolerance = exact match
+B_distinct_sr_equals_rows	245193	245193	PASS	src_open_candidates grain
+C_id_missing_in_extract	0	PASS	raw Open SR_NUMBER absent from extract
+C_id_extra_in_extract	0	PASS	extract SR_NUMBER not in raw Open
+D_field_mismatch_critical	0	PASS	null-safe <=> on critical raw columns
+E_status_domain_open_only	1	0	PASS	envelope A must be Open-only
+F_created_date_range	01/01/2019 01:06:20 PM	12/31/2025 12:59:29 PM	01/01/2019 01:06:20 PM .. 12/31/2025 12:59:29 PM	PASS	metric_a=raw_min metric_b=raw_max metric_c=extract min..max
+G_null_profile_created_status	0	0	0	PASS	null/blank CREATED_DATE, STATUS, LAST_MODIFIED_DATE counts
+G_null_closed_date_info	245193	INFO	blank CLOSED_DATE count among Open (expected ~all)
+H_sr_checksum_match	4226609361	4226609361	PASS	BIT_XOR(CRC32(SR_NUMBER)) set fingerprint raw Open vs extract
+I_peer_stats_present	104	104	PASS	peer_stats rowcount = distinct type_key; must be >0
+I_peer_no_null_type_key	0	PASS	type_key must be non-null in peer_stats
+I_peer_p75_nonneg_when_n	0	PASS	peer_p75_h present and >=0 when peer_n>0
+J_no_judged_columns	0	PASS	INFORMATION_SCHEMA probe for forbidden judged columns on src_open_candidates
+K_lineage_open_matches_raw	245193	245193	PASS	src_extract_lineage open_candidate_n vs raw_open_n
+K_lineage_t_freeze	2026-09-12 23:59:59	PASS	T_freeze working must be 2026-09-12 23:59:59
+L_raw_status_dist_info	Canceled=212654; Closed=1; Completed=14177547; Open=245193	INFO	raw STATUS distribution
+
+## arms/SER_2/PERF.csv
+mode,wall_s
+SER,3137.4
+
+## arms/SER_2/RUN_E.exit
+0,504.2,2026-10-03T11:57:19-05:00
+
+## arms/SER_2/RUN_G.exit
+0,2633.2,2026-10-03T12:41:13-05:00
+
+## arms/SER_2/times_E.txt
+E1 start 11:48:55.85 
+E1 exit 0 11:52:09.03 
+E2 start 11:52:09.03 
+E2 exit 0 11:57:19.27
+
+## arms/SER_2/times_G.txt
+G start 11:57:20.00 
+G exit 0 12:41:12.48
+
+## arms/SER_1/chain_E.cmd (chain script; the other arms differ only in folder)
+@echo off
+echo E1 start %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_E.txt"
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" --login-path=chicago311 -N -B --raw < "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E1.sql" > "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E1.tsv" 2> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E1.err"
+echo E1 exit %ERRORLEVEL% %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_E.txt"
+echo E2 start %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_E.txt"
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" --login-path=chicago311 -N -B --raw < "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E2.sql" > "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E2.tsv" 2> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\E2.err"
+echo E2 exit %ERRORLEVEL% %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_E.txt"
+
+## arms/SER_1/chain_G.cmd (chain script; the other arms differ only in folder)
+@echo off
+echo G start %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_G.txt"
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" --login-path=chicago311 -N -B --raw < "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\G.sql" > "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\G.tsv" 2> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\G.err"
+echo G exit %ERRORLEVEL% %TIME% >> "C:\Users\Mark\Documents\R Working Directory\ablation-runs\N13\C52\arms\SER_1\times_G.txt"
+
+
+---
+# C52_EVIDENCE.sha256
+279c8d7d3c260452d8cb6c97aaabe37da224d3171aebdbac083b49388546effe  C52_ARM_MANIFESTS.txt
+af5a3ed71f4a7121549c62e12c4f490414bc462a63e435e3f0e21bd664cfb72e  C52_arms.csv
+bde134f2d83b7da3aea1f60f8f608f834346eee41946099966c7609e74924bdf  C52_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm and smoke root
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. Prefix 'arms/<arm>' = reporting arm root; prefix 'smoke/<arm>_<path>_k<k>' = a non-reporting smoke root (C51 only). Bulky data copies are listed by hash and size only.
+arms/PAR_1 in  :: 7a3aec781fdca0a6d5f0c3455b51893bdd6f08b2ef12df6eaf11fdd6271b9b0b  1215  chain_E.cmd
+arms/PAR_1 in  :: aeacb2c1301b890580d81955707e4004df51803f1a1c355b982d5059a667e9bd  608  chain_G.cmd
+arms/PAR_1 in  :: 23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e  175  CK.sql
+arms/PAR_1 in  :: b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9  2811  E1.sql
+arms/PAR_1 in  :: 51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7  5195  E2.sql
+arms/PAR_1 in  :: 3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25  8001  G.sql
+arms/PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_POST.err
+arms/PAR_1 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_POST.tsv
+arms/PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_PRE.err
+arms/PAR_1 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_PRE.tsv
+arms/PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E1.err
+arms/PAR_1 out :: 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6  118671465  E1.tsv
+arms/PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E2.err
+arms/PAR_1 out :: 95dc8cab2e82009fde69327f1af8921bb039b1ccedeee4668e8873d646342a06  16184  E2.tsv
+arms/PAR_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  G.err
+arms/PAR_1 out :: ec26cd171c4617eb86d0145cd564662577db37e683c1608009083c2f011807f1  1556  G.tsv
+arms/PAR_1 out :: 3688d01fc40f9009c24e94b350ad27a81caec17bb33736c36a0a79c25f24bfe9  25  PERF.csv
+arms/PAR_1 out :: cba0704ab8250266e82f08df85708745abcdaedb3eab50d53e4b307f1712c0d8  36  RUN_E.exit
+arms/PAR_1 out :: 702544fb123c73993df2c1b1f01401060e5ce99758c15ddd81311100c215faaf  36  RUN_G.exit
+arms/PAR_1 out :: 85ecc7dd62a84c2a0b1301b77ca99cc4bd9459f54737cbac4d3688c209c3fe6c  94  times_E.txt
+arms/PAR_1 out :: dcbe1058ec68f3c3e2d8df7ecb6f6a333d16fc9f4c65a84a1bcc9139530872e0  45  times_G.txt
+arms/PAR_2 in  :: 8db689c322ceaf85e6f7f14632304bb6598bc3a8af68ec8b61f098dee6b9a48e  1215  chain_E.cmd
+arms/PAR_2 in  :: eafacc1e62862aa3510ce6cad380a1e34487d6aff0caf7be46569c011e452679  608  chain_G.cmd
+arms/PAR_2 in  :: 23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e  175  CK.sql
+arms/PAR_2 in  :: b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9  2811  E1.sql
+arms/PAR_2 in  :: 51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7  5195  E2.sql
+arms/PAR_2 in  :: 3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25  8001  G.sql
+arms/PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_POST.err
+arms/PAR_2 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_POST.tsv
+arms/PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_PRE.err
+arms/PAR_2 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_PRE.tsv
+arms/PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E1.err
+arms/PAR_2 out :: 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6  118671465  E1.tsv
+arms/PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E2.err
+arms/PAR_2 out :: 95dc8cab2e82009fde69327f1af8921bb039b1ccedeee4668e8873d646342a06  16184  E2.tsv
+arms/PAR_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  G.err
+arms/PAR_2 out :: ec26cd171c4617eb86d0145cd564662577db37e683c1608009083c2f011807f1  1556  G.tsv
+arms/PAR_2 out :: 667522ecefd9d1ded47e3d95c32706525a99fd6e269a231453ad949e03dcd8fd  25  PERF.csv
+arms/PAR_2 out :: d1ce47ca50161ea197d2555ef6f06cd6d87439afa066882096ec05bf77689d4c  35  RUN_E.exit
+arms/PAR_2 out :: f9d4c47fd55202bbd77877362d42207f7735fb8930e925f9c724560f4aff5143  36  RUN_G.exit
+arms/PAR_2 out :: 9c66cb5deba91e5f915d236078a76d08d5a4c5ad13f7563ed7356771ff7cab1b  94  times_E.txt
+arms/PAR_2 out :: 9f24692033a1ff8ea9c3a42822d35fae34186e1a5ecd42b63b2c57eabecc6ddc  45  times_G.txt
+arms/SER_1 in  :: e29475c9dcee21cee03678b5a9ee435faf7b7ae974416f3bdafd78781110879c  1215  chain_E.cmd
+arms/SER_1 in  :: 6e139695b3474783cd317abf556bb9b4f9f500a84900eecb9b73847b31419686  608  chain_G.cmd
+arms/SER_1 in  :: 23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e  175  CK.sql
+arms/SER_1 in  :: b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9  2811  E1.sql
+arms/SER_1 in  :: 51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7  5195  E2.sql
+arms/SER_1 in  :: 3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25  8001  G.sql
+arms/SER_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_POST.err
+arms/SER_1 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_POST.tsv
+arms/SER_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_PRE.err
+arms/SER_1 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_PRE.tsv
+arms/SER_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E1.err
+arms/SER_1 out :: 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6  118671465  E1.tsv
+arms/SER_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E2.err
+arms/SER_1 out :: 95dc8cab2e82009fde69327f1af8921bb039b1ccedeee4668e8873d646342a06  16184  E2.tsv
+arms/SER_1 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  G.err
+arms/SER_1 out :: ec26cd171c4617eb86d0145cd564662577db37e683c1608009083c2f011807f1  1556  G.tsv
+arms/SER_1 out :: 92115f00e0a361f05ce52db1dd2cc4a3b900eed0504f28ec02f38be86f50520a  25  PERF.csv
+arms/SER_1 out :: 040beebea0d6fb45ae55713e05eb48baf1870833baa05e4d5fe9287593f7cab9  35  RUN_E.exit
+arms/SER_1 out :: bb03b8cff32904730c773d8d1546d674a99c36ebc617dc8dae0591c0137e6e67  36  RUN_G.exit
+arms/SER_1 out :: 129a08e7162eeae85c6cec1a9fbb5c5ff48787e93200d75bb9cbd60b39a0a8d7  94  times_E.txt
+arms/SER_1 out :: 2db77cf85b463bba0eb7a80aa9046f7c8ec154b801b33f5c268299cab1ba31aa  45  times_G.txt
+arms/SER_2 in  :: 0bfc62947a5f8f0395c685bf4393e307ff0811d411266f3ff2ca0ab06cb0a80f  1215  chain_E.cmd
+arms/SER_2 in  :: b1bd3ccc2a2990f9024b322acbbe8409643c6c43d010e516f6ef85c396c8e5c7  608  chain_G.cmd
+arms/SER_2 in  :: 23f177f32f9886328ac2eef2690dbf6cdd48261597ba5bb34c29b982b14e181e  175  CK.sql
+arms/SER_2 in  :: b305fe4b01f3668424e96f71f5974c98d9102d9425d81f0116c1d1b585a578a9  2811  E1.sql
+arms/SER_2 in  :: 51a0c414169aa57e6f6ffb6550bd9b121a5a027ebf3bccfa8e9b865b372251d7  5195  E2.sql
+arms/SER_2 in  :: 3bd63f1138aaeb52d0c9eaf40667171c41b8efb65104488821056fefa20e7f25  8001  G.sql
+arms/SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_POST.err
+arms/SER_2 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_POST.tsv
+arms/SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  CK_PRE.err
+arms/SER_2 out :: 13b7f2d53daaaf27de17173bc1dee24314f8717902fa29b55d8a3d8171602ee7  162  CK_PRE.tsv
+arms/SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E1.err
+arms/SER_2 out :: 65bf0d9ae5bff494faa00094799f969c8fedaa85328b67775103723c694b4de6  118671465  E1.tsv
+arms/SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  E2.err
+arms/SER_2 out :: 95dc8cab2e82009fde69327f1af8921bb039b1ccedeee4668e8873d646342a06  16184  E2.tsv
+arms/SER_2 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  G.err
+arms/SER_2 out :: ec26cd171c4617eb86d0145cd564662577db37e683c1608009083c2f011807f1  1556  G.tsv
+arms/SER_2 out :: d83bd06e4e5b1f4437ebce5fb98f22750653a3ad40ebd053545ec18cfdf0f1d0  25  PERF.csv
+arms/SER_2 out :: fce7018a765e30cc9c34049dd289857450543b691782c9ab62e84403418fe308  35  RUN_E.exit
+arms/SER_2 out :: 74fccf2e9e8a1c7cfc0e856eb5152e14ef8e952398e25a79f84890331749623c  36  RUN_G.exit
+arms/SER_2 out :: 4f0b1a8e34dcd6b043ecc0c8680cbbf6d3a0d260ef945bb59d0c4c1babfb3513  94  times_E.txt
+arms/SER_2 out :: cac15dcd5b4594d9775fa6f0954f955795f9597a365c193a8ebabd6e2df7ef2c  45  times_G.txt
+
+---
+# SEED DIFFS (unified diff vs frozen code, or full text of new runner-side files)
+### seeds/C52/E1.sql (new file, 2811 bytes)
+-- N13 C52 E1: read-only form of frozen 01_source_extract.sql Envelope A (the SELECT of CREATE TABLE src_open_candidates AS ...),
+-- streamed to a file instead of creating a table; ORDER BY SR_NUMBER = the frozen table's primary-key order. No DDL, no writes.
+USE chicago311;
+SET SESSION sql_mode = 'ONLY_FULL_GROUP_BY,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+SET @T_freeze = CAST('2026-09-12 23:59:59' AS DATETIME);
+SET @T_lookback_start = DATE_SUB(@T_freeze, INTERVAL 365 DAY);
+SELECT
+  r.SR_NUMBER,
+  r.SR_TYPE,
+  r.SR_SHORT_CODE,
+  r.CREATED_DEPARTMENT,
+  r.OWNER_DEPARTMENT,
+  r.STATUS,
+  r.ORIGIN,
+  r.CREATED_DATE,
+  r.LAST_MODIFIED_DATE,
+  r.CLOSED_DATE,
+  r.STREET_ADDRESS,
+  r.CITY,
+  r.STATE,
+  r.ZIP_CODE,
+  r.STREET_NUMBER,
+  r.STREET_DIRECTION,
+  r.STREET_NAME,
+  r.STREET_TYPE,
+  r.DUPLICATE,
+  r.LEGACY_RECORD,
+  r.LEGACY_SR_NUMBER,
+  r.PARENT_SR_NUMBER,
+  r.COMMUNITY_AREA,
+  r.WARD,
+  r.ELECTRICAL_DISTRICT,
+  r.ELECTRICITY_GRID,
+  r.POLICE_SECTOR,
+  r.POLICE_DISTRICT,
+  r.POLICE_BEAT,
+  r.PRECINCT,
+  r.SANITATION_DIVISION_DAYS,
+  r.CREATED_HOUR,
+  r.CREATED_DAY_OF_WEEK,
+  r.CREATED_MONTH,
+  r.X_COORDINATE,
+  r.Y_COORDINATE,
+  r.LATITUDE,
+  r.LONGITUDE,
+  r.LOCATION,
+  -- Mechanical type_key (coalesce short code then type; blank → NULL for R)
+  NULLIF(
+    COALESCE(
+      NULLIF(TRIM(r.SR_SHORT_CODE), ''),
+      NULLIF(TRIM(r.SR_TYPE), '')
+    ),
+    ''
+  ) AS type_key,
+  -- Mechanical datetime parses (NULL if unparseable). Formats: ISO, US AM/PM, US 24h.
+  -- No timezone conversion here. Failures stay NULL for R integrity gate.
+  COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) AS created_ts,
+  COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.LAST_MODIFIED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.LAST_MODIFIED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.LAST_MODIFIED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.LAST_MODIFIED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) AS mod_ts,
+  CASE WHEN NULLIF(TRIM(r.CLOSED_DATE), '') IS NULL THEN NULL
+       ELSE COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  )
+  END AS closed_ts,
+  CAST(@T_freeze AS DATETIME) AS t_freeze,
+  'STATUS=Open' AS mechanical_envelope,
+  'chicago311-raw-frozen-2026-09-12' AS snapshot_id
+FROM raw_311_requests r
+WHERE r.STATUS = 'Open'
+ORDER BY r.SR_NUMBER;
+
+### seeds/C52/E2.sql (new file, 5195 bytes)
+-- N13 C52 E2: read-only form of frozen 01_source_extract.sql Envelope B (src_peer_cycle_stage -> src_peer_ranked -> src_peer_stats)
+-- as one statement with CTEs instead of staging tables; ORDER BY type_key = the frozen table's primary-key order. No DDL, no writes.
+USE chicago311;
+SET SESSION sql_mode = 'ONLY_FULL_GROUP_BY,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+SET @T_freeze = CAST('2026-09-12 23:59:59' AS DATETIME);
+SET @T_lookback_start = DATE_SUB(@T_freeze, INTERVAL 365 DAY);
+WITH stage AS (
+SELECT
+  NULLIF(
+    COALESCE(
+      NULLIF(TRIM(r.SR_SHORT_CODE), ''),
+      NULLIF(TRIM(r.SR_TYPE), '')
+    ),
+    ''
+  ) AS type_key,
+  (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  )) AS created_ts,
+  (CASE WHEN NULLIF(TRIM(r.CLOSED_DATE), '') IS NULL THEN NULL ELSE COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) END) AS closed_ts,
+  TIMESTAMPDIFF(
+    HOUR,
+    (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  )),
+    (CASE WHEN NULLIF(TRIM(r.CLOSED_DATE), '') IS NULL THEN NULL ELSE COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) END)
+  ) AS cycle_h
+FROM raw_311_requests r
+WHERE r.STATUS = 'Completed'
+  AND LOWER(TRIM(COALESCE(r.DUPLICATE, ''))) NOT IN ('true', 't', 'y', 'yes', '1')
+  AND LOWER(TRIM(COALESCE(r.LEGACY_RECORD, ''))) NOT IN ('true', 't', 'y', 'yes', '1')
+  AND NULLIF(TRIM(r.CREATED_DATE), '') IS NOT NULL
+  AND NULLIF(TRIM(r.CLOSED_DATE), '') IS NOT NULL
+  AND (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  )) IS NOT NULL
+  AND (CASE WHEN NULLIF(TRIM(r.CLOSED_DATE), '') IS NULL THEN NULL ELSE COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) END) IS NOT NULL
+  AND (CASE WHEN NULLIF(TRIM(r.CLOSED_DATE), '') IS NULL THEN NULL ELSE COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CLOSED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CLOSED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ) END)
+      >= (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ))
+  AND (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ))
+      >= @T_lookback_start
+  AND (COALESCE(
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %h:%i:%s %p'),
+    STR_TO_DATE(TRIM(r.CREATED_DATE), '%m/%d/%Y %H:%i:%s'),
+    STR_TO_DATE(REPLACE(TRIM(r.CREATED_DATE), 'T', ' '), '%Y-%m-%d %H:%i:%s.%f')
+  ))
+      <= @T_freeze
+  AND NULLIF(
+        COALESCE(NULLIF(TRIM(r.SR_SHORT_CODE), ''), NULLIF(TRIM(r.SR_TYPE), '')),
+        ''
+      ) IS NOT NULL
+), ranked AS (
+SELECT
+  type_key,
+  cycle_h,
+  ROW_NUMBER() OVER (PARTITION BY type_key ORDER BY cycle_h ASC) AS rn,
+  COUNT(*) OVER (PARTITION BY type_key) AS peer_n
+FROM stage
+)
+SELECT
+  type_key,
+  MAX(peer_n) AS peer_n,
+  MAX(CASE WHEN rn = CEILING(peer_n * 0.50) THEN cycle_h END) AS peer_p50_h,
+  MAX(CASE WHEN rn = CEILING(peer_n * 0.75) THEN cycle_h END) AS peer_p75_h,
+  CAST(@T_freeze AS DATETIME) AS t_freeze,
+  365 AS lookback_w_days,
+  'Completed non-dup non-legacy; closed>=created; created in [T-365d,T]; nearest-rank P50/P75' AS peer_def,
+  'empirical_not_city_sla' AS peer_label_note
+FROM ranked
+GROUP BY type_key
+ORDER BY type_key;
+
+### seeds/C52/G.sql (new file, 8001 bytes)
+-- N13 C52 G: read-only form of frozen 02_source_gate_checks.sql. Each 'INSERT INTO src_gate_results (...) SELECT ...' is run as its SELECT
+-- (17 result rows, same order as the frozen script); the results table DDL and the final emit/overall SELECTs are dropped (overall computed by the evaluator).
+-- Reads raw_311_requests and the frozen extract tables src_open_candidates / src_peer_stats / src_extract_lineage. No DDL, no writes.
+USE chicago311;
+-- A. Open count extract vs raw
+SELECT
+  'A_open_count_match',
+  CAST((SELECT COUNT(*) FROM raw_311_requests WHERE STATUS='Open') AS CHAR),
+  CAST((SELECT COUNT(*) FROM src_open_candidates) AS CHAR),
+  CASE WHEN (SELECT COUNT(*) FROM raw_311_requests WHERE STATUS='Open')
+            = (SELECT COUNT(*) FROM src_open_candidates)
+       THEN 'PASS' ELSE 'FAIL' END,
+  'raw_open_n vs extract_open_n; tolerance = exact match';
+
+-- B. Distinct SR_NUMBER = rowcount
+SELECT
+  'B_distinct_sr_equals_rows',
+  CAST(COUNT(*) AS CHAR),
+  CAST(COUNT(DISTINCT SR_NUMBER) AS CHAR),
+  CASE WHEN COUNT(*) = COUNT(DISTINCT SR_NUMBER) THEN 'PASS' ELSE 'FAIL' END,
+  'src_open_candidates grain'
+FROM src_open_candidates;
+
+-- C. ID coverage vs raw Open
+SELECT
+  'C_id_missing_in_extract',
+  CAST(COUNT(*) AS CHAR),
+  CASE WHEN COUNT(*)=0 THEN 'PASS' ELSE 'FAIL' END,
+  'raw Open SR_NUMBER absent from extract'
+FROM raw_311_requests r
+LEFT JOIN src_open_candidates d ON r.SR_NUMBER <=> d.SR_NUMBER
+WHERE r.STATUS='Open' AND d.SR_NUMBER IS NULL;
+
+SELECT
+  'C_id_extra_in_extract',
+  CAST(COUNT(*) AS CHAR),
+  CASE WHEN COUNT(*)=0 THEN 'PASS' ELSE 'FAIL' END,
+  'extract SR_NUMBER not in raw Open'
+FROM src_open_candidates d
+LEFT JOIN raw_311_requests r
+  ON d.SR_NUMBER <=> r.SR_NUMBER AND r.STATUS='Open'
+WHERE r.SR_NUMBER IS NULL;
+
+-- D. Critical field equality (null-safe)
+SELECT
+  'D_field_mismatch_critical',
+  CAST(SUM(CASE WHEN NOT (
+       r.STATUS <=> d.STATUS
+   AND r.SR_TYPE <=> d.SR_TYPE
+   AND r.SR_SHORT_CODE <=> d.SR_SHORT_CODE
+   AND r.CREATED_DATE <=> d.CREATED_DATE
+   AND r.LAST_MODIFIED_DATE <=> d.LAST_MODIFIED_DATE
+   AND r.CLOSED_DATE <=> d.CLOSED_DATE
+   AND r.DUPLICATE <=> d.DUPLICATE
+   AND r.LEGACY_RECORD <=> d.LEGACY_RECORD
+   AND r.LEGACY_SR_NUMBER <=> d.LEGACY_SR_NUMBER
+   AND r.PARENT_SR_NUMBER <=> d.PARENT_SR_NUMBER
+   AND r.WARD <=> d.WARD
+   AND r.COMMUNITY_AREA <=> d.COMMUNITY_AREA
+  ) THEN 1 ELSE 0 END) AS CHAR),
+  CASE WHEN SUM(CASE WHEN NOT (
+       r.STATUS <=> d.STATUS
+   AND r.SR_TYPE <=> d.SR_TYPE
+   AND r.SR_SHORT_CODE <=> d.SR_SHORT_CODE
+   AND r.CREATED_DATE <=> d.CREATED_DATE
+   AND r.LAST_MODIFIED_DATE <=> d.LAST_MODIFIED_DATE
+   AND r.CLOSED_DATE <=> d.CLOSED_DATE
+   AND r.DUPLICATE <=> d.DUPLICATE
+   AND r.LEGACY_RECORD <=> d.LEGACY_RECORD
+   AND r.LEGACY_SR_NUMBER <=> d.LEGACY_SR_NUMBER
+   AND r.PARENT_SR_NUMBER <=> d.PARENT_SR_NUMBER
+   AND r.WARD <=> d.WARD
+   AND r.COMMUNITY_AREA <=> d.COMMUNITY_AREA
+  ) THEN 1 ELSE 0 END)=0 THEN 'PASS' ELSE 'FAIL' END,
+  'null-safe <=> on critical raw columns'
+FROM raw_311_requests r
+INNER JOIN src_open_candidates d ON r.SR_NUMBER <=> d.SR_NUMBER
+WHERE r.STATUS='Open';
+
+-- E. STATUS domain Open-only
+SELECT
+  'E_status_domain_open_only',
+  CAST(COUNT(DISTINCT STATUS) AS CHAR),
+  CAST(SUM(STATUS<>'Open') AS CHAR),
+  CASE WHEN COUNT(DISTINCT STATUS)=1 AND SUM(STATUS<>'Open')=0 THEN 'PASS' ELSE 'FAIL' END,
+  'envelope A must be Open-only'
+FROM src_open_candidates;
+
+-- F. CREATED_DATE min/max vs raw Open
+SELECT
+  'F_created_date_range',
+  (SELECT MIN(CREATED_DATE) FROM raw_311_requests WHERE STATUS='Open'),
+  (SELECT MAX(CREATED_DATE) FROM raw_311_requests WHERE STATUS='Open'),
+  CONCAT(
+    (SELECT MIN(CREATED_DATE) FROM src_open_candidates),
+    ' .. ',
+    (SELECT MAX(CREATED_DATE) FROM src_open_candidates)
+  ),
+  CASE WHEN
+    (SELECT MIN(CREATED_DATE) FROM raw_311_requests WHERE STATUS='Open')
+      <=> (SELECT MIN(CREATED_DATE) FROM src_open_candidates)
+    AND
+    (SELECT MAX(CREATED_DATE) FROM raw_311_requests WHERE STATUS='Open')
+      <=> (SELECT MAX(CREATED_DATE) FROM src_open_candidates)
+  THEN 'PASS' ELSE 'FAIL' END,
+  'metric_a=raw_min metric_b=raw_max metric_c=extract min..max';
+
+-- G. Null profiles (INFO + soft FAIL only if CREATED/STATUS null — unexpected)
+SELECT
+  'G_null_profile_created_status',
+  CAST(SUM(CREATED_DATE IS NULL OR TRIM(CREATED_DATE)='') AS CHAR),
+  CAST(SUM(STATUS IS NULL OR TRIM(STATUS)='') AS CHAR),
+  CAST(SUM(LAST_MODIFIED_DATE IS NULL OR TRIM(LAST_MODIFIED_DATE)='') AS CHAR),
+  CASE WHEN SUM(CREATED_DATE IS NULL OR TRIM(CREATED_DATE)='')=0
+        AND SUM(STATUS IS NULL OR TRIM(STATUS)='')=0
+       THEN 'PASS' ELSE 'FAIL' END,
+  'null/blank CREATED_DATE, STATUS, LAST_MODIFIED_DATE counts'
+FROM src_open_candidates;
+
+SELECT
+  'G_null_closed_date_info',
+  CAST(SUM(CLOSED_DATE IS NULL OR TRIM(CLOSED_DATE)='') AS CHAR),
+  'INFO',
+  'blank CLOSED_DATE count among Open (expected ~all)'
+FROM src_open_candidates;
+
+-- H. Checksum strategy: CRC64-like via BIT_XOR(CRC32(SR_NUMBER)) ordered set fingerprint
+SELECT
+  'H_sr_checksum_match',
+  CAST((SELECT BIT_XOR(CRC32(SR_NUMBER)) FROM raw_311_requests WHERE STATUS='Open') AS CHAR),
+  CAST((SELECT BIT_XOR(CRC32(SR_NUMBER)) FROM src_open_candidates) AS CHAR),
+  CASE WHEN (SELECT BIT_XOR(CRC32(SR_NUMBER)) FROM raw_311_requests WHERE STATUS='Open')
+            = (SELECT BIT_XOR(CRC32(SR_NUMBER)) FROM src_open_candidates)
+       THEN 'PASS' ELSE 'FAIL' END,
+  'BIT_XOR(CRC32(SR_NUMBER)) set fingerprint raw Open vs extract';
+
+-- I. Peer stats exist at type_key grain; no action labels
+SELECT
+  'I_peer_stats_present',
+  CAST((SELECT COUNT(*) FROM src_peer_stats) AS CHAR),
+  CAST((SELECT COUNT(DISTINCT type_key) FROM src_peer_stats) AS CHAR),
+  CASE WHEN (SELECT COUNT(*) FROM src_peer_stats) > 0
+        AND (SELECT COUNT(*) FROM src_peer_stats)
+            = (SELECT COUNT(DISTINCT type_key) FROM src_peer_stats)
+       THEN 'PASS' ELSE 'FAIL' END,
+  'peer_stats rowcount = distinct type_key; must be >0';
+
+SELECT
+  'I_peer_no_null_type_key',
+  CAST(SUM(type_key IS NULL OR TRIM(type_key)='') AS CHAR),
+  CASE WHEN SUM(type_key IS NULL OR TRIM(type_key)='')=0 THEN 'PASS' ELSE 'FAIL' END,
+  'type_key must be non-null in peer_stats'
+FROM src_peer_stats;
+
+SELECT
+  'I_peer_p75_nonneg_when_n',
+  CAST(SUM(CASE WHEN peer_n > 0 AND (peer_p75_h IS NULL OR peer_p75_h < 0) THEN 1 ELSE 0 END) AS CHAR),
+  CASE WHEN SUM(CASE WHEN peer_n > 0 AND (peer_p75_h IS NULL OR peer_p75_h < 0) THEN 1 ELSE 0 END)=0
+       THEN 'PASS' ELSE 'FAIL' END,
+  'peer_p75_h present and >=0 when peer_n>0'
+FROM src_peer_stats;
+
+-- J. No judged label columns on extract (schema probe)
+SELECT
+  'J_no_judged_columns',
+  CAST(SUM(COLUMN_NAME IN (
+        'action','classification','label','is_eligible','is_open',
+        'ESCALATE','INCONCLUSIVE','STANDARD','dormant_h','kappa','selected'
+      )) AS CHAR),
+  CASE WHEN SUM(COLUMN_NAME IN (
+        'action','classification','label','is_eligible','is_open',
+        'ESCALATE','INCONCLUSIVE','STANDARD','dormant_h','kappa','selected'
+      ))=0 THEN 'PASS' ELSE 'FAIL' END,
+  'INFORMATION_SCHEMA probe for forbidden judged columns on src_open_candidates'
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA='chicago311' AND TABLE_NAME='src_open_candidates';
+
+-- K. Lineage vs freeze expectations
+SELECT
+  'K_lineage_open_matches_raw',
+  CAST(open_candidate_n AS CHAR),
+  CAST(raw_open_n AS CHAR),
+  CASE WHEN open_candidate_n = raw_open_n THEN 'PASS' ELSE 'FAIL' END,
+  'src_extract_lineage open_candidate_n vs raw_open_n'
+FROM src_extract_lineage;
+
+SELECT
+  'K_lineage_t_freeze',
+  CAST(t_freeze AS CHAR),
+  CASE WHEN t_freeze = CAST('2026-09-12 23:59:59' AS DATETIME) THEN 'PASS' ELSE 'FAIL' END,
+  'T_freeze working must be 2026-09-12 23:59:59'
+FROM src_extract_lineage;
+
+-- Status distribution INFO
+SELECT
+  'L_raw_status_dist_info',
+  GROUP_CONCAT(CONCAT(STATUS, '=', cnt) ORDER BY STATUS SEPARATOR '; '),
+  'INFO',
+  'raw STATUS distribution'
+FROM (
+  SELECT STATUS, COUNT(*) AS cnt FROM raw_311_requests GROUP BY STATUS
+) s;
+
+### seeds/C52/CK.sql (new file, 175 bytes)
+-- N13 C52 checksum bracket (read-only)
+CHECKSUM TABLE chicago311.raw_311_requests, chicago311.src_open_candidates, chicago311.src_peer_stats, chicago311.src_extract_lineage;
+
+### seeds/C52/ARMS.tsv (new file, 250 bytes)
+arm	mode	desc
+SER_1	SER	extract chain (E1, E2) then gate chain (G), one after the other
+PAR_1	PAR	extract chain and gate chain launched concurrently
+SER_2	SER	extract chain then gate chain
+PAR_2	PAR	extract chain and gate chain launched concurrently
+
+### seeds/C52/SQLCONC (new file, 46 bytes)
+C52 serial-vs-concurrent SQL arms (runner v4)
+
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C52 BUILDER REPORT

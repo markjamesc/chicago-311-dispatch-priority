@@ -1,0 +1,4 @@
+pair,n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+B: R-A(frozen) vs R-B(frozen) [contract ON both],222002,222002,222002,0,0,222002,0
+X1: R-A(frozen) vs R-B(pre-contract) [contract OFF on R-B],222002,222002,222002,0,0,221898,104
+X2: R-A(seeded no-contract) vs R-B(pre-contract) [contract OFF both],222002,222002,222002,0,0,222002,0

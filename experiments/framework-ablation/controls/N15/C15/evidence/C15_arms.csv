@@ -1,0 +1,8 @@
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+RK_CAP200,NA,0,,,,final_action_list.csv,,final_action_list.csv,final_action_list.csv,late hard cap: final_action_list = top 200 ESCALATE by dormant_h/peer_p75_h,TRUE,TRUE,FALSE
+RK_TYPECAP,NA,0,,,,final_action_list.csv,,final_action_list.csv,,late per-type cap of 100 ESCALATE,TRUE,TRUE,FALSE
+RK_KAPPACAP,NA,0,,,,final_action_list.csv,,final_action_list.csv,,late capacity via a raised kappa (8),TRUE,TRUE,FALSE
+RK_RANKONLY,NA,0,,,,final_action_list.csv,,,final_action_list.csv,"late ranking of the full ESCALATE set (same set, no cap)",FALSE,TRUE,FALSE
+RK_PRECAP,NA,1,,,,,,,,"cap of 1,000 applied to labels before Stage 5's own checks",FALSE,FALSE,TRUE
+RK_BENIGN,NA,0,,,capacity_coverage_note.csv,,,,,benign: one extra illustrative budget row in the FLAG-only capacity note,FALSE,FALSE,FALSE

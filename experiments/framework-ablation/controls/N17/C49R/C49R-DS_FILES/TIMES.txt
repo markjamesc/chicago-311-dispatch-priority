@@ -1,0 +1,4 @@
+sent=2026-10-09 07:12:44 CDT
+reply_complete=2026-10-09 07:14:40 CDT (approx; observed complete at check after ~2 min)
+url=https://chat.deepseek.com/a/chat/s/ec8baac5-4f85-41b7-95fa-8aa0e04a2828
+notes: DeepThink ON, Search OFF (Search ON by default; switched off, verified). Attachment chip count before send = 10 (all 10 files of delivery/FILES incl. SHA256SUMS.txt), no upload errors. Capture: select rendered reply, copy, clipget; unchanged + final newline.

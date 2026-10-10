@@ -1,0 +1,930 @@
+# C32 Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01–A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted, and Freeze Before Stage 5 (catalog #32) can be removed from the canonical framework.
+- REVERT: the control stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence;
+  - a hash or frozen-version mismatch against the FREEZE RECORD;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (runner results, raw CSVs, fixture rows, manifests, logs). Do not HALT only because historical stdout is missing.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+- Constitution §7 conditions 4–7 (recon, fixtures, no undeclared semantic change, no locked regression) apply to the clean arm B. The seeded arms' effects are assessed through P1 (conditions 8–9). Apply this the same way to every control.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution §10).
+Everything you need is in this message. There are no attachments and no tools.
+Reply in full, in one message. If your reply already ends with the two final lines, it is complete.
+
+Write these sections:
+1. Role attestation.
+2. Freeze check: are the Builder and Validator reports the hashed files in the FREEZE RECORD? Is each one complete, ending with its END line?
+3. Hard-fact agreement table: Builder vs Validator vs runner RESULTS. Mark each row agree or disagree.
+4. The nine KEEP conditions of constitution §7. Give PASS or FAIL for each, numbered 1–9, with a citation.
+5. HALT conditions of §9. For each one, say present or absent, with a citation.
+6. Blocking objections raised by the Validator and how the evidence bears on them.
+7. Verdict rationale: did removing the control materially change the outcome on the frozen pack?
+End your reply with exactly these two lines:
+TERMINAL_STATE: <KEEP|REVERT|HALT>
+END C32 ADJUDICATION
+
+---
+# COORDINATOR NOTES
+- Arm B's full-field recon shows dormant_h 1 and open_age_h 2 mismatches between R-A and R-B. These are three rows in the frozen pack itself where the two paths differ by exactly 1.000 h: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). The labels agree. The likely cause is a daylight-saving ambiguous-hour read; this is not confirmed. It is recorded as an open finding and the pack is not changed. "B recon is 0/0/0" in the RESULTS uses the frozen recon definition: only-RA, only-RB and classification disagreements. Under that definition the clean arm passes the HALT rule. The 1/2 full-field mismatches are known and expected in every control. They are not a seeded effect and not a harness defect.
+- Cross-reference: N1 is open finding **OF-1** in the coordinator's RESULTS_N15.md (DST ambiguous-hour clean-pair mismatch; coordinator decision 2026-10-03 05:08 CT: record and disclose, do not change the frozen pack). It was disclosed to the Builder and Validator in their packets (COORDINATOR NOTE N1) and in every spec ("Known open finding N1"), all before execution.
+
+---
+# SPEC
+# C32 — Ablation specification (FROZEN)
+
+**Ablation ID:** C32 (owner Remaining Ablation Program, catalog #32 "Freeze Before Stage 5")
+**Batch:** N15 batch 3 of 3 (controls C36, C35, C32, C15, C45)
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 04:26 CT)
+**Target stage:** Stage 4→5 boundary (validated outputs sealed before deeper analysis)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Freeze the validated outputs before deeper analysis. Stage 5 may read only the sealed files. A pre-Stage-5 check compares the Stage-5 inputs with the validation freeze.
+
+## Exact change being tested (ablation)
+There is no seal check. Stage 5 reads whatever is in the validated-output locations when it runs. Its own independent count checks stay.
+Seeded post-validation edits (PRE) happen after the validation freeze and before Stage 5.
+
+## Known open finding N1 (disclosed before execution; not changed)
+In the frozen pack, clean R-A and R-B differ by exactly 1.000 h on three ESCALATE rows: SR22-01936870 (dormant_h) and SR25-02017553, SR25-02017556 (open_age_h). Their labels agree. The likely cause is a daylight-saving ambiguous-hour clock read that differs between the paths; this is not confirmed. A full-field R-A vs R-B recon therefore shows dormant_h 1 and open_age_h 2 on the frozen pack itself. Every "B recon 0/0/0" rule in this batch uses the frozen recon definition: key set (only-RA, only-RB) and classification disagreements. It does not include dormant_h or open_age_h. Stage-5-only controls (C36, C35, C32, C15) do not rerun R-A or R-B; they start from the frozen validated state.
+
+## Stage-5-only arm design (runner v3, `seeds/<CID>/S5ONLY`)
+Every arm, including arm B, starts from the frozen validated state, copied from the frozen PC pack:
+- `R-A/outputs/RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9` (22,271,481 bytes)
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` (164 bytes)
+- `outputs/validated_action_list.csv` SHA-256 `2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a` (13,625,648 bytes)
+- `stage-05/run_deeper_analysis.R` SHA-256 `ed8694277737989d301b9b1f7e6a06a2dbb87a2ad25254fd53b1db47d92c1ec2` (3,443 bytes)
+- `stage-05/deeper/independent_checks_critical_counts.csv` SHA-256 `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` (190 bytes)
+- `stage-05/deeper/portfolio_summary.csv` SHA-256 `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` (183 bytes)
+- `stage-05/deeper/escalate_by_type.csv` SHA-256 `0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159` (3,932 bytes)
+- `stage-05/deeper/escalate_by_type_top25.csv` SHA-256 `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` (1,264 bytes)
+- `stage-05/deeper/inconclusive_by_clause.csv` SHA-256 `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` (58 bytes)
+- `stage-05/deeper/escalate_dormancy_summary.csv` SHA-256 `1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63` (138 bytes)
+- `stage-05/deeper/kappa_sensitivity.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` (164 bytes)
+- `stage-05/deeper/capacity_coverage_note.csv` SHA-256 `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` (644 bytes)
+Before anything else runs, the runner writes `VALIDATION_FREEZE.sha256` (SHA-256 and bytes of `R-A/outputs/RA_classifications.csv`, `R-B/outputs/RB_kappa_grid_counts.csv` and `outputs/validated_action_list.csv`). Each arm then runs these steps:
+1. **PRE** (C32 only): the arm's post-validation edit script.
+2. **FRZ_PRE**: re-hash of the three files against the freeze.
+3. **S5**: Stage 5, either the frozen-path harness `runner/stage45/run_deeper_analysis.R` (SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94`, 3439 bytes; a path-only copy of the frozen `stage-05/run_deeper_analysis.R`) or the arm's seeded variant.
+4. **FRZ_POST**: re-hash of the three files after Stage 5.
+
+**Arm B** = no edit + harness. It is the truth reference, and it must reproduce the frozen `stage-05/deeper` outputs.
+
+The harness keeps Stage 5's own independent checks: a `stopifnot` that n_decision, n_ESCALATE, n_INCONCLUSIVE, n_STANDARD and the validated-list count equal the frozen counts. Stage-5 outputs are compared by CSV content, with numbers to 1e-9. Seed scripts and diffs vs the harness are in `runner/SEEDS_b3.sha256` and `runner/SEED_DIFFS_b3.txt`. No R-A/R-B code seeds and no source variants are used in batch 3.
+
+**Harm set H:** Stage 5 completes (exit 0) and at least one of its 8 standard outputs differs from arm B. This is the owner's "post-hoc edits would alter conclusions".
+**Caught with the control:** FRZ_PRE shows a changed Stage-5 input (the seal check blocks Stage 5).
+**Caught without the control (D_abl):** Stage 5 exits non-zero.
+
+## Seeded arms (frozen before execution)
+- **FB_KGRID**: R-B kappa grid regenerated after validation (kappa=3 row moves 1,500 rows).
+  - PRE edit `runner/seeds/C32/FB_KGRID__pre_edit.R` SHA-256 `59a0a24002f9f4895e20e7b525d77240c9c0691734b0fc32a621b3d6e1341bf9` (470 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+- **FB_TF24**: R-A timing fields re-derived at T_freeze+24 h after validation; labels kept.
+  - PRE edit `runner/seeds/C32/FB_TF24__pre_edit.R` SHA-256 `01bf58b9ccc34c11e0b467000a89817ebb8f87e100e100ec6c54c3d2600cbfd0` (408 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+- **FB_CLAUSE**: INCONCLUSIVE clause relabelled after validation (missing or <30-peer rows split out).
+  - PRE edit `runner/seeds/C32/FB_CLAUSE__pre_edit.R` SHA-256 `5d37c02f15e4c5c0492d835000cf948e89e4ac9da7365a1a358a9b39b950d8fb` (505 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+- **FB_ROUND**: dormant_h rounded to whole hours after validation.
+  - PRE edit `runner/seeds/C32/FB_ROUND__pre_edit.R` SHA-256 `8ede748e02db132aef9b0034818cb69c312ada83b0afef3bb6a260fd5bba48f8` (371 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+- **FB_RECLASS**: 10 INCONCLUSIVE labels edited to ESCALATE after validation.
+  - PRE edit `runner/seeds/C32/FB_RECLASS__pre_edit.R` SHA-256 `433ffaf4a779e789b196140f5d897fd84364ff43b65d39b8856afea2d1098a5b` (409 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+- **FB_VALSORT**: validated list re-sorted after validation (same rows; benign for Stage-5 outputs).
+  - PRE edit `runner/seeds/C32/FB_VALSORT__pre_edit.R` SHA-256 `ea26387ceaeb397f6a4cd361031efce1660af4c588352596ab0c23be762e1689` (355 bytes)
+  - Stage-5 script `runner/stage45/run_deeper_analysis.R` SHA-256 `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94` (3439 bytes)
+
+## Operational benefit predicate P1
+- **P1 satisfied (KEEP side):** arm B is clean (Stage 5 exit 0; 8/8 outputs equal the frozen stage-05/deeper; the with-control check does not flag B) and H \ D_abl = ∅. Every harm is still caught without the control.
+- **P1 failed:** H \ D_abl ≠ ∅.
+
+Also reported, but not counted in P1:
+- H \ caught-with: harms the control itself misses.
+- Arms flagged with the control but not in H: the control's over-blocking cost.
+Owner threshold: Pass = post-hoc changes yield the same interpretations; Fail = post-hoc edits would alter conclusions (keep rule).
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the work folder `...\ablation-runs\N15`. No new extract. MySQL is used only for a read-only COUNT preflight. Nothing in the frozen pack is modified. All edits happen on arm copies.
+
+## Regression / HALT rules
+- HALT if arm B's Stage 5 exits non-zero, if arm B's 8 Stage-5 outputs differ from the frozen `stage-05/deeper`, or if any arm lacks an S5 exit record or a FRZ_PRE/FRZ_POST file.
+- HALT if Builder and Validator disagree on a hard number in the RESULTS file.
+- A seeded arm whose Stage 5 exits non-zero counts as caught in every regime (D_abl). It is not a HALT.
+- Raw evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   59a0a24002f9f4895e20e7b525d77240c9c0691734b0fc32a621b3d6e1341bf9 seeds/C32/FB_KGRID__pre_edit.R
+seed   OK   01bf58b9ccc34c11e0b467000a89817ebb8f87e100e100ec6c54c3d2600cbfd0 seeds/C32/FB_TF24__pre_edit.R
+seed   OK   5d37c02f15e4c5c0492d835000cf948e89e4ac9da7365a1a358a9b39b950d8fb seeds/C32/FB_CLAUSE__pre_edit.R
+seed   OK   8ede748e02db132aef9b0034818cb69c312ada83b0afef3bb6a260fd5bba48f8 seeds/C32/FB_ROUND__pre_edit.R
+seed   OK   433ffaf4a779e789b196140f5d897fd84364ff43b65d39b8856afea2d1098a5b seeds/C32/FB_RECLASS__pre_edit.R
+seed   OK   ea26387ceaeb397f6a4cd361031efce1660af4c588352596ab0c23be762e1689 seeds/C32/FB_VALSORT__pre_edit.R
+seed   OK   9380437d58eb080b7d3ab9621eee3bdec979b142b3c1f9685b02fe2ec331f2d0 seeds/C32/ARMS.tsv
+seed   OK   bff067e867a0f3f503b286ab47b647d687203dae33817b57c32a97602adcd94b seeds/C32/S5ONLY
+seed   OK   a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94 stage45/run_deeper_analysis.R
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1 | digest 0.6.39
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUNNER-SIDE FILES referenced by this control (SHA-256, bytes; verified by the preflight above)
+59a0a24002f9f4895e20e7b525d77240c9c0691734b0fc32a621b3d6e1341bf9  470  runner/seeds/C32/FB_KGRID__pre_edit.R
+01bf58b9ccc34c11e0b467000a89817ebb8f87e100e100ec6c54c3d2600cbfd0  408  runner/seeds/C32/FB_TF24__pre_edit.R
+5d37c02f15e4c5c0492d835000cf948e89e4ac9da7365a1a358a9b39b950d8fb  505  runner/seeds/C32/FB_CLAUSE__pre_edit.R
+8ede748e02db132aef9b0034818cb69c312ada83b0afef3bb6a260fd5bba48f8  371  runner/seeds/C32/FB_ROUND__pre_edit.R
+433ffaf4a779e789b196140f5d897fd84364ff43b65d39b8856afea2d1098a5b  409  runner/seeds/C32/FB_RECLASS__pre_edit.R
+ea26387ceaeb397f6a4cd361031efce1660af4c588352596ab0c23be762e1689  355  runner/seeds/C32/FB_VALSORT__pre_edit.R
+9380437d58eb080b7d3ab9621eee3bdec979b142b3c1f9685b02fe2ec331f2d0  871  runner/seeds/C32/ARMS.tsv
+bff067e867a0f3f503b286ab47b647d687203dae33817b57c32a97602adcd94b  64  runner/seeds/C32/S5ONLY
+a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94  3439  runner/stage45/run_deeper_analysis.R
+
+---
+# SOURCE VARIANTS used by this control (re-verified on the PC before any arm ran)
+(no source variants used)
+
+---
+# RUN LOG (this control)
+06:10:45 C32 arms
+06:10:45   B FRZ_PRE changed=0
+06:10:48   B S5 exit=0 secs=3.1
+06:10:49   B FRZ_POST changed=0
+06:10:51   FB_KGRID PRE exit=0 secs=1.1
+06:10:51   FB_KGRID FRZ_PRE changed=1
+06:10:53   FB_KGRID S5 exit=0 secs=2.4
+06:10:53   FB_KGRID FRZ_POST changed=1
+06:10:56   FB_TF24 PRE exit=0 secs=2.1
+06:10:56   FB_TF24 FRZ_PRE changed=1
+06:11:00   FB_TF24 S5 exit=0 secs=3.5
+06:11:00   FB_TF24 FRZ_POST changed=1
+06:11:03   FB_CLAUSE PRE exit=0 secs=2.1
+06:11:03   FB_CLAUSE FRZ_PRE changed=1
+06:11:05   FB_CLAUSE S5 exit=0 secs=2.2
+06:11:06   FB_CLAUSE FRZ_POST changed=1
+06:11:09   FB_ROUND PRE exit=0 secs=2
+06:11:09   FB_ROUND FRZ_PRE changed=1
+06:11:12   FB_ROUND S5 exit=0 secs=3
+06:11:12   FB_ROUND FRZ_POST changed=1
+06:11:15   FB_RECLASS PRE exit=0 secs=2.1
+06:11:15   FB_RECLASS FRZ_PRE changed=1
+06:11:17   FB_RECLASS S5 exit=1 secs=2
+06:11:17   FB_RECLASS FRZ_POST changed=1
+06:11:20   FB_VALSORT PRE exit=0 secs=2.1
+06:11:20   FB_VALSORT FRZ_PRE changed=1
+06:11:22   FB_VALSORT S5 exit=0 secs=2.1
+06:11:22   FB_VALSORT FRZ_POST changed=1
+
+---
+# C32_RESULTS.md (runner output)
+# C32 RESULTS — Freeze Before Stage 5 (catalog #32) ablation (runner output, mechanical facts only)
+
+Every arm starts from the frozen validated state (RA_classifications.csv, RB_kappa_grid_counts.csv, validated_action_list.csv copied from the frozen pack) and records VALIDATION_FREEZE.sha256 before anything else runs.
+Arm B runs the frozen-path Stage-5 harness with no edit and is the truth reference. Seeded arms apply the listed edit (PRE step) or Stage-5 variant.
+
+## Definitions (frozen in the spec)
+- Harm set H: Stage 5 completes (exit 0) and at least one of its 8 standard outputs differs from arm B (CSV content, numbers to 1e-9)
+- Caught with the control: the pre-Stage-5 freeze check finds a Stage-5 input whose SHA-256 differs from the validation freeze (FRZ_PRE)
+- Caught without the control (D_abl): Stage 5 exits non-zero (its own independent count checks)
+
+## Arm B
+- Stage 5 exit 0; outputs equal frozen stage-05/deeper: YES (8/8); with-control check on B: clean
+
+## Arms (C32_arms.csv)
+| arm | pre_exit | s5_exit | frz_pre_changed | frz_post_changed | s5_outputs_differ_vs_B | s5_added_files | label_check_fail | action_set_differs | rank_or_priority_cols | in_H | caught_with | caught_without |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| B | NA | 0 |  |  |  |  |  |  |  | NA | FALSE | FALSE |
+| FB_KGRID | 0 | 0 | R-B\outputs\RB_kappa_grid_counts.csv | R-B\outputs\RB_kappa_grid_counts.csv | kappa_sensitivity.csv |  |  |  |  | TRUE | TRUE | FALSE |
+| FB_TF24 | 0 | 0 | R-A\outputs\RA_classifications.csv | R-A\outputs\RA_classifications.csv | escalate_dormancy_summary.csv |  | escalate_dormancy_summary.csv |  |  | TRUE | TRUE | FALSE |
+| FB_CLAUSE | 0 | 0 | R-A\outputs\RA_classifications.csv | R-A\outputs\RA_classifications.csv | inconclusive_by_clause.csv |  | inconclusive_by_clause.csv |  |  | TRUE | TRUE | FALSE |
+| FB_ROUND | 0 | 0 | R-A\outputs\RA_classifications.csv | R-A\outputs\RA_classifications.csv | escalate_dormancy_summary.csv |  | escalate_dormancy_summary.csv |  |  | TRUE | TRUE | FALSE |
+| FB_RECLASS | 0 | 1 | R-A\outputs\RA_classifications.csv | R-A\outputs\RA_classifications.csv |  |  |  |  |  | FALSE | TRUE | TRUE |
+| FB_VALSORT | 0 | 0 | outputs\validated_action_list.csv | outputs\validated_action_list.csv |  |  |  |  |  | FALSE | TRUE | FALSE |
+
+## Sets
+- H = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND}
+- caught with the control = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND,FB_RECLASS,FB_VALSORT}
+- D_abl (caught without) = {FB_RECLASS}
+- H \ D_abl (escapes once the control is removed) = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND}
+- H \ caught-with (missed even with the control) = {}
+- flagged with the control but not in H (control cost / over-blocking) = {FB_RECLASS,FB_VALSORT}
+
+## Predicate P1 (frozen)
+KEEP-side requires arm B clean and H \ D_abl = {} (removing the control lets no harm through). Otherwise the control stays.
+P1 failed: H \ D_abl = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND}
+
+---
+# C32_arms.csv (raw, full file)
+arm,pre_exit,s5_exit,frz_pre_changed,frz_post_changed,s5_outputs_differ_vs_B,s5_added_files,label_check_fail,action_set_differs,rank_or_priority_cols,desc,in_H,caught_with,caught_without
+B,NA,0,,,,,,,,clean reference,NA,FALSE,FALSE
+FB_KGRID,0,0,R-B\outputs\RB_kappa_grid_counts.csv,R-B\outputs\RB_kappa_grid_counts.csv,kappa_sensitivity.csv,,,,,"R-B kappa grid regenerated after validation (kappa=3 row moves 1,500 rows)",TRUE,TRUE,FALSE
+FB_TF24,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,escalate_dormancy_summary.csv,,escalate_dormancy_summary.csv,,,R-A timing fields re-derived at T_freeze+24 h after validation; labels kept,TRUE,TRUE,FALSE
+FB_CLAUSE,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,inconclusive_by_clause.csv,,inconclusive_by_clause.csv,,,INCONCLUSIVE clause relabelled after validation (missing or <30-peer rows split out),TRUE,TRUE,FALSE
+FB_ROUND,0,0,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,escalate_dormancy_summary.csv,,escalate_dormancy_summary.csv,,,dormant_h rounded to whole hours after validation,TRUE,TRUE,FALSE
+FB_RECLASS,0,1,R-A\outputs\RA_classifications.csv,R-A\outputs\RA_classifications.csv,,,,,,10 INCONCLUSIVE labels edited to ESCALATE after validation,FALSE,TRUE,TRUE
+FB_VALSORT,0,0,outputs\validated_action_list.csv,outputs\validated_action_list.csv,,,,,,validated list re-sorted after validation (same rows; benign for Stage-5 outputs),FALSE,TRUE,FALSE
+
+---
+# FIXTURE RESULTS per arm and path (raw rows from each *_fixture_results.csv; file hashes are in the manifests)
+arm,path,fixture_id,expected,observed,pass
+
+---
+# C32_EVIDENCE.sha256
+c82b6c45926128e0ea13d379bd09809935fcd1b865f85c20114cb24cb9279d06  C32_ARM_MANIFESTS.txt
+5f33061cbc32353484dde0d1fd91a71ae7d019eda226ef1cc543e745f9036437  C32_arms.csv
+ab972e922b7aa2bebb9f8b3c370671fff351619732884a9455adc3d9873146de  C32_RESULTS.md
+
+---
+# ARM MANIFESTS (SHA-256, bytes, path) — every file of every arm
+Manifests: MANIFEST_inputs is hashed before each run and MANIFEST_outputs after. The RUN_* log filter is case-sensitive in this batch, so run_RA.R/run_RB.R appear under inputs. A seeded arm contains only the path(s) it runs; the other path is taken from arm B.
+B in  :: 9fa8f9758bd0e253651cd8233d7368883d29bb7d03bf4c882534d599aa8d0f09  111  ARM_SCRIPTS.txt
+B in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+B out :: 9fa8f9758bd0e253651cd8233d7368883d29bb7d03bf4c882534d599aa8d0f09  111  ARM_SCRIPTS.txt
+B out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_POST.txt
+B out :: 81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f  343  FRZ_PRE.txt
+B out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+B out :: a0bcaf1295efc0b9adedca1d3a1bfe8ba2847eb3664e7eccb8b11bda62637be5  33  RUN_S5.exit
+B out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+B out :: 6cb8b3f566ea2d1217ab7e124e05ba89e2097a30105293324e755fe1392d63e6  1970  RUN_S5.stdout.txt
+B out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+B out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+B out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+B out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+B out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+B out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+B out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+B out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+B out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_CLAUSE in  :: 8904715778f51a26832c12a3148f1d457af9b4429ddb79e04e8401f9c440b67f  222  ARM_SCRIPTS.txt
+FB_CLAUSE in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_CLAUSE out :: 8904715778f51a26832c12a3148f1d457af9b4429ddb79e04e8401f9c440b67f  222  ARM_SCRIPTS.txt
+FB_CLAUSE out :: a3904d1507bc66e0298af7d3da516134aa4cf55222375cddded038c8e29971f8  341  FRZ_POST.txt
+FB_CLAUSE out :: a3904d1507bc66e0298af7d3da516134aa4cf55222375cddded038c8e29971f8  341  FRZ_PRE.txt
+FB_CLAUSE out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+FB_CLAUSE out :: 0ecbdb82004f498af4c24fd898bfce82b3bc74cd186cafa0072b119581263935  22246113  R-A\outputs\RA_classifications.csv
+FB_CLAUSE out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_CLAUSE out :: d7b755abfbb1d614810485c7799de45569302f58f69c92bf560fc52cc147e4ca  33  RUN_PRE.exit
+FB_CLAUSE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_CLAUSE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_CLAUSE out :: 9e5fbaeb0f3126c3b796a20f34abb8158f55f8f43289d5533df8e850accfeecc  33  RUN_S5.exit
+FB_CLAUSE out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+FB_CLAUSE out :: 3d9dbb1319231ed6608a1bb9f683e95b5ee9889c4642899a966d3edecf3d16a2  2027  RUN_S5.stdout.txt
+FB_CLAUSE out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+FB_CLAUSE out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+FB_CLAUSE out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+FB_CLAUSE out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+FB_CLAUSE out :: a22d7de58acb11281c6fca66add1dcfeac780b41a344c122170476cc38132871  121  stage-05\deeper\inconclusive_by_clause.csv
+FB_CLAUSE out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+FB_CLAUSE out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+FB_CLAUSE out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+FB_CLAUSE out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_KGRID in  :: 8447acdcbcd7d90e9776da4619d3a6931b77dce9c1d27364ef55a87b30070046  221  ARM_SCRIPTS.txt
+FB_KGRID in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_KGRID out :: 8447acdcbcd7d90e9776da4619d3a6931b77dce9c1d27364ef55a87b30070046  221  ARM_SCRIPTS.txt
+FB_KGRID out :: cc3513b57ada47a0cfcbfabfa57cbb1720c311530d036d2f666c1f98fc39895e  341  FRZ_POST.txt
+FB_KGRID out :: cc3513b57ada47a0cfcbfabfa57cbb1720c311530d036d2f666c1f98fc39895e  341  FRZ_PRE.txt
+FB_KGRID out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+FB_KGRID out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+FB_KGRID out :: 12ea06198267aa6cf49814d1527f7464b5a1840fc326a519d4bcaa29f5946cee  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_KGRID out :: f475ce92cc86b8cdb35cf279bf2aef3c477c6c0f326442e0d03c1eaaa95d9233  33  RUN_PRE.exit
+FB_KGRID out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_KGRID out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_KGRID out :: 38acee2ebbc3fac02a4ddadfabe543c5f32654e9fab673613aacb97a4887ce33  33  RUN_S5.exit
+FB_KGRID out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+FB_KGRID out :: 73937d60d7cd1110ab7122284354cfddc1c76e8c7bb5349d058073fae58017f8  1977  RUN_S5.stdout.txt
+FB_KGRID out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+FB_KGRID out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+FB_KGRID out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+FB_KGRID out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+FB_KGRID out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+FB_KGRID out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+FB_KGRID out :: 12ea06198267aa6cf49814d1527f7464b5a1840fc326a519d4bcaa29f5946cee  164  stage-05\deeper\kappa_sensitivity.csv
+FB_KGRID out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+FB_KGRID out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_RECLASS in  :: 3d556cbf5c31ad2c7578c9f825b0bb7351d532a4e052ab0355461433928841da  223  ARM_SCRIPTS.txt
+FB_RECLASS in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_RECLASS out :: 3d556cbf5c31ad2c7578c9f825b0bb7351d532a4e052ab0355461433928841da  223  ARM_SCRIPTS.txt
+FB_RECLASS out :: d1a0f0f43a22770aab01222596ccbb460b072b2c0efa6098f00464b32578ff6c  341  FRZ_POST.txt
+FB_RECLASS out :: d1a0f0f43a22770aab01222596ccbb460b072b2c0efa6098f00464b32578ff6c  341  FRZ_PRE.txt
+FB_RECLASS out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+FB_RECLASS out :: 36e8efefbad7c6293e3be19ca6602e0ddc6aa7f6c739ebed4f5841672670957c  22271441  R-A\outputs\RA_classifications.csv
+FB_RECLASS out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_RECLASS out :: fa53c65c5b8e0c8a5df2db512f7e1e0f727cc1ca5623195d7f7428597af5ed4d  33  RUN_PRE.exit
+FB_RECLASS out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_RECLASS out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_RECLASS out :: 3debdf1ab35ed647973308314ed3b64e251d6607c04ab419e0cb48101d9ff7c6  31  RUN_S5.exit
+FB_RECLASS out :: dc58f53369f6cf0f187f87c54387c60036706884ec7f770a47f6601ebb59bf1d  52  RUN_S5.stderr.txt
+FB_RECLASS out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stdout.txt
+FB_RECLASS out :: 2c3258e6d8191846a8cfb29bb18a35a657957886df31582843ef5052413a46ac  192  stage-05\deeper\independent_checks_critical_counts.csv
+FB_RECLASS out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_ROUND in  :: 5ab9d41e61e0970b21b48d7cd3be014cfe656c988e624c7be43b485ed9ebdfcd  221  ARM_SCRIPTS.txt
+FB_ROUND in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_ROUND out :: 5ab9d41e61e0970b21b48d7cd3be014cfe656c988e624c7be43b485ed9ebdfcd  221  ARM_SCRIPTS.txt
+FB_ROUND out :: 170dfcaf3e962293d823cf12ab254a4424fd4802c774caa0612be005a92fd582  341  FRZ_POST.txt
+FB_ROUND out :: 170dfcaf3e962293d823cf12ab254a4424fd4802c774caa0612be005a92fd582  341  FRZ_PRE.txt
+FB_ROUND out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+FB_ROUND out :: ab82f152a0ae387350ff1917ec22e19c2f0a7eca523102888da23f615cdb74fd  20780086  R-A\outputs\RA_classifications.csv
+FB_ROUND out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_ROUND out :: 8f209cc28b23ffd293c1c883096534c5953d181ff2a3072e10d818f34a49ad80  31  RUN_PRE.exit
+FB_ROUND out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_ROUND out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_ROUND out :: f5a9c6d712ccc522f53dcd1ddc5fbe51307297f5334126e8d976818206e430fa  31  RUN_S5.exit
+FB_ROUND out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+FB_ROUND out :: 09f9e45f13092d1d5aef978162bfd17fd6c66f17519ad38ae5feb81945f4124e  1977  RUN_S5.stdout.txt
+FB_ROUND out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+FB_ROUND out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+FB_ROUND out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+FB_ROUND out :: cbdc7804f490ce51ff830c1cb7f170a9ee1acfdaf692e106b037cdd8549ee058  114  stage-05\deeper\escalate_dormancy_summary.csv
+FB_ROUND out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+FB_ROUND out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+FB_ROUND out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+FB_ROUND out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+FB_ROUND out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_TF24 in  :: 72ba93d89be553ade4f33b9f533b909f8b4ba19e843e783beb48f6af37fa30c9  220  ARM_SCRIPTS.txt
+FB_TF24 in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_TF24 out :: 72ba93d89be553ade4f33b9f533b909f8b4ba19e843e783beb48f6af37fa30c9  220  ARM_SCRIPTS.txt
+FB_TF24 out :: 8cf62e7306f21445d07bee6c35f796b282b67b2042676be3ef37e45feae7a26e  341  FRZ_POST.txt
+FB_TF24 out :: 8cf62e7306f21445d07bee6c35f796b282b67b2042676be3ef37e45feae7a26e  341  FRZ_PRE.txt
+FB_TF24 out :: 2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a  13625648  outputs\validated_action_list.csv
+FB_TF24 out :: b02c6846cd8b7ac4e953b8d8793ba32b45b364d2f21d9bee7f8bfab8fd0529a3  22309958  R-A\outputs\RA_classifications.csv
+FB_TF24 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_TF24 out :: e7b4c424d82941898f3ad44a23d6aff71b22d717b5a6e407792cc80409f931cb  33  RUN_PRE.exit
+FB_TF24 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_TF24 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_TF24 out :: 12c8e90f6c99eec2dcec4315841b4e19b3ab919fc5077ca32edd7c479ea5c649  33  RUN_S5.exit
+FB_TF24 out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+FB_TF24 out :: df07324fc0136472403fcbb2c4569a392b4a0cb1fbecadb711eb07724a44e385  1976  RUN_S5.stdout.txt
+FB_TF24 out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+FB_TF24 out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+FB_TF24 out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+FB_TF24 out :: fa12c9bee31afca46c2c94f3285a77bd6066b0d950967643576f479b9e1530df  138  stage-05\deeper\escalate_dormancy_summary.csv
+FB_TF24 out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+FB_TF24 out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+FB_TF24 out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+FB_TF24 out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+FB_TF24 out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_VALSORT in  :: f1df872e2d8645cafc4fd8694e91b7e8b9f3f9f16de5601c6891765233debf36  223  ARM_SCRIPTS.txt
+FB_VALSORT in  :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+FB_VALSORT out :: f1df872e2d8645cafc4fd8694e91b7e8b9f3f9f16de5601c6891765233debf36  223  ARM_SCRIPTS.txt
+FB_VALSORT out :: f1dbbc81862ac20e0d67b311bea9b8a89a7a748dadffaa4e7a5e7de6f8a6600e  341  FRZ_POST.txt
+FB_VALSORT out :: f1dbbc81862ac20e0d67b311bea9b8a89a7a748dadffaa4e7a5e7de6f8a6600e  341  FRZ_PRE.txt
+FB_VALSORT out :: 0de2eb2f5447109da66aee42c50cc2c943b8c4f1c307d4ef04fe6189a85b761e  13625648  outputs\validated_action_list.csv
+FB_VALSORT out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+FB_VALSORT out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  R-B\outputs\RB_kappa_grid_counts.csv
+FB_VALSORT out :: 95dbe619773e285728e0f1726ac141f304a3b3471d992f46c117ab3d30c01553  33  RUN_PRE.exit
+FB_VALSORT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stderr.txt
+FB_VALSORT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_PRE.stdout.txt
+FB_VALSORT out :: 037fe89ab600a7391e0922b5d547f0a0d735bd3995d69c2e38c797fe07f2d7e0  33  RUN_S5.exit
+FB_VALSORT out :: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  0  RUN_S5.stderr.txt
+FB_VALSORT out :: 4a3d7a84167b6ba7787149406f9e7dabe9cc4556369c869f97704c991ddd5bd3  1979  RUN_S5.stdout.txt
+FB_VALSORT out :: 4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609  644  stage-05\deeper\capacity_coverage_note.csv
+FB_VALSORT out :: 0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159  3932  stage-05\deeper\escalate_by_type.csv
+FB_VALSORT out :: 6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176  1264  stage-05\deeper\escalate_by_type_top25.csv
+FB_VALSORT out :: 1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63  138  stage-05\deeper\escalate_dormancy_summary.csv
+FB_VALSORT out :: f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d  58  stage-05\deeper\inconclusive_by_clause.csv
+FB_VALSORT out :: 4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146  190  stage-05\deeper\independent_checks_critical_counts.csv
+FB_VALSORT out :: 7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a  164  stage-05\deeper\kappa_sensitivity.csv
+FB_VALSORT out :: b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167  183  stage-05\deeper\portfolio_summary.csv
+FB_VALSORT out :: 65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd  335  VALIDATION_FREEZE.sha256
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+### seeds/C32/FB_KGRID__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+g <- read_csv(f("R-B/outputs/RB_kappa_grid_counts.csv"), show_col_types = FALSE)
+i <- which(g$kappa == 3); stopifnot(length(i) == 1)
+g$n_ESCALATE[i] <- g$n_ESCALATE[i] + 1500L; g$n_STANDARD[i] <- g$n_STANDARD[i] - 1500L  # [seed] R-B kappa grid regenerated after validation
+write_csv(g, f("R-B/outputs/RB_kappa_grid_counts.csv"))
+
+
+### seeds/C32/FB_TF24__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+ra <- read_csv(f("R-A/outputs/RA_classifications.csv"), show_col_types = FALSE)
+ra$dormant_h <- ra$dormant_h + 24; ra$open_age_h <- ra$open_age_h + 24  # [seed] R-A timing re-derived at T_freeze+24 h; labels kept
+write_csv(ra, f("R-A/outputs/RA_classifications.csv"))
+
+
+### seeds/C32/FB_CLAUSE__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+ra <- read_csv(f("R-A/outputs/RA_classifications.csv"), show_col_types = FALSE)
+i <- ra$classification == "INCONCLUSIVE" & (is.na(ra$peer_n) | ra$peer_n < 30); stopifnot(any(i))
+ra$integrity_clause[i] <- "missing_or_sub30_peer"  # [seed] clause relabelled after validation (split of thin_type_or_missing_peer)
+write_csv(ra, f("R-A/outputs/RA_classifications.csv"))
+
+
+### seeds/C32/FB_ROUND__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+ra <- read_csv(f("R-A/outputs/RA_classifications.csv"), show_col_types = FALSE)
+ra$dormant_h <- round(ra$dormant_h)  # [seed] dormant_h rounded to whole hours after validation
+write_csv(ra, f("R-A/outputs/RA_classifications.csv"))
+
+
+### seeds/C32/FB_RECLASS__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+ra <- read_csv(f("R-A/outputs/RA_classifications.csv"), show_col_types = FALSE)
+i <- which(ra$classification == "INCONCLUSIVE")[1:10]; ra$classification[i] <- "ESCALATE"  # [seed] 10 labels edited after validation
+write_csv(ra, f("R-A/outputs/RA_classifications.csv"))
+
+
+### seeds/C32/FB_VALSORT__pre_edit.R (new file; runs after the validation freeze, before Stage 5)
+suppressPackageStartupMessages({library(readr); library(dplyr)})
+root <- Sys.getenv("CHICAGO311_ROOT"); f <- function(p) file.path(root, p)
+v <- read_csv(f("outputs/validated_action_list.csv"), show_col_types = FALSE)
+write_csv(arrange(v, desc(dormant_h)), f("outputs/validated_action_list.csv"))  # [seed] validated (unordered) list re-sorted; same rows
+
+
+
+
+---
+# FREEZE RECORD (EVIDENCE_FREEZE.json)
+{
+  "ablation_id": "C32",
+  "frozen_at_ct": "2026-10-03 07:05:01 CDT",
+  "constitution_version": "1.0",
+  "roles": {"Builder": "ChatGPT", "Validator": "DeepSeek", "Adjudicator": "Grok"},
+  "baseline_sha256_files": [
+    "70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md",
+    "24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md"
+  ],
+  "builder_pack": [{"path": "C32/C32-builder/builder_report.md", "bytes": 15998, "sha256": "2ac81653d7e6a73fed016c0786ab655066acdc4368d9c4c835389bc48c552f31", "verdict_token_leak": false}],
+  "validator_pack": [{"path": "C32/C32-validator/validator_report.md", "bytes": 12237, "sha256": "9c3c5fed92db4087d316a72c7c8ac325b33d9312c544eec55eafc9c15f23b60b", "verdict_token_leak": false}],
+  "runner_evidence_sha256_file": "8277d74cb9c621dea82ad0c70766f70e998ba9098b5afc5d419b07c58f924662"
+}
+
+
+---
+# BUILDER REPORT (ChatGPT) — frozen, verbatim
+# C32 Builder Report
+
+## 1. Role attestation and ablation ID
+
+I attest that I am acting **only as the Builder** for this independent first pass, blind to the Validator output. The ablation is **C32**, Remaining Ablation Program catalog #32, **“Freeze Before Stage 5,”** in N15 batch 3 of 3. The frozen role assignment is Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. Constitution version is 1.0. The target is the **Stage 4→5 boundary**, where validated outputs are normally sealed before deeper analysis.
+
+The frozen baseline framework hashes are `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c` for `three-ai-measurement-design-framework.md` and `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e` for `three-ai-validation-and-analysis-framework.md`. Those values recur identically in the separate baseline-framework-hash section.
+
+## 2. Conceptual diff: what the ablation removes, and the exact seeded code changes, from the SEED DIFFS
+
+The control normally freezes the validated outputs before deeper analysis and requires a pre-Stage-5 comparison between the actual Stage-5 inputs and the validation freeze. **C32 removes that seal check.** Stage 5 therefore reads whatever happens to occupy the validated-output paths at execution time. Stage 5’s own independent count checks remain intact. The seeded PRE edits occur after the validation freeze and before Stage 5.
+
+| Seed | File changed | Exact seeded code operation |
+| --- | --- | --- |
+| **FB_KGRID** | `R-B/outputs/RB_kappa_grid_counts.csv` | Selects the unique `kappa == 3` row, then executes `g$n_ESCALATE[i] <- g$n_ESCALATE[i] + 1500L; g$n_STANDARD[i] <- g$n_STANDARD[i] - 1500L`. Thus 1,500 cases are shifted from STANDARD to ESCALATE at κ=3 while preserving their sum. |
+| **FB_TF24** | `R-A/outputs/RA_classifications.csv` | Executes `ra$dormant_h <- ra$dormant_h + 24; ra$open_age_h <- ra$open_age_h + 24`. Classification labels are not edited. |
+| **FB_CLAUSE** | `R-A/outputs/RA_classifications.csv` | Selects rows where `classification == "INCONCLUSIVE"` and `peer_n` is missing or `< 30`, asserts that at least one exists, then executes `ra$integrity_clause[i] <- "missing_or_sub30_peer"`. |
+| **FB_ROUND** | `R-A/outputs/RA_classifications.csv` | Executes `ra$dormant_h <- round(ra$dormant_h)`. |
+| **FB_RECLASS** | `R-A/outputs/RA_classifications.csv` | Takes the first 10 rows with `classification == "INCONCLUSIVE"` and executes `ra$classification[i] <- "ESCALATE"`. |
+| **FB_VALSORT** | `outputs/validated_action_list.csv` | Rewrites the same validated rows as `arrange(v, desc(dormant_h))`; this is an ordering-only mutation. |
+
+No R-A/R-B implementation code is seeded, no source variant is used, and every seeded arm uses the same Stage-5 harness hash `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94`.
+
+## 3. Hard mechanical facts table
+
+**Basis notation:** **R** = independently recomputed from raw rows/manifests in the packet. **Q** = quoted because the underlying row-level data needed for an independent numerical recomputation is not supplied.
+
+### Arm-level recomputation
+
+| Arm | Stage-5 input changed vs B | Input byte delta vs B | S5 exit | Standard Stage-5 outputs vs B | H | Caught with freeze check | D_abl | Basis |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **B** | none; frozen inputs match 3/3 | 0 | 0 | **8/8 equal** to frozen outputs | N/A | FALSE | FALSE | R |
+| **FB_KGRID** | `RB_kappa_grid_counts.csv` | **0 bytes**: 164→164, hash changed | 0 | **7/8 equal; 1/8 differs:** `kappa_sensitivity.csv` | TRUE | TRUE | FALSE | R |
+| **FB_TF24** | `RA_classifications.csv` | **+38,477 bytes**: 22,271,481→22,309,958 | 0 | **7/8 equal; 1/8 differs:** `escalate_dormancy_summary.csv` | TRUE | TRUE | FALSE | R |
+| **FB_CLAUSE** | `RA_classifications.csv` | **−25,368 bytes**: 22,271,481→22,246,113 | 0 | **7/8 equal; 1/8 differs:** `inconclusive_by_clause.csv` | TRUE | TRUE | FALSE | R |
+| **FB_ROUND** | `RA_classifications.csv` | **−1,491,395 bytes**: 22,271,481→20,780,086 | 0 | **7/8 equal; 1/8 differs:** `escalate_dormancy_summary.csv` | TRUE | TRUE | FALSE | R |
+| **FB_RECLASS** | `RA_classifications.csv` | **−40 bytes**: 22,271,481→22,271,441 | 1 | `independent_checks_critical_counts.csv` emitted with a different hash; the other **7/8** standard outputs are absent because execution stopped | FALSE | TRUE | TRUE | R |
+| **FB_VALSORT** | `validated_action_list.csv` | **0 bytes**: 13,625,648→13,625,648, hash changed | 0 | **8/8 equal** | FALSE | TRUE | FALSE | R |
+
+The raw arm rows independently reproduce the exit states, changed-file sets and output-difference sets. The B manifest reproduces all eight frozen output hashes exactly. The per-arm manifest comparisons establish the single-output differences for FB_CLAUSE, FB_KGRID, FB_ROUND and FB_TF24, the unchanged eight outputs for FB_VALSORT, and the early-stop output state for FB_RECLASS.
+
+### Cross-arm identities and set arithmetic
+
+| Mechanical fact | Recomputed result | Basis |
+| --- | --- | --- |
+| Frozen source COUNT preflight | `src_open_candidates = 245,193`; `src_peer_stats = 104` | Q — packet reports observed counts matching expectations. |
+| Baseline framework hash identities | **2/2** spec hashes equal the separate baseline-hash entries | R |
+| Seed PRE-script hash identities | **6/6** seed hashes in the specification equal the preflight/runner-side hashes | R |
+| B frozen Stage-5 input identities | **3/3** B input hashes equal the frozen validation hashes | R |
+| B frozen Stage-5 output identities | **8/8** B output hashes equal the frozen `stage-05/deeper` hashes | R |
+| Seed PRE exits | **6/6 = 0** | R |
+| Seed Stage-5 exits | **5/6 = 0**, **1/6 = non-zero** | R |
+| Seed FRZ_PRE detection | **6/6** seeded arms have exactly one changed validated input; B has **0** changed inputs | R |
+| FRZ_PRE vs FRZ_POST report-file hashes | **7/7 arms equal within arm** | R |
+| Harm set H | `{FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}`; ** | H | = 4** | R |
+| Caught with freeze control | all six seeded arms; **6/6** | R |
+| D_abl | `{FB_RECLASS}`; ** | D_abl | = 1** | R |
+| `H ∩ D_abl` | `∅`; **0/4 harms** are caught by Stage 5’s surviving checks | R |
+| `H \ D_abl` | `{FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}`; **4** | R |
+| `H \ caught-with` | `∅`; **0** | R |
+| `caught-with \ H` | `{FB_RECLASS, FB_VALSORT}`; **2** | R |
+| Successful seeded arms with unchanged `portfolio_summary.csv` | **5/5** | R |
+| Numerical portfolio delta | No field-level values are printed, so field-by-field arithmetic is unavailable; however the complete `portfolio_summary.csv` SHA-256 and byte length are identical to B in all **5/5** seeded arms that complete Stage 5 | R for file equality; field values not separately recomputable |
+| N1 timing mismatches | `1 dormant_h + 2 open_age_h = 3` total rows, each exactly `1.000 h`; labels agree | total **3** R from quoted component counts; component counts and magnitude Q |
+| Per-arm fixture-result rows in C32 evidence | **0** data rows; header only | R |
+| `n_agree + n_disagree = n_inner` | Not recomputable: the packet supplies no `n_agree`, `n_disagree`, or `n_inner` values | Not available |
+
+The recomputed set arithmetic agrees with the runner’s published sets: H has four arms, the freeze check flags all six seeded arms, D_abl contains only FB_RECLASS, and all four members of H remain in `H \ D_abl`.
+
+Hash propagation is also exact. In FB_KGRID, the changed R-B grid hash `12ea0619…` is also the changed `kappa_sensitivity.csv` hash. In FB_CLAUSE only `inconclusive_by_clause.csv` changes among the eight outputs. In FB_ROUND and FB_TF24 only `escalate_dormancy_summary.csv` changes. FB_VALSORT changes the validated-list input hash while all eight Stage-5 output hashes remain identical to B.
+
+## 4. P1 assessment against the frozen predicate in the SPEC
+
+The frozen P1 predicate requires both conditions: **arm B must be clean**, and `H \ D_abl` **must be empty**.
+
+The first condition is established mechanically. B exits Stage 5 with code 0; its three validated Stage-5 input hashes match the frozen versions; and its eight standard Stage-5 output hashes match the frozen `stage-05/deeper` hashes **8/8**. The run log also records B `FRZ_PRE changed=0` and `FRZ_POST changed=0`.
+
+The second condition is not established: recomputation gives
+
+`H = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}`
+
+and
+
+`D_abl = {FB_RECLASS}`,
+
+therefore
+
+`H \ D_abl = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}`,
+
+with cardinality **4**, not 0. All four harm arms complete Stage 5 successfully despite producing a changed standard Stage-5 output.
+
+Accordingly, **P1 is failed by the frozen predicate**. This statement is limited to the predicate result; no terminal disposition is issued.
+
+## 5. Fixture and reconciliation implications
+
+The `FIXTURE RESULTS per arm and path` evidence contains its column header and **zero result rows**. Therefore C32 itself supplies no new per-arm fixture expected/observed/pass results to recompute. This is consistent with the frozen Stage-5-only design: these controls begin from the frozen validated state and **do not rerun R-A or R-B**. The packet also states that no R-A/R-B code seeds and no source variants are used.
+
+The reconciliation implication is central to C32. The PRE mutations occur **after validation/reconciliation has already produced the frozen validated state**. Consequently, there is no fresh R-A/R-B reconciliation between PRE and Stage 5. FB_TF24, FB_CLAUSE, FB_ROUND and FB_RECLASS can therefore alter the R-A classification artifact after validation; FB_KGRID can alter the R-B κ-grid after validation; FB_VALSORT can alter the validated action-list serialization after validation. The freeze comparison is the mechanism designed to detect those post-validation mutations before Stage 5 consumes them.
+
+The known N1 discrepancy must remain separate from the seeded effects. In the frozen clean pair there is **1** `dormant_h` mismatch and **2** `open_age_h` mismatches, totaling **3 distinct rows**, and every mismatch is exactly **1.000 h** while classification labels agree. The packet records daylight-saving ambiguity only as a likely, unconfirmed explanation. The frozen reconciliation definition used for the clean-arm rule concerns only key-set differences and classification disagreements; it excludes `dormant_h` and `open_age_h`. Thus the N1 differences are pre-existing frozen-pack facts, not effects created by any C32 seed.
+
+## 6. Semantic/regression risks and unchanged surfaces
+
+The demonstrated semantic risk of removing the freeze is broader than classification-count corruption. Four different post-validation edits survive Stage 5’s retained count checks and change downstream analytical output: κ-grid composition changes `kappa_sensitivity.csv`; a +24-hour re-derivation changes `escalate_dormancy_summary.csv`; an integrity-clause relabel changes `inconclusive_by_clause.csv`; and rounding `dormant_h` changes `escalate_dormancy_summary.csv`. Each finishes with exit 0. The raw arm table establishes those four one-output divergences directly.
+
+The retained Stage-5 checks are effective against the particular FB_RECLASS mutation: changing 10 INCONCLUSIVE labels to ESCALATE causes Stage 5 to exit non-zero. They do **not**, however, detect any of the four members of H. Thus the evidence distinguishes a count-sensitive guard from an integrity seal: the former responds to a label-count change, while the latter also detects timing, clause, κ-grid and serialization changes.
+
+There is also measurable blocking cost. FB_VALSORT changes only row order in the validated action list, completes Stage 5, and produces **8/8** outputs identical to B; nevertheless the freeze comparison flags it because the input SHA-256 changes. FB_RECLASS is likewise flagged by the freeze comparison even though Stage 5’s own check independently prevents completion. Hence the recomputed flagged-but-not-H set is `{FB_RECLASS, FB_VALSORT}`, cardinality **2**.
+
+The unchanged surfaces are strong and localized. There are **no source variants**. The `VALIDATION_FREEZE.sha256` file has the same hash `65b91043…` in every arm manifest. Every completing seeded arm retains the B hash for `portfolio_summary.csv`, `capacity_coverage_note.csv`, `independent_checks_critical_counts.csv`, and all other standard outputs except the single output specifically affected by that seed. FB_VALSORT retains all eight.
+
+Finally, FRZ_PRE and FRZ_POST have identical hashes **within all 7 arms**, while each seeded arm’s changed input remains changed after Stage 5. Mechanically, the evidence therefore localizes the mutation to the PRE step rather than showing an additional Stage-5 mutation of the sealed-input files.
+
+## 7. Claim → evidence map
+
+| Claim | Frozen evidence section / table row | Evidence |
+| --- | --- | --- |
+| C32 removes the pre-Stage-5 seal comparison while retaining Stage 5’s independent count checks. | **SPEC → Exact change being tested** | Lines 37–42. |
+| The six PRE seeds are exactly κ=3 +1500/−1500, +24 h timing, INCONCLUSIVE clause split, `dormant_h` rounding, first 10 INCONCLUSIVE→ESCALATE, and descending-`dormant_h` re-sort. | **SEED DIFFS → FB_KGRID / FB_TF24 / FB_CLAUSE / FB_ROUND / FB_RECLASS / FB_VALSORT blocks** | Exact executable mutations at lines 579–625. |
+| B is a clean reference with Stage-5 exit 0 and frozen outputs reproduced 8/8. | **C32_RESULTS → Arm B**; **ARM MANIFESTS → B out rows** | Runner result and eight output hashes. |
+| FB_KGRID is in H and changes only `kappa_sensitivity.csv`. | **C32_arms.csv → FB_KGRID row**; **ARM MANIFESTS → FB_KGRID output rows** | Exit 0, differing output named; 7 other standard hashes equal B. |
+| FB_TF24 is in H and changes only `escalate_dormancy_summary.csv`. | **C32_arms.csv → FB_TF24 row**; **ARM MANIFESTS → FB_TF24 output rows** | Exit 0 and one differing standard output. |
+| FB_CLAUSE is in H and changes only `inconclusive_by_clause.csv`. | **C32_arms.csv → FB_CLAUSE row**; **ARM MANIFESTS → FB_CLAUSE output rows** | Exit 0 and one differing standard output. |
+| FB_ROUND is in H and changes only `escalate_dormancy_summary.csv`. | **C32_arms.csv → FB_ROUND row**; **ARM MANIFESTS → FB_ROUND output rows** | Exit 0 and one differing standard output. |
+| FB_RECLASS is detected without the freeze control because Stage 5 exits non-zero. | **C32_arms.csv → FB_RECLASS row** | `s5_exit=1`, `caught_without=TRUE`. |
+| FB_VALSORT is detected by the freeze comparison but leaves all eight Stage-5 outputs unchanged. | **C32_arms.csv → FB_VALSORT row**; **ARM MANIFESTS → FB_VALSORT output rows** | Changed validated-list input, exit 0, no output differences; all eight hashes equal B. |
+| H contains four arms, D_abl contains one different arm, so `H \ D_abl` contains all four harms. | **C32_RESULTS → Sets** | Explicit sets independently reproduced from raw arm rows. |
+| Therefore the frozen P1 predicate is not satisfied. | **SPEC → Operational benefit predicate** plus **C32_RESULTS → Predicate P1** | P1 requires `H \ D_abl = ∅`; observed difference set has four members. |
+| No per-arm fixture outcomes were produced in the C32 evidence table. | **FIXTURE RESULTS per arm and path** | Header is present with zero data rows. |
+| The clean frozen pair contains three known 1-hour timing mismatches, with labels agreeing, and they are not seeded C32 effects. | **COORDINATOR NOTE N1** | One `dormant_h` plus two `open_age_h` discrepancies; all exactly 1.000 h. |
+| No source variant contributes to the result. | **SOURCE VARIANTS used by this control** | Explicitly records `(no source variants used)`. |
+| `portfolio_summary.csv` is unchanged in every seeded arm that completes Stage 5. | **ARM MANIFESTS → B, FB_CLAUSE, FB_KGRID, FB_ROUND, FB_TF24, FB_VALSORT portfolio rows** | Each has SHA-256 `b58fc40f…`, 183 bytes. |
+
+END C32 BUILDER REPORT
+
+---
+# VALIDATOR REPORT (DeepSeek) — frozen, verbatim
+1. Role attestation and ablation ID.  
+   I am the Validator (DeepSeek), DeepThink on, blind to the Builder. I have not seen and do not request Builder output. Ablation ID: C32 (“Freeze Before Stage 5”), batch N15 batch 3 of 3. Frozen roles: Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok. I return no KEEP, REVERT, or HALT.
+2. Independent test plan: what I checked, and how.  
+   I checked the packet’s frozen hashes against the preflight, SPEC, manifests, RUN log, C32_arms.csv, and C32_EVIDENCE.sha256. I recomputed the arm sets H, caught_with, D_abl, H \ D_abl, H \ caught_with, and flagged-with-but-not-H from C32_arms.csv and the raw manifests. I compared every arm’s Stage-5 output hashes against arm B and against the frozen `stage-05/deeper` hashes in the SPEC. I checked FRZ_PRE/FRZ_POST changes, S5 exit codes, and whether arm B satisfies the frozen clean-reference condition. I assessed P1 using only the frozen predicate. I did not use Builder output and did not ask for files or tools.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+
+Frozen/preflight facts:
+
+- `src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`; MySQL count 245193. Matches SPEC and preflight.
+- `src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`; MySQL count 104. Preflight says expect 245193 / 104; observed 245193 / 104.
+- Frozen `RA_classifications.csv` SHA-256 `c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9`, 22,271,481 bytes.
+- Frozen `RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`, 164 bytes.
+- Frozen `validated_action_list.csv` SHA-256 `2bffa38b1cf13b99296a4c5d02ead7e22d3c20c4ff22647df31e1fa33761954a`, 13,625,648 bytes.
+- Frozen `stage-05/deeper` output hashes in SPEC:
+
+  - `capacity_coverage_note.csv` `4bf4523047a87a3c95f5a869dc5ebd2e0c2c4e36535dc2d438afd9c6e1711609` 644 bytes
+  - `escalate_by_type.csv` `0f2d8fe0b3509fe27c400eb7cee01e2126beadbca5d82c1b02a9083e00260159` 3932 bytes
+  - `escalate_by_type_top25.csv` `6d3bd20808cd49c4e8313a12e1c8d481a159a0d47a08b654f774c2fd6597c176` 1264 bytes
+  - `escalate_dormancy_summary.csv` `1c411c1fd02c74f17d94ed6d28849f640c992f075ad86d9d1c405cf350e21e63` 138 bytes
+  - `inconclusive_by_clause.csv` `f29e33c70c4182b86643f262c6199b247e9193fc8e2d5440ea61330e853dd32d` 58 bytes
+  - `independent_checks_critical_counts.csv` `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146` 190 bytes
+  - `kappa_sensitivity.csv` `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a` 164 bytes
+  - `portfolio_summary.csv` `b58fc40fc46ec1532b687d2597bc285f1d684a285a9443a02c4daa03582f3167` 183 bytes
+- Frozen `stage-05/run_deeper_analysis.R` in SPEC: `ed8694277737989d301b9b1f7e6a06a2dbb87a2ad25254fd53b1db47d92c1ec2`, 3443 bytes.
+- Runner `stage45/run_deeper_analysis.R`: `a2868ef5c28505145af2990c5a93df8869318af9b44949514f5b338f75b9cf94`, 3439 bytes. This differs from the frozen `stage-05/run_deeper_analysis.R` hash; the SPEC describes it as a path-only copy, but the hash is not equal.
+- `VALIDATION_FREEZE.sha256` hash is `65b91043101ec09a96ea082dc2876cf0a2eaf41c9674c15aba2f7b14dba5f8fd`, 335 bytes, in every arm manifest. Consistent.
+
+Arm B clean-reference facts:
+
+- S5 exit 0, per RUN log and `C32_arms.csv`.
+- FRZ_PRE changed=0; FRZ_POST changed=0; FRZ_PRE.txt and FRZ_POST.txt both hash `81ad521ae58e99efe553814d6cbf9866a4309f9559a6de6fdd3f5d7bd7aae98f`, 343 bytes.
+- All 8 Stage-5 output hashes match the frozen `stage-05/deeper` hashes exactly:
+
+  - `capacity_coverage_note.csv` = `4bf452...1609`
+  - `escalate_by_type.csv` = `0f2d8f...0159`
+  - `escalate_by_type_top25.csv` = `6d3bd2...c176`
+  - `escalate_dormancy_summary.csv` = `1c411c...1e63`
+  - `inconclusive_by_clause.csv` = `f29e33...d32d`
+  - `independent_checks_critical_counts.csv` = `4aca9c...d146`
+  - `kappa_sensitivity.csv` = `7a18fc...2c8a`
+  - `portfolio_summary.csv` = `b58fc4...3167`
+- With-control check on B: clean, caught_with=FALSE.
+
+Arm-level recomputation:
+
+| arm | pre_exit | s5_exit | frz_pre_changed | s5_outputs_differ_vs_B | in_H | caught_with | caught_without |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| B | NA | 0 | none | none | NA | FALSE | FALSE |
+| FB_KGRID | 0 | 0 | `R-B/outputs/RB_kappa_grid_counts.csv` | `kappa_sensitivity.csv` | TRUE | TRUE | FALSE |
+| FB_TF24 | 0 | 0 | `R-A/outputs/RA_classifications.csv` | `escalate_dormancy_summary.csv` | TRUE | TRUE | FALSE |
+| FB_CLAUSE | 0 | 0 | `R-A/outputs/RA_classifications.csv` | `inconclusive_by_clause.csv` | TRUE | TRUE | FALSE |
+| FB_ROUND | 0 | 0 | `R-A/outputs/RA_classifications.csv` | `escalate_dormancy_summary.csv` | TRUE | TRUE | FALSE |
+| FB_RECLASS | 0 | 1 | `R-A/outputs/RA_classifications.csv` | blank in arms CSV | FALSE | TRUE | TRUE |
+| FB_VALSORT | 0 | 0 | `outputs/validated_action_list.csv` | none | FALSE | TRUE | FALSE |
+
+Set identities recomputed:
+
+- H = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}
+- caught_with = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND, FB_RECLASS, FB_VALSORT}
+- D_abl = caught_without = {FB_RECLASS}
+- H \ D_abl = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}
+- H \ caught_with = {}
+- flagged with control but not in H = {FB_RECLASS, FB_VALSORT}
+
+Cross-arm hash equalities and differences:
+
+- `kappa_sensitivity.csv`: B=`7a18fc...2c8a`; FB_KGRID=`12ea06...6cee`; all other completed arms=`7a18fc...2c8a`.
+- `escalate_dormancy_summary.csv`: B=`1c411c...1e63`; FB_TF24=`fa12c9...30df`; FB_ROUND=`cbdc78...e058`; other completed arms=`1c411c...1e63`.
+- `inconclusive_by_clause.csv`: B=`f29e33...d32d`; FB_CLAUSE=`a22d7d...2871`; other completed arms=`f29e33...d32d`.
+- `independent_checks_critical_counts.csv`: B=`4aca9c...d146`; FB_RECLASS=`2c3258...46ac`; all other arms with this file=`4aca9c...d146`.
+- `capacity_coverage_note.csv`, `escalate_by_type.csv`, `escalate_by_type_top25.csv`, `portfolio_summary.csv`: identical hashes across all arms that produced them, and identical to arm B/frozen SPEC.
+- `R-A/outputs/RA_classifications.csv`: B=`c099e0...e0d9`; FB_TF24=`b02c68...29a3`; FB_CLAUSE=`0ecbdb...3935`; FB_ROUND=`ab82f1...74fd`; FB_RECLASS=`36e8ef...957c`; FB_KGRID and FB_VALSORT=`c099e0...e0d9`.
+- `R-B/outputs/RB_kappa_grid_counts.csv`: B=`7a18fc...2c8a`; FB_KGRID=`12ea06...6cee`; all other arms=`7a18fc...2c8a`.
+- `outputs/validated_action_list.csv`: B=`2bffa3...954a`; FB_VALSORT=`0de2eb...761e`; all other arms=`2bffa3...954a`.
+
+Portfolio deltas: The packet contains only the `portfolio_summary.csv` hash and byte count (`b58fc40...3167`, 183 bytes). The row-level portfolio numbers are not present in the packet, so I cannot independently recompute portfolio deltas from content. The observable portfolio fact is that all completed arms except FB_RECLASS produced the same `portfolio_summary.csv` hash as arm B and the frozen SPEC.
+
+Internal inconsistency flags in runner output:
+
+- FB_RECLASS manifest contains `stage-05/deeper/independent_checks_critical_counts.csv` with hash `2c3258e6d8191846a8cfb29bb18a35a657957886df31582843ef5052413a46ac`, 192 bytes, which differs from arm B’s `4aca9c33be586932a38a7e28a00523fb09e1bde4a72639f634a08c8d263fd146`, 190 bytes. `C32_arms.csv` leaves `s5_outputs_differ_vs_B` blank for FB_RECLASS. This does not change H because H requires Stage 5 exit 0, and FB_RECLASS has exit 1, but the table and manifest are not fully aligned in presentation.
+- The runner harness `stage45/run_deeper_analysis.R` hash `a2868ef...cf94` differs from the SPEC-listed frozen `stage-05/run_deeper_analysis.R` hash `ed86942...1ec2`. The SPEC describes the runner file as a path-only copy, but strict hash equality does not hold.
+- The fixture results table has only a header and no fixture rows. If fixtures were mandatory for this control, the packet does not provide fixture actuals/expecteds.
+
+4. Facts that cannot be recomputed from this packet.
+
+- The numeric contents of all `stage-05/deeper/*.csv` files: only hashes and byte counts are provided, not rows or values. Therefore portfolio counts, escalation-by-type counts, dormancy-summary values, kappa-sensitivity counts, independent critical counts, and clause counts cannot be recomputed from first values.
+- The contents of `RUN_S5.exit`, `RUN_PRE.exit`, `RUN_S5.stdout.txt`, and `RUN_S5.stderr.txt`: only hashes/byte counts are shown; exit codes are taken from the RUN log and `C32_arms.csv`.
+- The contents of `FRZ_PRE.txt`, `FRZ_POST.txt`, and `VALIDATION_FREEZE.sha256`: only hashes/byte counts are shown.
+- Fixture expected/observed rows: the fixture table is empty.
+- The precise MySQL query and any returned schema beyond the preflight counts 245193 and 104.
+- The actual diff between the frozen `stage-05/run_deeper_analysis.R` and runner `stage45/run_deeper_analysis.R`.
+
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.  
+   Frozen P1 KEEP-side condition: arm B is clean and H \ D_abl = ∅.
+
+- Arm B clean: yes. S5 exit 0; 8/8 Stage-5 outputs equal the frozen `stage-05/deeper` hashes; with-control check does not flag B.
+- H \ D_abl = {FB_KGRID, FB_TF24, FB_CLAUSE, FB_ROUND}, which is not empty. D_abl = {FB_RECLASS}.
+- Therefore the frozen P1 predicate is failed by the evidence: H \ D_abl ≠ ∅.  
+  Reported non-P1 sets:
+- H \ caught_with = {}.
+- flagged with the control but not in H = {FB_RECLASS, FB_VALSORT}.
+
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".  
+   None established by the frozen packet as a blocking objection. Non-blocking inconsistencies are noted in section 3: FB_RECLASS’s differing `independent_checks_critical_counts.csv` is not reflected in the `s5_outputs_differ_vs_B` cell, the runner Stage-5 script hash differs from the SPEC-listed frozen Stage-5 script hash, and the fixture table has no rows. These do not alter the recomputed H, D_abl, H \ D_abl, or P1 result under the frozen definitions.
+7. Claim → evidence map.  
+   | claim | evidence |  
+   |---|---|  
+   | Ablation C32, roles Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok | SPEC header |  
+   | Frozen source hashes and counts match preflight | PREFLIGHT frozen OK lines; SPEC hashes |  
+   | Frozen validated-state hashes match SPEC | SPEC; ARM MANIFESTS B out |  
+   | Arm B is clean | RUN log “B S5 exit=0”; C32_arms.csv B row; B manifest output hashes match frozen `stage-05/deeper` hashes |  
+   | Arm B FRZ_PRE/FRZ_POST changed=0 | RUN log; C32_arms.csv; B FRZ_PRE/FRZ_POST hashes equal |  
+   | H = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND} | C32_arms.csv `in_H` column; manifest output diffs |  
+   | caught_with = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND,FB_RECLASS,FB_VALSORT} | C32_arms.csv `caught_with`; FRZ_PRE changed non-empty for those arms |  
+   | D_abl = {FB_RECLASS} | C32_arms.csv `caught_without`; RUN log FB_RECLASS S5 exit=1 |  
+   | H \ D_abl = {FB_KGRID,FB_TF24,FB_CLAUSE,FB_ROUND} | Set subtraction from above |  
+   | P1 failed | Arm B clean but H \ D_abl ≠ ∅, per frozen predicate |  
+   | FB_KGRID caught with control | FRZ_PRE changed `R-B/outputs/RB_kappa_grid_counts.csv`; manifest hash changes to `12ea06...6cee` |  
+   | FB_TF24 caught with control | FRZ_PRE changed `R-A/outputs/RA_classifications.csv`; manifest hash changes to `b02c68...29a3` |  
+   | FB_CLAUSE caught with control | FRZ_PRE changed `R-A/outputs/RA_classifications.csv`; manifest hash changes to `0ecbdb...3935` |  
+   | FB_ROUND caught with control | FRZ_PRE changed `R-A/outputs/RA_classifications.csv`; manifest hash changes to `ab82f1...74fd` |  
+   | FB_RECLASS caught without control | RUN log S5 exit=1; C32_arms.csv caught_without=TRUE |  
+   | FB_VALSORT caught with control, not in H | FRZ_PRE changed `outputs/validated_action_list.csv`; S5 outputs all match B; C32_arms.csv in_H=FALSE |  
+   | No source variants used | PREFLIGHT “(no source variants used)” |  
+   | Fixture table empty | FIXTURE RESULTS section has header only |
+
+END C32 VALIDATOR REPORT
+
+---
+Reminder: exactly one terminal state. Final two lines: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END C32 ADJUDICATION'.

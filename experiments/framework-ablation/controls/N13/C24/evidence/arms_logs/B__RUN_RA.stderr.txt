@@ -1,0 +1,9 @@
+PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-A/outputs/RA_fixture_results.csv pass=14/14
+open_n=245193 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/ablation-runs/N13/C24/arms/B/R-A/outputs/RA_portfolio_counts.csv
+R-A done. mode=all

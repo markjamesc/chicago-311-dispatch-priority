@@ -1,0 +1,507 @@
+# C27 Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools, so do not ask for files.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts. Recompute every number you can from the evidence tables: identities, portfolio deltas, D-sets, and cross-arm hash equalities. Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Give facts only, no terminal state.
+6. Blocking objections. List any defect in the harness, seed, predicate application or evidence that should block a verdict, or state "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C27 VALIDATOR REPORT
+
+---
+# SPEC
+# C27 — Ablation specification (FROZEN)
+
+**Ablation ID:** C27 (owner Remaining Ablation Program, catalog #27 "Fixtures on Both Paths")
+**Constitution version:** 1.0
+**Baseline frameworks (frozen pre-hardening, same as A01–A08):**
+- `three-ai-measurement-design-framework.md` SHA-256 `70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c`
+- `three-ai-validation-and-analysis-framework.md` SHA-256 `24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e`
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2.
+`src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9` (245,193 rows); `src_peer_stats.csv` `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`.
+**Roles:** Builder=ChatGPT · Validator=DeepSeek · Adjudicator=Grok (owner instruction 2026-10-03 03:32 CT)
+**Target stage:** Stage 4 (fixture execution before production is trusted)
+**Frozen at CT:** 2026-10-03, before the runner executed
+
+## Control under test
+Both R-A and R-B must pass all 14 locked fixtures before their production outputs are trusted.
+
+## Exact change being tested (ablation)
+Only R-A must pass fixtures. R-B's fixture result is ignored, and R-B production is trusted if exact recon against R-A is clean (n_only_ra = n_only_rb = n_disagree = 0) and the run exits 0.
+
+## Seeded defects (frozen before execution)
+There are 9 single-rule deletions in R-B `20_integrity_and_classify.R`, one per fixture-protected rule. They were chosen by rule coverage, not by production impact:
+- M01 κ rule uses p50 instead of p75
+- M02 I01 deleted
+- M03 I02 mod<created deleted
+- M04 I04 thin peer deleted
+- M05 DUPLICATE exclusion deleted
+- M06 LEGACY exclusion deleted
+- M07 I05 parent deleted
+- M08 not-Open exclusion deleted
+- M09 I02 missing-CREATED deleted
+Files and SHA-256 are in `runner/SEEDS.sha256`; diffs are in `runner/SEED_DIFFS.txt`. A clean arm B (frozen R-A + frozen R-B) is the reference. Each mutant R-B is run in full: fixtures plus production.
+
+## Fixture suite
+`fixtures-v1-tcd-ig`, F01–F14.
+
+## Critical reconciliation fields (hard mechanical)
+SR_NUMBER key set; n_ra, n_rb, n_inner, n_only_ra, n_only_rb, n_agree, n_disagree; row-level classification; per-mutant R-B fixture pass count and failed IDs; exit codes.
+
+## Allowed source/data scope
+Frozen PC pack, read only and copied into the new work folder `...\ablation-runs\C27_C33`. No new extract; MySQL is used only for a read-only COUNT preflight. No rewrite of frozen labels or fixtures.
+
+## Expected unchanged surfaces
+SQL/Source Gate; TCD-IG rules; fixture expecteds; R-A code; SR_NUMBER grain; the frozen Chicago 311 pack.
+
+## Operational benefit predicate P1 (owner doc #27 thresholds, operationalized)
+Owner doc thresholds: "Pass: All fixtures passed on both. Fail: A disparity or single-sided fix occurs (keep rule)."
+Definitions:
+- **D_fix:** mutants detected under the baseline regime (R-B fixtures < 14/14, or a crash).
+- **D_abl:** mutants detected under the ablated regime (recon only/disagree > 0, or a crash).
+Outcomes:
+- **P1 satisfied:** D_fix ⊆ D_abl. Skipping the second path's fixtures loses no detection on this pack.
+- **P1 failed:** D_fix \ D_abl is non-empty. At least one defect is visible only to the second path's fixtures, a single-sided disparity that the ablated regime would trust.
+Mutants caught by neither regime are reported. They do not count for or against P1.
+
+## Regression / HALT rules
+- HALT if clean arm B does not reproduce the frozen pack: label diffs or only-rows ≠ 0 vs the frozen RA/RB classifications, recon not 0/0/0, or fixtures not 14/14 on both paths.
+- HALT if any mutant run is missing, or if Builder and Validator disagree on a hard number in `C27_RESULTS.md`.
+- Byte-hash equality with the 2026-09-19 outputs is INFO only (R 4.6.1 vs 4.5.1).
+- RAW evidence present → do not HALT for missing historical stdout. If P1 fails and no HALT condition holds → REVERT.
+
+## Builder task
+Make an independent first pass: role attestation, conceptual diff, a hard-facts table recomputed from the evidence, the P1 assessment, risks, and a claim→evidence map. No KEEP/REVERT/HALT.
+
+## Validator task
+Independently recompute the same hard facts. Blind to the Builder. List blocking objections. No KEEP/REVERT/HALT.
+
+---
+# CONSTITUTION
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# PREFLIGHT (runner, PC DESKTOP-RPECRM9, CT)
+frozen OK   ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9 data\source\src_open_candidates.csv
+frozen OK   cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58 data\source\src_peer_stats.csv
+frozen OK   f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587 R-A\run_RA.R
+frozen OK   6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd R-B\run_RB.R
+frozen OK   6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b R-B\R\00_config.R
+frozen OK   40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a R-B\R\10_io_parse.R
+frozen OK   72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99 R-B\R\20_integrity_and_classify.R
+frozen OK   2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e R-B\R\40_fixtures.R
+frozen OK   c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9 R-A\outputs\RA_classifications.csv
+frozen OK   a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193 R-B\outputs\RB_classifications.csv
+seed   OK   cb73809b27764de29cba80dceb99255ed98532bf6f98edfb40c792a283331f03 seeds/C27/M01_20_integrity_and_classify.R
+seed   OK   d005c31db5bda7f9a544b97b970644848f040ca696116fe282722720251fecac seeds/C27/M02_20_integrity_and_classify.R
+seed   OK   9d88bb7f8d5cfaab19365ea8529841defd940bcceb01a98e96d3b99ba3d47e63 seeds/C27/M03_20_integrity_and_classify.R
+seed   OK   0656942818ad8dfb1b3a934128f3fce78981617c1f683e0ecb52676b39553832 seeds/C27/M04_20_integrity_and_classify.R
+seed   OK   e3d6d89c438f850ac405212c51de58e62e8df2ac9e9a4d611a5906bb64d6e355 seeds/C27/M05_20_integrity_and_classify.R
+seed   OK   fd1a5f8c659deca1e678992240a7b9aa1b5059e815ae375196026a7e3b54e207 seeds/C27/M06_20_integrity_and_classify.R
+seed   OK   607e17bb6e3ae02a27b78222f157a2ae90ba3c9af24e2ff1f519c513b5260900 seeds/C27/M07_20_integrity_and_classify.R
+seed   OK   1a5877550b692ce26f4a536bb95fc36242f2e5a4b9c8fe753ba7122524da69bf seeds/C27/M08_20_integrity_and_classify.R
+seed   OK   e7bce4bba08089d922f2805373aeef6ba985a78e47d2d271f03caf93548a9726 seeds/C27/M09_20_integrity_and_classify.R
+seed   OK   8721246023b722dff1b1691c2273fa9bc48cbe0e9a72a61e1230d0d72b122867 seeds/C27/MUTANTS.tsv
+R: R version 4.6.1 (2026-06-24 ucrt) | dplyr 1.2.1 | readr 2.2.0 | lubridate 1.9.5 | stringr 1.6.0 | tidyr 1.3.2 | tibble 3.3.1
+mysql (INFO, read-only; expect 245193 / 104): src_open_candidates	245193 ; src_peer_stats	104
+preflight gating result: PASS
+
+---
+# RUN LOG (this control)
+03:49:45 C27 arms
+03:49:59   B RA exit=0 secs=13.2
+03:50:26   B RB exit=0 secs=27.3
+03:50:55   M01 RB exit=0 secs=27.4
+03:51:23   M02 RB exit=0 secs=27.3
+03:51:50   M03 RB exit=0 secs=26.3
+03:52:18   M04 RB exit=0 secs=27.3
+03:52:47   M05 RB exit=0 secs=28.3
+03:53:14   M06 RB exit=0 secs=26.3
+03:53:42   M07 RB exit=0 secs=27.3
+03:54:08   M08 RB exit=0 secs=25.4
+03:54:35   M09 RB exit=0 secs=26.3
+
+---
+# C27_RESULTS.md (runner output)
+# C27 RESULTS — Fixtures on Both Paths ablation (runner output, mechanical facts only)
+
+Baseline regime: both R-A and R-B must pass the 14 fixtures before production is trusted. Ablated regime: only R-A's fixtures run; R-B is trusted if exact recon vs R-A is clean.
+Seeds: 9 single-rule deletions in R-B 20_integrity_and_classify.R, one per fixture-protected rule (frozen before the run; see seed diffs).
+
+## Mechanical facts
+- H1 clean arm B: R-A exit 0, R-B exit 0; fixtures R-A 14/14, R-B 14/14
+- H2 clean arm reproduces frozen labels and recon 0/0/0: TRUE
+- H3 all 9 mutant runs present (exit recorded): TRUE
+- H4 D_fix (caught by R-B's own fixtures = baseline regime): {M01,M02,M04,M05,M06,M07,M08}
+- H5 D_abl (caught with R-B fixtures skipped: R-A fixtures + exact recon vs R-A, or crash): {M01,M04,M05,M06}
+- H6 D_fix minus D_abl (defects only the second-path fixture run catches): {M02,M07,M08}
+- H7 caught by neither regime: {M03,M09}
+
+## Clean arm repro vs frozen pack
+| cmp | n_x | n_truth | n_only_x | n_only_truth | n_label_diff | n_dormant_diff | max_abs_d_dormant_h | max_abs_d_open_age_h |
+|---|---|---|---|---|---|---|---|---|
+| B R-A vs frozen RA_classifications | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B R-B vs frozen RB_classifications | 222002 | 222002 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+## Clean arm recon
+| n_ra | n_rb | n_inner | n_only_ra | n_only_rb | n_agree | n_disagree |
+|---|---|---|---|---|---|---|
+| 222002 | 222002 | 222002 | 0 | 0 | 222002 | 0 |
+
+## Mutants
+| mutant | rule_removed | exit | rb_fixtures | rb_fixtures_failed | recon_n_rb | recon_only_ra | recon_only_rb | recon_disagree | prod_rows_changed_vs_clean_RB | detected_baseline_regime | detected_ablated_regime |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| M01 | kappa rule uses peer p50 instead of p75 (F01-F03,F10,F11) | 0 | 12/14 | F03;F10 | 222002 | 0 | 0 | 16973 | 16973 | TRUE | TRUE |
+| M02 | I01 Open+CLOSED_DATE contradiction deleted (F04) | 0 | 13/14 | F04 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M03 | I02 mod<created sub-clause deleted (F05) | 0 | 14/14 |  | 222002 | 0 | 0 | 0 | 0 | FALSE | FALSE |
+| M04 | I04 thin peer_n<n_min deleted (F06) | 0 | 13/14 | F06 | 222002 | 0 | 0 | 6377 | 6377 | TRUE | TRUE |
+| M05 | DUPLICATE exclusion deleted (F07) | 0 | 13/14 | F07 | 245014 | 0 | 23012 | 0 | 23012 | TRUE | TRUE |
+| M06 | LEGACY_RECORD exclusion deleted (F08) | 0 | 13/14 | F08 | 222176 | 0 | 174 | 0 | 174 | TRUE | TRUE |
+| M07 | I05 PARENT_SR_NUMBER clause deleted (F09) | 0 | 13/14 | F09 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M08 | not-Open exclusion deleted (F12) | 0 | 13/14 | F12 | 222002 | 0 | 0 | 0 | 0 | TRUE | FALSE |
+| M09 | I02 unparseable/missing CREATED sub-clause deleted (F13) | 0 | 14/14 |  | 222002 | 0 | 0 | 0 | 0 | FALSE | FALSE |
+
+
+---
+# C27_EVIDENCE.sha256
+0f442c32ccfbb0419cf6981786db85d00bfe646d0ea46e049ec9009177225547  C27_ARM_MANIFESTS.txt
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  C27_baseline_recon.csv
+954bc0059e9e2a40ba00e0ae6548389036ce96e4ea2661a925b3038073553f71  C27_mutants.csv
+457cf6a573674c40ab47d01081b51627854934aabbec7fee986025bae40c5f93  C27_repro.csv
+122196bf5859163ebc9f1a8fd687d26db6fafb4295a7ed31ae9f798b1687c676  C27_RESULTS.md
+
+---
+# ARM MANIFESTS (per-arm SHA-256, bytes, path) — key files only (full list in evidence)
+Note on manifests: MANIFEST_inputs is hashed before each run, MANIFEST_outputs after. The runner's file filter for RUN_* logs is case-insensitive. Because of that, run_RA.R / run_RB.R are listed under MANIFEST_outputs instead of MANIFEST_inputs. They are inputs and are not modified by the run.
+B in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+B in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+B in  :: 72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  5955  R-B\R\20_integrity_and_classify.R
+B out :: c099e092feb237c8492feca12f0293c5875384e27375eb7a40991591d63ae0d9  22271481  R-A\outputs\RA_classifications.csv
+B out :: f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  25009  R-A\run_RA.R
+B out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+M01 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M01 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M01 in  :: cb73809b27764de29cba80dceb99255ed98532bf6f98edfb40c792a283331f03  5980  R-B\R\20_integrity_and_classify.R
+M01 out :: cbd59de16b7b49d472a8bf3d830dec7005365838852fc023ebde13d5299be399  41963733  R-B\outputs\RB_classifications.csv
+M02 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M02 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M02 in  :: d005c31db5bda7f9a544b97b970644848f040ca696116fe282722720251fecac  5938  R-B\R\20_integrity_and_classify.R
+M02 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+M03 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M03 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M03 in  :: 9d88bb7f8d5cfaab19365ea8529841defd940bcceb01a98e96d3b99ba3d47e63  5942  R-B\R\20_integrity_and_classify.R
+M03 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+M04 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M04 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M04 in  :: 0656942818ad8dfb1b3a934128f3fce78981617c1f683e0ecb52676b39553832  5967  R-B\R\20_integrity_and_classify.R
+M04 out :: f6611d8dcec6b65e6f6a9cfee6f9b500dd5b4b2b9667b4785be42d0a28f419f8  42217063  R-B\outputs\RB_classifications.csv
+M05 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M05 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M05 in  :: e3d6d89c438f850ac405212c51de58e62e8df2ac9e9a4d611a5906bb64d6e355  5959  R-B\R\20_integrity_and_classify.R
+M05 out :: ca411fca7a509c468b4d2854e8002adeeb6a9127a008012ea03a8599ffbb8fab  45552786  R-B\outputs\RB_classifications.csv
+M06 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M06 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M06 in  :: fd1a5f8c659deca1e678992240a7b9aa1b5059e815ae375196026a7e3b54e207  5959  R-B\R\20_integrity_and_classify.R
+M06 out :: 7f136975192428b6b51faabd49a8f5af65075c86528a6d921ff5322fd6110759  41996881  R-B\outputs\RB_classifications.csv
+M07 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M07 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M07 in  :: 607e17bb6e3ae02a27b78222f157a2ae90ba3c9af24e2ff1f519c513b5260900  5969  R-B\R\20_integrity_and_classify.R
+M07 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+M08 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M08 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M08 in  :: 1a5877550b692ce26f4a536bb95fc36242f2e5a4b9c8fe753ba7122524da69bf  5953  R-B\R\20_integrity_and_classify.R
+M08 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+M09 in  :: ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9  118671837  data\source\src_open_candidates.csv
+M09 in  :: 40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  6612  R-B\R\10_io_parse.R
+M09 in  :: e7bce4bba08089d922f2805373aeef6ba985a78e47d2d271f03caf93548a9726  5955  R-B\R\20_integrity_and_classify.R
+M09 out :: a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193  41963733  R-B\outputs\RB_classifications.csv
+
+---
+# SEED DIFFS (unified diff vs frozen code)
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M01_20_integrity_and_classify.R
+@@ -89,7 +89,7 @@
+ 
+   # κ rule among coherent decision rows
+   eligible_coherent <- in_decision & !integrity_fail
+-  thresh <- kappa * peer_p75
++  thresh <- kappa * joined$peer_p50_h  # C27 SEED M01
+   escalate <- eligible_coherent & !is.na(dormant_h) & !is.na(thresh) & (dormant_h >= thresh)
+   standard <- eligible_coherent & !escalate
+ 
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M02_20_integrity_and_classify.R
+@@ -52,7 +52,7 @@
+   # I05 nonblank PARENT_SR_NUMBER
+   # I06 missing dormant clocks (mod missing → cannot compute dormant)
+ 
+-  p_closed_contra <- is_open & (closed_str_set | !is.na(closed_ts))
++  p_closed_contra <- rep(FALSE, n)  # C27 SEED M02
+   p_bad_clock <- is.na(created_ts) | is.na(mod_ts) | (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M03_20_integrity_and_classify.R
+@@ -53,7 +53,8 @@
+   # I06 missing dormant clocks (mod missing → cannot compute dormant)
+ 
+   p_closed_contra <- is_open & (closed_str_set | !is.na(closed_ts))
+-  p_bad_clock <- is.na(created_ts) | is.na(mod_ts) | (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
++  p_bad_clock <- is.na(created_ts) | is.na(mod_ts) |  # C27 SEED M03 (mod<created clause removed)
++   
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+   p_thin <- peer_n < RB_N_MIN
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M04_20_integrity_and_classify.R
+@@ -56,7 +56,7 @@
+   p_bad_clock <- is.na(created_ts) | is.na(mod_ts) | (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+-  p_thin <- peer_n < RB_N_MIN
++  p_thin <- rep(FALSE, n)  # C27 SEED M04
+   p_parent <- parent_nonblank
+   p_missing_dormant <- is.na(mod_ts) | is.na(dormant_h)
+ 
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M05_20_integrity_and_classify.R
+@@ -73,7 +73,7 @@
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- is_open & !leg_flag  # C27 SEED M05
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M06_20_integrity_and_classify.R
+@@ -73,7 +73,7 @@
+   # Decision-set membership
+   # Open already filtered in SQL for production; still enforce for fixtures.
+   # Exclude: not Open; DUPLICATE true-like; LEGACY true-like
+-  in_decision <- is_open & !dup_flag & !leg_flag
++  in_decision <- is_open & !dup_flag  # C27 SEED M06
+ 
+   classification <- rep(NA_character_, n)
+   evidence_reason <- rep(NA_character_, n)
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M07_20_integrity_and_classify.R
+@@ -57,7 +57,7 @@
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+   p_thin <- peer_n < RB_N_MIN
+-  p_parent <- parent_nonblank
++  p_parent <- rep(FALSE, n)  # C27 SEED M07
+   p_missing_dormant <- is.na(mod_ts) | is.na(dormant_h)
+ 
+   integrity_clause <- rep(NA_character_, n)
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M08_20_integrity_and_classify.R
+@@ -19,7 +19,7 @@
+ 
+   n <- nrow(joined)
+   status_norm <- trimws(as.character(joined$STATUS))
+-  is_open <- tolower(status_norm) == "open"
++  is_open <- rep(TRUE, n)  # C27 SEED M08
+ 
+   dup_flag <- rb_truthy(joined$DUPLICATE)
+   leg_flag <- rb_truthy(joined$LEGACY_RECORD)
+
+--- frozen/R-B/R/20_integrity_and_classify.R
++++ seeds/C27/M09_20_integrity_and_classify.R
+@@ -53,7 +53,8 @@
+   # I06 missing dormant clocks (mod missing → cannot compute dormant)
+ 
+   p_closed_contra <- is_open & (closed_str_set | !is.na(closed_ts))
+-  p_bad_clock <- is.na(created_ts) | is.na(mod_ts) | (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
++  p_bad_clock <- is.na(mod_ts) |  # C27 SEED M09
++    (!is.na(created_ts) & !is.na(mod_ts) & mod_ts < created_ts) |
+     (!is.na(created_ts) & created_ts > t_freeze)
+   p_blank_type <- rb_is_blank(joined$type_key)
+   p_thin <- peer_n < RB_N_MIN
+
+
+---
+Reminder: no KEEP/REVERT/HALT. Finish with the line: END C27 VALIDATOR REPORT

@@ -1,0 +1,38 @@
+{
+ "cid": "C04",
+ "role": "validator",
+ "source": "C04/C04-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 10570,
+ "source_sha256": "959dd81b486dca6d3ceb8bfea805fc84420fd6f3d14546c47680421b85f08949",
+ "output": "C04/C04-validator/validator_report.md",
+ "output_bytes": 10570,
+ "output_sha256": "959dd81b486dca6d3ceb8bfea805fc84420fd6f3d14546c47680421b85f08949",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 06:17:28\nreply_complete=2026-10-09 06:21:32\n# reply_complete = first-seen (upper bound; polled ~4 min after send, true finish not observed). DeepThink ON, Search OFF (was ON by default, turned off before send). Packet sent as file attachment. Thoughts not captured. URL https://chat.deepseek.com/a/chat/s/950313ed-aeba-4e49-87f5-420d3fb9cd8d"
+}

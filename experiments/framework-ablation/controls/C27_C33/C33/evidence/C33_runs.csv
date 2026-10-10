@@ -1,0 +1,5 @@
+arm,path,code,exit,secs,fixtures_pass,fixtures_failed
+B,RA,frozen R-A,0,16.2,14/14,
+B,RB,frozen R-B,0,28.4,14/14,
+X1,RB,R-B pre-contract parser (historical 12:56 CT 2026-09-19),0,24.5,14/14,
+X2,RA,R-A seeded no-contract parser,0,15.2,14/14,

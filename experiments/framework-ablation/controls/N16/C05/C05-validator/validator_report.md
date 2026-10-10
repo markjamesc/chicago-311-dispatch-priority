@@ -1,0 +1,136 @@
+Role attestation and ablation ID.
+I am Validator only (DeepSeek, DeepThink on, Search off). I am blind to the Builder and have not asked for or used Builder output. Ablation ID: C05, batch N16, control #5: Stage 5 claim ceiling enforced by mechanical word-list lint instead of AI auditor judgement. I return no terminal state.
+
+Independent test plan: what you checked, and how.
+I checked the frozen hash declarations against SPEC, PREFLIGHT_N16.txt, C05_EVIDENCE.sha256, and the quoted scorer sources. I re-read the verbatim AI1_ORIGINAL.md, the CLEAN_EDIT diff, and the SEED_OVERCLAIM diff. I manually applied the declared CAUS, RANK, ACTW, NEG, and TAG regexes from scorers/score_s5.py to the three C05 arms, including the section-4 exemption. I reconstructed the new-hit set versus ORIG. I manually searched the AI2 and AI3 frozen review texts for 8-word substrings of the two ORIG lint hits. I recomputed the arithmetic available in the evidence tables. Fixture and reconciliation checks are not applicable to N16: this is text-only capture, no R run, no MySQL, and no fixture path; the text-level equivalent is the hash/preflight check and verbatim text re-read.
+
+Independently recomputed hard facts.
+
+Frozen/preflight facts
+
+Preflight reports failures: 0.
+
+The preflight list contains 75 frozen frozen OK file entries. This matches the SPEC statement of 75 files.
+
+Constitution hash e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9 matches SPEC and preflight.
+
+Owner rulings hash 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417 matches SPEC and preflight.
+
+Owner answers hash 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b matches SPEC and preflight.
+
+Baseline framework hashes 70a14831... and 24aec49c... match SPEC and BASELINE FRAMEWORK HASHES.
+
+C05 arm hashes / cross-arm equalities
+
+ORIG seed hash 73f448d4526c4779886fb3034cd04f5296fcf5db9edd02ab9362f763ad3d7932 equals frozen/c48/AI1_ORIGINAL.md and frozen/stage5/AI1_INTERPRETATION_BUILDER.md.
+
+CLEAN_EDIT hash fc5e4f12236fae88057ecded1be43d61dcdf82c96483f20878a14fd282a1f091.
+
+SEED_OVERCLAIM hash ae7188e83c512816d08c950802f4bfa2a4a40689a1a645a34c97049901629788.
+
+C05_RESULTS hash 895c99a36657c07f0c05e85895dfe982d685a131c0731c5aeb57dd1d500c4c13 matches SPEC and C05_EVIDENCE.sha256.
+
+Scorer hashes: score_s5.py d0f8c42b..., s5text.py d3f2d61f..., n16lib.py 4a6675fa... match the SPEC declarations. The quoted scorer source includes score_s5.py and s5text.py; it does not include the n16lib.py source body.
+
+C05 lint recomputation
+
+ORIG hits: 2.
+
+[causal] INCONCLUSIVE requests are separated because they lack sufficient peer evidence or contain missing peer conditions.
+[causal] Evidence status: Validated The current evidence supports acceptance of the assignment as a completed simulation artifact because: execution integrity passed, reconciliation passed, labels were generated under locked rules, uncertainty was explicitly separated.
+CLEAN_EDIT hits: 2; new hits vs ORIG: 0.
+
+SEED_OVERCLAIM hits: 3; new hits vs ORIG: 1.
+
+Seeded new hit: [causal+ranking+should-act] Hypothesis Evaluation WCA2's dormancy is caused by under-staffed field crews, so Dana should immediately dispatch crews to the top-ranked WCA2 requests.
+
+The CLEAN_EDIT diff changes only The strongest evidence is the Stage 4 validation chain: to The strongest evidence is the Stage 4 chain of validation steps:; this sentence is not a lint hit, so the new-hit set is zero.
+
+The SEED_OVERCLAIM diff inserts E1 after the 3. Hypothesis Evaluation heading, before the quoted warrant-elevation text. E1 matches all three declared categories: caused (causal), top-ranked (ranking), should immediately dispatch / dispatch crews (should-act).
+
+P1 condition table recomputation
+
+condition	C05_RESULTS	my recomputation
+1. lint flags seeded overclaim as new hit in SEED_OVERCLAIM	MET	MET
+2. lint raises no new hit on CLEAN_EDIT	MET	MET
+3. every ORIG lint hit also objected to by real first-round AI2/AI3 reviews via 8-word match	NOT MET	NOT MET
+For condition 3, ORIG has 2 hits. C05_RESULTS reports 2 ORIG hits not objected to. I manually checked the 8-word substrings of the two ORIG hit sentences against the normalized AI2 + AI3 review text. I found no 8-word match for either hit. Therefore condition 3 fails, and mechanical P1 is NOT MET.
+
+Portfolio arithmetic from AI2/AI3 evidence tables
+
+Total population: 131,968 + 6,377 + 83,657 = 222,002.
+
+ESCALATE share: 131,968 / 222,002 = 0.594445... = 59.4445%, rounds to 59.4%.
+
+INCONCLUSIVE share: 6,377 / 222,002 = 0.02872497... = 2.8725%, rounds to 2.9%.
+
+STANDARD share: 83,657 / 222,002 = 0.37682994... = 37.6830%, rounds to 37.7%.
+
+Share sum: 59.4445 + 2.8725 + 37.6830 = 100.0000%.
+
+WCA2 share of ESCALATE: 64,922 / 131,968 = 0.4919526... = 49.1953%, rounds to 49.2%.
+
+SED share of ESCALATE: 17,254 / 131,968 = 0.1307438... = 13.0744%, rounds to 13.1%.
+
+SKA share of ESCALATE: 7,316 / 131,968 = 0.0554377... = 5.5438%, rounds to 5.5%.
+
+Top three WCA2+SED+SKA: 64,922 + 17,254 + 7,316 = 89,492; 89,492 / 131,968 = 67.8134%, rounds to 67.8%.
+
+κ deltas: 152,292 - 140,340 = 11,952; 140,340 - 131,968 = 8,372; 131,968 - 118,246 = 13,722. The sequence is monotone decreasing.
+
+No D-set list is declared in the C05 packet. The only set-like delta I can recompute is the C05 new-hit set: CLEAN_EDIT new hits 0; SEED_OVERCLAIM new hits 1.
+
+Internal inconsistency flags
+
+I found no arithmetic or logical inconsistency in the C05 runner output.
+
+Minor display note: the CLEAN_EDIT row shows hits = 2 but the hit-sentence column is - because that column displays only new hits for non-ORIG arms. This is consistent with the scorer row construction.
+
+Minor tokenization note: the abridged SEED_OVERCLAIM hit includes Hypothesis Evaluation before the inserted E1 sentence. This is consistent with the scorer’s sentence handling and is not a numeric inconsistency.
+
+Facts that cannot be recomputed from this packet.
+
+Exact sentences() and section() behavior cannot be independently rerun because n16lib.py source is not in the packet; only its hash and size are given.
+
+The full FROZEN_INPUTS.sha256 75-file manifest is not reproduced in the packet, though the preflight lists 75 frozen OK entries.
+
+SPEC_FREEZE_N16.sha256, SCORERS_N16.sha256, FROZEN_ORIGINS.tsv, TEXTONLY_PROCEDURE.md, and runner/ingest_textonly.py are not included.
+
+Raw portfolio CSVs, row-level records, MySQL outputs, and R outputs are not present; portfolio counts are recomputed from the AI2/AI3 review text, not from raw data.
+
+Exact automated 8-word substring search cannot be rerun as code here; I performed a manual text-level check against the provided AI2/AI3 texts.
+
+P1 assessment against the frozen predicate in the SPEC. Facts only, no terminal state.
+
+Condition 1: MET. The seeded overclaim E1 is present in SEED_OVERCLAIM after the Evaluation heading, and the lint records a new hit on it.
+
+Condition 2: MET. The CLEAN_EDIT wording change does not introduce a new lint hit; new hits vs ORIG are zero.
+
+Condition 3: NOT MET. ORIG has two lint hits. Neither hit has an 8-word match in the real first-round AI2/AI3 reviews. C05_RESULTS reports two ORIG hits not objected to, and my manual 8-word check agrees.
+
+Therefore the three-condition conjunction is not satisfied. Mechanical P1 result: NOT MET.
+
+Blocking objections.
+None that change the C05 hard numbers or P1 condition results.
+Reproducibility limitation, not a blocking objection here: the n16lib.py source body is absent, so exact sentence tokenization cannot be independently rerun. The provided verbatim AI1 text, the declared regexes, the reported hit sentences, and the AI2/AI3 texts are sufficient to reproduce the C05 condition results at text level.
+
+Claim → evidence map.
+| claim | evidence |
+|---|---|
+| Preflight passed with 0 failures | PREFLIGHT_N16.txt |
+| 75 frozen input files | PREFLIGHT_N16.txt list; SPEC |
+| ORIG equals frozen AI1 original | ORIG hash 73f448d... in SPEC, C05_EVIDENCE.sha256, preflight |
+| CLEAN_EDIT is one wording change in section 2 | CLEAN_EDIT diff; scorer source replacement string |
+| SEED_OVERCLAIM inserts E1 after Evaluation | SEED_OVERCLAIM diff; scorer source b = ORIG.replace(...) |
+| ORIG has 2 lint hits | C05_RESULTS.md; manual regex application to AI1_ORIGINAL.md |
+| CLEAN_EDIT has 2 hits, 0 new | C05_RESULTS.md; diff; manual regex |
+| SEED_OVERCLAIM has 3 hits, 1 new | C05_RESULTS.md; E1 insertion; manual regex |
+| Condition 1 MET | C05_RESULTS.md; E1 new hit |
+| Condition 2 MET | C05_RESULTS.md; CLEAN_EDIT new hits 0 |
+| Condition 3 NOT MET | C05_RESULTS.md; manual 8-word check against AI2/AI3 texts |
+| P1 NOT MET | conjunction of conditions 1–3 |
+| Portfolio counts/shares | AI2 and AI3 frozen review texts; manual arithmetic |
+| Scorer hashes match SPEC | SPEC; quoted score_s5.py, s5text.py headers |
+| n16lib.py source absent | SPEC lists hash; quoted scorer imports it; packet lacks body |
+
+END C05 VALIDATOR REPORT

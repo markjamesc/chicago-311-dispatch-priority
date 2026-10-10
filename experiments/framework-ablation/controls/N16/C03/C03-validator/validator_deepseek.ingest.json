@@ -1,0 +1,38 @@
+{
+ "cid": "C03",
+ "role": "validator",
+ "source": "C03/C03-validator/validator_deepseek_TEXTONLY.txt",
+ "source_bytes": 9953,
+ "source_sha256": "1234538837b66da7b0e90351c29e2aebbe8dd45603e26c8d24f63b1d3a8396fc",
+ "output": "C03/C03-validator/validator_report.md",
+ "output_bytes": 9950,
+ "output_sha256": "eaddc17ba1d268683247163aa9458413f0b2e12b218b83f2c6347ca081fcf8f1",
+ "checks": {
+  "end_count": 1,
+  "end_last_line": true,
+  "leak": false,
+  "bare_verdict_words": 0,
+  "sections_found_in_order": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "sections_by_title": [
+   "Role attestation",
+   "Independent test plan",
+   "Independently recomputed hard facts",
+   "Facts that cannot be recomputed",
+   "P1 assessment",
+   "Blocking objections",
+   "Claim"
+  ],
+  "sections_ok": true,
+  "one_reply": true
+ },
+ "ok": true,
+ "times_txt": "sent=2026-10-09 02:44:33\nreply_complete=2026-10-09 02:49:07"
+}

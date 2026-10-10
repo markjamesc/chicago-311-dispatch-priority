@@ -1,0 +1,154 @@
+Role attestation
+
+Adjudicator only, Grok (Expert), ablation C09, batch N16, owner control #9 (Ambiguity attack before lock, ledger replay). Builder is ChatGPT; Validator is DeepSeek. This reply does not rerun the scorer, repair code, create a criterion, relax a gate, or prefer one side’s mechanical result over the other’s. Terminal states are limited to KEEP, REVERT, or HALT under constitution §§7–10 and the C09 SPEC. Capture is the owner-approved text-only packet. Fixture and R reconciliation do not apply: N16 reads frozen Stage 1–5 text only and runs no R-A / R-B path, so N1 / OF-1 cannot enter any C09 number.
+
+Freeze check
+
+The FREEZE RECORD (frozen_at_ct 2026-10-09 03:12:50 CT) names the Builder pack C09/C09-builder/builder_report.md (21975 bytes, SHA-256 efb16473f80b24595f3e185c778ff5097a66747a7b0861e86466008a296d769c, verdict_token_leak: false) and the Validator pack C09/C09-validator/validator_report.md (9707 bytes, SHA-256 6ddb0fd97706c0b3db0c999c690aeb44a660618dd896ef73599c572169b4d254, verdict_token_leak: false). The reports in this packet are those frozen files: each is complete and ends with its END line (END C09 BUILDER REPORT; END C09 VALIDATOR REPORT). Neither report contains a KEEP, REVERT, or HALT token. Constitution e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9, owner sheet 1214c8966aea50f3dc67b3c57a74d89c894fb0c973d41a40999b9a907af1f417, owner answer 3a7a87caa4687006fe9799764882c1187ebd4c495b450593307a02c33d6fda1b, scorer 8b3da05ebec56f322d1bf8ca1e24bd98399a19d1ed6adea6aa0af2347997a430, C09_RESULTS.md 490ce631ae7d17493cdf3acdd3484aabbc9f875685250ad1bfa3fb67144668fc, and C09_ledger.csv 220fa2785f11ddf2c9cc3c89e7b1f9fd273711ee4429d85efa00ec47fcc8f2dd match across SPEC, PREFLIGHT, and C09_EVIDENCE.sha256. PREFLIGHT reports failures: 0. No hash or frozen-version mismatch is shown.
+
+Hard-fact agreement table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FactBuilderValidatorScorer RESULTSMarkLedger rows A001–A013131313 rows in the ledger table and CSVagreeSubstantive under frozen scorer1010 (A001–A008, A011, A012)10 yes rowsagreeNon-substantive process/governance3 (A009, A010, A013)33 no (process) rowsagreeSubstantive rows needing a later ruling5: A003, A006, A007, A008, A0115: same IDscount 5; same five yesagreeNeeded count if A012 is treated as processstill 5still 5not rescored; both recomputes leave the fiveagreeDesign Gate checklist items161616agreeTopic-regex hits (not in P1)8/16: 4, 5, 6, 7, 10, 11, 13, 168/16: same items8 / 16agreeReview keyword counts2, 1, 7, 4 (total 14)2, 1, 7, 4same four countsagreeMechanical P1 side5 ≠ 0, not KEEP-side5 ≠ 0, zero-count falseREVERT sideagreeSeed files / new R or MySQL runs0 / 0not applicable; nonenone declaredagreePreflight failures00PREFLIGHT PASS failures: 0agreeA012 case-sensitive process caveatdisclosed; does not change the fivedisclosed; does not change the fivescorer marks A012 substantive, later = noagree (shared caveat, not a conflict)Item 16 lexical overbreadthdisclosed; not in P1disclosed; not in P1regex hit on Grok; not scoredagree (shared caveat, not a conflict)
+No hard number or classification that decides P1 is in disagreement. The shared A012 and item-16 notes are annotations of the frozen scorer, not rival mechanical results.
+
+The nine KEEP conditions of constitution §7
+PASS. Both packs are present, complete, end with their END lines, and are the files named in the FREEZE RECORD; verdict_token_leak is false; PREFLIGHT failures: 0. Citation: FREEZE RECORD; both END lines; PREFLIGHT.
+PASS. Roles are ChatGPT Builder, DeepSeek Validator, Grok Adjudicator; each report attests an independent first pass and blindness; no verdict-token leak. Citation: FREEZE RECORD roles; Builder §1; Validator §1; constitution §1.
+PASS. Builder, Validator, and scorer RESULTS agree on 13 rows, 10 substantive, 5 later-ruling rows (A003, A006, A007, A008, A011), 8/16 checklist hits, and review counts 2/1/7/4. Citation: agreement table; C09_RESULTS counts; both recomputation sections.
+PASS (not applicable, as waived before execution). SPEC: constitution §7 conditions 4 and 5 are not applicable to this text-only control; no R path and no reconciliation field list is scored. Text-level equivalent: the seven overlapping input hashes in C09_EVIDENCE.sha256 match PREFLIGHT. Citation: SPEC Regression / HALT rules; coordinator note; both reports’ fixture sections.
+PASS (not applicable, as waived before execution). No fixture suite is in scope; seeds are none; known-answer cases are the unmodified ledger and the declared scorer. Citation: SPEC seed files (none) and the same waiver.
+PASS. No seeded code or framework change; frozen inputs are read only; the A012 capitalization behavior and the checklist regexes are in the pre-execution scorer, and the checklist count is declared not scored. Citation: SPEC Disclosures; scorer source; both unchanged-surface notes.
+PASS. No locked output surface was rewritten. N16 does not run R-A / R-B, so OF-1 cannot enter the count. Citation: coordinator note; SPEC Disclosures; PREFLIGHT PASS.
+FAIL. P1 is KEEP-side only if 0 substantive ledger ambiguities needed a later ruling. The frozen count is 5 (A003 exact dates open to Stage 3; A006 portfolio urgency later; A007 exact eligibility formulas open; A008 urgency/lateness open to Stage 3; A011 capacity/ranking open later). 5 ≠ 0. The 8/16 checklist count is reported, not scored. Citation: SPEC Operational benefit predicate P1; C09_RESULTS mechanical P1 line and Counts row 1; C09_ledger.csv.
+PASS. The Validator’s two objections are on the record, but neither is supported by the frozen evidence as a blocking gate: the 7-second timestamp order is not a hash mismatch and PREFLIGHT failures are 0; the A012 classification is agreed by both sides and does not change the P1 count. Citation: Validator §6; hash equalities in Validator §3; Builder §3.2; constitution §7.9 and §9.
+
+Condition 8 fails. The nine conditions are conjunctive, so KEEP is unavailable.
+
+HALT conditions of §9
+
+
+Hard mechanical results conflict: absent. Both sides and the scorer give needed = 5 and checklist = 8/16. Citation: agreement table; constitution §4 and §9.
+Required raw evidence missing: absent. Scorer results, ledger CSV, scorer source, frozen ledger, Stage 1 lock, four reviews, and Design Gate package are in the packet. A missing historical stdout is not a HALT under the control instructions. Citation: C09_RESULTS; C09_ledger.csv; scorer source; FROZEN INPUTS.
+Hash or frozen-version mismatch: absent. Listed hashes agree across SPEC, PREFLIGHT, and C09_EVIDENCE.sha256. Citation: FROZEN REFERENCE HASHES; Validator §3 hash table; PREFLIGHT failures: 0.
+Baseline or constitution changed mid-run: absent. Baseline hashes and constitution e6c3b348… are the frozen values. Citation: BASELINE FRAMEWORK HASHES; PREFLIGHT.
+Role separation violated: absent. Three distinct roles; no pack holds more than one. Citation: FREEZE RECORD; constitution §1.
+Information barrier breached before first-pass freeze: absent. Both reports attest blindness; verdict_token_leak is false on both packs. Citation: FREEZE RECORD; Builder §1; Validator §1.
+Benefit predicate not operationally defined before execution: absent. P1 was declared in the frozen SPEC (KEEP-side iff 0 later rulings; checklist not scored), under owner answer Z / 9-C. Citation: SPEC Operational benefit predicate P1; owner-answer hash.
+Adjudicator cannot tell which pack is authoritative: absent. The FREEZE RECORD names both packs and their hashes. Citation: FREEZE RECORD.
+
+No §9 HALT condition is present. The SPEC’s extra HALT triggers (hard-number disagreement that decides P1, missing or incomplete reply, post-freeze change, frozen-input hash difference) are also absent.
+
+Blocking objections raised by the Validator and how the evidence bears on them
+
+Objection 1, preflight/order: C09_RESULTS.md is stamped 2026-10-09 02:21:35 CT and PREFLIGHT 2026-10-09 02:21:42 CT. That 7-second order is real on the face of the two headers. It is not a hash mismatch, not a missing artifact, and not a Builder/Validator disagreement on a P1 number. PREFLIGHT still reports failures: 0, and the result and input hashes match the freeze references. It does not meet §9 and does not decide P1. Not supported as blocking.
+Objection 2, A012: severity is Blocking (process); the frozen scorer excludes Process|governance case-sensitively, so A012 is marked substantive. Both sides recompute this and both recompute that correcting it leaves the later-ruling set at A003, A006, A007, A008, A011 (count 5). A012’s resolution is Open — PENDING_COMPUTERUSE, which does not match the later-ruling pattern, so it is not in the P1 numerator either way. This is a shared scorer caveat, not a hard-fact conflict. Not supported as blocking.
+Non-blocking notes (item 16 Grok vs Grok Auto; CSV resolutions truncated at 70 characters by res[:70]; DESIGN_GATE_RECEIPT.md read and unused) are consistent with the frozen scorer and are outside P1. They do not reopen the gate.
+
+Verdict rationale
+
+The change under test is dropping the pre-lock ambiguity attack. The approved arm is a replay, not a no-attack rerun: score the real ledger against later rulings. P1 is not inverted on this control. KEEP requires that the attack found nothing that later needed a ruling. The frozen, independently reproduced count is 5. Those five are population, window, evidence, and capacity matters that the ledger itself marks open or later (exact dates, portfolio urgency, eligible formulas, urgency/lateness rules, capacity/ranking). The 8/16 checklist figure is lexical and declared not scored; both sides also warn that several hits are partial. Because the mechanics are coherent, the packs are frozen and complete, and no HALT condition holds, the failed predicate takes the conservative terminal state: the attack stays.
+TERMINAL_STATE: REVERT
+END C09 ADJUDICATION
