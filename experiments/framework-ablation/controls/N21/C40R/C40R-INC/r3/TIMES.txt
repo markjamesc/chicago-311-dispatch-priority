@@ -1,0 +1,3 @@
+sent=unknown
+reply_complete=unknown
+# Send and reply-complete times were not recorded (turn 3 was sent by an earlier interrupted helper). Known only: sent after 14:27:12 CT; page shows "Worked for 7m 49s". Nothing is guessed. Original capture: TIMES_original_capture.txt (unedited).

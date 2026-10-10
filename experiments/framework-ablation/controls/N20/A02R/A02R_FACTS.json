@@ -1,0 +1,166 @@
+{
+  "run1_pre_fix": {
+    "ra_fix_pass": "14/14",
+    "rb_fix_pass": "14/14",
+    "rb_F03": [
+      "STANDARD",
+      "STANDARD"
+    ],
+    "ra_F03_observed_pass": true,
+    "ra_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "rb_portfolio": {
+      "decision": 222002,
+      "ESC": 132072,
+      "INC": 6377,
+      "STD": 83553
+    },
+    "recon_in_log": null,
+    "exit_ra": [
+      "0"
+    ],
+    "exit_rb": [
+      "0"
+    ]
+  },
+  "rerun_post_fix": {
+    "ra_fix_pass": "14/14",
+    "rb_fix_pass": "14/14",
+    "rb_F03": [
+      "STANDARD",
+      "STANDARD"
+    ],
+    "ra_F03_observed_pass": true,
+    "ra_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "rb_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "recon_in_log": [
+      "222002",
+      "222002",
+      "222002",
+      "0",
+      "0",
+      "222002",
+      "0"
+    ],
+    "exit_ra": [
+      "0"
+    ],
+    "exit_rb": [
+      "0"
+    ]
+  },
+  "run1_ESC_delta_RB_minus_RA": 104,
+  "run1_STD_delta_RA_minus_RB": 104,
+  "post_fix_portfolios_equal": true,
+  "recon_summary_csv": {
+    "n_ra": "222002",
+    "n_rb": "222002",
+    "n_inner": "222002",
+    "n_only_ra": "0",
+    "n_only_rb": "0",
+    "n_agree": "222002",
+    "n_disagree": "0"
+  },
+  "recon_disagree_ids_rows_post_fix": 0,
+  "fixture_csvs": {
+    "RA": {
+      "n": 14,
+      "all_pass": true,
+      "F03": [
+        [
+          "STANDARD",
+          "STANDARD"
+        ]
+      ]
+    },
+    "RB": {
+      "n": 14,
+      "all_pass": true,
+      "F03": [
+        [
+          null,
+          null
+        ]
+      ]
+    }
+  },
+  "fixture_gate_locked_at": "2026-09-19 10:26:37 CT",
+  "run1_started_at": "2026-09-19T12:56:16.7553084-05:00",
+  "fixture_run_in_log_before_recon_flagged_defect": true,
+  "checks": [
+    [
+      "R-A fixtures 14/14 in pre-fix run",
+      true
+    ],
+    [
+      "R-B fixtures 14/14 in pre-fix run",
+      true
+    ],
+    [
+      "R-A fixtures 14/14 in post-fix run",
+      true
+    ],
+    [
+      "R-B fixtures 14/14 in post-fix run",
+      true
+    ],
+    [
+      "F03 expected=observed=STANDARD (R-B, both runs)",
+      true
+    ],
+    [
+      "F03 STANDARD/STANDARD TRUE (R-A table, both runs)",
+      true
+    ],
+    [
+      "Pre-fix: ESC differs RB-RA = 104",
+      true
+    ],
+    [
+      "Pre-fix: STD differs RA-RB = 104",
+      true
+    ],
+    [
+      "Pre-fix: INC equal 6377 and decision equal 222002",
+      true
+    ],
+    [
+      "Post-fix portfolios identical (131968/6377/83657)",
+      true
+    ],
+    [
+      "Post-fix RECON_SUMMARY.csv: agree 222002, disagree 0, only_ra 0, only_rb 0",
+      true
+    ],
+    [
+      "RECON_DISAGREE_IDS.csv has 0 data rows",
+      true
+    ],
+    [
+      "All four R exits 0",
+      true
+    ],
+    [
+      "Fixture CSVs 14 rows all pass",
+      true
+    ],
+    [
+      "Fixture Gate lock time precedes first production run (2026-09-19 10:26:37 CT < 12:56:16 CT)",
+      true
+    ]
+  ]
+}

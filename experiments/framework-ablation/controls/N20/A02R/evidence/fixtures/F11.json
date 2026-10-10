@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F11",
+  "intent": "legacy excluded",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F11",
+    "SR_TYPE": "Sanitation Code Violation",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-08-01 10:00:00",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "true",
+    "LEGACY_SR_NUMBER": "CSR18-00000001",
+    "WARD": "7",
+    "COMMUNITY_AREA": "46"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": false,
+    "exclusion_reason": "legacy",
+    "action": null,
+    "selected": false
+  }
+}

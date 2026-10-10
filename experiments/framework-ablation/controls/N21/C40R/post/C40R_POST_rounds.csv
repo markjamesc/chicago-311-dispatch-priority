@@ -1,0 +1,9 @@
+arm,round,gate,rb_exit,fixtures,classifications_equal,hidden_depth_gate,reply_min,gate_min,round_active_min,code_sha256
+INC,1,FAIL,0,14/14,FALSE,not run (gate FAIL),3.48,0.59,4.08,MISSING
+INC,2,FAIL,0,14/14,TRUE,not run (gate FAIL),12.03,0.52,12.55,MISSING
+INC,3,FAIL,0,14/14,TRUE,not run (gate FAIL),,0.53,,MISSING
+INC,4,FAIL,0,14/14,TRUE,not run (gate FAIL),9.82,0.53,10.34,MISSING
+INC,5,FAIL,0,14/14,TRUE,not run (gate FAIL),7.97,0.54,8.51,MISSING
+INC,6,FAIL,0,14/14,TRUE,not run (gate FAIL),4.87,0.6,5.47,197aea5662b6ca8f
+FRESH,1,FAIL,0,14/14,TRUE,not run (gate FAIL),4.02,0.43,4.45,MISSING
+FRESH,2,FAIL,0,14/14,TRUE,not run (gate FAIL),6.23,0.7,6.93,MISSING

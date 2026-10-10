@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F12",
+  "intent": "knob boundary twin age 14",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F12",
+    "SR_TYPE": "Garbage Cart Maintenance",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-08-29 12:00:00",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "8",
+    "COMMUNITY_AREA": "49"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": true,
+    "open_age_days": 14,
+    "action": "ESCALATE",
+    "selected": true
+  }
+}

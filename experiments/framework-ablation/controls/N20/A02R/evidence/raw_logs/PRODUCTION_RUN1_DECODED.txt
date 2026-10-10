@@ -1,0 +1,78 @@
+=== RESTART 2026-09-19T12:56:16.7553084-05:00 ===
+unpacked R-B
+type_key,peer_n,peer_p50_h,peer_p75_h,t_freeze,lookback_w_days,peer_def,peer_label_note 
+nrow 104 
+Rscript.exe : PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-fade2373-8767-4d9b-a5b1-6257ebc9253e.ps1:84 char:1
++ & $rscript (Join-Path $root "R-A\run_RA.R") 2>&1 | Tee-Object -FilePa ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PROJECT_ROOT=C:...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_fixture_results.csv pass=14/14
+# A tibble: 14 %� 4
+   fixture_id expected               observed               pass 
+   <chr>      <chr>                  <chr>                  <lgl>
+ 1 F01        ESCALATE               ESCALATE               TRUE 
+ 2 F02        STANDARD               STANDARD               TRUE 
+ 3 F03        STANDARD               STANDARD               TRUE 
+ 4 F04        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 5 F05        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 6 F06        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 7 F07        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 8 F08        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 9 F09        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+10 F10        STANDARD               STANDARD               TRUE 
+11 F11        ESCALATE               ESCALATE               TRUE 
+12 F12        OUT_OF_SET             OUT_OF_SET             TRUE 
+13 F13        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+14 F14        TWO_INDEPENDENT_LABELS TWO_INDEPENDENT_LABELS TRUE 
+open_n=245193 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_portfolio_counts.csv
+# A tibble: 1 %� 7
+  n_decision n_ESCALATE n_INCONCLUSIVE n_STANDARD kappa rule_version t_freeze   
+       <int>      <int>          <int>      <int> <dbl> <chr>        <chr>      
+1     222002     131968           6377      83657     2 RA-tcd-ig-v1 2026-09-12�Ǫ
+R-A done. mode=all
+=== RA EXIT 0 2026-09-19T12:56:27.0759267-05:00 ===
+Rscript.exe : [R-B] project root: C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-fade2373-8767-4d9b-a5b1-6257ebc9253e.ps1:86 char:1
++ & $rscript (Join-Path $root "R-B\run_RB.R") all 2>&1 | Tee-Object -Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([R-B] project r...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03���STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+[R-B] open n=245193 peer types=104
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_classifications.csv (n=222002)
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_portfolio_counts.csv (n=1)
+[R-B] portfolio: decision=222002 ESCALATE=132072 INCONCLUSIVE=6377 STANDARD=83553
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+[R-B] done mode=all
+=== RB EXIT 0 2026-09-19T12:56:49.1027805-05:00 ===
+
+Name                       Length LastWriteTime        
+----                       ------ -------------        
+RA_classifications.csv   22271481 9/19/2026 12:56:27 PM
+RA_fixture_results.csv        985 9/19/2026 12:56:18 PM
+RA_portfolio_counts.csv       140 9/19/2026 12:56:27 PM
+RB_classifications.csv   41963341 9/19/2026 12:56:41 PM
+RB_fixture_results.csv       1792 9/19/2026 12:56:27 PM
+RB_kappa_grid_counts.csv      164 9/19/2026 12:56:49 PM
+RB_portfolio_counts.csv       100 9/19/2026 12:56:41 PM
+
+
+
+=== DONE 2026-09-19T12:56:49.1122608-05:00 ===

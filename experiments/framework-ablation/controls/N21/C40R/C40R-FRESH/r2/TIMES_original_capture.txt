@@ -1,0 +1,10 @@
+url=https://chatgpt.com/c/6aca9078-ac64-83e9-ba5b-95e488090275
+sent=2026-10-10 15:16:59
+reply_complete=2026-10-10 15:23:13
+# notes
+# Pre-send check: chat had exactly 1 turn (r1 reply ending "END C40R BUILD FRESH r1"); no r2 turn existed. Reasoning selector showed "High".
+# Attachment: MESSAGE.txt (2,802 B) attached via the composer file input (Playwright setInputFiles); ChatGPT displayed it as "MESSAGE(2).txt" (Document). No message text typed.
+# Polls (CT): no END/Stop present at 15:17:50, 15:19:15, 15:19:49, 15:20:24, 15:20:58, 15:21:32, 15:22:06, 15:22:39 (last poll without END); first poll with END and Stop gone at 15:23:13.
+# reply_complete = first poll at which Stop button was absent; actual completion within window 15:22:39-15:23:13.
+# No tool-use indicators or download links observed in the r2 reply (one R code block, notes, END line).
+# reply_box_copybutton.md = Copy-reply button clipboard (with ``` fences); reply_box.md = selected rendered reply text. Both saved unchanged plus final newline.

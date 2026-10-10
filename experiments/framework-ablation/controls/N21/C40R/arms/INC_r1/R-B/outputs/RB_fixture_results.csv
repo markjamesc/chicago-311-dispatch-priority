@@ -1,0 +1,15 @@
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,dormant_h=480.000000 >= kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,dormant_h=24.000000 < kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,dormant_h=2400.000000 < kappa*peer_p75_h=4320.000000 (kappa=2; peer_p75_h=2160.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I02_OPEN_CLOSED,integrity=I02_OPEN_CLOSED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I06_MOD_BEFORE_CREATED,integrity=I06_MOD_BEFORE_CREATED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I14_THIN_TYPE,integrity=I14_THIN_TYPE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I11_ORPHAN_PARENT,integrity=I11_ORPHAN_PARENT,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,dormant_h=96.000000 < kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,dormant_h=192.000000 >= kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I03_CREATED_PARSE,integrity=I03_CREATED_PARSE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig

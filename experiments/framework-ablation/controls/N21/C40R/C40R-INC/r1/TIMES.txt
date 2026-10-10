@@ -1,0 +1,4 @@
+sent=2026-10-10 13:51:56
+reply_complete=2026-10-10 13:55:25
+# reply_complete is approximate (page "Worked for 3m 29s" after send; no clock timestamp on page). Original capture with url/notes: TIMES_original_capture.txt (unedited).
+# Packet was sent as a single file attachment (62,034 B), not pasted.

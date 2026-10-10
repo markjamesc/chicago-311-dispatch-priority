@@ -1,0 +1,8 @@
+url=https://chatgpt.com/c/6aca8935-5720-83ea-8a1c-7820adbf24b4
+sent=14:07:58 CT (approx +/-3s; send click between 14:07:35 and 14:08:01 shell clock readings)
+reply_complete=between 14:15:50 and 14:20:00 CT (observed by polling; END line first seen at ~14:20:00 check, absent at ~14:15:50 check)
+page_worked_for=Worked for 3m 54s (inconsistent with observed wall time; reply was still streaming at ~14:12 and ~14:16)
+model_setting=High (shown in composer)
+attachment_method=MESSAGE.txt (5,024 B) attached via file input as single attachment, no message text
+chatgpt_tool_use=yes: showed progress/analysis notes ("Reconstructed fixture hashes"), produced file 20_integrity_and_classify.R with "Download corrected R file" link (not downloaded)
+notes=reply_box_copybutton.md from Copy button (fences present, opening fence is bare ``` with no language tag). reply_box.md from selecting rendered reply container; it ends with file chip text "20_integrity_and_classify.R / File" after the END line. No hand edits.

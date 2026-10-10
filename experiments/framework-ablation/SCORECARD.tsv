@@ -2,7 +2,7 @@ control_id	batch	rule_under_test	mechanical_result	recorded_terminal_state	super
 C27	C27_C33	Fixtures on both paths		REVERT		controls/C27_C33/C27/
 C33	C27_C33	Naive clock contract		REVERT		controls/C27_C33/C33/
 C24	N13	Mechanical vs judged population (SQL envelope vs R)	HALT	HALT	superseded by N19 C24V3 (REVERT)	controls/N13/C24/
-C40	N13	Repair-round cap	PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)	NONE_RECORDED (NOT_TRIGGERED per spec)		controls/N13/C40/
+C40	N13	Repair-round cap	PARTIAL: pre-chat conditions evaluated; conditions marked PENDING are evaluated after the extra chats (see SPEC)	NONE_RECORDED (NOT_TRIGGERED per spec)	N13 C40 NOT_TRIGGERED; re-run as N21 C40R (HALT, BOTH_CENSORED)	controls/N13/C40/
 C41	N13	Fixture depth over count	P1 MET	KEEP		controls/N13/C41/
 C42	N13	Batched owner rulings	P1 NOT MET	REVERT		controls/N13/C42/
 C43	N13	Narrow freeze scope (hash gate-feeding artifacts only)	P1 NOT MET	REVERT		controls/N13/C43/
@@ -44,3 +44,5 @@ C54	N16	Builder file-download capture channel		REVERT		controls/N16/C54/
 C49R	N17	Individual-file evidence delivery + SHA256SUMS.txt + inventory		KEEP		controls/N17/C49R/
 C24V2	N18	Mechanical vs judged population (SQL envelope vs R)		NONE_RECORDED	attempt, no terminal state; superseded by N19 C24V3 (REVERT)	controls/N18/C24V2/
 C24V3	N19	Mechanical vs judged population (SQL envelope vs R)	P1 NOT MET	REVERT		controls/N19/C24V3/
+A02R	N20	Known-case Fixture Gate before builders (re-run of A02)		REVERT		controls/N20/A02R/
+C40R	N21	Repair-round cap (re-run of C40)	HALT (BOTH_CENSORED; no Builder/Validator/Adjudicator chats run per spec; existing rule stays)	HALT		controls/N21/C40R/

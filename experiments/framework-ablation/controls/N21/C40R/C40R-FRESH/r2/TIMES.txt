@@ -1,0 +1,3 @@
+sent=2026-10-10 15:16:59
+reply_complete=2026-10-10 15:23:13
+# reply_complete is an upper bound: the reply finished between 15:22:39 (last poll without END) and 15:23:13 (first poll with END and Stop gone). Original capture: TIMES_original_capture.txt (unedited).

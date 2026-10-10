@@ -1,0 +1,3 @@
+sent=2026-10-10 14:23:11
+reply_complete=2026-10-10 14:27:12
+# sent is the CT clock read right after clicking Send (+/-2 s). reply_complete: END line first seen 14:27:09, Stop button gone at 14:27:12. Original capture: TIMES_original_capture.txt (unedited).

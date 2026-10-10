@@ -1,0 +1,1474 @@
+# A02R Adjudicator — Grok (TERMINAL DECISION)
+
+Role: Adjudicator only (Expert mode, as in A01-A08). Return exactly one terminal state: KEEP, REVERT or HALT.
+- KEEP: the ablation is adopted: the known-case Fixture Gate may be made optional or post-hoc.
+- REVERT: the mandatory pre-builder Fixture Gate stays.
+- HALT: only for these conditions:
+  - a hard mechanical disagreement between the Builder and Validator packs;
+  - missing raw evidence required for the predeclared P1 and critical facts;
+  - a hash or frozen-version mismatch against the FREEZE RECORD or the manifest;
+  - a role or information-barrier breach;
+  - a predicate that was not defined before execution.
+- Raw evidence is present (production stdout logs, fixture runner source, recon script and outputs, Fixture Gate receipt, manifests). Do not HALT only because a historical artifact outside the predeclared critical facts is absent; the known gaps are listed in the SPEC section 4.
+- If P1 fails and no HALT condition holds, return REVERT. That is the conservative default.
+You may not rerun anything, repair code, create new criteria, relax a gate, or pick one side's mechanical result over the other's (constitution section 10).
+
+# HISTORY DISCLOSURE (facts, not guidance)
+- Original A02 (2026-09-19; Builder DeepSeek, Validator Grok, Adjudicator ChatGPT) returned HALT twice. The recorded reason was missing raw evidence (production stdout, fixture runner source, fixture-freeze ordering). The original substantive reading was that P1 fails. Neither is binding on you; decide only on this packet.
+- A02R is the same ablation with the rotated roles and the completed evidence listed in the SPEC. No experiment was re-executed.
+Final two lines of your reply: 'TERMINAL_STATE: <KEEP|REVERT|HALT>' then 'END A02 ADJUDICATION'.
+
+---
+# FROZEN SPEC (ABLATION_SPEC_A02R.md)
+# A02R — Ablation specification (FROZEN before any A02R chat)
+
+**Ablation ID:** A02R (re-run of A02, "Known-case Fixture Gate before builders"). Batch N20. Owner-authorised 2026-10-10 ("finish A02").
+**Supersedes nothing.** The original A02 (2026-09-19, Builder=DeepSeek, Validator=Grok, Adjudicator=ChatGPT, terminal HALT twice) and all its evidence stay on file unchanged: `chicago-311-run/ablations/A02/`, spec `ORIGINAL_A02_ABLATION_SPEC.md` (copied here byte-for-byte).
+**Design: identical to A02.** Same change under test, same benefit predicate P1, same critical mechanical facts, same expected-unchanged surfaces, same regression rule, same constitution (v1.0, hash in `SPEC_FREEZE_A02R.sha256`), same baseline framework hashes.
+
+## Why A02R exists (disclosure)
+The original A02 returned HALT, twice (ChatGPT as Adjudicator). The substantive finding was not KEEP; the HALT was triggered by Constitution §3/§9 "required raw evidence is missing": the packet carried result tables and a markdown recon summary but not the raw production stdout, the fixture runner source, the fixture-freeze ordering receipt, or the code that produced the numbers. A later diagnosis (`A02/HARNESS_DIAGNOSIS.md`) concluded the evidence packet, not the ablation, was deficient.
+
+## What changes in A02R (the only changes)
+1. **Roles rotated to the current protocol:** Builder=ChatGPT, Validator=DeepSeek, Adjudicator=Grok (original: DeepSeek/Grok/ChatGPT). Builder and Validator are fresh chats that never saw the original A02 packs, reports or verdict; the Adjudicator is told the history (HALT, why) in a disclosure block.
+2. **Evidence packet completed.** Added to the original `_raw_evidence` set: (a) the raw production stdout/stderr logs of the 2026-09-19 12:56 CT first production run (pre-fix) and the 13:46 CT tz-fix re-run, in original bytes plus a decoded text copy; (b) the R-A and R-B production source and the R-B module source, including both fixture runners (R-A `build_fixture_pack`/`run_fixtures` in `run_RA.R`; R-B `R/40_fixtures.R`); (c) the recon scripts `run_recon.R`, `diagnose_disagree.R`; (d) the Fixture Gate receipt (locked 2026-09-19 10:26:37 CT, i.e. before the 12:56 CT production run) and the locked fixture pack; (e) SHA-256 of every file (`EVIDENCE_MANIFEST_A02R.sha256`); (f) a deterministic mechanical facts table produced by `runner/a02r_facts.py` from those files.
+3. **No new compute.** Nothing is re-executed on the PC. The raw logs are the original run's own output. No code, fixture, or expected value is modified or re-run; A02R is an evidence-complete re-adjudication of the same experiment under the rotated roles.
+4. **Known gaps, disclosed up front (not hidden):** (i) the 104 SR_NUMBERs of the first run's disagreement were not saved (only the post-fix empty list `RECON_DISAGREE_IDS.csv` and the 104 count derived from the portfolio counts 132,072 vs 131,968, plus the Builder-reported diagnostics in the original A02 which A02R does not give the new Builder/Validator); (ii) the PowerShell log files mix UTF-8 and UTF-16 bytes, the decoded copy strips NULs and is a convenience only; (iii) `stage-03/fixtures/*.json` hold only F01–F12 and a README still labelled v0.1-PENDING; F13/F14 live in the fixture runner code; the locked pack md and Fixture Gate receipt are authoritative; (iv) the Fixture Gate receipt carries the lock time but the pack has no external timestamp authority.
+
+## Operational benefit predicate P1 (unchanged from A02)
+Removing mandatory pre-builder Fixture Gate reduces steps while detection coverage remains equal: Chicago's production clock-skew defect (104-row disagree) and construct boundaries (F03→STANDARD) would still have been caught by exact recon / other controls alone, with no increase in shipped wrong labels.
+Benefit **fails** if evidence shows Fixture Gate was necessary for construct sign-off (e.g. F03) or that optional fixtures would have allowed greenwash / silent design drift.
+
+## Critical mechanical facts (unchanged; now checked by script, `A02R_FACTS.md`)
+- Fixture results: R-A 14/14, R-B 14/14, F03→STANDARD
+- Production first recon: 104 disagrees; post-fix: 0
+- Fixtures use in-process clocks (did not catch CSV tz bug)
+
+## Expected unchanged
+Chicago frozen pack; κ/T_freeze; SQL nonjudgment; dual-path (A01 REVERT already kept).
+
+## Regression
+Must not authorize rewriting fixtures after fail to match code.
+
+## Verdict convention
+KEEP = the Fixture Gate may be made optional / post-hoc. REVERT = mandatory pre-builder Fixture Gate stays. HALT per Constitution §9 only. Per the harness note: if Builder and Validator agree on hard numbers, the raw evidence manifest is present, P1 fails and no §9 condition holds, the result is REVERT.
+
+---
+# ORIGINAL A02 SPEC (byte-identical copy; design is the same)
+# A02 — Ablation specification (FROZEN)
+
+**Ablation ID:** A02  
+**Constitution version:** 1.0  
+**Roles:** Builder=DeepSeek · Validator=Grok · Adjudicator=ChatGPT  
+**Target stage(s):** Stage 3 (fixture freeze before builders) and Stage 4 (Fixture Gate enforcement)  
+**Baseline SHAs:** see BASELINE_FRAMEWORK.sha256
+
+## Exact change being tested
+
+**Proposed canonical change:** Remove or make optional the requirement that a frozen known-case Fixture Gate must PASS before R-A/R-B production builders run (allow production-first; fixtures optional/post-hoc).
+
+## Operational benefit predicate P1
+
+Removing mandatory pre-builder Fixture Gate reduces steps while detection coverage remains equal: Chicago’s production clock-skew defect (104-row disagree) and construct boundaries (F03→STANDARD) would still have been caught by exact recon / other controls alone, with no increase in shipped wrong labels.
+
+Benefit **fails** if evidence shows Fixture Gate was necessary for construct sign-off (e.g. F03) or that optional fixtures would have allowed greenwash / silent design drift.
+
+## Critical mechanical facts
+
+- Fixture results: R-A 14/14, R-B 14/14, F03→STANDARD  
+- Production first recon: 104 disagrees; post-fix: 0  
+- Fixtures use in-process clocks (did not catch CSV tz bug)
+
+## Expected unchanged
+
+Chicago frozen pack; κ/T_freeze; SQL nonjudgment; dual-path (A01 REVERT already kept).
+
+## Regression
+
+Must not authorize rewriting fixtures after fail to match code.
+
+---
+# CONSTITUTION v1.0
+# Ablation Constitution
+
+**Version:** 1.0
+
+This constitution controls automated three-model framework ablations. It must be frozen before an ablation begins and may not be changed in response to that ablation's results.
+
+## 1. Separation of duties
+
+For each ablation:
+
+- exactly one model is Builder;
+- exactly one different model is Validator;
+- exactly one third model is Adjudicator;
+- no model may hold more than one role;
+- Builder and Validator first-pass outputs are blind to one another;
+- the Adjudicator receives only frozen evidence after Builder and Validator packs are complete.
+
+## 2. Frozen inputs
+
+The following must be frozen before execution:
+
+- baseline framework version;
+- ablation specification;
+- fixture suite;
+- critical reconciliation field list;
+- allowed source/data scope;
+- expected unchanged surfaces;
+- operational benefit predicate;
+- regression rule;
+- model-role assignment;
+- constitution version.
+
+Missing frozen inputs require **HALT**.
+
+## 3. Evidence requirement
+
+A claim that a test passed is not evidence by itself.
+
+Required mechanical claims must be backed by raw execution evidence where applicable:
+
+- stdout/stderr;
+- SQL/R/tool output;
+- fixture actuals and expecteds;
+- reconciliation output;
+- diff output;
+- file manifests;
+- SHA-256 hashes.
+
+If a required raw artifact is unavailable, return **HALT**.
+
+## 4. Hard mechanical agreement
+
+Builder and Validator must agree on all predeclared hard mechanical facts.
+
+Examples include:
+
+- `mismatch_count == 0` on the frozen critical-field list;
+- fixture IDs executed;
+- expected versus actual fixture results;
+- baseline and candidate version hashes;
+- declared changed-file set;
+- source row counts where specified;
+- required output existence.
+
+If Builder and Validator disagree on a hard mechanical fact, return **HALT**.
+
+Do not silently REVERT. Mechanical disagreement means the harness or implementation requires diagnosis.
+
+## 5. Semantic protection
+
+Schema equality alone does not prove semantic equality.
+
+The ablation must therefore use both:
+
+- deterministic file/schema/configuration diffing; and
+- locked behavioral fixtures covering the decision-changing semantics relevant to the change.
+
+Any undeclared semantic change returns **REVERT** unless the disagreement itself makes the harness suspect, in which case return **HALT**.
+
+## 6. Benefit predicate
+
+Every ablation must state an operational benefit predicate before execution.
+
+The predicate must be checkable from frozen artifacts without asking the Builder what it meant.
+
+Valid forms include:
+
+- detection of a seeded failure missed by baseline;
+- removal of redundant complexity with unchanged detection coverage and outputs;
+- elimination of a documented ambiguity demonstrated by independent implementation;
+- detection of a seeded Stage 4 delivery/implementation defect;
+- measurable reduction in unnecessary steps while all required safeguards remain green.
+
+A subjective statement such as "the change is better" is invalid and requires **HALT** before execution.
+
+## 7. KEEP rule
+
+Return **KEEP** only when all are true:
+
+1. evidence packs are complete and frozen;
+2. role separation is valid;
+3. Builder and Validator agree on hard mechanical facts;
+4. exact reconciliation passes where required;
+5. every mandatory fixture passes;
+6. no undeclared semantic change is detected;
+7. no locked regression is introduced;
+8. the predeclared benefit predicate is satisfied;
+9. no blocking objection remains supported by the frozen evidence.
+
+All nine conditions are conjunctive.
+
+## 8. REVERT rule
+
+Return **REVERT** when:
+
+- the mechanics are internally coherent;
+- HALT conditions are absent;
+- but one or more KEEP conditions are not established.
+
+REVERT is the conservative default for unresolved soft judgment.
+
+## 9. HALT rule
+
+Return **HALT** when:
+
+- hard mechanical results conflict;
+- required raw evidence is missing;
+- hashes or frozen versions mismatch;
+- the baseline or constitution changed mid-run;
+- role separation was violated;
+- information barriers were breached before first-pass freeze;
+- the benefit predicate was not operationally defined before execution;
+- the adjudicator cannot determine which frozen evidence pack is authoritative.
+
+HALT means the experiment is not valid enough to adjudicate.
+
+## 10. Adjudicator limits
+
+The Adjudicator may not:
+
+- create a new success criterion;
+- relax a failed hard gate;
+- choose one mechanical result over another when Builder and Validator conflict;
+- modify Builder or Validator artifacts;
+- repair code;
+- rerun the ablation and substitute its own result;
+- use majority vote to override the constitution.
+
+It must cite the frozen evidence supporting each constitutional condition.
+
+## 11. Constitution changes
+
+This constitution may not self-modify during an ablation.
+
+A proposed change to the constitution must be treated as a separate meta-ablation with:
+
+- a frozen prior constitution;
+- a declared proposed revision;
+- independent Builder/Validator analysis;
+- third-model adjudication;
+- deterministic evidence freezing.
+
+## 12. Final rule
+
+> **Hard disagreement halts. Coherent evidence without proven benefit reverts. Only independently reproduced, regression-free, predeclared benefit is kept.**
+
+---
+# BASELINE FRAMEWORK HASHES
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+
+---
+# SCRIPT-DERIVED MECHANICAL FACTS (A02R_FACTS.md; produced by runner/a02r_facts.py from the evidence below; no verdict)
+# A02R mechanical facts (script-derived; no verdict)
+
+Source: `evidence/` files only. Script: `runner/a02r_facts.py`.
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | R-A fixtures 14/14 in pre-fix run | TRUE |
+| 2 | R-B fixtures 14/14 in pre-fix run | TRUE |
+| 3 | R-A fixtures 14/14 in post-fix run | TRUE |
+| 4 | R-B fixtures 14/14 in post-fix run | TRUE |
+| 5 | F03 expected=observed=STANDARD (R-B, both runs) | TRUE |
+| 6 | F03 STANDARD/STANDARD TRUE (R-A table, both runs) | TRUE |
+| 7 | Pre-fix: ESC differs RB-RA = 104 | TRUE |
+| 8 | Pre-fix: STD differs RA-RB = 104 | TRUE |
+| 9 | Pre-fix: INC equal 6377 and decision equal 222002 | TRUE |
+| 10 | Post-fix portfolios identical (131968/6377/83657) | TRUE |
+| 11 | Post-fix RECON_SUMMARY.csv: agree 222002, disagree 0, only_ra 0, only_rb 0 | TRUE |
+| 12 | RECON_DISAGREE_IDS.csv has 0 data rows | TRUE |
+| 13 | All four R exits 0 | TRUE |
+| 14 | Fixture CSVs 14 rows all pass | TRUE |
+| 15 | Fixture Gate lock time precedes first production run (2026-09-19 10:26:37 CT < 12:56:16 CT) | TRUE |
+
+## Extracted values
+```json
+{
+  "run1_pre_fix": {
+    "ra_fix_pass": "14/14",
+    "rb_fix_pass": "14/14",
+    "rb_F03": [
+      "STANDARD",
+      "STANDARD"
+    ],
+    "ra_F03_observed_pass": true,
+    "ra_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "rb_portfolio": {
+      "decision": 222002,
+      "ESC": 132072,
+      "INC": 6377,
+      "STD": 83553
+    },
+    "recon_in_log": null,
+    "exit_ra": [
+      "0"
+    ],
+    "exit_rb": [
+      "0"
+    ]
+  },
+  "rerun_post_fix": {
+    "ra_fix_pass": "14/14",
+    "rb_fix_pass": "14/14",
+    "rb_F03": [
+      "STANDARD",
+      "STANDARD"
+    ],
+    "ra_F03_observed_pass": true,
+    "ra_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "rb_portfolio": {
+      "decision": 222002,
+      "ESC": 131968,
+      "INC": 6377,
+      "STD": 83657
+    },
+    "recon_in_log": [
+      "222002",
+      "222002",
+      "222002",
+      "0",
+      "0",
+      "222002",
+      "0"
+    ],
+    "exit_ra": [
+      "0"
+    ],
+    "exit_rb": [
+      "0"
+    ]
+  },
+  "recon_summary_csv": {
+    "n_ra": "222002",
+    "n_rb": "222002",
+    "n_inner": "222002",
+    "n_only_ra": "0",
+    "n_only_rb": "0",
+    "n_agree": "222002",
+    "n_disagree": "0"
+  },
+  "fixture_csvs": {
+    "RA": {
+      "n": 14,
+      "all_pass": true,
+      "F03": [
+        [
+          "STANDARD",
+          "STANDARD"
+        ]
+      ]
+    },
+    "RB": {
+      "n": 14,
+      "all_pass": true,
+      "F03": [
+        [
+          null,
+          null
+        ]
+      ]
+    }
+  },
+  "fixture_gate_locked_at": "2026-09-19 10:26:37 CT",
+  "run1_started_at": "2026-09-19T12:56:16.7553084-05:00"
+}
+```
+
+Note: Fixture runs in both the pre-fix and post-fix logs are 14/14 PASS. The 104-row disagreement was therefore invisible to the Fixture Gate and visible to exact recon (portfolio ESC 131,968 vs 132,072).
+
+---
+# EVIDENCE (inline). All other evidence files are listed by hash only.
+
+### raw production stdout/stderr, run 1 (2026-09-19 12:56 CT, pre-tz-fix; decoded copy, original bytes hashed in manifest)
+```
+=== RESTART 2026-09-19T12:56:16.7553084-05:00 ===
+unpacked R-B
+type_key,peer_n,peer_p50_h,peer_p75_h,t_freeze,lookback_w_days,peer_def,peer_label_note 
+nrow 104 
+Rscript.exe : PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-fade2373-8767-4d9b-a5b1-6257ebc9253e.ps1:84 char:1
++ & $rscript (Join-Path $root "R-A\run_RA.R") 2>&1 | Tee-Object -FilePa ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PROJECT_ROOT=C:...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_fixture_results.csv pass=14/14
+# A tibble: 14 %� 4
+   fixture_id expected               observed               pass 
+   <chr>      <chr>                  <chr>                  <lgl>
+ 1 F01        ESCALATE               ESCALATE               TRUE 
+ 2 F02        STANDARD               STANDARD               TRUE 
+ 3 F03        STANDARD               STANDARD               TRUE 
+ 4 F04        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 5 F05        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 6 F06        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 7 F07        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 8 F08        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 9 F09        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+10 F10        STANDARD               STANDARD               TRUE 
+11 F11        ESCALATE               ESCALATE               TRUE 
+12 F12        OUT_OF_SET             OUT_OF_SET             TRUE 
+13 F13        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+14 F14        TWO_INDEPENDENT_LABELS TWO_INDEPENDENT_LABELS TRUE 
+open_n=245193 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_portfolio_counts.csv
+# A tibble: 1 %� 7
+  n_decision n_ESCALATE n_INCONCLUSIVE n_STANDARD kappa rule_version t_freeze   
+       <int>      <int>          <int>      <int> <dbl> <chr>        <chr>      
+1     222002     131968           6377      83657     2 RA-tcd-ig-v1 2026-09-12�Ǫ
+R-A done. mode=all
+=== RA EXIT 0 2026-09-19T12:56:27.0759267-05:00 ===
+Rscript.exe : [R-B] project root: C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-fade2373-8767-4d9b-a5b1-6257ebc9253e.ps1:86 char:1
++ & $rscript (Join-Path $root "R-B\run_RB.R") all 2>&1 | Tee-Object -Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([R-B] project r...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03���STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+[R-B] open n=245193 peer types=104
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_classifications.csv (n=222002)
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_portfolio_counts.csv (n=1)
+[R-B] portfolio: decision=222002 ESCALATE=132072 INCONCLUSIVE=6377 STANDARD=83553
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+[R-B] done mode=all
+=== RB EXIT 0 2026-09-19T12:56:49.1027805-05:00 ===
+
+Name                       Length LastWriteTime        
+----                       ------ -------------        
+RA_classifications.csv   22271481 9/19/2026 12:56:27 PM
+RA_fixture_results.csv        985 9/19/2026 12:56:18 PM
+RA_portfolio_counts.csv       140 9/19/2026 12:56:27 PM
+RB_classifications.csv   41963341 9/19/2026 12:56:41 PM
+RB_fixture_results.csv       1792 9/19/2026 12:56:27 PM
+RB_kappa_grid_counts.csv      164 9/19/2026 12:56:49 PM
+RB_portfolio_counts.csv       100 9/19/2026 12:56:41 PM
+
+
+
+=== DONE 2026-09-19T12:56:49.1122608-05:00 ===
+```
+
+
+### raw production stdout/stderr, tz-fix re-run (2026-09-19 13:46 CT; decoded copy)
+```
+=== TZ FIX RERUN 2026-09-19T13:46:08.3543542-05:00 ===
+Rscript.exe : PROJECT_ROOT=C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-0be12e74-4b37-41fc-aa5a-83d7ef8dc213.ps1:81 char:1
++ & $rscript (Join-Path $root "R-A\run_RA.R") 2>&1 | Tee-Object -FilePa ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PROJECT_ROOT=C:...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+RA_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A
+SOURCE_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/data/source
+OUT_DIR=C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_fixture_results.csv pass=14/14
+# A tibble: 14 %� 4
+   fixture_id expected               observed               pass 
+   <chr>      <chr>                  <chr>                  <lgl>
+ 1 F01        ESCALATE               ESCALATE               TRUE 
+ 2 F02        STANDARD               STANDARD               TRUE 
+ 3 F03        STANDARD               STANDARD               TRUE 
+ 4 F04        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 5 F05        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 6 F06        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+ 7 F07        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 8 F08        OUT_OF_SET             OUT_OF_SET             TRUE 
+ 9 F09        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+10 F10        STANDARD               STANDARD               TRUE 
+11 F11        ESCALATE               ESCALATE               TRUE 
+12 F12        OUT_OF_SET             OUT_OF_SET             TRUE 
+13 F13        INCONCLUSIVE           INCONCLUSIVE           TRUE 
+14 F14        TWO_INDEPENDENT_LABELS TWO_INDEPENDENT_LABELS TRUE 
+open_n=245193 peer_types=104
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_classifications.csv n=222002
+Wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_portfolio_counts.csv
+# A tibble: 1 %� 7
+  n_decision n_ESCALATE n_INCONCLUSIVE n_STANDARD kappa rule_version t_freeze   
+       <int>      <int>          <int>      <int> <dbl> <chr>        <chr>      
+1     222002     131968           6377      83657     2 RA-tcd-ig-v1 2026-09-12�Ǫ
+R-A done. mode=all
+=== RA EXIT 0 2026-09-19T13:46:18.6953722-05:00 ===
+Rscript.exe : [R-B] project root: C:/Users/Mark/Documents/R Working Directory/chicago311
+At C:\Users\Mark\AppData\Local\Temp\ps-script-0be12e74-4b37-41fc-aa5a-83d7ef8dc213.ps1:83 char:1
++ & $rscript (Join-Path $root "R-B\run_RB.R") all 2>&1 | Tee-Object -Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([R-B] project r...tory/chicago311:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[R-B] rule_version: RB-tcd-ig-v1  kappa_default=2
+[R-B] T_freeze: 2026-09-12 23:59:59 CDT
+[R-B] scoring fixture pack fixtures-v1-tcd-ig ...
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_fixture_results.csv (n=14)
+[R-B] fixtures pass 14/14 | F03 observed=STANDARD expected=STANDARD
+[R-B] F03���STANDARD OK at kappa=2
+[R-B] source CSVs present
+[R-B] loading open candidates...
+[R-B] open n=245193 peer types=104
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_classifications.csv (n=222002)
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_portfolio_counts.csv (n=1)
+[R-B] portfolio: decision=222002 ESCALATE=131968 INCONCLUSIVE=6377 STANDARD=83657
+[R-B] wrote C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_kappa_grid_counts.csv (n=4)
+[R-B] kappa grid written for {1, 1.5, 2, 3}
+Warning message:
+The following named parsers don't match the column names: created_ts, mod_ts, closed_ts, CREATED_DATE, 
+LAST_MODIFIED_DATE, CLOSED_DATE 
+[R-B] done mode=all
+=== RB EXIT 0 2026-09-19T13:46:43.6294218-05:00 ===
+RA cols:  sr_number,type_key,classification,dormant_h,peer_n,peer_p75_h,kappa,open_age_h,integrity_clause,rule_version 
+RB cols:  sr_number,type_key,classification,evidence_reason,dormant_h,open_age_h,peer_n,peer_p75_h,peer_p50_h,kappa,integrity_clause,rule_version,design_version 
+# A tibble: 1 %� 7
+    n_ra   n_rb n_inner n_only_ra n_only_rb n_agree n_disagree
+   <int>  <int>   <int>     <int>     <int>   <int>      <int>
+1 222002 222002  222002         0         0  222002          0
+# A tibble: 0 %� 3
+# ��c% 3 variables: class_ra <chr>, class_rb <chr>, n <int>
+wrote recon; disagree n= 0 
+=== RECON DONE 2026-09-19T13:46:45.2357002-05:00 ===
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+```
+
+
+### raw_evidence/RECON_SUMMARY.csv (post-fix)
+```
+n_ra,n_rb,n_inner,n_only_ra,n_only_rb,n_agree,n_disagree
+222002,222002,222002,0,0,222002,0
+```
+
+
+### raw_evidence/RECON_DISAGREE_IDS.csv (post-fix; header only)
+```
+sr_number,class_ra,class_rb
+```
+
+
+### raw_evidence/RA_portfolio_counts.csv
+```
+n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,kappa,rule_version,t_freeze
+222002,131968,6377,83657,2,RA-tcd-ig-v1,2026-09-12 23:59:59 CDT
+```
+
+
+### raw_evidence/RB_portfolio_counts.csv
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD,n_out_of_set
+2,222002,131968,6377,83657,23191
+```
+
+
+### raw_evidence/r_a_fixture_results.csv
+```
+fixture_id,expected,observed,pass,dormant_h,peer_p75_h,integrity_clause,notes
+F01,ESCALATE,ESCALATE,TRUE,480,168,dormant_ge_kappa_peer_p75,
+F02,STANDARD,STANDARD,TRUE,24,168,within_type_dormancy,
+F03,STANDARD,STANDARD,TRUE,2400,2160,within_type_dormancy,
+F04,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,open_with_closed_date,
+F05,INCONCLUSIVE,INCONCLUSIVE,TRUE,240,168,inverted_clocks,
+F06,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,240,thin_type_or_missing_peer,
+F07,OUT_OF_SET,OUT_OF_SET,TRUE,9600,168,EXCLUDED,
+F08,OUT_OF_SET,OUT_OF_SET,TRUE,480,168,EXCLUDED,
+F09,INCONCLUSIVE,INCONCLUSIVE,TRUE,480,168,orphan_parent_nonblank,
+F10,STANDARD,STANDARD,TRUE,96,72,within_type_dormancy,
+F11,ESCALATE,ESCALATE,TRUE,192,72,dormant_ge_kappa_peer_p75,
+F12,OUT_OF_SET,OUT_OF_SET,TRUE,48,168,EXCLUDED,
+F13,INCONCLUSIVE,INCONCLUSIVE,TRUE,120,168,unparseable_created,
+F14,TWO_INDEPENDENT_LABELS,TWO_INDEPENDENT_LABELS,TRUE,NA,NA,within_type_dormancy;within_type_dormancy,FIX-F14A=STANDARD; FIX-F14B=STANDARD
+```
+
+
+### raw_evidence/r_b_fixture_results.csv
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_parent_sr_present,I05_parent_sr_present,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,,168,500,I02_bad_clocks,I02_bad_clocks,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+
+### raw_evidence/EXACT_RECON_REPORT.md
+```
+# Exact recon report — R-A vs R-B
+
+**Status:** PASS (after clock-parse fix)  
+**When:** 2026-09-19 13:46 CT  
+**Decision set:** 222,002 rows (identical SR_NUMBER sets)
+
+## Portfolio (κ = 2)
+
+| Path | ESCALATE | INCONCLUSIVE | STANDARD |
+|------|----------|--------------|----------|
+| R-A  | 131,968  | 6,377        | 83,657   |
+| R-B  | 131,968  | 6,377        | 83,657   |
+
+## Label agreement
+
+- Agree: **222,002 / 222,002**
+- Disagree: **0**
+- Only-RA / Only-RB: 0 / 0
+
+Fixtures: both paths **14/14 PASS** (F03 → STANDARD).
+
+## Prior mismatch (diagnosed, then fixed)
+
+First production run disagreed on **104** rows, all `STANDARD` (R-A) vs `ESCALATE` (R-B).  
+Peer `n` / `p75` / κ matched; `dormant_h` differed by a systematic **~5.0 hours** (America/Chicago offset). All 104 sat within 5h of the κ×p75 threshold.
+
+**Cause:** naive SQL wall clocks (`created_ts` / `mod_ts`) were tagged as UTC by `readr`. R-B’s POSIXct shortcut kept the wrong instant; R-A’s `force_tz` happened to recover Chicago wall digits. Locked rule now: **always character → parse as `America/Chicago` wall**; never `force_tz` / never trust readr POSIXct for these columns.
+
+**Fix files:** `R-A/run_RA.R` (`parse_ts_chicago` + `clock_col_types`); `R-B/R/10_io_parse.R` (`rb_parse_ts` / `rb_normalize_open` / TSV + character cols).
+
+## Next
+
+Structural cross-review + Validation Gate freeze (owner), then Stage 5.
+```
+
+
+### raw_evidence/SOURCE_GATE_REPORT.md
+```
+# SOURCE_GATE_REPORT — Chicago 311 Stage 4 Method B
+**Overall:** **PASS**
+**When (CT):** 2026-09-19 ~07:30 CT (extract started ~05:34 CT; ~1h56m)
+**Authority:** Design Gate PASS; Fixture Gate PASS (`fixtures-v1-tcd-ig`, F01–F14, F03→STANDARD at κ=2)
+**R-A/R-B:** UNBLOCKED — may start independent judged builds
+
+## Counts (live)
+| Metric | Value |
+|---|---|
+| extract Open n | 245,193 |
+| raw Open n | 245,193 |
+| distinct SR_NUMBER | 245,193 |
+| peer type_key n | 104 |
+| peer row sum | 1,881,338 |
+| Source Gate overall | **PASS** (15 PASS, 0 FAIL, 2 INFO) |
+
+## Check results
+| Check | Result |
+|---|---|
+| A_open_count_match | PASS |
+| B_distinct_sr_equals_rows | PASS |
+| C_id_extra / C_id_missing | PASS |
+| D_field_mismatch_critical | PASS |
+| E_status_domain_open_only | PASS |
+| F_created_date_range | PASS |
+| G_null_profile_created_status | PASS |
+| G_null_closed_date_info | INFO (expected ~all Open blank CLOSED_DATE) |
+| H_sr_checksum_match | PASS |
+| I_peer_stats_present / p75 / type_key | PASS |
+| J_no_judged_columns | PASS |
+| K_lineage_open_matches_raw / t_freeze | PASS |
+| L_raw_status_dist_info | INFO |
+
+## Deliverables
+- MySQL `chicago311.src_open_candidates`
+- MySQL `chicago311.src_peer_stats`
+- MySQL `chicago311.src_extract_lineage`
+- Scripts: `sql/01_source_extract.sql`, `sql/02_source_gate_checks.sql`
+
+## Note
+Shell wrapper exit_code 1 was only from a post-gate `SELECT` against non-table `src_gate_overall`; gate script itself exited 0 with `SOURCE_GATE_PASS`.
+```
+
+
+### raw_evidence/LINEAGE_ATTESTATION.md
+```
+# Lineage attestation — Stage 4 validated freeze (pending owner Validation Gate)
+
+**As-of:** 2026-09-19 13:46 CT (post clock-parse fix re-run)  
+**design_version:** `stage3-v1-tcd-ig`  
+**fixture_version:** `fixtures-v1-tcd-ig`  
+**T_freeze:** 2026-09-12 23:59:59 America/Chicago  
+**κ:** 2.0
+
+## SHA-256 (DESKTOP-RPECRM9)
+
+| File | Bytes | SHA-256 |
+|------|------:|---------|
+| src_open_candidates.csv | 118,671,837 | BA089FCC51A0008BB1253AE6B8CDF8081AF9562A2AD8BF3FF73E376FB83D81B9 |
+| src_peer_stats.csv | 16,276 | CB78AE214891EAECD0CC3C48BFFC52AEF745FF14E5F666647D8ABC215D79EB58 |
+| RA_classifications.csv | 22,271,481 | C099E092FEB237C8492FECA12F0293C5875384E27375EB7A40991591D63AE0D9 |
+| RB_classifications.csv | 41,963,733 | A0E42B8667B38BAF6BC1E79090D06B1A7C62659926EA7A78185975B8FE6FE193 |
+| RA_fixture_results.csv | 985 | 33696CD1C6DF7EEFA62B07B078CFC554A661120D8B7685887FF3FFBCD82B6110 |
+| RB_fixture_results.csv | 1,792 | 0D72245CAC95555E32A3E6073E3EA9CC0A97DE97F18C82965DFF21F49052E9E9 |
+| RECON_SUMMARY.csv | 91 | 110CABAD9BA44BC69C1E2525EA014378E01CAB9F17561779D8D7EA0648640B09 |
+
+## Portfolio (frozen candidate)
+
+| Path | n_decision | ESCALATE | INCONCLUSIVE | STANDARD |
+|------|-----------:|---------:|-------------:|---------:|
+| R-A / R-B (agree) | 222,002 | 131,968 | 6,377 | 83,657 |
+
+validated_action_list.csv = unordered ESCALATE set, n=131,968 (from R-A; identical labels to R-B after recon).
+
+## Clock-parse fix recorded
+
+Naive SQL wall clocks re-parsed as America/Chicago character → POSIXct (no `force_tz` / no trusted readr POSIXct). First production run had 104 ESCALATE/STANDARD disagrees (~5h skew); post-fix recon = 0 disagrees.
+```
+
+
+### fixtures/FIXTURE_GATE_RECEIPT.md (lock time)
+```
+# Fixture Gate Receipt — Chicago 311
+**status:** PASS / LOCKED
+**locked_at:** 2026-09-19 10:26:37 CT
+**fixture_version:** fixtures-v1-tcd-ig
+**owner_approval:** Approve Fixture Gate: freeze F01–F14 as locked known cases including F03→STANDARD at κ=2; R builders may run after Source Gate PASS
+**design_version:** stage3-v1-tcd-ig (B-leaning hybrid)
+**κ default:** 2.0
+**litmus:** F03 → STANDARD (not escalate by raw age)
+**authority:** R-A/R-B must pass F01–F14 before Validation Gate; do not rewrite fixtures to make code pass.
+```
+
+
+### fixtures/KNOWN_CASE_FIXTURE_PACK_LOCKED.md
+```
+# Known-Case Fixture Pack — LOCKED
+**fixture_version:** fixtures-v1-tcd-ig
+**status:** LOCKED
+**locked_at:** 2026-09-19 10:26:37 CT
+**κ:** 2.0
+**T:** 2026-09-12 23:59:59 America/Chicago (snapshot as-of)
+
+| ID | Sketch | Expected | Why |
+|----|--------|----------|-----|
+| F01 | Open pothole-like; peer_p75=7d; last modify 20d ago; κ=2 | ESCALATE | Silent > 2× type P75 |
+| F02 | Same type; created 40d ago; modified 1d ago | STANDARD | Age large; dormancy not |
+| F03 | Building-like; peer_p75=90d; dormant 100d; κ=2 | STANDARD | 100 < 180; naive age would escalate |
+| F04 | Open + CLOSED_DATE populated | INCONCLUSIVE | Contradiction |
+| F05 | LAST_MODIFIED before CREATED | INCONCLUSIVE | Clock fail |
+| F06 | Rare type; peer_n=8 | INCONCLUSIVE | Thin type |
+| F07 | DUPLICATE=true, Open, dormant 400d | Out of set | Not the work item |
+| F08 | LEGACY_RECORD true, else F01-like | Out of set | Different generating process |
+| F09 | PARENT_SR_NUMBER set; parent unresolved | INCONCLUSIVE | Orphan child |
+| F10 | peer_p75=3d; created 4d ago; never modified after create; dormant 4d; κ=2 | STANDARD | 4 < 6 |
+| F11 | Same as F10; dormant 8d | ESCALATE | Crossed κ×P75 without large calendar age |
+| F12 | Canceled or Completed | No label | Outside decision set |
+| F13 | Unparseable CREATED_DATE, STATUS Open | INCONCLUSIVE | Cannot compute clocks |
+| F14 | Two open non-dup rows same address/type | Two independent labels | Grain = SR_NUMBER |
+
+A failed fixture is evidence against an implementation. Do not rewrite the fixture to make the code pass.
+```
+
+
+### code/run_RA.R lines 102-134 (parse_ts_chicago)
+```
+parse_ts_chicago <- function(x) {
+  # Locked rule: SQL export clocks are naive America/Chicago wall times (no offset).
+  # Never force_tz on POSIXct — readr often tags naive ISO as UTC and force_tz then
+  # shifts the instant by the CDT/CST offset (~5h), flipping near-threshold labels.
+  # Always recover printed digits, then parse as America/Chicago wall clock.
+  if (inherits(x, "POSIXt")) {
+    tz_src <- attr(x, "tzone")
+    if (is.null(tz_src) || !nzchar(tz_src[[1]])) tz_src <- "UTC"
+    s <- format(x, format = "%Y-%m-%d %H:%M:%S", tz = tz_src[[1]])
+  } else {
+    s <- str_trim(as.character(x))
+  }
+  s[is_blank(s)] <- NA_character_
+  s <- str_replace(s, "T", " ")
+  # Drop fractional seconds, trailing Z / offset — wall digits are Chicago
+  s2 <- str_replace(s, "\\.[0-9]+", "")
+  s2 <- str_replace(s2, "(Z|[+-][0-9]{2}:?[0-9]{2})$", "")
+  out <- suppressWarnings(lubridate::ymd_hms(s2, tz = "America/Chicago", quiet = TRUE))
+  miss <- is.na(out) & !is.na(s2)
+  if (any(miss)) {
+    out[miss] <- suppressWarnings(lubridate::mdy_hms(s2[miss], tz = "America/Chicago", quiet = TRUE))
+  }
+  miss <- is.na(out) & !is.na(s2)
+  if (any(miss)) {
+    out[miss] <- suppressWarnings(lubridate::ymd_hm(s2[miss], tz = "America/Chicago", quiet = TRUE))
+  }
+  miss <- is.na(out) & !is.na(s2)
+  if (any(miss)) {
+    out[miss] <- suppressWarnings(lubridate::mdy_hm(s2[miss], tz = "America/Chicago", quiet = TRUE))
+  }
+  out
+}
+
+```
+
+
+### code/run_RA.R lines 328-497 (R-A fixture pack and runner)
+```
+# ---- Synthetic fixtures F01–F14 (locked pack; do not rewrite expected) -------
+build_fixture_pack <- function(t_freeze = T_FREEZE) {
+  # Peer stats used by fixtures
+  peers <- tribble(
+    ~type_key, ~peer_n, ~peer_p75_h,
+    "POTHOLE", 500L, 7 * 24,
+    "BUILDING", 200L, 90 * 24,
+    "FASTTYPE", 100L, 3 * 24,
+    "RARETYPE", 8L, 10 * 24
+  )
+
+  # Helper to stamp times relative to T
+  ago <- function(hours) t_freeze - lubridate::dhours(hours)
+  fmt <- function(x) format(x, "%Y-%m-%d %H:%M:%S")
+
+  rows <- list(
+    # F01 ESCALATE: dormant 20d, peer_p75=7d, κ=2 → 20>=14
+    list(id = "F01", expected = "ESCALATE", in_set = TRUE,
+         SR_NUMBER = "FIX-F01", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(25 * 24)), LAST_MODIFIED_DATE = fmt(ago(20 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F02 STANDARD: created 40d, modified 1d ago
+    list(id = "F02", expected = "STANDARD", in_set = TRUE,
+         SR_NUMBER = "FIX-F02", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(40 * 24)), LAST_MODIFIED_DATE = fmt(ago(1 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F03 STANDARD: building peer_p75=90d, dormant 100d; 100 < 180
+    list(id = "F03", expected = "STANDARD", in_set = TRUE,
+         SR_NUMBER = "FIX-F03", SR_SHORT_CODE = "BUILDING", SR_TYPE = "Building",
+         STATUS = "Open", CREATED_DATE = fmt(ago(120 * 24)), LAST_MODIFIED_DATE = fmt(ago(100 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F04 INCONCLUSIVE: Open + CLOSED_DATE
+    list(id = "F04", expected = "INCONCLUSIVE", in_set = TRUE,
+         SR_NUMBER = "FIX-F04", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(10 * 24)), LAST_MODIFIED_DATE = fmt(ago(5 * 24)),
+         CLOSED_DATE = fmt(ago(1 * 24)), DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F05 INCONCLUSIVE: mod before created
+    list(id = "F05", expected = "INCONCLUSIVE", in_set = TRUE,
+         SR_NUMBER = "FIX-F05", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(5 * 24)), LAST_MODIFIED_DATE = fmt(ago(10 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F06 INCONCLUSIVE: thin type peer_n=8
+    list(id = "F06", expected = "INCONCLUSIVE", in_set = TRUE,
+         SR_NUMBER = "FIX-F06", SR_SHORT_CODE = "RARETYPE", SR_TYPE = "Rare",
+         STATUS = "Open", CREATED_DATE = fmt(ago(30 * 24)), LAST_MODIFIED_DATE = fmt(ago(20 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F07 Out of set: DUPLICATE=true
+    list(id = "F07", expected = "OUT_OF_SET", in_set = FALSE,
+         SR_NUMBER = "FIX-F07", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(400 * 24)), LAST_MODIFIED_DATE = fmt(ago(400 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "true", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F08 Out of set: LEGACY
+    list(id = "F08", expected = "OUT_OF_SET", in_set = FALSE,
+         SR_NUMBER = "FIX-F08", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(25 * 24)), LAST_MODIFIED_DATE = fmt(ago(20 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "true", PARENT_SR_NUMBER = ""),
+    # F09 INCONCLUSIVE: nonblank unresolved parent
+    list(id = "F09", expected = "INCONCLUSIVE", in_set = TRUE,
+         SR_NUMBER = "FIX-F09", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(25 * 24)), LAST_MODIFIED_DATE = fmt(ago(20 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = "MISSING-PARENT-999"),
+    # F10 STANDARD: peer_p75=3d, dormant 4d; 4 < 6
+    list(id = "F10", expected = "STANDARD", in_set = TRUE,
+         SR_NUMBER = "FIX-F10", SR_SHORT_CODE = "FASTTYPE", SR_TYPE = "Fast",
+         STATUS = "Open", CREATED_DATE = fmt(ago(4 * 24)), LAST_MODIFIED_DATE = fmt(ago(4 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F11 ESCALATE: dormant 8d; 8 >= 6
+    list(id = "F11", expected = "ESCALATE", in_set = TRUE,
+         SR_NUMBER = "FIX-F11", SR_SHORT_CODE = "FASTTYPE", SR_TYPE = "Fast",
+         STATUS = "Open", CREATED_DATE = fmt(ago(8 * 24)), LAST_MODIFIED_DATE = fmt(ago(8 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F12 No label: Completed
+    list(id = "F12", expected = "OUT_OF_SET", in_set = FALSE,
+         SR_NUMBER = "FIX-F12", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Completed", CREATED_DATE = fmt(ago(10 * 24)), LAST_MODIFIED_DATE = fmt(ago(2 * 24)),
+         CLOSED_DATE = fmt(ago(1 * 24)), DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F13 INCONCLUSIVE: unparseable CREATED_DATE
+    list(id = "F13", expected = "INCONCLUSIVE", in_set = TRUE,
+         SR_NUMBER = "FIX-F13", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = "NOT-A-DATE", LAST_MODIFIED_DATE = fmt(ago(5 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    # F14a/b: two independent STANDARD-ish coherent rows (both labeled)
+    list(id = "F14a", expected = "STANDARD", in_set = TRUE, fixture_group = "F14",
+         SR_NUMBER = "FIX-F14A", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(3 * 24)), LAST_MODIFIED_DATE = fmt(ago(2 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = ""),
+    list(id = "F14b", expected = "STANDARD", in_set = TRUE, fixture_group = "F14",
+         SR_NUMBER = "FIX-F14B", SR_SHORT_CODE = "POTHOLE", SR_TYPE = "Pothole",
+         STATUS = "Open", CREATED_DATE = fmt(ago(4 * 24)), LAST_MODIFIED_DATE = fmt(ago(1 * 24)),
+         CLOSED_DATE = "", DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = "")
+  )
+
+  open_df <- bind_rows(lapply(rows, function(r) {
+    as_tibble(r[c(
+      "SR_NUMBER", "SR_SHORT_CODE", "SR_TYPE", "STATUS", "CREATED_DATE",
+      "LAST_MODIFIED_DATE", "CLOSED_DATE", "DUPLICATE", "LEGACY_RECORD", "PARENT_SR_NUMBER"
+    )])
+  }))
+  meta <- bind_rows(lapply(rows, function(r) {
+    tibble(
+      fixture_id = r$id,
+      fixture_group = if (!is.null(r$fixture_group)) r$fixture_group else r$id,
+      SR_NUMBER = r$SR_NUMBER,
+      expected = r$expected,
+      in_set = r$in_set
+    )
+  }))
+  list(open = open_df, peers = peers, meta = meta)
+}
+
+run_fixtures <- function(out_dir) {
+  pack <- build_fixture_pack()
+  judged <- classify_open_rows(pack$open, pack$peers)
+  # Map observed label: excluded → OUT_OF_SET
+  observed <- judged %>%
+    mutate(
+      observed = dplyr::case_when(
+        .exclude ~ "OUT_OF_SET",
+        is.na(classification) ~ "OUT_OF_SET",
+        TRUE ~ classification
+      )
+    ) %>%
+    select(SR_NUMBER, observed, classification, dormant_h, peer_n, peer_p75_h, integrity_clause)
+
+  # Per-fixture rows (F14 is group pass if both labeled independently)
+  detail <- pack$meta %>%
+    left_join(observed, by = "SR_NUMBER") %>%
+    mutate(
+      pass = observed == expected
+    )
+
+  # Collapse F14 to one fixture result: both must pass and both in decision set with labels
+  f14 <- detail %>% filter(fixture_group == "F14")
+  f14_pass <- nrow(f14) == 2 && all(f14$pass) && all(f14$observed != "OUT_OF_SET")
+
+  results <- detail %>%
+    filter(fixture_group != "F14") %>%
+    transmute(
+      fixture_id = fixture_group,
+      expected,
+      observed,
+      pass,
+      dormant_h,
+      peer_p75_h,
+      integrity_clause,
+      notes = ""
+    ) %>%
+    bind_rows(tibble(
+      fixture_id = "F14",
+      expected = "TWO_INDEPENDENT_LABELS",
+      observed = if (f14_pass) "TWO_INDEPENDENT_LABELS" else paste(f14$observed, collapse = ","),
+      pass = f14_pass,
+      dormant_h = NA_real_,
+      peer_p75_h = NA_real_,
+      integrity_clause = paste(f14$integrity_clause, collapse = ";"),
+      notes = paste(f14$SR_NUMBER, f14$observed, sep = "=", collapse = "; ")
+    )) %>%
+    arrange(fixture_id)
+
+  # Ensure F01–F14 present
+  stopifnot(all(sprintf("F%02d", 1:14) %in% results$fixture_id))
+
+  out_path <- file.path(out_dir, "RA_fixture_results.csv")
+  readr::write_csv(results, out_path)
+  message("Wrote ", out_path, " pass=", sum(results$pass), "/", nrow(results))
+  print(results %>% select(fixture_id, expected, observed, pass), n = 20)
+  invisible(results)
+}
+
+# ---- Production run ---------------------------------------------------------
+```
+
+
+### code/RB_40_fixtures.R (R-B fixture pack and runner, full)
+```
+# Locked fixture pack fixtures-v1-tcd-ig (synthetic; do not rewrite expectations)
+
+rb_hours <- function(days) as.numeric(days) * 24
+
+#' Build synthetic open rows + peer stats for F01–F14
+rb_build_fixture_pack <- function(t_freeze = RB_T_FREEZE) {
+  # Helper to shift freeze by -hours
+  ago <- function(hours) t_freeze - as.difftime(hours, units = "hours")
+  fmt <- function(ts) format(ts, "%Y-%m-%d %H:%M:%S")
+
+  # Peer stats for fixture types
+  peers <- data.frame(
+    type_key = c("POTHOLE", "BUILDING", "FAST", "RARETYPE", "ADDRTYPE"),
+    peer_n = c(500L, 200L, 120L, 8L, 80L),
+    peer_p50_h = c(rb_hours(3), rb_hours(45), rb_hours(1.5), rb_hours(2), rb_hours(2)),
+    peer_p75_h = c(rb_hours(7), rb_hours(90), rb_hours(3), rb_hours(4), rb_hours(3)),
+    stringsAsFactors = FALSE
+  )
+
+  # F01 ESCALATE: pothole peer_p75=7d; dormant 20d; 20*24=480 >= 2*7*24=336
+  # F02 STANDARD: same type; created 40d; mod 1d ago
+  # F03 STANDARD: building peer_p75=90d; dormant 100d; 100 < 180
+  # F04 INCONCLUSIVE: Open + CLOSED_DATE
+  # F05 INCONCLUSIVE: mod before created
+  # F06 INCONCLUSIVE: rare type peer_n=8
+  # F07 OUT: DUPLICATE true
+  # F08 OUT: LEGACY true
+  # F09 INCONCLUSIVE: PARENT set
+  # F10 STANDARD: peer_p75=3d; dormant 4d; 4 < 6
+  # F11 ESCALATE: dormant 8d; 8 >= 6
+  # F12 OUT: Completed
+  # F13 INCONCLUSIVE: unparseable CREATED
+  # F14: two independent STANDARD-ish rows (short dormancy)
+
+  mk <- function(id, type_key, status, created_h_ago, mod_h_ago,
+                 closed = "", dup = "false", leg = "false", parent = "",
+                 created_raw = NULL, mod_raw = NULL) {
+    created_ts <- if (is.null(created_h_ago)) as.POSIXct(NA, tz = "America/Chicago") else ago(created_h_ago)
+    mod_ts <- if (is.null(mod_h_ago)) as.POSIXct(NA, tz = "America/Chicago") else ago(mod_h_ago)
+    created_s <- if (!is.null(created_raw)) created_raw else if (is.na(created_ts)) "" else fmt(created_ts)
+    mod_s <- if (!is.null(mod_raw)) mod_raw else if (is.na(mod_ts)) "" else fmt(mod_ts)
+    data.frame(
+      SR_NUMBER = id,
+      STATUS = status,
+      SR_TYPE = type_key,
+      SR_SHORT_CODE = type_key,
+      type_key = type_key,
+      CREATED_DATE = created_s,
+      LAST_MODIFIED_DATE = mod_s,
+      CLOSED_DATE = closed,
+      created_ts = created_ts,
+      mod_ts = mod_ts,
+      closed_ts = if (nzchar(closed)) rb_parse_ts(closed) else as.POSIXct(NA, tz = "America/Chicago"),
+      DUPLICATE = dup,
+      LEGACY_RECORD = leg,
+      PARENT_SR_NUMBER = parent,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  rows <- rbind(
+    mk("SYN-F01", "POTHOLE", "Open", 25 * 24, 20 * 24),
+    mk("SYN-F02", "POTHOLE", "Open", 40 * 24, 1 * 24),
+    mk("SYN-F03", "BUILDING", "Open", 120 * 24, 100 * 24),
+    mk("SYN-F04", "POTHOLE", "Open", 10 * 24, 10 * 24, closed = "2026-09-01 12:00:00"),
+    # F05: created 10d ago, mod 20d ago (before created)
+    {
+      c_ts <- ago(10 * 24); m_ts <- ago(20 * 24)
+      data.frame(
+        SR_NUMBER = "SYN-F05", STATUS = "Open", SR_TYPE = "POTHOLE", SR_SHORT_CODE = "POTHOLE",
+        type_key = "POTHOLE",
+        CREATED_DATE = fmt(c_ts), LAST_MODIFIED_DATE = fmt(m_ts), CLOSED_DATE = "",
+        created_ts = c_ts, mod_ts = m_ts,
+        closed_ts = as.POSIXct(NA, tz = "America/Chicago"),
+        DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = "",
+        stringsAsFactors = FALSE
+      )
+    },
+    mk("SYN-F06", "RARETYPE", "Open", 30 * 24, 30 * 24),
+    mk("SYN-F07", "POTHOLE", "Open", 400 * 24, 400 * 24, dup = "true"),
+    mk("SYN-F08", "POTHOLE", "Open", 25 * 24, 20 * 24, leg = "true"),
+    mk("SYN-F09", "POTHOLE", "Open", 15 * 24, 15 * 24, parent = "PARENT-MISSING-999"),
+    mk("SYN-F10", "FAST", "Open", 4 * 24, 4 * 24),
+    mk("SYN-F11", "FAST", "Open", 8 * 24, 8 * 24),
+    mk("SYN-F12", "POTHOLE", "Completed", 10 * 24, 5 * 24, closed = "2026-09-05 09:00:00"),
+    # F13 unparseable created
+    {
+      m_ts <- ago(5 * 24)
+      data.frame(
+        SR_NUMBER = "SYN-F13", STATUS = "Open", SR_TYPE = "POTHOLE", SR_SHORT_CODE = "POTHOLE",
+        type_key = "POTHOLE",
+        CREATED_DATE = "NOT-A-DATE", LAST_MODIFIED_DATE = fmt(m_ts), CLOSED_DATE = "",
+        created_ts = as.POSIXct(NA, tz = "America/Chicago"), mod_ts = m_ts,
+        closed_ts = as.POSIXct(NA, tz = "America/Chicago"),
+        DUPLICATE = "false", LEGACY_RECORD = "false", PARENT_SR_NUMBER = "",
+        stringsAsFactors = FALSE
+      )
+    },
+    mk("SYN-F14A", "ADDRTYPE", "Open", 2 * 24, 1 * 24),
+    mk("SYN-F14B", "ADDRTYPE", "Open", 3 * 24, 1 * 24)
+  )
+
+  expected <- data.frame(
+    fixture_id = c(
+      "F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09",
+      "F10", "F11", "F12", "F13", "F14A", "F14B"
+    ),
+    SR_NUMBER = c(
+      "SYN-F01", "SYN-F02", "SYN-F03", "SYN-F04", "SYN-F05", "SYN-F06",
+      "SYN-F07", "SYN-F08", "SYN-F09", "SYN-F10", "SYN-F11", "SYN-F12",
+      "SYN-F13", "SYN-F14A", "SYN-F14B"
+    ),
+    expected_classification = c(
+      "ESCALATE", "STANDARD", "STANDARD", "INCONCLUSIVE", "INCONCLUSIVE", "INCONCLUSIVE",
+      "OUT_OF_SET", "OUT_OF_SET", "INCONCLUSIVE",
+      "STANDARD", "ESCALATE", "OUT_OF_SET",
+      "INCONCLUSIVE", "STANDARD", "STANDARD"
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  list(open = rows, peers = peers, expected = expected)
+}
+
+rb_score_fixtures <- function(kappa = RB_KAPPA_DEFAULT, t_freeze = RB_T_FREEZE) {
+  pack <- rb_build_fixture_pack(t_freeze = t_freeze)
+  judged <- rb_judge_rows(pack$open, pack$peers, kappa = kappa, t_freeze = t_freeze)
+
+  # Map OUT_OF_SET
+  got <- judged$classification
+  got[!judged$in_decision_set] <- "OUT_OF_SET"
+
+  exp <- pack$expected
+  m <- merge(exp, data.frame(
+    SR_NUMBER = judged$SR_NUMBER,
+    observed_classification = got,
+    dormant_h = judged$dormant_h,
+    peer_p75_h = judged$peer_p75_h,
+    peer_n = judged$peer_n,
+    integrity_clause = judged$integrity_clause,
+    evidence_reason = judged$evidence_reason,
+    stringsAsFactors = FALSE
+  ), by = "SR_NUMBER", all.x = TRUE, sort = FALSE)
+
+  # Restore fixture order
+  m <- m[match(exp$SR_NUMBER, m$SR_NUMBER), ]
+  m$pass <- m$expected_classification == m$observed_classification
+  m$kappa <- kappa
+  m$fixture_version <- RB_FIXTURE_VERSION
+
+  # Compact F14 report: also emit F14 summary row? Deliverable says F01–F14.
+  # Provide F14 as combined note while keeping F14A/F14B detail rows + F14 rollup
+  f14 <- m[m$fixture_id %in% c("F14A", "F14B"), ]
+  f14_pass <- all(f14$pass)
+  rollup <- data.frame(
+    fixture_id = "F14",
+    SR_NUMBER = "SYN-F14A|SYN-F14B",
+    expected_classification = "STANDARD|STANDARD",
+    observed_classification = paste(f14$observed_classification, collapse = "|"),
+    dormant_h = NA_real_,
+    peer_p75_h = NA_real_,
+    peer_n = NA_integer_,
+    integrity_clause = NA_character_,
+    evidence_reason = "grain=SR_NUMBER two independent labels",
+    pass = f14_pass,
+    kappa = kappa,
+    fixture_version = RB_FIXTURE_VERSION,
+    stringsAsFactors = FALSE
+  )
+  # Primary deliverable rows F01–F13 + F14 rollup (drop A/B from main export? keep both)
+  primary_ids <- c("F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09",
+                   "F10", "F11", "F12", "F13")
+  primary <- m[m$fixture_id %in% primary_ids, ]
+  out <- rbind(primary, rollup)
+  rownames(out) <- NULL
+  out
+}
+```
+
+
+### code/RB_10_io_parse.R (R-B timestamp parsing, full)
+```
+# I/O + clock/type parsing helpers (R-B)
+
+rb_is_blank <- function(x) {
+  xch <- as.character(x)
+  is.na(x) | !nzchar(trimws(xch))
+}
+
+rb_truthy <- function(x) {
+  v <- tolower(trimws(as.character(x)))
+  v %in% c("true", "t", "1", "yes", "y")
+}
+
+#' Parse timestamps into America/Chicago POSIXct; unparseable → NA
+rb_parse_ts <- function(x) {
+  # If somehow POSIXct arrives, recover printed digits in its tagged tz then re-parse as Chicago
+  if (inherits(x, "POSIXt")) {
+    tz_src <- attr(x, "tzone")
+    if (is.null(tz_src) || !nzchar(tz_src[[1]])) tz_src <- "UTC"
+    xch <- format(x, format = "%Y-%m-%d %H:%M:%S", tz = tz_src[[1]])
+  } else {
+    xch <- trimws(as.character(x))
+  }
+  xch[rb_is_blank(xch)] <- NA_character_
+  # Strip trailing Z / offset loosely; treat wall as Chicago per locked contract
+  xch <- sub("T", " ", xch, fixed = TRUE)
+  xch <- sub("Z$", "", xch)
+  xch <- sub("([+-][0-9]{2}:[0-9]{2})$", "", xch)
+  xch <- sub("\\.[0-9]+$", "", xch)
+
+  out <- rep(as.POSIXct(NA, tz = "America/Chicago"), length(xch))
+  ok <- !is.na(xch)
+  if (!any(ok)) return(out)
+
+  # Try several formats without lubridate dependency for core path
+  formats <- c(
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d %H:%M",
+    "%m/%d/%Y %I:%M:%S %p",
+    "%m/%d/%Y %H:%M:%S",
+    "%m/%d/%Y %H:%M"
+  )
+  for (fmt in formats) {
+    still <- ok & is.na(out)
+    if (!any(still)) break
+    parsed <- suppressWarnings(as.POSIXct(xch[still], format = fmt, tz = "America/Chicago"))
+    out[still] <- parsed
+  }
+  out
+}
+
+rb_type_key <- function(short_code, sr_type) {
+  sc <- trimws(as.character(short_code))
+  st <- trimws(as.character(sr_type))
+  sc[rb_is_blank(sc)] <- NA_character_
+  st[rb_is_blank(st)] <- NA_character_
+  key <- ifelse(!is.na(sc), sc, st)
+  key[rb_is_blank(key)] <- NA_character_
+  key
+}
+
+rb_read_csv_flex <- function(path) {
+  if (!file.exists(path)) stop("Missing required file: ", path, call. = FALSE)
+  # MySQL --batch exports are tab-separated. Force clock cols to character so
+  # rb_parse_ts owns America/Chicago wall-clock (never trust readr POSIXct/UTC).
+  clock_cols <- readr::cols(
+    created_ts = readr::col_character(),
+    mod_ts = readr::col_character(),
+    closed_ts = readr::col_character(),
+    CREATED_DATE = readr::col_character(),
+    LAST_MODIFIED_DATE = readr::col_character(),
+    CLOSED_DATE = readr::col_character(),
+    .default = readr::col_guess()
+  )
+  if (requireNamespace("readr", quietly = TRUE)) {
+    df <- tryCatch(
+      readr::read_tsv(path, col_types = clock_cols, show_col_types = FALSE, progress = FALSE, guess_max = 100000),
+      error = function(e) readr::read_csv(path, col_types = clock_cols, show_col_types = FALSE, progress = FALSE)
+    )
+    return(as.data.frame(df, stringsAsFactors = FALSE))
+  }
+  utils::read.delim(path, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("", "NA", "NULL"))
+}
+
+#' Normalize open-candidate frame; recompute type_key / clocks if needed
+rb_normalize_open <- function(raw) {
+  nm <- names(raw)
+  pick <- function(cands) {
+    hit <- intersect(cands, nm)
+    if (length(hit)) hit[[1]] else NA_character_
+  }
+  col_sr <- pick(c("SR_NUMBER", "sr_number"))
+  col_status <- pick(c("STATUS", "status"))
+  col_type <- pick(c("SR_TYPE", "sr_type"))
+  col_short <- pick(c("SR_SHORT_CODE", "sr_short_code"))
+  col_created <- pick(c("CREATED_DATE", "created_date", "created_ts"))
+  col_mod <- pick(c("LAST_MODIFIED_DATE", "last_modified_date", "mod_ts"))
+  col_closed <- pick(c("CLOSED_DATE", "closed_date", "closed_ts"))
+  col_dup <- pick(c("DUPLICATE", "duplicate"))
+  col_leg <- pick(c("LEGACY_RECORD", "legacy_record"))
+  col_parent <- pick(c("PARENT_SR_NUMBER", "parent_sr_number"))
+  col_tk <- pick(c("type_key"))
+  col_created_ts <- pick(c("created_ts"))
+  col_mod_ts <- pick(c("mod_ts"))
+  col_closed_ts <- pick(c("closed_ts"))
+
+  n <- nrow(raw)
+  getc <- function(col) if (is.na(col)) rep(NA_character_, n) else as.character(raw[[col]])
+
+  created_raw <- getc(col_created)
+  mod_raw <- getc(col_mod)
+  closed_raw <- getc(col_closed)
+
+  # Always character → America/Chicago wall parse (no POSIXct shortcut / force_tz)
+  created_ts <- if (!is.na(col_created_ts)) rb_parse_ts(raw[[col_created_ts]]) else rb_parse_ts(created_raw)
+  if (!is.na(col_created) && any(is.na(created_ts) & !rb_is_blank(created_raw))) {
+    miss <- is.na(created_ts)
+    created_ts[miss] <- rb_parse_ts(created_raw[miss])
+  }
+  mod_ts <- if (!is.na(col_mod_ts)) rb_parse_ts(raw[[col_mod_ts]]) else rb_parse_ts(mod_raw)
+  if (!is.na(col_mod) && any(is.na(mod_ts) & !rb_is_blank(mod_raw))) {
+    miss <- is.na(mod_ts)
+    mod_ts[miss] <- rb_parse_ts(mod_raw[miss])
+  }
+  closed_ts <- if (!is.na(col_closed_ts)) rb_parse_ts(raw[[col_closed_ts]]) else rb_parse_ts(closed_raw)
+  if (!is.na(col_closed) && any(is.na(closed_ts) & !rb_is_blank(closed_raw))) {
+    miss <- is.na(closed_ts)
+    closed_ts[miss] <- rb_parse_ts(closed_raw[miss])
+  }
+
+  type_key <- if (!is.na(col_tk)) {
+    tk <- as.character(raw[[col_tk]])
+    tk[rb_is_blank(tk)] <- NA_character_
+    # Fill blanks via coalesce rule
+    fill <- rb_type_key(getc(col_short), getc(col_type))
+    ifelse(is.na(tk), fill, tk)
+  } else {
+    rb_type_key(getc(col_short), getc(col_type))
+  }
+
+  data.frame(
+    SR_NUMBER = getc(col_sr),
+    STATUS = getc(col_status),
+    SR_TYPE = getc(col_type),
+    SR_SHORT_CODE = getc(col_short),
+    type_key = type_key,
+    CREATED_DATE = created_raw,
+    LAST_MODIFIED_DATE = mod_raw,
+    CLOSED_DATE = closed_raw,
+    created_ts = created_ts,
+    mod_ts = mod_ts,
+    closed_ts = closed_ts,
+    DUPLICATE = getc(col_dup),
+    LEGACY_RECORD = getc(col_leg),
+    PARENT_SR_NUMBER = getc(col_parent),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+}
+
+rb_normalize_peers <- function(raw) {
+  nm <- names(raw)
+  pick <- function(cands) {
+    hit <- intersect(cands, nm)
+    if (length(hit)) hit[[1]] else NA_character_
+  }
+  col_tk <- pick(c("type_key", "TYPE_KEY"))
+  col_n <- pick(c("peer_n", "PEER_N", "n"))
+  col_p50 <- pick(c("peer_p50_h", "PEER_P50_H"))
+  col_p75 <- pick(c("peer_p75_h", "PEER_P75_H"))
+  if (is.na(col_tk) || is.na(col_n) || is.na(col_p75)) {
+    stop("src_peer_stats missing type_key / peer_n / peer_p75_h", call. = FALSE)
+  }
+  tk <- as.character(raw[[col_tk]])
+  data.frame(
+    type_key = tk,
+    peer_n = as.integer(raw[[col_n]]),
+    peer_p50_h = if (!is.na(col_p50)) as.numeric(raw[[col_p50]]) else NA_real_,
+    peer_p75_h = as.numeric(raw[[col_p75]]),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+}
+
+rb_hours_diff <- function(t_end, t_start) {
+  as.numeric(difftime(t_end, t_start, units = "hours"))
+}
+```
+
+
+### code/run_recon.R (exact recon, full)
+```
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+})
+ra <- read_csv("C:/Users/Mark/Documents/R Working Directory/chicago311/R-A/outputs/RA_classifications.csv", show_col_types = FALSE)
+rb <- read_csv("C:/Users/Mark/Documents/R Working Directory/chicago311/R-B/outputs/RB_classifications.csv", show_col_types = FALSE)
+names(ra) <- tolower(names(ra))
+names(rb) <- tolower(names(rb))
+cat("RA cols: ", paste(names(ra), collapse=","), "\n")
+cat("RB cols: ", paste(names(rb), collapse=","), "\n")
+ra2 <- ra %>% transmute(sr_number = as.character(sr_number), class_ra = classification)
+rb2 <- rb %>% transmute(sr_number = as.character(sr_number), class_rb = classification)
+j <- full_join(ra2, rb2, by = "sr_number")
+summary <- tibble(
+  n_ra = nrow(ra2),
+  n_rb = nrow(rb2),
+  n_inner = sum(!is.na(j$class_ra) & !is.na(j$class_rb)),
+  n_only_ra = sum(!is.na(j$class_ra) & is.na(j$class_rb)),
+  n_only_rb = sum(is.na(j$class_ra) & !is.na(j$class_rb)),
+  n_agree = sum(j$class_ra == j$class_rb, na.rm = TRUE),
+  n_disagree = sum(j$class_ra != j$class_rb, na.rm = TRUE)
+)
+write_csv(summary, "C:/Users/Mark/Documents/R Working Directory/chicago311/recon/RECON_SUMMARY.csv")
+disagree <- j %>% filter(!is.na(class_ra), !is.na(class_rb), class_ra != class_rb)
+write_csv(disagree, "C:/Users/Mark/Documents/R Working Directory/chicago311/recon/RECON_DISAGREE_IDS.csv")
+print(summary)
+print(count(disagree, class_ra, class_rb))
+ra_a <- ra %>% select(any_of(c("sr_number","classification","type_key","dormant_h","peer_n","peer_p75_h","integrity_clause","open_age_h","kappa","age_days","dormancy_ratio","action","mod_ts","created_ts")))
+rb_a <- rb %>% select(any_of(c("sr_number","classification","type_key","dormant_h","peer_n","peer_p75_h","integrity_clause","open_age_h","kappa","evidence_reason","age_days","dormancy_ratio","action","mod_ts","created_ts")))
+diag <- disagree %>%
+  left_join(ra_a, by = "sr_number", suffix = c("", "_x")) %>%
+  left_join(rb_a, by = "sr_number", suffix = c("_ra", "_rb"))
+write_csv(diag, "C:/Users/Mark/Documents/R Working Directory/chicago311/recon/RECON_DISAGREE_DIAG.csv")
+cat("wrote recon; disagree n=", nrow(disagree), "\n")
+```
+
+---
+# EVIDENCE MANIFEST (sha256 of every evidence file, inline or not)
+6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b  evidence/code/RB_00_config.R
+40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a  evidence/code/RB_10_io_parse.R
+72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99  evidence/code/RB_20_integrity_and_classify.R
+2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e  evidence/code/RB_40_fixtures.R
+03a0e7258c3541f3e961135830f9197b8c69fc30aae03a25859675228be141b8  evidence/code/diagnose_disagree.R
+f4e8993ca9c7d55a232795da6f2b84226ce8573b646521fa27fdf2029da58587  evidence/code/run_RA.R
+6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd  evidence/code/run_RB.R
+12629db16175f57c409501e3b84164a692153bded834e40c57798af5845d798f  evidence/code/run_recon.R
+3a03e139350141baa2b6fef9d065a6075d9248cf53b971ad1bc6c81aa07fa57f  evidence/fixtures/DESIGN_GATE_RECEIPT.md
+588f8446a657a3587e6ed2c30aacc9acf7c487867ea771f5687b113d89e70eb5  evidence/fixtures/F01.json
+822b5abd5c4f9862e473c8d6222d9f371dbb4cefcb88f8c64ada84b72c7532d8  evidence/fixtures/F02.json
+8707dfc52a0bb8a022c9420682c984f3f455d34e7270dc3d30e14337c45a5a8a  evidence/fixtures/F03.json
+89f9574222f384124caf52d9bced289fa7c8e5c0610aa52b907f851cfb8102a9  evidence/fixtures/F04.json
+8f313c3bd565924d7bd92f25999c5bab287349f3ec4caa34efb1d26433f3ed8c  evidence/fixtures/F05.json
+a726fd4d48aa2f11eedf80bfc7e6199de3313fafc630750d4fc7778000a5b828  evidence/fixtures/F06.json
+0b3d1e927fc364bad79f8430322d3743d7c8b8476cf35778130ac389d1d85263  evidence/fixtures/F07.json
+67a50a6d982de24e7ec3e3bda377f964e3549e0702b445607214a213344f423d  evidence/fixtures/F08.json
+3999e83612741f6e057bad54bf67792dd70d668faf82602c0dc6a0b9959a30df  evidence/fixtures/F09.json
+79a0fd086b6894058631e4f81132db20e653f9ce0138529a80f390896cc121e7  evidence/fixtures/F10.json
+2cc2da19617a1050cb20db5762918a1028ada25bc58b189d903c9d4845a1863c  evidence/fixtures/F11.json
+bce633f216557f3ceac7dd9526b14b55c17c5ec147dc37576fc77ccbccc0cc4c  evidence/fixtures/F12.json
+50be9bee78cd0c892b5d5e13491c7852c48b6ff422603a218e6baaee3bddf83a  evidence/fixtures/FIXTURE_GATE_RECEIPT.md
+c79484d64365c6896ff859a621bb58c4580ef5086aca1a5447b112e5e9e91de4  evidence/fixtures/KNOWN_CASE_FIXTURE_PACK.md
+0c2a2f0c48ad9b4ae5f98b70cb6c59e0f472f5d9fe258f2516525fe19a0f6d34  evidence/fixtures/KNOWN_CASE_FIXTURE_PACK_LOCKED.md
+d63df15e5253f7b1bcb847c440370419aa16f0a4946b8174fbf0d60aab846921  evidence/fixtures/README.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  evidence/raw_evidence/BASELINE_FRAMEWORK.sha256
+85504e41a1c3898ae1cf0c1158aeb417738a9eadf6d59533e1e6c9f602f1bd16  evidence/raw_evidence/EXACT_RECON_REPORT.md
+61d1a116d78f8b8e4b30d8325f868190d781e6edc07f215281aa9cfd640bc27b  evidence/raw_evidence/LINEAGE_ATTESTATION.md
+0c412aaaa7524c1e6466d364ffde1cc393f7b6a3301db194df245b18aff84926  evidence/raw_evidence/MANIFEST.sha256
+b5888db21b184e5c929ffbe424c38340de39ded1313f9f892354fee4635e22e3  evidence/raw_evidence/RA_portfolio_counts.csv
+eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c  evidence/raw_evidence/RB_portfolio_counts.csv
+bb3488617bb7f11e96e9b3de7da0b98c108031367cfccd2e110a3683d99f0b59  evidence/raw_evidence/RECON_DISAGREE_IDS.csv
+110cabad9ba44bc69c1e2525ea014378e01cab9f17561779d8d7ea0648640b09  evidence/raw_evidence/RECON_SUMMARY.csv
+42142caaba2b687491fc53a2823a697e6310935241ced402aba8970869b9a3b8  evidence/raw_evidence/SOURCE_GATE_REPORT.md
+33696cd1c6df7eefa62b07b078cfc554a661120d8b7685887ff3ffbcd82b6110  evidence/raw_evidence/r_a_fixture_results.csv
+0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9  evidence/raw_evidence/r_b_fixture_results.csv
+81b62bc05901b902b18c7a97306fea5c89d222ceed6b0bc16446a351a847fcfb  evidence/raw_evidence/stage4_validation_status.json
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  evidence/raw_evidence/structural_cross_review.md
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  evidence/raw_evidence/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  evidence/raw_evidence/three-ai-validation-and-analysis-framework.md
+840499a68ea96cfaba47901c173585ead41c74b1fa36e6d2d834dc983849c4da  evidence/raw_evidence/workflow_gate_status.json
+6983c0f107852fb987977f064101e44bcb2c973ab589672cc35e8e7c8cde84a5  evidence/raw_logs/PRODUCTION_RERUN_TZFIX_2026-09-19_1346_ORIGINAL_BYTES.log
+68eeb065aacd0e95a69764a3a131dacf93be201840778e2d86504c4642266b72  evidence/raw_logs/PRODUCTION_RERUN_TZFIX_DECODED.txt
+d0f34c3fddca7078c13b02ff4e6a7c6e2bb18ff7be1da2a45d0aaffd27716393  evidence/raw_logs/PRODUCTION_RUN1_2026-09-19_1256_ORIGINAL_BYTES.log
+92a8c445338964ad938a0e264407fa008c05bd0ecace44d8ee738624e0827984  evidence/raw_logs/PRODUCTION_RUN1_DECODED.txt
+725df8edc46abdb38551b4885e579f2b14e20665b7acf103fbfa13a05d312692  evidence/stage4_docs/STRUCTURAL_CROSS_REVIEW.md
+52f9db27b4dfb555ace51cb1f4bef14dd82108dd0d4cc37949f4084fccaf4e8c  evidence/stage4_docs/VALIDATION_GATE_PACKAGE.md
+6fbe8e5700c4c94ce9b354f78b89d1cc9f839cf0d9937d112d739d9b6ac78046  evidence/stage4_docs/WORKFLOW_GATE_RECEIPT.md
+c75390b385f9c76de858dc09b4eb704045637981e77b07ef51eed4c46bee5636  ABLATION_SPEC_A02R.md
+b306d7e426ce5aa901c1b7db0168de99c9796c6f455fb35b4fede2f10f22f0e9  ORIGINAL_A02_ABLATION_SPEC.md
+e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  CONSTITUTION_v1.md
+86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256
+4528ab5c24de2a619a8ab0024590a933e649bf4117a9860168cf861d77280b3e  A02R_FACTS.md
+528d2ff4df2d11761b67b74ef62c0f2201cbfc7208acf046db2f9e35a308a9b0  A02R_FACTS.json
+2636f1d625400210b874417f2a05d70271c9d7dc9af48cf58f147cae4d71e160  runner/a02r_facts.py

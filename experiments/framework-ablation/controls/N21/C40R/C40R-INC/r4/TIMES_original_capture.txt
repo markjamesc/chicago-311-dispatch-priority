@@ -1,0 +1,7 @@
+url=https://chatgpt.com/c/6aca8935-5720-83ea-8a1c-7820adbf24b4
+sent=2026-10-10 15:24:51
+reply_complete=2026-10-10 15:34:40
+# attachment: MESSAGE.txt uploaded via composer file input as single attachment, no message text (ChatGPT displayed it as "MESSAGE(3).txt"); reasoning High; pre-send check: exactly 3 prior turns (r1-r3), no r4
+# polls ~30s: last poll without END ~15:34:07 (Stop present); first poll with END ~15:34:38 (Stop still present); Stop gone ~15:34:40
+# UI showed "Worked for 9m 8s"; no tool-use/download links or file attachments in r4 reply
+# reply_box_copybutton.md = response Copy button via clipget.py; reply_box.md = mouse-drag selection of rendered reply + Ctrl+C; both saved unchanged + final newline

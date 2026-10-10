@@ -1,0 +1,7 @@
+url=https://chatgpt.com/c/6aca9078-ac64-83e9-ba5b-95e488090275
+sent=2026-10-10 14:23:11
+reply_complete=2026-10-10 14:27:12
+# NEW chat, model selector showed High, no tools enabled. Packet C40R_2_FRESH_BUILDER_ChatGPT.txt (68,942 B) sent as a single file attachment, no message text. sent is the CT clock read immediately after clicking Send (+/-2 s).
+# Completion window: END line absent at the 14:27:01 poll; END line first seen 14:27:09 (still streaming); Stop button gone at 14:27:12 (reply_complete). Page showed "Worked for 3m 9s".
+# No tool use, no code-interpreter, no download links observed; reply = one R fenced code block + Notes bullets (reply says "Gate status: UNVERIFIED") + END line.
+# reply_box_copybutton.md = Copy-reply button (keeps ``` fences); reply_box.md = selected rendered text. Both read via /workspace/clipget.py; first/last lines verified against page; saved unchanged plus final newline. First Copy-button read returned stale clipboard (INC r2 text) and was discarded; re-copied.

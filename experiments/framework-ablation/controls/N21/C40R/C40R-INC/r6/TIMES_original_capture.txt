@@ -1,0 +1,7 @@
+url=https://chatgpt.com/c/6aca8935-5720-83ea-8a1c-7820adbf24b4
+sent=2026-10-10 15:52:39
+reply_complete=2026-10-10 15:57:31
+# notes: pre-send check: 5 user/5 assistant turns, last END C40R BUILD INC r5, no r6 turn. Sent MESSAGE.txt as sole attachment, no text, reasoning High.
+# sent = shell clock right after Send click (click ~15:52:37-39).
+# last poll without END: 2026-10-10 15:56:46 (Stop present); first poll with END: 2026-10-10 15:57:28 (Stop gone); reply_complete recorded at 15:57:31 shell check after observation (Stop vanished between 15:56:46 and 15:57:28).
+# reply includes an attached handoff file (not downloaded).

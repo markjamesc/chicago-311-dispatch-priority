@@ -1,0 +1,3 @@
+sent=2026-10-10 15:52:39
+reply_complete=2026-10-10 15:57:31
+# reply_complete: last poll without END 15:56:46 (Stop present); first poll with END and Stop gone 15:57:28. Original capture: TIMES_original_capture.txt (unedited).

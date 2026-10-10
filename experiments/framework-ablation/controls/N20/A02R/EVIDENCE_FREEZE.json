@@ -1,0 +1,39 @@
+{
+  "ablation_id": "A02R",
+  "frozen_at_ct": "2026-10-10 13:31:02 CT",
+  "constitution_version": "1.0",
+  "roles": {
+    "Builder": "ChatGPT",
+    "Validator": "DeepSeek",
+    "Adjudicator": "Grok"
+  },
+  "baseline_sha256_files": [
+    "c75390b385f9c76de858dc09b4eb704045637981e77b07ef51eed4c46bee5636  ABLATION_SPEC_A02R.md",
+    "b306d7e426ce5aa901c1b7db0168de99c9796c6f455fb35b4fede2f10f22f0e9  ORIGINAL_A02_ABLATION_SPEC.md",
+    "e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9  CONSTITUTION_v1.md",
+    "86067f79de27c634656462c1106a38c10c12c531432fb847a0e08e349a5ade08  BASELINE_FRAMEWORK.sha256",
+    "4528ab5c24de2a619a8ab0024590a933e649bf4117a9860168cf861d77280b3e  A02R_FACTS.md",
+    "528d2ff4df2d11761b67b74ef62c0f2201cbfc7208acf046db2f9e35a308a9b0  A02R_FACTS.json",
+    "53cf165b25674fed2a35ab624caa985cd2a71819b1bb4efd907088be71dfa862  EVIDENCE_MANIFEST_A02R.sha256",
+    "2636f1d625400210b874417f2a05d70271c9d7dc9af48cf58f147cae4d71e160  runner/a02r_facts.py",
+    "d6fd537e90c6b60b6edd47815ed932d5f9379c5cf9dd2fbdf84498f8b2017d61  runner/build_packets.py"
+  ],
+  "builder_pack": [
+    {
+      "path": "A02R/A02R-builder/builder_report.md",
+      "bytes": 30179,
+      "sha256": "cebcaeeccefda838417655555d7f71757a001f7a03f0a83e49df6d379320d388",
+      "verdict_token_leak": false
+    }
+  ],
+  "validator_pack": [
+    {
+      "path": "A02R/A02R-validator/validator_report.md",
+      "bytes": 9872,
+      "sha256": "c1e1da0b3c1eb21966ee96216474e3eb69cd52a94ef1077b6266bd4209586698",
+      "verdict_token_leak": false
+    }
+  ],
+  "runner_evidence_sha256_file": null,
+  "capture_mode": "text-only (run note; do not publish)"
+}

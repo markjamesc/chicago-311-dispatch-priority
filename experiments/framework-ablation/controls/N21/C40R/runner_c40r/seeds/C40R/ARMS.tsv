@@ -1,0 +1,6 @@
+C40R gate validation arms (run on the PC BEFORE any builder chat, via c40r_round.ps1 -Validation)
+arm	candidate	expected_gate	desc
+REF	FROZEN:R-B\R\20_integrity_and_classify.R	PASS	frozen module: gate PASS and hidden check PASS
+SEED_NOPARENT	seeds\C40R\SEED_NOPARENT__20_integrity_and_classify.R	FAIL	I05 integrity clause dropped (nonblank PARENT_SR_NUMBER no longer INCONCLUSIVE); 23,014 source rows carry a parent number
+SEED_REASONFMT	seeds\C40R\SEED_REASONFMT__20_integrity_and_classify.R	FAIL	evidence_reason number format changed (4 to 3 decimals) for ESCALATE rows
+SEED_DUPLEAK	seeds\C40R\SEED_DUPLEAK__20_integrity_and_classify.R	FAIL	DUPLICATE rows stay in the decision set

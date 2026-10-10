@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F10",
+  "intent": "CREATED after freeze \u2192 INCONCLUSIVE",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F10",
+    "SR_TYPE": "Tree Debris Clean-Up Request",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-09-13 08:00:00",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "false",
+    "PARENT_SR_NUMBER": "",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "6",
+    "COMMUNITY_AREA": "44"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": true,
+    "action": "INCONCLUSIVE",
+    "selected": false,
+    "evidence_notes": "created_after_freeze"
+  }
+}

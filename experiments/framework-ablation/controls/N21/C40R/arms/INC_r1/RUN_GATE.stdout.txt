@@ -1,0 +1,1 @@
+gate=FAIL rb_exit=0 rb_secs=29.9 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=TRUE 

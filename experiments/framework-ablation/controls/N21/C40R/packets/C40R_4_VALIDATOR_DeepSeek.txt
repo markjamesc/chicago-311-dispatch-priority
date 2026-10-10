@@ -1,0 +1,1171 @@
+# C40R Validator — DeepSeek (INDEPENDENT FIRST PASS)
+
+Role: Validator only (DeepThink on). You are blind to the Builder; you have not seen and must not ask for its output. Do NOT return KEEP, REVERT or HALT.
+
+Everything you need is in this message. There are no attachments and no tools.
+Write a report with exactly these sections:
+1. Role attestation and ablation ID.
+2. Independent test plan: what you checked, and how.
+3. Independently recomputed hard facts (per-round gate/fixtures/hidden, first PASS per arm, divergence, active minutes for both regimes, hash equalities). Flag any internal inconsistency in the runner output.
+4. Facts that cannot be recomputed from this packet.
+5. P1 assessment against the frozen predicate in the SPEC. Facts only, no terminal state.
+6. Blocking objections: any defect in the harness, seeds, predicate application, timing records or evidence that should block a verdict, or "none".
+7. Claim → evidence map.
+End your reply with this exact line on its own:
+END C40R VALIDATOR REPORT
+
+---
+# WHAT IS REAL AND WHAT IS MODELLED
+Real: every builder reply, gate run, exit record, hidden check and timing record under ROUNDS. Prior real evidence (C40 NOT_TRIGGERED; PricePoint R-B r1–r10) is context only and is not re-scored. Modelled: the task difficulty (the larger module 20_integrity_and_classify.R was chosen so that the cap can trigger; this was decided before any builder chat). See the SPEC section 'Design choice'.
+
+---
+# SPEC
+# C40R — Ablation specification (FROZEN)
+
+**Ablation ID:** C40R (re-test of Addendum 01b candidate #40 "Repair-round cap"; successor to C40, N13 batch 6)
+**Why C40R exists:** C40 ended NOT_TRIGGERED (2026-10-03): the incumbent builder's first build failed the gate and its second passed, so the cap of 2 failed rounds was never reached and the two regimes were identical. C40 produced no verdict. Owner instruction 2026-10-10: finish #40.
+**Definition under test (unchanged from C40; owner's Addendum 01b text, `ADDENDUM_01_control_39.md` SHA-256 `a3bf8f6a6b27a670c8a3dde85e7fe51a53febfff298d2e70b2f3511e82de5b4f`):** Rule as it stands: unlimited repair rounds for one builder (PricePoint R-B reached r10). Variant: after 2 failed rounds (the owner text says "2–3"; 2 is used, as in C40), swap in a fresh builder, or escalate to the owner after the fresh builder's own cap. KEEP (adopt the cap) if a valid build arrives no later and no defect escapes. REVERT otherwise. HALT if evidence is incomplete.
+**The cap is NOT redefined.** It stays at 2 failed rounds. Lowering it to 1 was considered and rejected (see "Design choice").
+**Constitution:** 1.0, `CONSTITUTION_v1.md` (copy of the C40 file), SHA-256 `e6c3b3489ad7315d8566dcd7e01c28cc311049722a306dea90c3dab6404fdae9`.
+**Baseline frameworks (frozen pre-hardening, as in C40):**
+70a14831aa41452651443b4561979aedd07cc08a43ace38d07d9c5c624600c4c  docs/three-ai-measurement-design-framework.md
+24aec49c3cd1b12e4fafa85e7333874100fae9348f0d211c1df09eac893cdb2e  docs/three-ai-validation-and-analysis-framework.md
+**Frozen data pack:** Chicago 311 Dataset 2, `stage3-v1-tcd-ig`, `fixtures-v1-tcd-ig`, T_freeze 2026-09-12 23:59:59 America/Chicago, κ=2. PC `C:\Users\Mark\Documents\R Working Directory\chicago311`, read only. No new data, no MySQL, no internet.
+**Roles:** Builder (extra chats) = ChatGPT (incumbent chat INC; fresh chat FRESH) · Validator = DeepSeek · Adjudicator = Grok. No Grok chat is used for building (owner usage priority).
+
+## Design choice (what is real, what is modelled)
+- **REAL, reused as prior evidence only:** the C40 run (INC r1 FAIL, r2 PASS, NOT_TRIGGERED), the PricePoint R-B history (r1–r10, Addendum 02 #40 table, ~9 h 42 min to a valid build), and the frozen C40 gate and hidden check scripts. None of this is re-scored, edited or reconstructed. No evidence is fabricated or self-adjudicated. The C40 result stays NOT_TRIGGERED in the scorecard history.
+- **Rejected options:** (a) *Replaying C40 with a cap of 1.* It changes the rule under test (owner text says 2–3) and the real r2 pass (1.19 active minutes) would make the fresh builder lose on time by construction. (b) *Counterfactually simulating a fresh builder from the saved PricePoint rounds.* That would be modelled evidence; the Addendum itself says that duration is not measured. (c) *Seeding a failure into a builder's output.* Fabricates the builder behaviour.
+- **MODELLED (disclosed):** the task difficulty. Instead of the small I/O parsing module, the build task is the largest logic module of the frozen R-B path, `R-B/R/20_integrity_and_classify.R` (the integrity gate and κ classification, plus portfolio and κ-grid count functions). In PricePoint this is the kind of module whose byte-exact reconciliation took R-B many rounds. This raises the chance that the incumbent fails twice; it does not guarantee it. Every build, gate and hidden-check result is a real run on the PC. Difficulty is a design choice made BEFORE any builder chat and is not tuned afterwards.
+- **If the incumbent again passes at r1 or r2:** the outcome is NOT_TRIGGERED a second time. No third design is run under this spec; #40 stays "no verdict, n=2 NOT_TRIGGERED" and the owner decides (accept the rule as-is, or define a different cap). This is pre-registered here to prevent hunting for a triggering task.
+
+## Exact change being tested
+- **Build task (identical for every builder):** write `R-B/R/20_integrity_and_classify.R` for the frozen R-B path. The packet gives every other R-B file verbatim, including the frozen `10_io_parse.R`, `00_config.R`, `40_fixtures.R`, `run_RB.R`, the locked design documents, source file samples, the output-column contract and reference output hashes. The frozen module itself is never shown.
+- **Functions the module must define (called by `run_RB.R` and `40_fixtures.R`):** `rb_judge_rows(open_df, peer_df, kappa, t_freeze)`, `rb_portfolio_counts(judged, kappa)`, `rb_kappa_grid_counts(open_df, peer_df, grid, t_freeze)`.
+- **Gate (valid build), `c40r_gate.R` (byte-copy of `c40_gate.R` except label text):** the frozen R-B tree with only `20_integrity_and_classify.R` replaced; `Rscript R-B/run_RB.R all` on the frozen extract exits 0, fixtures 14/14, and the 4 R-B key outputs are byte-identical to the frozen ones. A failed gate produces `GATE_REPORT.md` (exit status, failing fixtures, which outputs differ, per-column counts, up to 5 example rows; no frozen code), sent to the builder as the next repair message.
+- **Hidden escape check:** on every gate-passing build, the ruling-41A depth gate `fixdepth.R depth` (byte-copy of the C40 file), never shown to builders. "No defect escapes" = the valid build passes it.
+- **Regimes (`c40r_next.R` state machine; adapted copy of `c40_next.R`):** INC r1 → gate. PASS at r1 or r2 → **NOT_TRIGGERED**. INC r1 and r2 both FAIL → regimes diverge: **variant** = FRESH chat (new ChatGPT chat) with the original packet plus INC's r1–r2 gate reports (no code), cap 2 failed rounds, then escalation; **baseline** = INC continues repairing, experiment stop at r6. Neither reaches a valid build → **BOTH_CENSORED** (HALT-incomplete).
+- **Time:** active minutes from divergence = Σ over rounds after r2 of (reply minutes from `TIMES.txt` + runner-measured gate minutes). `TIMES.txt` is written by the operator AT CHAT TIME, two lines `sent=YYYY-mm-dd HH:MM:SS` and `reply_complete=YYYY-mm-dd HH:MM:SS` (America/Chicago, operator's clock), with the reply-complete time read from the page when the END line appears, not from a file mtime. Baseline without a valid build by r6 counts as infinite. Minutes are operator-logged (disclosed). If an upper bound decides condition 2, report it as ambiguous (no scoring as met).
+- **Chat protocol:** one INC chat; messages are rounds. Attach `MESSAGE.txt` as a file or verify the composer before sending (C40 note D-C1: backticks were garbled). Builder chats are blind to the ablation and are frozen round by round.
+
+## Pre-freeze disclosure: validation attempt 1 (a seed defect, NOT a result)
+On 2026-10-10 13:41-13:44 CT, before any builder chat, gate validation was run on the PC on the first freeze (SPEC_FREEZE hash 6a57ef586e97...). REF passed; SEED_REASONFMT and SEED_DUPLEAK failed as expected; the seed SEED_KAPPAGT (`dormant_h > thresh` instead of `>=`) PASSED the gate and hidden check, because no row lies exactly on the boundary, so it changed nothing. That is a defect of the seed, found before any builder round, and says nothing about the repair cap. Owner-approved on 2026-10-10: the seed was replaced. The first replacement, SEED_THINPEER (`peer_n <= RB_N_MIN` instead of `<`), was validated at 13:46 CT and ALSO passed, because the peer table has no type with peer_n = 50 (smallest values 1, 5, 8, 25, 32, 33, 58, 70). The second replacement is SEED_NOPARENT (the I05 clause `p_parent` forced FALSE; 23,014 source rows carry a PARENT_SR_NUMBER). The spec, ARMS.tsv, seeds and packet templates were re-frozen after each replacement (new freeze hashes). The failed first-attempt rows are kept verbatim in `VALIDATION_ATTEMPT1_ROUNDS_LOG.tsv`, the attempt-2 rows (REF PASS, SEED_THINPEER PASS, SEED_REASONFMT FAIL, SEED_DUPLEAK FAIL) in `VALIDATION_ATTEMPT2_ROUNDS_LOG.tsv`, and both old seeds and freeze files in `superseded_seed_v1/`. These are seed defects found before any builder round, not results. No other file was changed; the INC and FRESH builder packets are byte-identical to the first freeze.
+
+## Verdict convention
+**KEEP = adopt the cap (a valid build arrives no later and no defect escapes). REVERT otherwise. HALT if evidence is incomplete.**
+
+## Operational benefit predicate P1 (mechanical; same as C40, module name changed only)
+Evaluated only if the regimes diverged. **P1 satisfied (KEEP side)** when all hold:
+0. (validity) gate validation before any chat: REF PASS with hidden PASS; every seeded module (SEED_NOPARENT, SEED_REASONFMT, SEED_DUPLEAK) FAIL the gate;
+1. the variant (FRESH) reaches a valid build within its cap (2 failed rounds);
+2. no later: the variant's active minutes from divergence ≤ the baseline's (baseline without a valid build by r6 = infinite);
+3. no defect escapes: the variant's valid build passes the hidden check.
+REVERT side: 1, 2 or 3 fails. HALT if 0 fails or a round record is missing. NOT_TRIGGERED and BOTH_CENSORED are reported as such (no verdict).
+Disclosed limits: n = 1 task, one builder model; the FRESH builder gets the handover reports (that is the variant as defined); the hidden check is not shown to discriminate between gate-passing modules; the module-difficulty choice is modelled; timing is operator-logged.
+
+## Regression / HALT rules
+HALT if a gate run or exit record is missing, if gate validation fails, or if Builder and Validator disagree on a hard number in the RESULTS file.
+
+## Chats (exact order; Grok only for adjudication)
+1. INC builder (ChatGPT, new chat) packet `C40R_1_INC_BUILDER_ChatGPT.txt`, then repair messages in the same chat while gates fail (max r6).
+2. Only if INC r1 and r2 FAIL: FRESH builder (ChatGPT, new chat) packet `C40R_2_FRESH_BUILDER_ChatGPT.txt` (generated), repairs in that chat (max r2).
+3. Only if EVALUATED: Builder report (ChatGPT, new chat), Validator report (DeepSeek, new chat), Adjudicator (Grok, new chat), packets assembled by `c40r_assemble.py`.
+
+## Frozen hashes (preflighted by `c40r_round.ps1` before every round; any mismatch = no round runs)
+- `R-B/run_RB.R` SHA-256 `6786fcf5fbed21f4a7cae389ce90887dd08182fe2b8ba3e82e242f222336defd`
+- `R-B/R/00_config.R` SHA-256 `6c9b0e31772476db02c24cfe21335c6783b4b7adbebc8a74739c82a34c70450b`
+- `R-B/R/10_io_parse.R (frozen, shown to builders)` SHA-256 `40e67d8360f3dc77c1c59455589a221ef1ade59d6c34f7c274ac0e9a5132154a`
+- `R-B/R/20_integrity_and_classify.R (frozen, NEVER shown)` SHA-256 `72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99`
+- `R-B/R/40_fixtures.R` SHA-256 `2ad4aa69cd3b3bd7dea5f08ef2e784dbdf53a64f8ff67b7622d4a4a1b6b7a07e`
+- `R-B/outputs/RB_classifications.csv` SHA-256 `a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193`
+- `R-B/outputs/RB_fixture_results.csv` SHA-256 `0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9`
+- `R-B/outputs/RB_portfolio_counts.csv` SHA-256 `eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c`
+- `R-B/outputs/RB_kappa_grid_counts.csv` SHA-256 `7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a`
+- `data/source/src_open_candidates.csv` SHA-256 `ba089fcc51a0008bb1253ae6b8cdf8081af9562a2ad8bf3ff73e376fb83d81b9`
+- `data/source/src_peer_stats.csv` SHA-256 `cb78ae214891eaecd0cc3c48bffc52aef745ff14e5f666647d8abc215d79eb58`
+
+Runner files, seeds, scorer and packets are listed with SHA-256 in `SPEC_FREEZE_C40R.sha256` (written after this spec, before any PC execution).
+
+---
+# SEEDS (gate-validation modules; derived from the frozen module by a one-line edit each)
+- `SEED_DUPLEAK__20_integrity_and_classify.R` SHA-256 `4f1d8422f4dbe7fad83c5ad737a5bd36f4f50494dc6453f00e8761870f73ec69`
+- `SEED_NOPARENT__20_integrity_and_classify.R` SHA-256 `4a68398b7506336818243d60e100c6c0e2e59520c4bc444f48a9ad1b1ff6784e`
+- `SEED_REASONFMT__20_integrity_and_classify.R` SHA-256 `8a25f51a510a616b111b502973066b15947da45624591c36d34f942e6f927cc9`
+
+---
+# HARNESS SCRIPTS (verbatim)
+## c40r_gate.R (SHA-256 f4fb6afc666f47e86b0b6520846730aabdf7a5e9e7d502c1c3f10e985ba2755e)
+```
+#!/usr/bin/env Rscript
+# C40R build gate (N13 c40r). Usage: Rscript c40r_gate.R <ARM_ROOT> <FROZEN_ROOT> <LABEL>
+# Gate PASS (= valid build) iff RUN_RB.exit is 0, the fixture results are 14/14 pass, and the 4 R-B key outputs are byte-identical to the frozen R-B outputs.
+# Writes <ARM_ROOT>/GATE_RESULT.txt (machine) and <ARM_ROOT>/GATE_REPORT.md (sent to the builder in the next repair round; field-level diff, no frozen code).
+suppressPackageStartupMessages({ library(digest); library(readr) })
+a <- commandArgs(trailingOnly = TRUE); R <- a[[1]]; FZ <- a[[2]]; LAB <- a[[3]]
+sha <- function(p) if (file.exists(p)) digest(file = p, algo = "sha256") else "MISSING"
+FROZEN_RB <- c("RB_classifications.csv" = "a0e42b8667b38baf6bc1e79090d06b1a7c62659926ea7a78185975b8fe6fe193", "RB_fixture_results.csv" = "0d72245cac95555e32a3e6073e3ea9cc0a97de97f18c82965dff21f49052e9e9",
+               "RB_portfolio_counts.csv" = "eb677bc1a831fad4b91d6b9ebe73b10310c5dc521dd779cdc1102b9157d7673c", "RB_kappa_grid_counts.csv" = "7a18fcb12f5f9795a3273d3f0bbb6334e83c4eb9cecfa185314a7d8883352c8a")
+ex <- if (file.exists(file.path(R, "RUN_RB.exit"))) strsplit(readLines(file.path(R, "RUN_RB.exit"), warn = FALSE)[1], ",")[[1]] else c("MISSING", NA)
+O <- file.path(R, "R-B", "outputs"); h <- sapply(names(FROZEN_RB), function(f) sha(file.path(O, f))); eq <- h == FROZEN_RB
+fx <- if (file.exists(file.path(O, "RB_fixture_results.csv"))) read.csv(file.path(O, "RB_fixture_results.csv"), colClasses = "character") else NULL
+fx_pass <- if (is.null(fx)) 0L else sum(fx$pass == "TRUE"); fx_n <- if (is.null(fx)) 0L else nrow(fx)
+gate <- ex[1] == "0" && fx_n == 14 && fx_pass == 14 && all(eq)
+rep <- c(paste0("# C40R gate report — ", LAB, " — ", if (gate) "PASS" else "FAILED"), "",
+         sprintf("- Production run `Rscript R-B/run_RB.R all`: exit %s (%s s).", ex[1], ex[2]),
+         sprintf("- Fixtures: %d/%d pass%s.", fx_pass, fx_n, if (!is.null(fx) && fx_pass < fx_n) paste0(" — failing: ", paste(fx$fixture_id[fx$pass != "TRUE"], collapse = ", ")) else ""), "",
+         "| output | byte-identical to frozen reference |", "|---|---|", sprintf("| %s | %s |", names(FROZEN_RB), ifelse(eq, "YES", "NO")), "")
+st <- file.path(R, "RUN_RB.stderr.txt")
+if (ex[1] != "0" && file.exists(st)) { z <- readLines(st, warn = FALSE); z <- z[nzchar(trimws(z))]; rep <- c(rep, "Last 15 lines of stderr:", "```", tail(z, 15), "```", "") }
+if (!eq[["RB_classifications.csv"]] && file.exists(file.path(O, "RB_classifications.csv"))) {
+  rc <- function(p) read_csv(p, col_types = cols(.default = col_character()), progress = FALSE, na = character())
+  fz <- rc(file.path(FZ, "R-B", "outputs", "RB_classifications.csv")); cd <- rc(file.path(O, "RB_classifications.csv"))
+  rep <- c(rep, sprintf("RB_classifications.csv: reference %d rows, %d columns; yours %d rows, %d columns.", nrow(fz), ncol(fz), nrow(cd), ncol(cd)))
+  if (!identical(names(fz), names(cd))) rep <- c(rep, paste0("Column names differ. Reference: ", paste(names(fz), collapse = ","), " | yours: ", paste(names(cd), collapse = ",")))
+  m <- merge(fz, cd, by = "SR_NUMBER", all = TRUE, suffixes = c(".ref", ".yours"))
+  rep <- c(rep, sprintf("SR_NUMBER only in reference: %d; only in yours: %d.", sum(!(fz$SR_NUMBER %in% cd$SR_NUMBER)), sum(!(cd$SR_NUMBER %in% fz$SR_NUMBER))), "", "| column | rows that differ (matched SR_NUMBER) |", "|---|---|")
+  ex_rows <- character(0)
+  for (cn in intersect(setdiff(names(fz), "SR_NUMBER"), names(cd))) { x <- m[[paste0(cn, ".ref")]]; y <- m[[paste0(cn, ".yours")]]; k <- !is.na(x) & !is.na(y) & x != y
+    rep <- c(rep, sprintf("| %s | %d |", cn, sum(k)))
+    if (any(k)) { i <- head(which(k), 5); ex_rows <- c(ex_rows, sprintf("| %s | %s | %s | %s |", m$SR_NUMBER[i], cn, x[i], y[i])) } }
+  if (length(ex_rows)) rep <- c(rep, "", "First differing rows (up to 5 per column):", "", "| SR_NUMBER | column | reference | yours |", "|---|---|---|---|", ex_rows)
+  if (identical(names(fz), names(cd)) && nrow(fz) == nrow(cd) && !length(ex_rows) && all(fz$SR_NUMBER == cd$SR_NUMBER)) rep <- c(rep, "", "All values equal but the bytes differ (row order, quoting, number formatting or line endings).")
+  rep <- c(rep, "") }
+for (f in setdiff(names(FROZEN_RB)[!eq], "RB_classifications.csv")) if (file.exists(file.path(O, f))) rep <- c(rep, paste0(f, " (yours):"), "```", readLines(file.path(O, f), warn = FALSE), "```", "")
+writeLines(rep, file.path(R, "GATE_REPORT.md"))
+writeLines(sprintf("gate=%s rb_exit=%s rb_secs=%s fixtures=%d/%d classifications_equal=%s fixture_results_equal=%s portfolio_equal=%s kappa_grid_equal=%s", if (gate) "PASS" else "FAIL", ex[1], ex[2], fx_pass, fx_n, eq[1], eq[2], eq[3], eq[4]), file.path(R, "GATE_RESULT.txt"))
+cat(readLines(file.path(R, "GATE_RESULT.txt")), "\n")
+```
+
+## c40r_next.R (SHA-256 9d4b474ccddc9d22aabac6869fbd6327fb6ada9c17d48bb55c23a24761cccd3c)
+```
+#!/usr/bin/env Rscript
+# C40R state machine (N13 c40r). Usage: Rscript c40r_next.R <N13_ROOT> <INC|FRESH> <k>
+# Cap regime (variant): after 2 failed incumbent rounds, a fresh builder (new chat) gets the original packet plus the incumbent's gate reports (no code); the fresh builder has the same cap (2 failed rounds), then escalation to the owner.
+# Unlimited regime (baseline): the incumbent keeps repairing; experiment stop at r6 (usage), so a baseline without a valid build by r6 is censored.
+# Writes the next message (C40R/C40R-<arm>/r<k+1>/MESSAGE.txt), the fresh-builder packet at divergence, and appends C40R/STATE_LOG.txt and C40R/ROUND_PACKETS.sha256.
+suppressPackageStartupMessages(library(digest))
+a <- commandArgs(trailingOnly = TRUE); W <- normalizePath(a[[1]], winslash = "/", mustWork = TRUE); arm <- a[[2]]; k <- as.integer(a[[3]])
+C <- file.path(W, "C40R"); RMAX <- c(INC = 6L, FRESH = 2L); CAP <- 2L
+gr <- function(arm, k) { p <- file.path(C, "arms", sprintf("%s_r%d", arm, k), "GATE_RESULT.txt"); if (!file.exists(p)) stop("missing ", p); sub("^gate=([A-Z]+).*$", "\\1", readLines(p, warn = FALSE)[1]) }
+rep_of <- function(arm, k) readLines(file.path(C, "arms", sprintf("%s_r%d", arm, k), "GATE_REPORT.md"), warn = FALSE, encoding = "UTF-8")
+now <- format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")
+logl <- function(s) { cat(s, "\n"); cat(paste0(now, " ", s, "\n"), file = file.path(C, "STATE_LOG.txt"), append = TRUE) }
+wr <- function(p, x) { dir.create(dirname(p), recursive = TRUE, showWarnings = FALSE); if (file.exists(p)) stop(p, " exists; never overwritten")
+  con <- file(p, open = "wb"); writeBin(charToRaw(enc2utf8(paste0(paste(x, collapse = "\n"), "\n"))), con); close(con)
+  cat(sprintf("%s  %s\n", digest(file = p, algo = "sha256"), sub(paste0("^", W, "/"), "", p)), file = file.path(C, "ROUND_PACKETS.sha256"), append = TRUE); logl(paste("wrote", sub(paste0("^", W, "/"), "", p))) }
+repair <- function(arm, k) c(sprintf("# C40R — repair round r%d (%s builder)", k + 1, if (arm == "INC") "incumbent" else "fresh"), "",
+  sprintf("Your round r%d file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.", k), "", rep_of(arm, k), "",
+  "Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.",
+  "Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:", sprintf("END C40R BUILD %s r%d", arm, k + 1))
+g <- gr(arm, k)
+if (arm == "INC") {
+  if (g == "PASS") { logl(sprintf("INC r%d PASS -> %s", k, if (k <= CAP) "NOT_TRIGGERED (valid build within the cap; regimes identical; no fresh builder; no B/V/G chats)" else "INC_VALID")); quit(status = 0) }
+  if (k == CAP && all(sapply(seq_len(CAP), function(i) gr("INC", i)) == "FAIL")) {
+    tp <- readLines(file.path(C, "packets", "C40R_2_FRESH_BUILDER_ChatGPT.TEMPLATE.txt"), warn = FALSE, encoding = "UTF-8"); j <- which(tp == "@@HANDOVER@@"); if (length(j) != 1) stop("placeholder")
+    ho <- c("# HANDOVER FROM THE PREVIOUS BUILDER (cap reached after 2 failed rounds; gate reports only, no code)", unlist(lapply(seq_len(CAP), function(i) c("", sprintf("## Previous builder, round r%d", i), rep_of("INC", i)))))
+    wr(file.path(C, "packets", "C40R_2_FRESH_BUILDER_ChatGPT.txt"), c(tp[seq_len(j - 1)], ho, tp[-seq_len(j)]))
+    logl(sprintf("DIVERGED after INC r%d FAIL: variant = fresh builder (packet C40R/packets/C40R_2_FRESH_BUILDER_ChatGPT.txt, new chat); baseline = INC continues", k)) }
+  if (k < RMAX[["INC"]]) wr(file.path(C, "C40R-INC", sprintf("r%d", k + 1), "MESSAGE.txt"), repair("INC", k)) else logl(sprintf("INC r%d FAIL at the experiment stop -> INC_CENSORED (no valid build by r%d)", k, k))
+} else {
+  if (g == "PASS") { logl(sprintf("FRESH r%d PASS -> FRESH_VALID", k)); quit(status = 0) }
+  if (k < RMAX[["FRESH"]]) wr(file.path(C, "C40R-FRESH", sprintf("r%d", k + 1), "MESSAGE.txt"), repair("FRESH", k)) else logl(sprintf("FRESH r%d FAIL -> FRESH_ESCALATED (cap reached again; escalate to the owner)", k))
+}
+```
+
+## c40r_eval.py (SHA-256 5b9691833de35955a6b305afa19d4412037417895186ae61d9bf84843c74c41c)
+```
+#!/usr/bin/env python3
+"""C40R post-protocol evaluator (Python port of N13 c40_eval.R; same predicate, module = 20_integrity_and_classify.R).
+Usage: python3 c40r_eval.py <WORK_ROOT>     (reads <WORK_ROOT>/C40R/arms/<INC|FRESH>_r<k>/ and <WORK_ROOT>/C40R/C40R-<arm>/r<k>/TIMES.txt; writes <WORK_ROOT>/C40R/post/)
+Mechanical only: never decides KEEP/REVERT/HALT beyond the frozen P1 text; adjudication is Grok's."""
+import sys, os, re, csv, hashlib, datetime
+W = os.path.abspath(sys.argv[1]); C = os.path.join(W, "C40R"); OUT = os.path.join(C, "post"); os.makedirs(OUT, exist_ok=True)
+MOD = "20_integrity_and_classify.R"; CAP = 2; INC_MAX = 6; FRESH_MAX = 2
+def rl(p):
+    if not os.path.exists(p): return None
+    with open(p, encoding="utf-8", errors="replace") as f: return (f.readline() or "").strip()
+def kv(line, k):
+    if not line: return None
+    m = re.search(r"(?:^|\s)%s=([^\s]*)" % re.escape(k), line); return m.group(1) if m else None
+def ex(p):
+    z = rl(p)
+    try: return float(z.split(",")[1])
+    except Exception: return None
+def tmin(p):
+    if not os.path.exists(p): return None
+    d = {}
+    for ln in open(p, encoding="utf-8", errors="replace"):
+        m = re.match(r"^(sent|reply_complete)=(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)", ln)
+        if m and m.group(1) not in d: d[m.group(1)] = datetime.datetime.strptime(m.group(2), "%Y-%m-%d %H:%M:%S")
+    if "sent" in d and "reply_complete" in d: return (d["reply_complete"] - d["sent"]).total_seconds() / 60
+    return None
+def sha16(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()[:16] if os.path.exists(p) else "MISSING"
+rows = []
+for arm in ("INC", "FRESH"):
+    for k in range(1, INC_MAX + 1):
+        d = os.path.join(C, "arms", "%s_r%d" % (arm, k))
+        if not os.path.isdir(d): continue
+        g = rl(os.path.join(d, "GATE_RESULT.txt")); hd = rl(os.path.join(d, "outputs", "GATE_depth.txt"))
+        rm = tmin(os.path.join(C, "C40R-" + arm, "r%d" % k, "TIMES.txt"))
+        gs = sum(x for x in (ex(os.path.join(d, n)) for n in ("RUN_RB.exit", "RUN_GATE.exit", "RUN_HIDDEN.exit")) if x is not None) / 60
+        rows.append(dict(arm=arm, round=k, gate=kv(g, "gate"), rb_exit=kv(g, "rb_exit"), fixtures=kv(g, "fixtures"),
+            classifications_equal=kv(g, "classifications_equal"), hidden_depth_gate=("not run (gate FAIL)" if hd is None else kv(hd, "gate")),
+            reply_min=None if rm is None else round(rm, 2), gate_min=round(gs, 2), round_active_min=None if rm is None else round(rm + gs, 2),
+            code_sha256=sha16(os.path.join(d, "R-B", "R", MOD))))
+inc = [r for r in rows if r["arm"] == "INC"]; fr = [r for r in rows if r["arm"] == "FRESH"]
+def first_pass(t):
+    for r in sorted(t, key=lambda r: r["round"]):
+        if r["gate"] == "PASS": return r["round"]
+    return None
+ip = first_pass(inc); fp = first_pass(fr); halt = []; outcome = "PENDING"
+if not inc: halt.append("no incumbent round recorded")
+if ip is not None and ip <= CAP: outcome = "NOT_TRIGGERED"
+diverged = len([r for r in inc if r["round"] <= CAP]) >= CAP and all(r["gate"] == "FAIL" for r in inc if r["round"] <= CAP)
+base_t = var_t = None; esc_v = esc_b = None
+if diverged:
+    post = [r for r in inc if r["round"] >= CAP + 1 and (ip is None or r["round"] <= ip)]
+    base_t = float("inf") if ip is None else sum((r["round_active_min"] or 0) for r in post)
+    var_t = float("inf") if fp is None else sum((r["round_active_min"] or 0) for r in fr if r["round"] <= fp)
+    inc_done = ip is not None or (inc and max(r["round"] for r in inc) >= INC_MAX)
+    fr_done = fp is not None or (fr and max(r["round"] for r in fr) >= FRESH_MAX)
+    if not (inc_done and fr_done): outcome = "PENDING (protocol not finished)"
+    elif ip is None and fp is None: outcome = "BOTH_CENSORED"
+    else: outcome = "EVALUATED"
+    if any(r["round_active_min"] is None for r in [x for x in inc if x["round"] > CAP] + fr):
+        halt.append("a TIMES.txt record is missing for a post-divergence round")
+    esc_v = next((r["hidden_depth_gate"] for r in fr if r["round"] == fp), None) if fp else None
+    esc_b = next((r["hidden_depth_gate"] for r in inc if r["round"] == ip), None) if ip else None
+names = ["1. variant valid build: the fresh builder passes the gate within its cap (2 failed rounds)",
+ "2. no later: variant active time from divergence <= baseline active time from divergence (baseline without a valid build by r6 = infinite)",
+ "3. no defect escapes: the variant's valid build passes the hidden depth check (ruling-41A depth gate, never shown to builders)"]
+if outcome == "EVALUATED" and not halt: met = [fp is not None, (var_t is not None and var_t <= base_t), esc_v == "PASS"]
+else: met = [None, None, None]
+if halt: verdict = "HALT"
+elif outcome == "NOT_TRIGGERED": verdict = "NOT TRIGGERED (cap never reached; no verdict; no Builder/Validator/Adjudicator chats)"
+elif outcome == "BOTH_CENSORED": verdict = "HALT-INCOMPLETE (neither regime produced a valid build; no Builder/Validator/Adjudicator chats)"
+elif outcome == "EVALUATED": verdict = "P1 MET" if all(met) else "P1 NOT MET"
+else: verdict = "PENDING"
+def mdrow(v): return "| " + " | ".join(str(x).replace("|", "/") for x in v) + " |"
+L = ["# C40R POST-PROTOCOL RESULTS (mechanical; generated %s)" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "",
+     "**Mechanical predicate result: %s**" % verdict, ""]
+if halt: L += ["HALT reasons:"] + ["- " + h for h in halt] + [""]
+L.append("Outcome class: %s. Incumbent first PASS: %s. Fresh first PASS: %s. Diverged: %s." % (outcome, ip, fp, diverged))
+if diverged and outcome == "EVALUATED":
+    L.append("Active minutes from divergence: baseline (INC r%d..) = %s; variant (FRESH) = %s. Hidden check on the valid builds: variant %s, baseline %s." % (CAP + 1, base_t, var_t, esc_v, esc_b))
+L += ["", "## Predicate conditions", "| condition | met |", "|---|---|"] + [mdrow((n, "n/a" if m is None else ("MET" if m else "NOT MET"))) for n, m in zip(names, met)] + ["", "## Rounds"]
+cols = ["arm", "round", "gate", "rb_exit", "fixtures", "classifications_equal", "hidden_depth_gate", "reply_min", "gate_min", "round_active_min", "code_sha256"]
+if rows: L += [mdrow(cols), "|" + "---|" * len(cols)] + [mdrow([r[c] for c in cols]) for r in rows]
+else: L.append("(none)")
+sl = os.path.join(C, "STATE_LOG.txt")
+if os.path.exists(sl): L += ["", "## STATE_LOG.txt", "```"] + open(sl, encoding="utf-8", errors="replace").read().splitlines() + ["```"]
+open(os.path.join(OUT, "C40R_POST_RESULTS.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
+if rows:
+    with open(os.path.join(OUT, "C40R_POST_rounds.csv"), "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=cols); w.writeheader(); w.writerows(rows)
+print("C40R:", verdict)
+```
+
+## fixdepth.R (hidden depth check; byte-identical to the C40 / b5-C41 file)
+SHA-256 5aa0cb96037b2616a26d4e68565be26393e5669f450b56783a70239e585696bd; the file is not reproduced here (never shown to builders).
+
+---
+# C40R ROUNDS AND POST-PROTOCOL RESULT (frozen; P1 is decided from these)
+ROUNDS_FREEZE.json SHA-256 1381bff8d791ce04e3a17ffbcef225a4a37a9f79cd900867aaf0267a953e5384:
+```
+{
+ "C40R-FRESH/r1/20_integrity_and_classify.R": "25c342a67da34dff40ff36aac636999a2cd1e2d0c30ba9feacb604efb7913052",
+ "C40R-FRESH/r1/EXTRACT.txt": "178640d978da31e291e16a26053827a5c4d57fabb31dc1e8005025bccd5a18f9",
+ "C40R-FRESH/r1/TIMES.txt": "7df79eaea68b020d5f4dd059cc6cb5a0f43bfa23e87fb769a885cef391f72a33",
+ "C40R-FRESH/r1/reply.md": "86f9c530dca7dee01818cbf1d88d3bae8641d6f464dddc83685731da6154d054",
+ "C40R-FRESH/r2/20_integrity_and_classify.R": "2dffff037f0d0f6604d85a34ec3b8ab310447a8aef96819a6b6dd6fd4579e6fb",
+ "C40R-FRESH/r2/EXTRACT.txt": "2177589ffe36fe7b35ccb68288add55de137742576d5c8759eeeef35fde57ffb",
+ "C40R-FRESH/r2/MESSAGE.txt": "b7a457882f18b1520495d9d7be3092e31ce2ee1434f99dfbb0dbd827dc56be07",
+ "C40R-FRESH/r2/TIMES.txt": "738b5950e536da13f680454b9b25462e1b4119ef454b7877fcdb898179e7063a",
+ "C40R-FRESH/r2/reply.md": "7b92d006a3568852ac78d915c45f97bcbc64e1e4b93f0c3de7c8ce779812fe85",
+ "C40R-INC/r1/20_integrity_and_classify.R": "5d9f31ff77d5d501317d0df0f90e2bf7c6e6080e62aebec99412ab4e3bffd5a9",
+ "C40R-INC/r1/EXTRACT.txt": "8dde9f30ec25dca48d360e5bc049e67692763a5766d4eee02ea9b73939d6fcd9",
+ "C40R-INC/r1/TIMES.txt": "ea48e9cc3436914172b140d95938b63657adc4e84ca893a5f1c3126c23cdc3d4",
+ "C40R-INC/r1/reply.md": "4bd3f689dfa93e6da9f458eda74c203d2f2b5245ee1c767f21ae8d54f78d935c",
+ "C40R-INC/r2/20_integrity_and_classify.R": "1996564e070277e000ac13e05e3c3b53ffd8263d9a57f9dc66b9ccae1812b408",
+ "C40R-INC/r2/EXTRACT.txt": "6b5fcf92c574b6f6e811cbbfc9e94c471ef3dd3b11aaf3981636b1827b589285",
+ "C40R-INC/r2/MESSAGE.txt": "b0e0ac32ca60bbc06915184a4ac4b468d5c753ce386de93bdfb788331b87cfce",
+ "C40R-INC/r2/TIMES.txt": "b596c3928af9ba3c36cb41633f04a92142c9f91db872693d1c1b299160c1e180",
+ "C40R-INC/r2/reply.md": "f6c2617a72bee1a7d8477394d6e92c453dd771c4adc8b56ccae079e0ccd9848d",
+ "C40R-INC/r3/20_integrity_and_classify.R": "60c92946fa8450a112d4a9065853406cc1977ec32d0f052f0954261cbba995b3",
+ "C40R-INC/r3/EXTRACT.txt": "22611a48ccf328a2a2ce281049351f1f301fc656465fbcc1ef9344b856c25747",
+ "C40R-INC/r3/MESSAGE.txt": "b7eb9d1fb195fc5f53987b8b1e17048464707908511abb0dff722b67f5f2279d",
+ "C40R-INC/r3/TIMES.txt": "dcc07a41f4af1ef238e1f7df93998ca184d3e6f1f36e1c7c506b876544b14b28",
+ "C40R-INC/r3/reply.md": "a430b0b3b72666166c2d8d9e5646ab46749681f72da3ff98fc191392e711a52a",
+ "C40R-INC/r4/20_integrity_and_classify.R": "35daca8965dd07205ab7c1afb28fa56affe90a1dada08bf0c72dda0c9436805f",
+ "C40R-INC/r4/EXTRACT.txt": "ea81ae12097737ceef8de539a844c0b145b614f4c59773ee18239b81987f4ea4",
+ "C40R-INC/r4/MESSAGE.txt": "cff3d741f9b6d7d170bceed163542b8fed2734f4fa5a115bf29f59153f8614ef",
+ "C40R-INC/r4/TIMES.txt": "362d3d9db97a430bd15f6176748d775e18bfe8923c0979e1881a5f34cfc06dd4",
+ "C40R-INC/r4/reply.md": "d0724e3415fef674b68f77240ab8a9e6b2fa5ca47a85a0c6ff1fe53c0e8b2af6",
+ "C40R-INC/r5/20_integrity_and_classify.R": "957ce6dddb54a9d4e80b96ed543a42d2139c350ddacf1430637658d834bf2225",
+ "C40R-INC/r5/EXTRACT.txt": "58e82db965e76a7b6940d662baa6195775234179d2ac778a247a834bd967916d",
+ "C40R-INC/r5/MESSAGE.txt": "44f934e98b4847395a57974f7c4919279d006201e2b28f9a8a8ce10b840ecec5",
+ "C40R-INC/r5/TIMES.txt": "64c7c2d1f68774730fcd9b2d67c3e874cf510b31feceb942e7b9d56e3a84b364",
+ "C40R-INC/r5/reply.md": "d321c81ca41dd2beb0bbf1a7999706e46c135dd94a7682bc51fdde4a9a28e51e",
+ "C40R-INC/r6/20_integrity_and_classify.R": "197aea5662b6ca8f98c6fd6e5c49699b4c8135383b2808a9daaac4bc15b926c1",
+ "C40R-INC/r6/EXTRACT.txt": "49d37f98ad1dad944fe6db4d880c1492f11d3b2f17aa0d3d647e12ee463bcff9",
+ "C40R-INC/r6/MESSAGE.txt": "8d42efca8c71d5143d68ff5f2741f0024d829979db759024c2b1b8442ece08b8",
+ "C40R-INC/r6/TIMES.txt": "531691d2ad06292493a5d2bd39f26a0335072e215f9e9ef322fecb19aae49e63",
+ "C40R-INC/r6/reply.md": "767e47fcdc19a20dae340968cb70b7e520be8d49d8df1f45550d06983f875479",
+ "ROUNDS_LOG.tsv": "557347f6f8f3b31edb19cd8e1255298176b04a7b79625677af31c372b8ab3b83",
+ "STATE_LOG.txt": "46019b816b1fc02fb6ff4b74f0a074c87663bf2179ee9f90736bcb71915fef63",
+ "arms/FRESH_r1/GATE_REPORT.md": "3dbefd6f578b72c26b6dc6467dc4c6802dbbc58716b7c4dcc9f5508f32ca3168",
+ "arms/FRESH_r1/GATE_RESULT.txt": "753660a84997c4f9ce0527838647c5fba946a51855346e84a03354674eed8b40",
+ "arms/FRESH_r1/MANIFEST_inputs.sha256": "2323e7dcc36897f843f8fedb9950324aebdda2b97b65759f6882d772aa3422e1",
+ "arms/FRESH_r1/MANIFEST_outputs.sha256": "f16c0726734e8a4761b2b20bfe4fd078318fc9fb783c794a02834e4582b975b7",
+ "arms/FRESH_r1/RUN_GATE.exit": "b91903c7d80a5b766a3b7f93f2196a1203f84c563ffb89f024609ce8539dafe5",
+ "arms/FRESH_r1/RUN_RB.exit": "bc522256f64172e932de651c2df322500631add01f05c5bc38db9fed04fbf2c5",
+ "arms/FRESH_r2/GATE_REPORT.md": "bde536eddbd5fa41542c6cdb5ea7d0cfd838866aa4c5dd720e548712067687d5",
+ "arms/FRESH_r2/GATE_RESULT.txt": "9ae600dbe99501bd88820500340253323afd42b049a81bee6a9fdecbf7de7656",
+ "arms/FRESH_r2/MANIFEST_inputs.sha256": "09604586ad34c9df527cbf1d36c8adb0164239aca52a7175fd00a0a800e2bb55",
+ "arms/FRESH_r2/MANIFEST_outputs.sha256": "3b66c8598288951cd3dbfd982bb5441ea3d0c582a707d40d4ba58abaf4694c69",
+ "arms/FRESH_r2/RUN_GATE.exit": "429874d93e5c38f34bf739642d59968ff0caa694cd394757db5b2422031cb150",
+ "arms/FRESH_r2/RUN_RB.exit": "3b3df0fa222114a7c9c7a0d160e2f61f039b19c345236c5d4fb42fac1026a71f",
+ "arms/INC_r1/GATE_REPORT.md": "e51f794ce3bdddad02280e39ea3b2800881eb6664afb4c65a6b80ec3a4b50f83",
+ "arms/INC_r1/GATE_RESULT.txt": "152065ce1e2ac931feb6a57348efce32a12cb402366104a90a4fb4c10372b170",
+ "arms/INC_r1/MANIFEST_inputs.sha256": "d1a2f871d04b4a362be04b03941f74f8ffae299477b9f49965f7c9c556c478f9",
+ "arms/INC_r1/MANIFEST_outputs.sha256": "1cb7875bdccff5dcd17fdbfccac79e8b6fc553979e5cad69a25b79b982502618",
+ "arms/INC_r1/RUN_GATE.exit": "c64b764a158949075cc81380ce85d0353a65d769ca8090734000a16f677b96f6",
+ "arms/INC_r1/RUN_RB.exit": "a0e97815f1bbc3f43f6605c0013a4224aca3dd9c6b06912feba80a928c4bc5d1",
+ "arms/INC_r2/GATE_REPORT.md": "3a03a5f74e32df503ce2583e7b5abdb25d693810c77374919c9002e6922384cd",
+ "arms/INC_r2/GATE_RESULT.txt": "f6b6eb193a278f7c8952b586d172b3ce5a0856ece050127a3a183b54d68fd9b9",
+ "arms/INC_r2/MANIFEST_inputs.sha256": "4b04aa7b80915f97c93d361fef39955434ee5bcddf37391b6c6901dc38355bb7",
+ "arms/INC_r2/MANIFEST_outputs.sha256": "d11ff8d70af9872aee96f3725b768c198878667ad4f6eb1239078548ac817695",
+ "arms/INC_r2/RUN_GATE.exit": "be91ca730b03c5a05fd20fd3a5e39f41ef4033c33a9c2a96343a52531efa0be5",
+ "arms/INC_r2/RUN_RB.exit": "a1f44382c1887aee62c2e2bc101899e2a0e8b291d0ee0cea6baaad211e4d88cb",
+ "arms/INC_r3/GATE_REPORT.md": "e7995be7953a0eefc35ed34ea84bb2ef14797b2c011ea770711e406792ab882c",
+ "arms/INC_r3/GATE_RESULT.txt": "bf84aad66a1f097660e48978ec94fdb07c65b5615faadd419e4499f935c3518a",
+ "arms/INC_r3/MANIFEST_inputs.sha256": "57d55034f727b17af653c119aa11e3d4c430f98afb0bb46d540def107ea63a8e",
+ "arms/INC_r3/MANIFEST_outputs.sha256": "98385e6b7137391b4150d8a652bd2503d75fa286ae5537118c726bf1ec6f6323",
+ "arms/INC_r3/RUN_GATE.exit": "d77d1f1fd57468a7f83324f1b3ea4c3828f386815903ab406750e2be0c4cf91c",
+ "arms/INC_r3/RUN_RB.exit": "1550ec890cc5d44a0f68c5c5836ad6d100facec011c0a1de758b0d85ac4a32de",
+ "arms/INC_r4/GATE_REPORT.md": "ebdf97e6cb38e24f636f5f638ecf6b7a3510019ae1e393df5941b9bda2d8a648",
+ "arms/INC_r4/GATE_RESULT.txt": "aa86e4867a849139c430758f53d58c0ef159d650b86def788538dba497037ce9",
+ "arms/INC_r4/MANIFEST_inputs.sha256": "5631d0b5f79e3cad1269a91c2a5d3dc4fee4d6d8701fb5cadab08db8a97d5819",
+ "arms/INC_r4/MANIFEST_outputs.sha256": "b3a10e6fda034d492f246fd30c7f53bbcb72616b03dec4a41bedf09668455d2e",
+ "arms/INC_r4/RUN_GATE.exit": "22a4f3044c06cd8676c978bf6313bb6be501413f9f2f03ab15785def22cc778b",
+ "arms/INC_r4/RUN_RB.exit": "d5eeb55f4f12fbe117af4fe57be32ba435247f20864834253806c23172fa72c8",
+ "arms/INC_r5/GATE_REPORT.md": "7fda4098ebb4401f411a643163690a2be40efa6bc02f62d5771a141b03fb3572",
+ "arms/INC_r5/GATE_RESULT.txt": "6bf83fae6c9d6f9268afacb8dee532c5c49ed308115904ebb3f3838f35d45022",
+ "arms/INC_r5/MANIFEST_inputs.sha256": "c80fa251482aaebd43528144bda8b7d630b715fce9ac8ff5ef977a3776b26dc1",
+ "arms/INC_r5/MANIFEST_outputs.sha256": "61718fcbfd8180bd766eee81093c487f03f69765474d9ecdd27f82686e539845",
+ "arms/INC_r5/RUN_GATE.exit": "1896bd5f55e87acf64e577ab6a0861c5200601b13ffc19449a9207fdc806e1cf",
+ "arms/INC_r5/RUN_RB.exit": "18af5875546e324cb823d0960f40f9abe71409bc97934980fcdd16d0ab9ccc43",
+ "arms/INC_r6/GATE_REPORT.md": "0e3c03c35cbce4b6d0872d353a69421743c53bdb5e14149740f6bc1b78c28bb0",
+ "arms/INC_r6/GATE_RESULT.txt": "f5308c141d920b316c3237bf23bdd52253ec08b99b159c0306242cf965ddab16",
+ "arms/INC_r6/MANIFEST_inputs.sha256": "365add7a8fe889f0c259def9589ae391736994ab2287b89362621dc5cf4d8f9d",
+ "arms/INC_r6/MANIFEST_outputs.sha256": "4bec7baadba1a2b0126268b295d1bc372907e39034d4a24c6265e8cb88322520",
+ "arms/INC_r6/RUN_GATE.exit": "dc688e46d2df08b9e3295a600645d4c34d479e316e930d0c80989973acff5082",
+ "arms/INC_r6/RUN_RB.exit": "b176ecc9fea85e7a076e9fa46e037094874242afbcc5bcbe828e96efbc03de50"
+}
+```
+
+## c40r_eval.py output
+# C40R POST-PROTOCOL RESULTS (mechanical; generated 2026-10-10 16:01:18)
+
+**Mechanical predicate result: HALT**
+
+HALT reasons:
+- a TIMES.txt record is missing for a post-divergence round
+
+Outcome class: BOTH_CENSORED. Incumbent first PASS: None. Fresh first PASS: None. Diverged: True.
+
+## Predicate conditions
+| condition | met |
+|---|---|
+| 1. variant valid build: the fresh builder passes the gate within its cap (2 failed rounds) | n/a |
+| 2. no later: variant active time from divergence <= baseline active time from divergence (baseline without a valid build by r6 = infinite) | n/a |
+| 3. no defect escapes: the variant's valid build passes the hidden depth check (ruling-41A depth gate, never shown to builders) | n/a |
+
+## Rounds
+| arm | round | gate | rb_exit | fixtures | classifications_equal | hidden_depth_gate | reply_min | gate_min | round_active_min | code_sha256 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| INC | 1 | FAIL | 0 | 14/14 | FALSE | not run (gate FAIL) | 3.48 | 0.59 | 4.08 | MISSING |
+| INC | 2 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 12.03 | 0.52 | 12.55 | MISSING |
+| INC | 3 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | None | 0.53 | None | MISSING |
+| INC | 4 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 9.82 | 0.53 | 10.34 | MISSING |
+| INC | 5 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 7.97 | 0.54 | 8.51 | MISSING |
+| INC | 6 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 4.87 | 0.6 | 5.47 | 197aea5662b6ca8f |
+| FRESH | 1 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 4.02 | 0.43 | 4.45 | MISSING |
+| FRESH | 2 | FAIL | 0 | 14/14 | TRUE | not run (gate FAIL) | 6.23 | 0.7 | 6.93 | MISSING |
+
+## STATE_LOG.txt
+```
+2026-10-10 14:05:57 CDT wrote C40R/C40R-INC/r2/MESSAGE.txt
+2026-10-10 14:21:36 CDT wrote C40R/packets/C40R_2_FRESH_BUILDER_ChatGPT.txt
+2026-10-10 14:21:36 CDT DIVERGED after INC r2 FAIL: variant = fresh builder (packet C40R/packets/C40R_2_FRESH_BUILDER_ChatGPT.txt, new chat); baseline = INC continues
+2026-10-10 14:21:36 CDT wrote C40R/C40R-INC/r3/MESSAGE.txt
+2026-10-10 15:13:43 CDT wrote C40R/C40R-FRESH/r2/MESSAGE.txt
+2026-10-10 15:16:58 CDT wrote C40R/C40R-INC/r4/MESSAGE.txt
+2026-10-10 15:25:12 CDT FRESH r2 FAIL -> FRESH_ESCALATED (cap reached again; escalate to the owner)
+2026-10-10 15:36:31 CDT wrote C40R/C40R-INC/r5/MESSAGE.txt
+2026-10-10 15:51:31 CDT wrote C40R/C40R-INC/r6/MESSAGE.txt
+2026-10-10 16:00:01 CDT INC r6 FAIL at the experiment stop -> INC_CENSORED (no valid build by r6)
+```
+
+
+## ROUNDS_LOG.tsv (gate validation arms and rounds)
+```
+﻿time	arm	round	validation	candidate_sha256	gate	hidden
+2026-10-10T13:49:15-05:00	REF	0	True	72ac5def1875a6f695262fa74e9be446ebc1015f27368ef2b906dcfefb381d99	gate=PASS rb_exit=0 rb_secs=25.4 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=TRUE portfolio_equal=TRUE kappa_grid_equal=TRUE	gate=PASS n_pass=14 n=14 stubs=none poison_probe=ran error=
+2026-10-10T13:49:49-05:00	SEED_NOPARENT	0	True	4a68398b7506336818243d60e100c6c0e2e59520c4bc444f48a9ad1b1ff6784e	gate=FAIL rb_exit=0 rb_secs=27.2 fixtures=13/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T13:50:24-05:00	SEED_REASONFMT	0	True	8a25f51a510a616b111b502973066b15947da45624591c36d34f942e6f927cc9	gate=FAIL rb_exit=0 rb_secs=26.4 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T13:51:01-05:00	SEED_DUPLEAK	0	True	4f1d8422f4dbe7fad83c5ad737a5bd36f4f50494dc6453f00e8761870f73ec69	gate=FAIL rb_exit=0 rb_secs=27.5 fixtures=13/14 classifications_equal=FALSE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=FALSE	not run (gate FAIL)
+2026-10-10T14:05:57-05:00	INC	1	False	5d9f31ff77d5d501317d0df0f90e2bf7c6e6080e62aebec99412ab4e3bffd5a9	gate=FAIL rb_exit=0 rb_secs=29.9 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T14:21:36-05:00	INC	2	False	1996564e070277e000ac13e05e3c3b53ffd8263d9a57f9dc66b9ccae1812b408	gate=FAIL rb_exit=0 rb_secs=27.9 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T15:13:43-05:00	FRESH	1	False	25c342a67da34dff40ff36aac636999a2cd1e2d0c30ba9feacb604efb7913052	gate=FAIL rb_exit=0 rb_secs=24.1 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T15:16:58-05:00	INC	3	False	60c92946fa8450a112d4a9065853406cc1977ec32d0f052f0954261cbba995b3	gate=FAIL rb_exit=0 rb_secs=27.4 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T15:25:12-05:00	FRESH	2	False	2dffff037f0d0f6604d85a34ec3b8ab310447a8aef96819a6b6dd6fd4579e6fb	gate=FAIL rb_exit=0 rb_secs=25.9 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T15:36:31-05:00	INC	4	False	35daca8965dd07205ab7c1afb28fa56affe90a1dada08bf0c72dda0c9436805f	gate=FAIL rb_exit=0 rb_secs=27.2 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T15:51:30-05:00	INC	5	False	957ce6dddb54a9d4e80b96ed543a42d2139c350ddacf1430637658d834bf2225	gate=FAIL rb_exit=0 rb_secs=28.1 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+2026-10-10T16:00:00-05:00	INC	6	False	197aea5662b6ca8f98c6fd6e5c49699b4c8135383b2808a9daaac4bc15b926c1	gate=FAIL rb_exit=0 rb_secs=31.8 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE	not run (gate FAIL)
+
+```
+
+### C40R-FRESH/r1/20_integrity_and_classify.R (SHA-256 25c342a67da34dff40ff36aac636999a2cd1e2d0c30ba9feacb604efb7913052; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-FRESH/r1/TIMES.txt (SHA-256 7df79eaea68b020d5f4dd059cc6cb5a0f43bfa23e87fb769a885cef391f72a33)
+```
+sent=2026-10-10 14:23:11
+reply_complete=2026-10-10 14:27:12
+# sent is the CT clock read right after clicking Send (+/-2 s). reply_complete: END line first seen 14:27:09, Stop button gone at 14:27:12. Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### C40R-FRESH/r2/20_integrity_and_classify.R (SHA-256 2dffff037f0d0f6604d85a34ec3b8ab310447a8aef96819a6b6dd6fd4579e6fb; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-FRESH/r2/MESSAGE.txt (SHA-256 b7a457882f18b1520495d9d7be3092e31ce2ee1434f99dfbb0dbd827dc56be07)
+```
+# C40R — repair round r2 (fresh builder)
+
+Your round r1 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — FRESH r1 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (24.1 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+2,222002,131968,6377,83657
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD FRESH r2
+```
+
+### C40R-FRESH/r2/TIMES.txt (SHA-256 738b5950e536da13f680454b9b25462e1b4119ef454b7877fcdb898179e7063a)
+```
+sent=2026-10-10 15:16:59
+reply_complete=2026-10-10 15:23:13
+# reply_complete is an upper bound: the reply finished between 15:22:39 (last poll without END) and 15:23:13 (first poll with END and Stop gone). Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### C40R-INC/r1/20_integrity_and_classify.R (SHA-256 5d9f31ff77d5d501317d0df0f90e2bf7c6e6080e62aebec99412ab4e3bffd5a9; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r1/TIMES.txt (SHA-256 ea48e9cc3436914172b140d95938b63657adc4e84ca893a5f1c3126c23cdc3d4)
+```
+sent=2026-10-10 13:51:56
+reply_complete=2026-10-10 13:55:25
+# reply_complete is approximate (page "Worked for 3m 29s" after send; no clock timestamp on page). Original capture with url/notes: TIMES_original_capture.txt (unedited).
+# Packet was sent as a single file attachment (62,034 B), not pasted.
+```
+
+### C40R-INC/r2/20_integrity_and_classify.R (SHA-256 1996564e070277e000ac13e05e3c3b53ffd8263d9a57f9dc66b9ccae1812b408; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r2/MESSAGE.txt (SHA-256 b0e0ac32ca60bbc06915184a4ac4b468d5c753ce386de93bdfb788331b87cfce)
+```
+# C40R — repair round r2 (incumbent builder)
+
+Your round r1 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — INC r1 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (29.9 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 222002 |
+| dormant_h | 0 |
+| open_age_h | 0 |
+| peer_n | 6315 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 6377 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR18-00191995 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192008 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192021 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192151 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.268889 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192236 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.268889 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR20-03279926 | peer_n | 0 |  |
+| SR22-00047020 | peer_n | 0 |  |
+| SR23-00037006 | peer_n | 0 |  |
+| SR23-00037009 | peer_n | 0 |  |
+| SR23-00037010 | peer_n | 0 |  |
+| SR20-03279926 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR22-00047020 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037006 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037009 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037010 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,dormant_h=480.000000 >= kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,dormant_h=24.000000 < kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,dormant_h=2400.000000 < kappa*peer_p75_h=4320.000000 (kappa=2; peer_p75_h=2160.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I02_OPEN_CLOSED,integrity=I02_OPEN_CLOSED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I06_MOD_BEFORE_CREATED,integrity=I06_MOD_BEFORE_CREATED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I14_THIN_TYPE,integrity=I14_THIN_TYPE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I11_ORPHAN_PARENT,integrity=I11_ORPHAN_PARENT,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,dormant_h=96.000000 < kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,dormant_h=192.000000 >= kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I03_CREATED_PARSE,integrity=I03_CREATED_PARSE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+2,222002,131968,6377,83657
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD INC r2
+```
+
+### C40R-INC/r2/TIMES.txt (SHA-256 b596c3928af9ba3c36cb41633f04a92142c9f91db872693d1c1b299160c1e180)
+```
+sent=2026-10-10 14:07:58
+reply_complete=2026-10-10 14:20:00
+# reply_complete is a documented UPPER BOUND: the reply finished between 14:15:50 and 14:20:00 CT (END line absent at the 14:15:50 poll, present at the 14:20:00 poll). sent is approximate (+/-3 s). Original capture: TIMES_original_capture.txt (unedited). Per spec, if the upper bound decides condition 2 it is reported as ambiguous.
+```
+
+### C40R-INC/r3/20_integrity_and_classify.R (SHA-256 60c92946fa8450a112d4a9065853406cc1977ec32d0f052f0954261cbba995b3; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r3/MESSAGE.txt (SHA-256 b7eb9d1fb195fc5f53987b8b1e17048464707908511abb0dff722b67f5f2279d)
+```
+# C40R — repair round r3 (incumbent builder)
+
+Your round r2 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — INC r2 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.9 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD INC r3
+```
+
+### C40R-INC/r3/TIMES.txt (SHA-256 dcc07a41f4af1ef238e1f7df93998ca184d3e6f1f36e1c7c506b876544b14b28)
+```
+sent=unknown
+reply_complete=unknown
+# Send and reply-complete times were not recorded (turn 3 was sent by an earlier interrupted helper). Known only: sent after 14:27:12 CT; page shows "Worked for 7m 49s". Nothing is guessed. Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### C40R-INC/r4/20_integrity_and_classify.R (SHA-256 35daca8965dd07205ab7c1afb28fa56affe90a1dada08bf0c72dda0c9436805f; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r4/MESSAGE.txt (SHA-256 cff3d741f9b6d7d170bceed163542b8fed2734f4fa5a115bf29f59153f8614ef)
+```
+# C40R — repair round r4 (incumbent builder)
+
+Your round r3 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — INC r3 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,X_duplicate,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,X_legacy_record,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,X_not_open,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD INC r4
+```
+
+### C40R-INC/r4/TIMES.txt (SHA-256 362d3d9db97a430bd15f6176748d775e18bfe8923c0979e1881a5f34cfc06dd4)
+```
+sent=2026-10-10 15:24:51
+reply_complete=2026-10-10 15:34:40
+# reply_complete: last poll without END ~15:34:07; first poll with END ~15:34:38 (Stop still present); Stop gone ~15:34:40. Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### C40R-INC/r5/20_integrity_and_classify.R (SHA-256 957ce6dddb54a9d4e80b96ed543a42d2139c350ddacf1430637658d834bf2225; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r5/MESSAGE.txt (SHA-256 44f934e98b4847395a57974f7c4919279d006201e2b28f9a8a8ce10b840ecec5)
+```
+# C40R — repair round r5 (incumbent builder)
+
+Your round r4 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — INC r4 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.2 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD INC r5
+```
+
+### C40R-INC/r5/TIMES.txt (SHA-256 64c7c2d1f68774730fcd9b2d67c3e874cf510b31feceb942e7b9d56e3a84b364)
+```
+sent=2026-10-10 15:37:55
+reply_complete=2026-10-10 15:45:53
+# reply_complete: last poll without END 15:45:10 (Stop present); first poll with END and Stop gone 15:45:53. Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### C40R-INC/r6/20_integrity_and_classify.R (SHA-256 197aea5662b6ca8f98c6fd6e5c49699b4c8135383b2808a9daaac4bc15b926c1; code not reproduced; ChatGPT builder output, hash only)
+
+### C40R-INC/r6/MESSAGE.txt (SHA-256 8d42efca8c71d5143d68ff5f2741f0024d829979db759024c2b1b8442ece08b8)
+```
+# C40R — repair round r6 (incumbent builder)
+
+Your round r5 file `R-B/R/20_integrity_and_classify.R` was deployed on the frozen R-B path and FAILED the gate. The gate report follows.
+
+# C40R gate report — INC r5 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (28.1 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+
+Fix the file. Return the COMPLETE corrected `R-B/R/20_integrity_and_classify.R` in ONE fenced ```r code block (no other code blocks), then at most 10 lines saying what you changed.
+Do not change any other file; the gate deploys only this file. Reply in full, in one message. End your reply with exactly this line:
+END C40R BUILD INC r6
+```
+
+### C40R-INC/r6/TIMES.txt (SHA-256 531691d2ad06292493a5d2bd39f26a0335072e215f9e9ef322fecb19aae49e63)
+```
+sent=2026-10-10 15:52:39
+reply_complete=2026-10-10 15:57:31
+# reply_complete: last poll without END 15:56:46 (Stop present); first poll with END and Stop gone 15:57:28. Original capture: TIMES_original_capture.txt (unedited).
+```
+
+### arms/FRESH_r1/GATE_REPORT.md (SHA-256 3dbefd6f578b72c26b6dc6467dc4c6802dbbc58716b7c4dcc9f5508f32ca3168)
+```
+# C40R gate report — FRESH r1 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (24.1 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+2,222002,131968,6377,83657
+```
+```
+
+### arms/FRESH_r1/GATE_RESULT.txt (SHA-256 753660a84997c4f9ce0527838647c5fba946a51855346e84a03354674eed8b40)
+```
+gate=FAIL rb_exit=0 rb_secs=24.1 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=TRUE
+```
+
+### arms/FRESH_r2/GATE_REPORT.md (SHA-256 bde536eddbd5fa41542c6cdb5ea7d0cfd838866aa4c5dd720e548712067687d5)
+```
+# C40R gate report — FRESH r2 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (25.9 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/FRESH_r2/GATE_RESULT.txt (SHA-256 9ae600dbe99501bd88820500340253323afd42b049a81bee6a9fdecbf7de7656)
+```
+gate=FAIL rb_exit=0 rb_secs=25.9 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r1/GATE_REPORT.md (SHA-256 e51f794ce3bdddad02280e39ea3b2800881eb6664afb4c65a6b80ec3a4b50f83)
+```
+# C40R gate report — INC r1 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (29.9 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | NO |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | NO |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_classifications.csv: reference 222002 rows, 13 columns; yours 222002 rows, 13 columns.
+SR_NUMBER only in reference: 0; only in yours: 0.
+
+| column | rows that differ (matched SR_NUMBER) |
+|---|---|
+| type_key | 0 |
+| classification | 0 |
+| evidence_reason | 222002 |
+| dormant_h | 0 |
+| open_age_h | 0 |
+| peer_n | 6315 |
+| peer_p75_h | 0 |
+| peer_p50_h | 0 |
+| kappa | 0 |
+| integrity_clause | 6377 |
+| rule_version | 0 |
+| design_version | 0 |
+
+First differing rows (up to 5 per column):
+
+| SR_NUMBER | column | reference | yours |
+|---|---|---|---|
+| SR18-00191995 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192008 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192021 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2694, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.269444 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192151 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.268889 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR18-00192236 | evidence_reason | E_dormant_ge_kappa_p75 (dormant_h=57677.2689, kappa=2.00, peer_p75_h=2250.0000) | dormant_h=57677.268889 >= kappa*peer_p75_h=4500.000000 (kappa=2; peer_p75_h=2250.000000) |
+| SR20-03279926 | peer_n | 0 |  |
+| SR22-00047020 | peer_n | 0 |  |
+| SR23-00037006 | peer_n | 0 |  |
+| SR23-00037009 | peer_n | 0 |  |
+| SR23-00037010 | peer_n | 0 |  |
+| SR20-03279926 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR22-00047020 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037006 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037009 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+| SR23-00037010 | integrity_clause | I04_thin_peer_n | I13_PEER_MISSING |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,dormant_h=480.000000 >= kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,dormant_h=24.000000 < kappa*peer_p75_h=336.000000 (kappa=2; peer_p75_h=168.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,dormant_h=2400.000000 < kappa*peer_p75_h=4320.000000 (kappa=2; peer_p75_h=2160.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I02_OPEN_CLOSED,integrity=I02_OPEN_CLOSED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I06_MOD_BEFORE_CREATED,integrity=I06_MOD_BEFORE_CREATED,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I14_THIN_TYPE,integrity=I14_THIN_TYPE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I11_ORPHAN_PARENT,integrity=I11_ORPHAN_PARENT,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,dormant_h=96.000000 < kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,dormant_h=192.000000 >= kappa*peer_p75_h=144.000000 (kappa=2; peer_p75_h=72.000000),TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I03_CREATED_PARSE,integrity=I03_CREATED_PARSE,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+
+RB_portfolio_counts.csv (yours):
+```
+kappa,n_decision,n_ESCALATE,n_INCONCLUSIVE,n_STANDARD
+2,222002,131968,6377,83657
+```
+```
+
+### arms/INC_r1/GATE_RESULT.txt (SHA-256 152065ce1e2ac931feb6a57348efce32a12cb402366104a90a4fb4c10372b170)
+```
+gate=FAIL rb_exit=0 rb_secs=29.9 fixtures=14/14 classifications_equal=FALSE fixture_results_equal=FALSE portfolio_equal=FALSE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r2/GATE_REPORT.md (SHA-256 3a03a5f74e32df503ce2583e7b5abdb25d693810c77374919c9002e6922384cd)
+```
+# C40R gate report — INC r2 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.9 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/INC_r2/GATE_RESULT.txt (SHA-256 f6b6eb193a278f7c8952b586d172b3ce5a0856ece050127a3a183b54d68fd9b9)
+```
+gate=FAIL rb_exit=0 rb_secs=27.9 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r3/GATE_REPORT.md (SHA-256 e7995be7953a0eefc35ed34ea84bb2ef14797b2c011ea770711e406792ab882c)
+```
+# C40R gate report — INC r3 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.4 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,X_duplicate,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,X_legacy_record,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,X_not_open,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/INC_r3/GATE_RESULT.txt (SHA-256 bf84aad66a1f097660e48978ec94fdb07c65b5615faadd419e4499f935c3518a)
+```
+gate=FAIL rb_exit=0 rb_secs=27.4 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r4/GATE_REPORT.md (SHA-256 ebdf97e6cb38e24f636f5f638ecf6b7a3510019ae1e393df5941b9bda2d8a648)
+```
+# C40R gate report — INC r4 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (27.2 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/INC_r4/GATE_RESULT.txt (SHA-256 aa86e4867a849139c430758f53d58c0ef159d650b86def788538dba497037ce9)
+```
+gate=FAIL rb_exit=0 rb_secs=27.2 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r5/GATE_REPORT.md (SHA-256 7fda4098ebb4401f411a643163690a2be40efa6bc02f62d5771a141b03fb3572)
+```
+# C40R gate report — INC r5 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (28.1 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/INC_r5/GATE_RESULT.txt (SHA-256 6bf83fae6c9d6f9268afacb8dee532c5c49ed308115904ebb3f3838f35d45022)
+```
+gate=FAIL rb_exit=0 rb_secs=28.1 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+
+### arms/INC_r6/GATE_REPORT.md (SHA-256 0e3c03c35cbce4b6d0872d353a69421743c53bdb5e14149740f6bc1b78c28bb0)
+```
+# C40R gate report — INC r6 — FAILED
+
+- Production run `Rscript R-B/run_RB.R all`: exit 0 (31.8 s).
+- Fixtures: 14/14 pass.
+
+| output | byte-identical to frozen reference |
+|---|---|
+| RB_classifications.csv | YES |
+| RB_fixture_results.csv | NO |
+| RB_portfolio_counts.csv | YES |
+| RB_kappa_grid_counts.csv | YES |
+
+RB_fixture_results.csv (yours):
+```
+SR_NUMBER,fixture_id,expected_classification,observed_classification,dormant_h,peer_p75_h,peer_n,integrity_clause,evidence_reason,pass,kappa,fixture_version
+SYN-F01,F01,ESCALATE,ESCALATE,480,168,500,,"E_dormant_ge_kappa_p75 (dormant_h=480.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F02,F02,STANDARD,STANDARD,24,168,500,,"S_dormant_lt_kappa_p75 (dormant_h=24.0000, kappa=2.00, peer_p75_h=168.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F03,F03,STANDARD,STANDARD,2400,2160,200,,"S_dormant_lt_kappa_p75 (dormant_h=2400.0000, kappa=2.00, peer_p75_h=2160.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F04,F04,INCONCLUSIVE,INCONCLUSIVE,240,168,500,I01_open_closed_date,I01_open_closed_date,TRUE,2,fixtures-v1-tcd-ig
+SYN-F05,F05,INCONCLUSIVE,INCONCLUSIVE,480,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F06,F06,INCONCLUSIVE,INCONCLUSIVE,720,96,8,I04_thin_peer_n,I04_thin_peer_n,TRUE,2,fixtures-v1-tcd-ig
+SYN-F07,F07,OUT_OF_SET,OUT_OF_SET,9600,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F08,F08,OUT_OF_SET,OUT_OF_SET,480,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F09,F09,INCONCLUSIVE,INCONCLUSIVE,360,168,500,I05_unresolved_parent,I05_unresolved_parent,TRUE,2,fixtures-v1-tcd-ig
+SYN-F10,F10,STANDARD,STANDARD,96,72,120,,"S_dormant_lt_kappa_p75 (dormant_h=96.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F11,F11,ESCALATE,ESCALATE,192,72,120,,"E_dormant_ge_kappa_p75 (dormant_h=192.0000, kappa=2.00, peer_p75_h=72.0000)",TRUE,2,fixtures-v1-tcd-ig
+SYN-F12,F12,OUT_OF_SET,OUT_OF_SET,120,168,500,,,TRUE,2,fixtures-v1-tcd-ig
+SYN-F13,F13,INCONCLUSIVE,INCONCLUSIVE,120,168,500,I02_bad_clock,I02_bad_clock,TRUE,2,fixtures-v1-tcd-ig
+SYN-F14A|SYN-F14B,F14,STANDARD|STANDARD,STANDARD|STANDARD,,,,,grain=SR_NUMBER two independent labels,TRUE,2,fixtures-v1-tcd-ig
+```
+```
+
+### arms/INC_r6/GATE_RESULT.txt (SHA-256 f5308c141d920b316c3237bf23bdd52253ec08b99b159c0306242cf965ddab16)
+```
+gate=FAIL rb_exit=0 rb_secs=31.8 fixtures=14/14 classifications_equal=TRUE fixture_results_equal=FALSE portfolio_equal=TRUE kappa_grid_equal=TRUE
+```
+

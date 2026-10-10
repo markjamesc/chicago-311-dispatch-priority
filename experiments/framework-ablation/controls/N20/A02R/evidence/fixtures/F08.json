@@ -1,0 +1,26 @@
+{
+  "fixture_id": "F08",
+  "intent": "clean duplicate-child excluded",
+  "T_freeze": "2026-09-12T23:59:59-05:00",
+  "open_age_days_threshold": 14,
+  "source_row": {
+    "SR_NUMBER": "SYN-F08",
+    "SR_TYPE": "Abandoned Vehicle Complaint",
+    "STATUS": "Open",
+    "CREATED_DATE": "2026-08-01 10:00:00",
+    "CLOSED_DATE": "",
+    "DUPLICATE": "true",
+    "PARENT_SR_NUMBER": "SYN-PARENT-1",
+    "LEGACY_RECORD": "false",
+    "LEGACY_SR_NUMBER": "",
+    "WARD": "4",
+    "COMMUNITY_AREA": "33"
+  },
+  "expected": {
+    "is_open": true,
+    "is_eligible": false,
+    "exclusion_reason": "duplicate_child",
+    "action": null,
+    "selected": false
+  }
+}

@@ -1,0 +1,4 @@
+# C40R INC r3 capture record
+- reply.md = byte copy of reply_box_copybutton.md (sha256 a430b0b3b72666166c2d8d9e5646ab46749681f72da3ff98fc191392e711a52a); bare fences accepted by the extractor. reply_box.md unedited.
+- TIMES: sent and reply_complete are UNKNOWN and recorded as such; no time was estimated. Known bounds: sent after 14:27:12 CT; page indicator "Worked for 7m 49s" (ChatGPT work time only; the C40 notes show this indicator can disagree with wall time).
+- What the frozen spec says: see the 'Time' bullet and P1/HALT rules in ABLATION_SPEC_C40R.md, quoted in the run report. c40r_eval.py parses sent=/reply_complete= as YYYY-mm-dd HH:MM:SS; "unknown" yields no minutes for r3 and the evaluator adds the HALT reason "a TIMES.txt record is missing for a post-divergence round". Unchanged; not decided here.
