@@ -45,4 +45,4 @@ C49R	N17	Individual-file evidence delivery + SHA256SUMS.txt + inventory		KEEP		c
 C24V2	N18	Mechanical vs judged population (SQL envelope vs R)		NONE_RECORDED	attempt, no terminal state; superseded by N19 C24V3 (REVERT)	controls/N18/C24V2/
 C24V3	N19	Mechanical vs judged population (SQL envelope vs R)	P1 NOT MET	REVERT		controls/N19/C24V3/
 A02R	N20	Known-case Fixture Gate before builders (re-run of A02)		REVERT		controls/N20/A02R/
-C40R	N21	Repair-round cap (re-run of C40)	HALT (BOTH_CENSORED; no Builder/Validator/Adjudicator chats run per spec; existing rule stays)	HALT		controls/N21/C40R/
+C40R	N21	Repair-round cap (re-run of C40)	HALT (BOTH_CENSORED; no Builder/Validator/Adjudicator chats run per spec; existing rule stays)	HALT	Status source: scorer report post/C40R_POST_RESULTS.md, not a TERMINAL_STATE.txt. HALT reason: missing INC round-3 timing record (unrecoverable, unknown). Inconclusive; no demonstrated advantage for either repair strategy; existing rule stays. See C40R_STATUS_NOTE.md	controls/N21/C40R/

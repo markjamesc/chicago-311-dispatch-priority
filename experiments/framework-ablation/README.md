@@ -1,6 +1,6 @@
 # Chicago 311 framework ablation evidence pack (A01-A08 reference plus numbered controls C01-C54)
 
-Evidence published as it exists. Nothing was reconstructed, re-adjudicated or edited for this publication; no verdict here was assigned by the publisher. Each terminal state is the state recorded in the control's own `TERMINAL_STATE.txt`.
+Evidence published as it exists. Nothing was reconstructed, re-adjudicated or edited for this publication; no verdict here was assigned by the publisher. Each terminal state is the state recorded in the control's own `TERMINAL_STATE.txt`. **Exception: C40R (#40).** It has no `TERMINAL_STATE.txt`; its HALT comes from the scorer report `controls/N21/C40R/post/C40R_POST_RESULTS.md`. The HALT reason is a missing INC round-3 timing record (unrecoverable, recorded as unknown). The outcome is BOTH_CENSORED: neither builder produced a valid build within its limit. The result is inconclusive, shows no advantage for either repair strategy, and the existing rule stays by default. See `controls/N21/C40R/C40R_STATUS_NOTE.md`.
 
 ## What is here
 - `controls/<batch>/<control>/`: for each control, its frozen spec (`ABLATION_SPEC*.md`), baseline and constitution hashes, `EVIDENCE_FREEZE.json`, packets sent to the Builder, Validator and Adjudicator, their saved replies and reports, the mechanical evidence (`evidence/`, arms, scorers, seeds, SQL/R run logs where they exist), and `TERMINAL_STATE.txt`.
